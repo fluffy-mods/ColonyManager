@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+  <!-- Main Manager Tab -->
+  <FM.Manager>Manager</FM.Manager>
+  <FM.Details>Details</FM.Details>
+  <FM.Manage>Manage!</FM.Manage>
+  <FM.Delete>Delete</FM.Delete>
+
+  <!-- Production Tab -->
+  <!-- Miscelaneous -->
+  <FMP.ManageBillTooltip>Assign this bill to be managed by your manager(s).</FMP.ManageBillTooltip>
+  <FMP.DeleteBillTooltip>Stop managing this bill, and clean up outstanding bills</FMP.DeleteBillTooltip>
+  <FMP.Production>Production</FMP.Production>
+  <FMP.FilterDesc>Type a few letters to filter the list</FMP.FilterDesc>
+  <FMP.ClearFilterDesc>Clear the current filter</FMP.ClearFilterDesc>
+  <FMP.MainProduct>Main product: {0} ({1})</FMP.MainProduct>
+  <FMP.NoThreshold>No threshold</FMP.NoThreshold>
+  <FMP.NoThresholdTooltip>No threshold set</FMP.NoThresholdTooltip>
+
+  <!-- Thresholds -->
+  <FMP.Threshold>Threshold</FMP.Threshold>
+  <FMP.ThresholdCount>Current: {0}, target: {1}</FMP.ThresholdCount>
+  <FMP.ThresholdDetails>Theshold details</FMP.ThresholdDetails>
+
+  <!-- BillGivers -->
+  <FMP.BillGivers>Workstations</FMP.BillGivers>
+  <FMP.BillGiversCount>{0} available, {1} selected</FMP.BillGiversCount>
+  <FMP.BillGiversTooltip>Available:\n{0}\n\nSelected:{1}</FMP.BillGiversTooltip>
+  <FMP.BillGiversDetails>Select workstations</FMP.BillGiversDetails>
+
+  <!-- Tab headers -->
+  <FMP.All>All</FMP.All>
+  <FMP.Current>Current</FMP.Current>
+  <FMP.Available>Available</FMP.Available>
+
+</LanguageData>
