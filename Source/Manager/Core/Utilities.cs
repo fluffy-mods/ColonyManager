@@ -1,47 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-
-using Verse;
+﻿using System.Linq;
 using RimWorld;
+using Verse;
 
 namespace FM
 {
     public static class Utilities
     {
-        /// <summary>
-        /// Cast an arbitrary object into another, preserving values of common members.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="myobj"></param>
-        /// <returns></returns>
-        public static T Cast<T>(this Object myobj)
-        {
-            Type objectType = myobj.GetType();
-            Type target = typeof(T);
-            var x = Activator.CreateInstance(target, false);
-            var z = from source in objectType.GetMembers().ToList()
-                    where source.MemberType == MemberTypes.Property
-                    select source;
-            var d = from source in target.GetMembers().ToList()
-                    where source.MemberType == MemberTypes.Property
-                    select source;
-            List<MemberInfo> members = d.Where(memberInfo => d.Select(c => c.Name)
-               .ToList().Contains(memberInfo.Name)).ToList();
-            PropertyInfo propertyInfo;
-            object value;
-            foreach (var memberInfo in members)
-            {
-                propertyInfo = typeof(T).GetProperty(memberInfo.Name);
-                value = myobj.GetType().GetProperty(memberInfo.Name).GetValue(myobj, null);
-
-                propertyInfo.SetValue(x, value, null);
-            }
-            return (T)x;
-        }
-
         /// <summary>
         /// Returns current count of ThingDef thing, as used by core bill screens. (Bill_Production).
         /// </summary>
@@ -53,29 +17,26 @@ namespace FM
             return thing.stackCount;
         }
 
-        private static int cachedCount;
+        private static int _cachedCount;
 
-        private static ThingFilter cachedFilter;
+        private static ThingFilter _cachedFilter;
 
-        private static int lastCache;
+        private static int _lastCache;
 
-        private static bool TryGetCached(ThingFilter category, out int count)
+        private static bool TryGetCached(ThingFilter filter, out int count)
         {
-            if (lastCache < Find.TickManager.TicksGame + 250)
+            if (_lastCache < Find.TickManager.TicksGame + 250 && _cachedFilter == filter)
             {
                 count = 0;
                 return false;
             }
-            else
-            {
-                count = cachedCount;
-                return true;
-            }
+            count = _cachedCount;
+            return true;
         }
 
         public static int CountProducts(ThingFilter filter)
         {
-            int count = 0;
+            int count;
 
             if (TryGetCached(filter, out count)) return count;
 
@@ -90,9 +51,9 @@ namespace FM
                 
                 count += CountProducts(thing);
             }
-            cachedFilter = filter;
-            lastCache = Find.TickManager.TicksGame;
-            cachedCount = count;
+            _cachedFilter = filter;
+            _lastCache = Find.TickManager.TicksGame;
+            _cachedCount = count;
             return count;
         }
 

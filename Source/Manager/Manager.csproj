@@ -46,25 +46,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Building\CompProperties_ManagerStation.cs" />
-    <Compile Include="Building\Comp_ManagerStation.cs" />
+    <Compile Include="Building\CompPropertiesManagerStation.cs" />
+    <Compile Include="Building\CompManagerStation.cs" />
     <Compile Include="Core\Trigger.cs" />
-    <Compile Include="Core\Trigger_Threshold.cs" />
+    <Compile Include="Core\TriggerThreshold.cs" />
     <Compile Include="Core\UI\IManagerTab.cs" />
     <Compile Include="Core\Manager.cs" />
-    <Compile Include="Core\Manager_Controller.cs" />
-    <Compile Include="Core\Manager_Job.cs" />
-    <Compile Include="Core\UI\UIThingFilter_Searchable.cs" />
-    <Compile Include="Core\UI\Window_TriggerThresholdDetails.cs" />
+    <Compile Include="Core\ManagerController.cs" />
+    <Compile Include="Core\ManagerJob.cs" />
+    <Compile Include="Core\UI\UIThingFilterSearchable.cs" />
+    <Compile Include="Core\UI\WindowTriggerThresholdDetails.cs" />
     <Compile Include="Core\Utilities.cs" />
-    <Compile Include="Core\UI\MainTabWindow_Manager.cs" />
+    <Compile Include="Core\UI\MainTabWindowManager.cs" />
     <Compile Include="Core\UI\ManagerTab.cs" />
-    <Compile Include="Production\BillGiver_Tracker.cs" />
-    <Compile Include="Production\MainProduct_Tracker.cs" />
-    <Compile Include="Production\ManagerJob_Production.cs" />
-    <Compile Include="Production\ManagerTab_Production.cs" />
-    <Compile Include="Production\UI\Window_BillGiverDetails.cs" />
-    <Compile Include="Production\Utilities_Production.cs" />
+    <Compile Include="Production\BillGiverTracker.cs" />
+    <Compile Include="Production\MainProductTracker.cs" />
+    <Compile Include="Production\ManagerJobProduction.cs" />
+    <Compile Include="Production\ManagerTabProduction.cs" />
+    <Compile Include="Production\UI\WindowBillGiverDetails.cs" />
+    <Compile Include="Production\UtilitiesProduction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

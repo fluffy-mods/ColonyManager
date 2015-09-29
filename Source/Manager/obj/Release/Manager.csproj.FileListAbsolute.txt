@@ -2,3 +2,4 @@ C:\Users\Karel\Desktop\RimWorld914Win\Mods\Manager\Source\Manager\bin\Release\Ma
 C:\Users\Karel\Desktop\RimWorld914Win\Mods\Manager\Source\Manager\bin\Release\Manager.pdb
 C:\Users\Karel\Desktop\RimWorld914Win\Mods\Manager\Source\Manager\obj\Release\Manager.dll
 C:\Users\Karel\Desktop\RimWorld914Win\Mods\Manager\Source\Manager\obj\Release\Manager.pdb
+C:\Users\Karel\Desktop\RimWorld914Win\Mods\Manager\Source\Manager\obj\Release\Manager.csprojResolveAssemblyReference.cache

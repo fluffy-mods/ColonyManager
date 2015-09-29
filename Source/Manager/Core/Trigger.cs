@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using UnityEngine;
-using RimWorld;
-using Verse;
+﻿using Verse;
 
 namespace FM
 {
     public abstract class Trigger
     {
-        public abstract bool state
+        public abstract bool State
         {
             get;
         }

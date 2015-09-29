@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
 using RimWorld;
-using Verse;
 using UnityEngine;
-using Verse.AI;
-using Verse.Sound;
+using Verse;
 
 namespace FM
 {
-    public static class Utilities_Production
+    public static class UtilitiesProduction
     {
         /// <summary>
         /// Get the thingdefs for everything that can potentially be a billgiver for rd.
@@ -19,7 +15,7 @@ namespace FM
         /// <param name="rd"></param>
         /// <param name="includeNonBuilding"></param>
         /// <returns></returns>
-        public static List<ThingDef> getRecipeUsers(this RecipeDef rd, bool includeNonBuilding = false)
+        public static List<ThingDef> GetRecipeUsers(this RecipeDef rd, bool includeNonBuilding = false)
         {
             List<ThingDef> recipeUsers = new List<ThingDef>();
             // probably redundant starting point, get recipeusers as defined in the recipe.
@@ -27,7 +23,7 @@ namespace FM
 
             // fetch thingdefs which have recipes, and the recipes include ours.
             recipeUsers.AddRange(DefDatabase<ThingDef>.AllDefsListForReading.Where(t => t.recipes != null && t.recipes.Contains(rd)).ToList());
-            if (!includeNonBuilding) recipeUsers.Where(t => t.category == ThingCategory.Building);
+            if (!includeNonBuilding) recipeUsers = recipeUsers.Where(t => t.category == ThingCategory.Building).ToList();
             return recipeUsers.Distinct().ToList();
         }
 
@@ -36,14 +32,14 @@ namespace FM
         /// </summary>
         /// <param name="rd"></param>
         /// <returns></returns>
-        public static List<Building_WorkTable> getCurrentRecipeUsers(this RecipeDef rd)
+        public static List<Building_WorkTable> GetCurrentRecipeUsers(this RecipeDef rd)
         {
-            List<ThingDef> recipeUsers = rd.getRecipeUsers();
+            List<ThingDef> recipeUsers = rd.GetRecipeUsers();
             List<Building_WorkTable> currentRecipeUsers = new List<Building_WorkTable>();
 
-            for (int i = 0; i < recipeUsers.Count; i++)
+            foreach (ThingDef td in recipeUsers)
             {
-                currentRecipeUsers.AddRange(Find.ListerBuildings.AllBuildingsColonistOfDef(recipeUsers[i]).Select(b => b as Building_WorkTable));
+                currentRecipeUsers.AddRange(Find.ListerBuildings.AllBuildingsColonistOfDef(td).Select(b => b as Building_WorkTable));
             }
 
             return currentRecipeUsers;
@@ -57,29 +53,26 @@ namespace FM
         /// <returns></returns>
         public static bool HasBuildingRecipeUser(this RecipeDef rd, bool built = false)
         {
-            List<ThingDef> recipeUsers = getRecipeUsers(rd);
+            List<ThingDef> recipeUsers = GetRecipeUsers(rd);
             return recipeUsers.Any(t => (t.category == ThingCategory.Building) && (!built || Find.ListerThings.ThingsInGroup(ThingRequestGroup.PotentialBillGiver).Select(thing => thing.def).Contains(t)));
         }
-        
+
         /// <summary>
         /// Amount per worker to satsify the bill.
         /// </summary>
-        /// <param name="bill"></param>
+        /// <param name="job"></param>
         /// <param name="i"></param>
         /// <returns></returns>
-        public static int CountPerWorker(this ManagerJob_Production job, int i)
+        public static int CountPerWorker(this ManagerJobProduction job, int i)
         {
-            int n = job.billGivers.CurBillGiverCount;
-            int diff = Mathf.CeilToInt(Math.Abs(job.trigger.count - Utilities.CountProducts(job.trigger.thresholdFilter) / job.mainProduct.Count));
+            int n = job.BillGivers.CurBillGiverCount;
+            int diff = Mathf.CeilToInt(Math.Abs(job.Trigger.Count - Utilities.CountProducts(job.Trigger.ThresholdFilter) / job.MainProduct.Count));
             float naive = diff / n;
             if (diff % n > i)
             {
                 return (int) Math.Ceiling(naive);
             }
-            else
-            {
-                return (int)Math.Floor(naive);
-            }
+            return (int)Math.Floor(naive);
         }
 
         /// <summary>
@@ -90,14 +83,7 @@ namespace FM
         public static Bill_Production Copy(this Bill_Production bill)
         {
             Bill_Production copy;
-            if (bill as Bill_ProductionWithUft != null)
-            {
-                copy = new Bill_ProductionWithUft(bill.recipe);
-            }
-            else
-            {
-                copy = new Bill_Production(bill.recipe);
-            }
+            copy = bill is Bill_ProductionWithUft ? new Bill_ProductionWithUft(bill.recipe) : new Bill_Production(bill.recipe);
 
             // copy relevant attributes, others are set by manager when assigning
             // uft specific things are irrelevant here, and set by core

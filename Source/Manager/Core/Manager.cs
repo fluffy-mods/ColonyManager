@@ -1,30 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
 using Verse;
-using RimWorld;
-using UnityEngine;
 
 namespace FM
 {
     public static class Manager
     {
         public static ManagerTab[] ManagerTabs =  {
-            new ManagerTab_Production()
+            new ManagerTabProduction()
         };
 
-        private static JobStack stack = null;
+        private static JobStack _stack;
 
-        public static JobStack JobStack
-        {
-            get
-            {
-                if (stack == null) stack = new JobStack();
-                return stack;
-            }
-        }
+        public static JobStack JobStack => _stack ?? (_stack = new JobStack());
 
         public static void DoWork()
         {
@@ -37,7 +25,7 @@ namespace FM
     {
         public JobStack()
         {
-            this.stack = new List<ManagerJob>();
+            stack = new List<ManagerJob>();
         }
 
         private List<ManagerJob> stack;
@@ -46,7 +34,7 @@ namespace FM
         {
             get
             {
-                return stack.OrderBy(mj => mj.priority).ToList();
+                return stack.OrderBy(mj => mj.Priority).ToList();
             }
         } 
 
@@ -54,17 +42,11 @@ namespace FM
         {
             get
             {
-                return stack.Where(mj => mj.ShouldDoNow).OrderBy(mj => mj.priority).ToList();
+                return stack.Where(mj => mj.ShouldDoNow).OrderBy(mj => mj.Priority).ToList();
             }
         }
 
-        public ManagerJob NextJob
-        {
-            get
-            {
-                return CurStack.DefaultIfEmpty(null).FirstOrDefault();
-            }
-        }
+        public ManagerJob NextJob => CurStack.DefaultIfEmpty(null).FirstOrDefault();
 
         public void TryDoNextJob()
         {
@@ -83,7 +65,7 @@ namespace FM
         
         public void Add(ManagerJob job)
         {
-            job.priority = stack.Count + 1;
+            job.Priority = stack.Count + 1;
             stack.Add(job);
         }
 

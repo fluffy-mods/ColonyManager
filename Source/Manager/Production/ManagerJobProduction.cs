@@ -1,43 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Verse;
+﻿using System.Collections.Generic;
 using RimWorld;
-
+using Verse;
 
 namespace FM
 {
-    public class ManagerJob_Production : ManagerJob, IManagerJob
+    public class ManagerJobProduction : ManagerJob
     {
-        public ManagerJob_Production(RecipeDef recipe)
+        public ManagerJobProduction(RecipeDef recipe)
         {
-            if (recipe.UsesUnfinishedThing) bill = new Bill_ProductionWithUft(recipe);
-            else bill = new Bill_Production(recipe);
-            mainProduct = new MainProduct_Tracker(bill.recipe);
-            trigger = new Trigger_Threshold(this);
-            billGivers = new BillGiver_Tracker(bill.recipe);
+            Bill = recipe.UsesUnfinishedThing ? new Bill_ProductionWithUft(recipe) : new Bill_Production(recipe);
+            MainProduct = new MainProductTracker(Bill.recipe);
+            Trigger = new TriggerThreshold(this);
+            BillGivers = new BillGiverTracker(Bill.recipe);
         }
 
-        public BillGiver_Tracker billGivers;
+        public BillGiverTracker BillGivers;
 
-        public MainProduct_Tracker mainProduct;
+        public MainProductTracker MainProduct;
 
-        public Bill_Production bill;
+        public Bill_Production Bill;
 
-        public new Trigger_Threshold trigger;
+        public new TriggerThreshold Trigger;
 
-        public override bool active
+        public override bool Active
         {
             get
             {
-                return !bill.suspended;
+                return !Bill.suspended;
             }
 
             set
             {
-                bill.suspended = !value;
+                Bill.suspended = !value;
             }
         }
 
@@ -51,14 +45,14 @@ namespace FM
             // flag to see if anything had to be done.
             bool actionTaken = false;
 
-            if (trigger.state)
+            if (Trigger.State)
             {
 #if DEBUG
                 Log.Message("Checking workers for presence of bills");
 #endif
-                List<Building_WorkTable> workers = billGivers.GetAssignedBillGivers;
+                List<Building_WorkTable> workers = BillGivers.GetAssignedBillGivers;
 
-                // If trigger met, check if there's places we need to add the bill.
+                // If Trigger met, check if there's places we need to add the bill.
                 for (int workerIndex = 0; workerIndex < workers.Count; workerIndex++)
                 {
                     Building_WorkTable worker = workers[workerIndex];
@@ -68,11 +62,11 @@ namespace FM
                     bool billPresent = false;
                     if (worker.BillStack != null && worker.BillStack.Count > 0)
                     {
-                        for (int i = 0; i < worker.BillStack.Count; i++)
+                        foreach (Bill t in worker.BillStack)
                         {
-                            // TODO: the check for manager bills was removed with the removal from managed_bill class, we will now touch manually assigned jobs, this may not be desired.
-                            Bill_Production thatBill = worker.BillStack[i] as Bill_Production;
-                            if (thatBill != null && thatBill.recipe == bill.recipe)
+// TODO: the check for manager bills was removed with the removal from managed_bill class, we will now touch manually assigned jobs, this may not be desired.
+                            Bill_Production thatBill = t as Bill_Production;
+                            if (thatBill != null && thatBill.recipe == Bill.recipe)
                             {
                                 billPresent = true;
                                 if (thatBill.suspended || thatBill.repeatCount == 0)
@@ -81,7 +75,7 @@ namespace FM
                                     Log.Message("Trying to unsuspend and/or bump targetCount");
 #endif
                                     thatBill.suspended = false;
-                                    thatBill.repeatCount = Utilities_Production.CountPerWorker(this, workerIndex);
+                                    thatBill.repeatCount = this.CountPerWorker(workerIndex);
                                     actionTaken = true;
                                 }
                             }
@@ -95,10 +89,10 @@ namespace FM
 #if DEBUG
                         Log.Message("Trying to add bill");
 #endif
-                        Bill_Production copy = bill.Copy();
+                        Bill_Production copy = Bill.Copy();
                         copy.repeatMode = BillRepeatMode.RepeatCount;
-                        copy.repeatCount = Utilities_Production.CountPerWorker(this, workerIndex);
-                        worker.BillStack.AddBill(copy);
+                        copy.repeatCount = this.CountPerWorker(workerIndex);
+                        worker.BillStack?.AddBill(copy);
                         actionTaken = true;
                     }
                 }
@@ -116,7 +110,7 @@ namespace FM
 #if DEBUG
             Log.Message("Cleaning up obsolete bills");
 #endif
-            foreach (Building_WorkTable worker in billGivers.GetAssignedBillGivers)
+            foreach (Building_WorkTable worker in BillGivers.GetAssignedBillGivers)
             {
 #if DEBUG
                 Log.Message("Checking worker " + worker.LabelCap);
@@ -127,7 +121,7 @@ namespace FM
                     {
                         // TODO: Again, check was removed.
                         Bill_Production thatBill = worker.BillStack[i] as Bill_Production;
-                        if (thatBill != null && thatBill.recipe == this.bill.recipe)
+                        if (thatBill != null && thatBill.recipe == Bill.recipe)
                         {
 #if DEBUG
                             Log.Message("Trying to delete obsolete bill");
@@ -142,7 +136,7 @@ namespace FM
         public override string ToString()
         {
             string strout = base.ToString();
-            strout += "\n" + bill.ToString();
+            strout += "\n" + Bill;
             return strout;
         }
     }

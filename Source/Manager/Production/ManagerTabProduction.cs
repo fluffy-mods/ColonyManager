@@ -6,79 +6,69 @@ using System.Text;
 using RimWorld;
 using Verse;
 using UnityEngine;
-using Verse.AI;
 using Verse.Sound;
 
 namespace FM
 {
-    public class ManagerTab_Production : ManagerTab
+    public class ManagerTabProduction : ManagerTab
     {
-        private string label = "FMP.Production".Translate();
-
-        public ManagerTab_Production()
+        public ManagerTabProduction()
         {
             RefreshSourceList();
         }
 
-        public override string Label
+        public override string Label { get; } = "FMP.Production".Translate();
+
+        public float LeftRowSize = 300f;
+
+        public enum SourceOptions
         {
-            get
-            {
-                return label;
-            }
+            All,
+            Available,
+            Current
         }
 
-        public float leftRowSize = 300f;
+        public static SourceOptions Source = SourceOptions.All;
 
-        public enum sourceOptions
-        {
-            all,
-            available,
-            current
-        }
+        public static Vector2 LeftRowScrollPosition = new Vector2(0f, 0f);
 
-        public static sourceOptions source = sourceOptions.all;
+        public static Vector2 BillScrollPosition = new Vector2(0f, 0f);
 
-        public static Vector2 leftRowScrollPosition = new Vector2(0f, 0f);
+        public static List<ManagerJobProduction> SourceList;
 
-        public static Vector2 billScrollPosition = new Vector2(0f, 0f);
+        public static string SourceFilter = "";
 
-        public static List<ManagerJob_Production> sourceList;
-
-        public static string sourceFilter = "";
-
-        public static float sourceListHeight;
+        public static float SourceListHeight;
 
         public static void RefreshSourceList()
         {
-            sourceList = new List<ManagerJob_Production>();
+            SourceList = new List<ManagerJobProduction>();
 
-            switch (source)
+            switch (Source)
             {
-                case sourceOptions.available:
-                    sourceList = (from rd in DefDatabase<RecipeDef>.AllDefsListForReading
+                case SourceOptions.Available:
+                    SourceList = (from rd in DefDatabase<RecipeDef>.AllDefsListForReading
                                   where rd.HasBuildingRecipeUser(true)
-                                  select (new ManagerJob_Production(rd))).ToList();
+                                  select (new ManagerJobProduction(rd))).ToList();
                                   // select (rd.UsesUnfinishedThing ? new Bill_Managed(rd) : (Bill_Managed) new Bill_ManagedWithUft(rd))).ToList();
                     break;
-                case sourceOptions.current:
-                    sourceList = Manager.JobStack.FullStack.OfType<ManagerJob_Production>().ToList();
+                case SourceOptions.Current:
+                    SourceList = Manager.JobStack.FullStack.OfType<ManagerJobProduction>().ToList();
                     break;
-                case sourceOptions.all:
-                default:
-                    sourceList = (from rd in DefDatabase<RecipeDef>.AllDefsListForReading
+                case SourceOptions.All:
+                    SourceList = (from rd in DefDatabase<RecipeDef>.AllDefsListForReading
                                   where rd.HasBuildingRecipeUser()
-                                  select (new ManagerJob_Production(rd))).ToList();
+                                  select (new ManagerJobProduction(rd))).ToList();
                     // select (rd.UsesUnfinishedThing ? new Bill_Managed(rd) : (Bill_Managed) new Bill_ManagedWithUft(rd))).ToList();
                     break;
             }
         }
 
-        public static ManagerJob_Production job;
+        public static ManagerJobProduction Job;
 
         public override void DoWindowContents(Rect canvas)
         {
-            Rect leftRow = new Rect(0f, 35f, leftRowSize, canvas.height - 35f);
+            Rect leftRow = new Rect(0f, 35f, LeftRowSize, canvas.height - 35f);
             Rect contentCanvas = new Rect(leftRow.xMax + 10f, 5f, canvas.width - leftRow.width - 10f, canvas.height - 5f);
             
             DoLeftRow(leftRow);
@@ -87,9 +77,9 @@ namespace FM
 
         public void DoContent(Rect canvas)
         {
-            Widgets.DrawMenuSection(canvas, true);
+            Widgets.DrawMenuSection(canvas);
 
-            if (job != null)
+            if (Job != null)
             {
                 // leave some space for bottom buttons.
                 float bottomButtonsHeight = 30f;
@@ -102,12 +92,12 @@ namespace FM
 
                 // add / remove to the stack
                 Rect add = new Rect(bottomButtons.width * .75f, 0f, bottomButtons.width / 4f - 6f, bottomButtons.height);
-                if (source == sourceOptions.current)
+                if (Source == SourceOptions.Current)
                 {
                     if (Widgets.TextButton(add, "FM.Delete".Translate()))
                     {
-                        Manager.JobStack.Delete(job);
-                        job = null;
+                        Manager.JobStack.Delete(Job);
+                        Job = null;
                         RefreshSourceList();
                         return; // hopefully that'll just skip to the next tick without any further errors?
                     }
@@ -115,15 +105,15 @@ namespace FM
                 }
                 else
                 {
-                    if (job.trigger.IsValid)
+                    if (Job.Trigger.IsValid)
                     {
                         if (Widgets.TextButton(add, "FM.Manage".Translate()))
                         {
-                            Manager.JobStack.Add(job);
+                            Manager.JobStack.Add(Job);
 
-                            source = sourceOptions.current;
+                            Source = SourceOptions.Current;
                             RefreshSourceList();
-                            sourceFilter = "";
+                            SourceFilter = "";
                         }
                         TooltipHandler.TipRegion(add, "FMP.ManageBillTooltip".Translate());
                     } else
@@ -132,7 +122,7 @@ namespace FM
                         Color oldColor = GUI.color;
                         Text.Anchor = TextAnchor.MiddleCenter;
                         GUI.color = new Color(.6f, .6f, .6f);
-                        Widgets.DrawBox(add, 1);
+                        Widgets.DrawBox(add);
                         GUI.Label(add, "FMP.NoThreshold".Translate());
                         Text.Anchor = oldAnchor;
                         GUI.color = oldColor;
@@ -146,91 +136,80 @@ namespace FM
                 Text.Anchor = TextAnchor.MiddleCenter;
                 Text.Font = GameFont.Medium;
                 Rect recta = new Rect(0f, 0f, canvas.width, 50f);
-                Widgets.Label(recta, job.bill.LabelCap);
+                Widgets.Label(recta, Job.Bill.LabelCap);
                 Text.Anchor = TextAnchor.UpperLeft;
                 Text.Font = GameFont.Small;
                 Rect rect2 = new Rect(6f, 50f, canvas.width * .3f, canvas.height - 50f);
-                Listing_Standard listing_Standard = new Listing_Standard(rect2);
-                if (job.bill.suspended)
+                Listing_Standard listingStandard = new Listing_Standard(rect2);
+                if (Job.Bill.suspended)
                 {
-                    if (listing_Standard.DoTextButton("Suspended".Translate()))
+                    if (listingStandard.DoTextButton("Suspended".Translate()))
                     {
-                        job.bill.suspended = false;
+                        Job.Bill.suspended = false;
                     }
                 }
-                else if (listing_Standard.DoTextButton("NotSuspended".Translate()))
+                else if (listingStandard.DoTextButton("NotSuspended".Translate()))
                 {
-                    job.bill.suspended = true;
+                    Job.Bill.suspended = true;
                 }
-                string label = ("BillStoreMode_" + job.bill.storeMode).Translate();
-                if (listing_Standard.DoTextButton(label))
+                string billStoreModeLabel = ("BillStoreMode_" + Job.Bill.storeMode).Translate();
+                if (listingStandard.DoTextButton(billStoreModeLabel))
                 {
-                    List<FloatMenuOption> list = new List<FloatMenuOption>();
-                    foreach (BillStoreMode mode in Enum.GetValues(typeof(BillStoreMode)))
-                    {
-                        list.Add(new FloatMenuOption(("BillStoreMode_" + mode).Translate(), delegate
-                        {
-                            job.bill.storeMode = mode;
-                        }, MenuOptionPriority.Medium, null, null));
-                    }
-                    Find.WindowStack.Add(new FloatMenu(list, false));
+                    List<FloatMenuOption> list = (from BillStoreMode mode in Enum.GetValues(typeof (BillStoreMode)) select new FloatMenuOption(("BillStoreMode_" + mode).Translate(), delegate { Job.Bill.storeMode = mode; })).ToList();
+                    Find.WindowStack.Add(new FloatMenu(list));
                 }
 
                 // other stuff
-                listing_Standard.DoGap(12f);
-                listing_Standard.DoLabel("IngredientSearchRadius".Translate() + ": " + job.bill.ingredientSearchRadius.ToString("#####0"));
-                job.bill.ingredientSearchRadius = Mathf.RoundToInt(listing_Standard.DoSlider((float)job.bill.ingredientSearchRadius, 0f, 250f));
+                listingStandard.DoGap();
+                listingStandard.DoLabel("IngredientSearchRadius".Translate() + ": " + Job.Bill.ingredientSearchRadius.ToString("#####0"));
+                Job.Bill.ingredientSearchRadius = Mathf.RoundToInt(listingStandard.DoSlider(Job.Bill.ingredientSearchRadius, 0f, 250f));
 
-                if (job.bill.recipe.workSkill != null)
+                if (Job.Bill.recipe.workSkill != null)
                 {
-                    listing_Standard.DoLabel("MinimumSkillLevel".Translate(new object[]
-                    {
-                    job.bill.recipe.workSkill.label.ToLower()
-                    }) + ": " + job.bill.minSkillLevel.ToString("#####0"));
-                    job.bill.minSkillLevel = Mathf.RoundToInt(listing_Standard.DoSlider((float)job.bill.minSkillLevel, 0f, 20f));
+                    listingStandard.DoLabel("MinimumSkillLevel".Translate(Job.Bill.recipe.workSkill.label.ToLower()) + ": " + Job.Bill.minSkillLevel.ToString("#####0"));
+                    Job.Bill.minSkillLevel = Mathf.RoundToInt(listingStandard.DoSlider(Job.Bill.minSkillLevel, 0f, 20f));
                 }
 
                 // draw threshold config
-                job.trigger.DrawThresholdConfig(ref listing_Standard);
-                job.billGivers.DrawBillGiverConfig(ref listing_Standard);
-                listing_Standard.End();
+                Job.Trigger.DrawThresholdConfig(ref listingStandard);
+                Job.BillGivers.DrawBillGiverConfig(ref listingStandard);
+                listingStandard.End();
 
                 // ingredient picker
                 Rect rect3 = new Rect(rect2.xMax + 6f, 50f, canvas.width * .4f, canvas.height - 50f);
-                ThingFilterUI.DoThingFilterConfigWindow(rect3, ref billScrollPosition, job.bill.ingredientFilter, job.bill.recipe.fixedIngredientFilter, 4);
+                ThingFilterUI.DoThingFilterConfigWindow(rect3, ref BillScrollPosition, Job.Bill.ingredientFilter, Job.Bill.recipe.fixedIngredientFilter, 4);
 
                 // description
                 Rect rect4 = new Rect(rect3.xMax + 6f, rect3.y + 30f, canvas.width - rect3.xMax - 12f, canvas.height - 50f);
                 StringBuilder stringBuilder = new StringBuilder();
 
                 // add mainproduct line
-                stringBuilder.AppendLine("FMP.MainProduct".Translate(job.mainProduct.Label, job.mainProduct.Count));
+                stringBuilder.AppendLine("FMP.MainProduct".Translate(Job.MainProduct.Label, Job.MainProduct.Count));
                 stringBuilder.AppendLine();
 
-                if (job.bill.recipe.description != null)
+                if (Job.Bill.recipe.description != null)
                 {
-                    stringBuilder.AppendLine(job.bill.recipe.description);
+                    stringBuilder.AppendLine(Job.Bill.recipe.description);
                     stringBuilder.AppendLine();
                 }
-                stringBuilder.AppendLine("WorkAmount".Translate() + ": " + job.bill.recipe.WorkAmountTotal(null).ToStringWorkAmount());
+                stringBuilder.AppendLine("WorkAmount".Translate() + ": " + Job.Bill.recipe.WorkAmountTotal(null).ToStringWorkAmount());
                 stringBuilder.AppendLine();
-                for (int i = 0; i < job.bill.recipe.ingredients.Count; i++)
+                foreach (IngredientCount ingredientCount in Job.Bill.recipe.ingredients)
                 {
-                    IngredientCount ingredientCount = job.bill.recipe.ingredients[i];
                     if (!ingredientCount.filter.Summary.NullOrEmpty())
                     {
-                        stringBuilder.AppendLine(job.bill.recipe.IngredientValueGetter.BillRequirementsDescription(ingredientCount));
+                        stringBuilder.AppendLine(Job.Bill.recipe.IngredientValueGetter.BillRequirementsDescription(ingredientCount));
                     }
                 }
                 stringBuilder.AppendLine();
-                string text4 = job.bill.recipe.IngredientValueGetter.ExtraDescriptionLine();
+                string text4 = Job.Bill.recipe.IngredientValueGetter.ExtraDescriptionLine();
                 if (text4 != null)
                 {
                     stringBuilder.AppendLine(text4);
                     stringBuilder.AppendLine();
                 }
                 stringBuilder.AppendLine("MinimumSkills".Translate());
-                stringBuilder.AppendLine(job.bill.recipe.MinSkillString);
+                stringBuilder.AppendLine(Job.Bill.recipe.MinSkillString);
                 Text.Font = GameFont.Small;
                 string text5 = stringBuilder.ToString();
                 if (Text.CalcHeight(text5, rect4.width) > rect4.height)
@@ -239,9 +218,9 @@ namespace FM
                 }
                 Widgets.Label(rect4, text5);
                 Text.Font = GameFont.Small;
-                if (job.bill.recipe.products.Count == 1)
+                if (Job.Bill.recipe.products.Count == 1)
                 {
-                    Widgets.InfoCardButton(rect4.x, rect3.y, job.bill.recipe.products[0].thingDef);
+                    Widgets.InfoCardButton(rect4.x, rect3.y, Job.Bill.recipe.products[0].thingDef);
                 }
             }
             GUI.EndGroup();
@@ -262,13 +241,13 @@ namespace FM
             // filter
             Rect filterRect = new Rect(10f, canvas.yMin + 5f, canvas.width - 50f, 30f);
             GUI.SetNextControlName("filterTextfield");
-            sourceFilter = Widgets.TextField(filterRect, sourceFilter);
-            if (sourceFilter != "")
+            SourceFilter = Widgets.TextField(filterRect, SourceFilter);
+            if (SourceFilter != "")
             {
                 Rect clearFilter = new Rect(filterRect.width + 10f, filterRect.yMin, 30f, 30f);
                 if (Widgets.ImageButton(clearFilter, Widgets.CheckboxOffTex))
                 {
-                    sourceFilter = "";
+                    SourceFilter = "";
                 }
                 TooltipHandler.TipRegion(clearFilter, "FMP.ClearFilterDesc".Translate());
             }
@@ -278,46 +257,46 @@ namespace FM
             List<TabRecord> list = new List<TabRecord>();
             TabRecord item = new TabRecord("FMP.All".Translate(), delegate
             {
-                source = sourceOptions.all;
+                Source = SourceOptions.All;
                 RefreshSourceList();
-            }, source == sourceOptions.all);
+            }, Source == SourceOptions.All);
             list.Add(item);
             TabRecord item2 = new TabRecord("FMP.Available".Translate(), delegate
             {
-                source = sourceOptions.available;
+                Source = SourceOptions.Available;
                 RefreshSourceList();
-            }, source == sourceOptions.available);
+            }, Source == SourceOptions.Available);
             list.Add(item2);
             TabRecord item3 = new TabRecord("FMP.Current".Translate(), delegate
             {
-                source = sourceOptions.current;
+                Source = SourceOptions.Current;
                 RefreshSourceList();
-            }, source == sourceOptions.current);
+            }, Source == SourceOptions.Current);
             list.Add(item3);
             TabDrawer.DrawTabs(canvas, list);
 
             // content
             Rect scrollCanvas = canvas.ContractedBy(10f);
             scrollCanvas.yMin = scrollCanvas.yMin + 40f;
-            float height = sourceListHeight + 20f;
+            float height = SourceListHeight + 20f;
             Rect scrollView = new Rect(0f, 0f, scrollCanvas.width - 16f, height);
-            Widgets.BeginScrollView(scrollCanvas, ref leftRowScrollPosition, scrollView);
+            Widgets.BeginScrollView(scrollCanvas, ref LeftRowScrollPosition, scrollView);
             Rect scrollContent = scrollView.ContractedBy(10f);
 
             GUI.BeginGroup(scrollContent);
             float y = 0;
 
-            foreach (ManagerJob_Production current in from job in sourceList
-                                             where job.bill.recipe.label.ToUpper().Contains(sourceFilter.ToUpper()) || job.mainProduct.Label.ToUpper().Contains(sourceFilter.ToUpper())
-                                             orderby job.bill.recipe.LabelCap
+            foreach (ManagerJobProduction current in from job in SourceList
+                                             where job.Bill.recipe.label.ToUpper().Contains(SourceFilter.ToUpper()) || job.MainProduct.Label.ToUpper().Contains(SourceFilter.ToUpper())
+                                             orderby job.Bill.recipe.LabelCap
                                              select job)
             {
                 Rect recipeRow = new Rect(0f, y, scrollContent.width, 25f);
 
-                string text = current.bill.recipe.LabelCap + " (";
+                string text = current.Bill.recipe.LabelCap + " (";
                 try
                 {
-                    text += String.Join(", ", current.billGivers.GetBillGiverDefs.Select(ru => ru.LabelCap).ToArray());
+                    text += String.Join(", ", current.BillGivers.GetBillGiverDefs.Select(ru => ru.LabelCap).ToArray());
                 }
                 catch
                 {
@@ -339,17 +318,17 @@ namespace FM
                 if (Widgets.TextButton(recipeRowResized, text, false, true))
                 {
                     SoundDefOf.Click.PlayOneShotOnCamera();
-                    job = current;
+                    Job = current;
                 }
 
-                if (job != null && job == current)
+                if (Job != null && Job == current)
                 {
                     GUI.DrawTexture(recipeRowResized, TexUI.HighlightTex);
                 }
 
                 y += recipeRowResized.height;
             }
-            sourceListHeight = y;
+            SourceListHeight = y;
             GUI.EndGroup();
             Widgets.EndScrollView();
         }

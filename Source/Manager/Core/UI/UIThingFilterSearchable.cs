@@ -1,36 +1,48 @@
-﻿using RimWorld;
-using System;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
 namespace FM
 {
-    public class ThingFilterUI_Searchable
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public class ThingFilterUiSearchable
     {
+/*
         private const float ExtraViewHeight = 90f;
+*/
 
+/*
         private const float RangeLabelTab = 10f;
+*/
 
+/*
         private const float RangeLabelHeight = 19f;
+*/
 
+/*
         private const float SliderHeight = 26f;
+*/
 
+/*
         private const float SliderTab = 20f;
+*/
 
         private static float viewHeight;
 
         public void DoThingFilterConfigWindow(Rect rect, ref Vector2 scrollPosition, ThingFilter filter, ThingFilter parentFilter = null, int openMask = 1)
         {
-            Widgets.DrawMenuSection(rect, true);
+            Widgets.DrawMenuSection(rect);
             Text.Font = GameFont.Tiny;
             float num = rect.width - 2f;
             Rect rect2 = new Rect(rect.x + 1f, rect.y + 1f, num / 2f, 24f);
-            if (Widgets.TextButton(rect2, "ClearAll".Translate(), true, false))
+            if (Widgets.TextButton(rect2, "ClearAll".Translate()))
             {
                 filter.SetDisallowAll();
             }
             Rect rect3 = new Rect(rect2.xMax + 1f, rect2.y, num / 2f, 24f);
-            if (Widgets.TextButton(rect3, "AllowAll".Translate(), true, false))
+            if (Widgets.TextButton(rect3, "AllowAll".Translate()))
             {
                 filter.SetAllowAll(parentFilter);
             }
@@ -44,7 +56,7 @@ namespace FM
             DrawQualityFilterConfig(ref num2, viewRect.width, filter);
             float num3 = num2;
             Rect rect4 = new Rect(0f, num2, 9999f, 9999f);
-            Listing_TreeThingFilter listing_TreeThingFilter = new Listing_TreeThingFilter(rect4, filter, parentFilter, 210f, true);
+            Listing_TreeThingFilter listingTreeThingFilter = new Listing_TreeThingFilter(rect4, filter, parentFilter, 210f, true);
             TreeNode_ThingCategory node = ThingCategoryNodeDatabase.RootNode;
             if (parentFilter != null)
             {
@@ -54,10 +66,10 @@ namespace FM
                 }
                 node = parentFilter.DisplayRootCategory;
             }
-            listing_TreeThingFilter.DoCategoryChildren(node, 0, openMask, true);
-            listing_TreeThingFilter.End();
-            viewHeight = num3 + listing_TreeThingFilter.CurHeight + 90f;
-            Log.Message(viewHeight.ToString());
+            listingTreeThingFilter.DoCategoryChildren(node, 0, openMask, true);
+            listingTreeThingFilter.End();
+            viewHeight = num3 + listingTreeThingFilter.CurHeight + 90f;
+            Log.Message(viewHeight.ToString(CultureInfo.InvariantCulture));
             Widgets.EndScrollView();
         }
 
