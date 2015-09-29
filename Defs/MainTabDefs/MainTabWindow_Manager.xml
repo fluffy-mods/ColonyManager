@@ -5,7 +5,7 @@
     <defName>Fluffy_Manager</defName>
     <label>manager</label>
     <description>Choose which colonist does what kinds of work, and in what priority order.</description>
-    <windowClass>FM.MainTabWindow_Manager</windowClass>
+    <windowClass>FM.MainTabWindowManager</windowClass>
     <order>11</order>
   </MainTabDef>
 

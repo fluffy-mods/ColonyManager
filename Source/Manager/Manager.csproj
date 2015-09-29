@@ -62,7 +62,7 @@
     <Compile Include="Production\BillGiverTracker.cs" />
     <Compile Include="Production\MainProductTracker.cs" />
     <Compile Include="Production\ManagerJobProduction.cs" />
-    <Compile Include="Production\ManagerTabProduction.cs" />
+    <Compile Include="Production\UI\ManagerTabProduction.cs" />
     <Compile Include="Production\UI\WindowBillGiverDetails.cs" />
     <Compile Include="Production\UtilitiesProduction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

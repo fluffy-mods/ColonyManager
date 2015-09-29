@@ -28,6 +28,16 @@
   <FMP.BillGiversTooltip>Available:\n{0}\n\nSelected:{1}</FMP.BillGiversTooltip>
   <FMP.BillGiversDetails>Select workstations</FMP.BillGiversDetails>
 
+  <!-- BillGiversDetailsWindow -->
+  <FMP.AllWorkstations>All workstations</FMP.AllWorkstations>
+  <FMP.AllWorkstationsTooltip>Set the manager to allow assigning this bill to all possible workstations</FMP.AllWorkstationsTooltip>
+  <FMP.ByAreaAndCount>By area / count</FMP.ByAreaAndCount>
+  <FMP.ByAreaAndCountTooltip>Set the manager to allow assigning this bill to a specific number of workstations, in a specific area</FMP.ByAreaAndCountTooltip>
+  <FMP.AllowedAreas>Area:</FMP.AllowedAreas>
+  <FMP.AllowedWorkstationCount>Max:</FMP.AllowedWorkstationCount>
+  <FMP.SpecificWorkstations>Set workstations</FMP.SpecificWorkstations>
+  <FMP.SpecificWorkstationsTooltip>Set the manager to allow assigning this bill to specific workstations.</FMP.SpecificWorkstationsTooltip>
+
   <!-- Tab headers -->
   <FMP.All>All</FMP.All>
   <FMP.Current>Current</FMP.Current>

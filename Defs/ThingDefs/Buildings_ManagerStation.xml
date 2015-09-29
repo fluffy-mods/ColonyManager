@@ -63,8 +63,8 @@
         <glowRadius>10</glowRadius>
         <glowColor>(255,0,0,0)</glowColor>
       </li>
-      <li Class="FM.CompProperties_ManagerStation">
-        <compClass>FM.Comp_ManagerStation</compClass>
+      <li Class="FM.CompPropertiesManagerStation">
+        <compClass>FM.CompManagerStation</compClass>
         <speed>500</speed>
       </li>     
     </comps>
