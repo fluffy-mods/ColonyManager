@@ -20,6 +20,8 @@ namespace FM
 
         public Bill_Production Bill;
 
+        public List<Bill_Production> AssignedBills = new List<Bill_Production>(); 
+
         public new TriggerThreshold Trigger;
 
         public override bool Active
@@ -64,17 +66,16 @@ namespace FM
                     {
                         foreach (Bill t in worker.BillStack)
                         {
-// TODO: the check for manager bills was removed with the removal from managed_bill class, we will now touch manually assigned jobs, this may not be desired.
                             Bill_Production thatBill = t as Bill_Production;
-                            if (thatBill != null && thatBill.recipe == Bill.recipe)
+                            if (thatBill != null && thatBill.recipe == Bill.recipe && AssignedBills.Contains(thatBill))
                             {
                                 billPresent = true;
-                                if (thatBill.suspended || thatBill.repeatCount == 0)
+                                if (thatBill.suspended != Bill.suspended || thatBill.repeatCount == 0)
                                 {
 #if DEBUG
                                     Log.Message("Trying to unsuspend and/or bump targetCount");
 #endif
-                                    thatBill.suspended = false;
+                                    thatBill.suspended = Bill.suspended;
                                     thatBill.repeatCount = this.CountPerWorker(workerIndex);
                                     actionTaken = true;
                                 }
@@ -93,6 +94,7 @@ namespace FM
                         copy.repeatMode = BillRepeatMode.RepeatCount;
                         copy.repeatCount = this.CountPerWorker(workerIndex);
                         worker.BillStack?.AddBill(copy);
+                        AssignedBills.Add(copy);
                         actionTaken = true;
                     }
                 }
@@ -119,14 +121,14 @@ namespace FM
                 {
                     for (int i = 0; i < worker.BillStack.Count; i++)
                     {
-                        // TODO: Again, check was removed.
                         Bill_Production thatBill = worker.BillStack[i] as Bill_Production;
-                        if (thatBill != null && thatBill.recipe == Bill.recipe)
+                        if (thatBill != null && thatBill.recipe == Bill.recipe && AssignedBills.Contains(thatBill))
                         {
 #if DEBUG
                             Log.Message("Trying to delete obsolete bill");
 #endif
                             worker.BillStack.Delete(thatBill);
+                            AssignedBills.Remove(thatBill);
                         }
                     }
                 }
