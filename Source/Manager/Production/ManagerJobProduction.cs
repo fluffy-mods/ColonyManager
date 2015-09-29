@@ -54,6 +54,7 @@ namespace FM
                 Log.Message("Checking workers for presence of bills");
 #endif
                 List<Building_WorkTable> workers = BillGivers.GetAssignedBillGivers;
+                // TODO: Handle assigned billgiver changes gracefully.
 
                 // If Trigger met, check if there's places we need to add the bill.
                 for (int workerIndex = 0; workerIndex < workers.Count; workerIndex++)
