@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using RimWorld;
 using Verse;
 
@@ -79,6 +80,8 @@ namespace FM
                                     thatBill.repeatCount = this.CountPerWorker(workerIndex);
                                     actionTaken = true;
                                 }
+
+                                Update(thatBill, ref actionTaken);
                             }
                         }
                     }
@@ -104,6 +107,33 @@ namespace FM
                 CleanUp();
             }
             return actionTaken;
+        }
+
+        private void Update(Bill_Production thatBill, ref bool actionTaken)
+        {
+            if (thatBill.storeMode != Bill.storeMode)
+            {
+                thatBill.storeMode = Bill.storeMode;
+                actionTaken = true;
+            }
+
+            if (thatBill.ingredientFilter != Bill.ingredientFilter)
+            {
+                thatBill.ingredientFilter = Bill.ingredientFilter;
+                actionTaken = true;
+            }
+
+            if (Math.Abs(thatBill.ingredientSearchRadius - Bill.ingredientSearchRadius) > 1)
+            {
+                thatBill.ingredientSearchRadius = Bill.ingredientSearchRadius;
+                actionTaken = true;
+            }
+
+            if (thatBill.minSkillLevel != Bill.minSkillLevel)
+            {
+                thatBill.minSkillLevel = Bill.minSkillLevel;
+                actionTaken = true;
+            }
         }
 
         public override void CleanUp()
