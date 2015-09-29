@@ -47,6 +47,11 @@ namespace FM
             }
             Input = Widgets.TextField(buttonRect, Input);
             GUI.color = oldColor;
+            if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return)
+            {
+                Event.current.Use();
+                Find.WindowStack.TryRemove(this);
+            }
         }
 
         public TriggerThreshold Trigger;
