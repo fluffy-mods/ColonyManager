@@ -7,7 +7,6 @@ namespace FM
     {
         public TriggerThreshold(ManagerJobProduction job)
         {
-            _job = job;
             Op = Ops.LowerThan;
             MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
             Count = MaxUpperThreshold / 5;
@@ -16,8 +15,6 @@ namespace FM
             if (job.MainProduct.ThingDef != null) ThresholdFilter.SetAllow(job.MainProduct.ThingDef, true);
             if (job.MainProduct.CategoryDef != null) ThresholdFilter.SetAllow(job.MainProduct.CategoryDef, true);
         }
-
-        private ManagerJob _job;
 
         public int MaxUpperThreshold;
 
@@ -76,16 +73,6 @@ namespace FM
 
         public override string ToString()
         {
-            // TODO: implement for ThingFilter
-            //switch (thresholdTargetMode)
-            //{
-            //    case ThresholdTargetModes.Thing:
-            //        return (thing == null ? "null" : thing.LabelCap) + opString + count + " (" + CurCount + " " + state.ToString() + ")";
-            //    case ThresholdTargetModes.Category:
-            //        return (category == null ? "null" : category.LabelCap) + opString + count + " (" + CurCount + " " + state.ToString() + ")";
-            //    default:
-            //        return "Incorrectly initialized Trigger";
-            //}
             return "Trigger_Threshold.ToString() not implemented";
         }
 

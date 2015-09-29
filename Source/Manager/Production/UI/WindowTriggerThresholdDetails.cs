@@ -34,7 +34,6 @@ namespace FM
                 Find.WindowStack.Add(new FloatMenu(list));
             }
             buttonRect.x = buttonRect.xMax + 3f;
-            // TODO: string to int, validate
             Color oldColor = GUI.color;
             if (!Input.IsInt())
             {
