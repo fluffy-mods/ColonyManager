@@ -1,3 +1,0 @@
-C:\Users\Karel\Desktop\RimWorld914Win\Mods\Manager\Assemblies\Manager.dll
-C:\Users\Karel\Desktop\RimWorld914Win\Mods\Manager\Source\Manager\obj\Debug\Manager.csprojResolveAssemblyReference.cache
-C:\Users\Karel\Desktop\RimWorld914Win\Mods\Manager\Source\Manager\obj\Debug\Manager.dll
