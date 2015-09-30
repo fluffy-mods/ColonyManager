@@ -8,9 +8,9 @@ Desktop.ini
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
-**/bin
-**/obj
-**/.vs
+*/Source/bin
+*/Source/obj
+*/Source/.vs
 
 # Windows Installer files
 *.cab
@@ -49,3 +49,4 @@ Temporary Items
 Source/BetterAnimalsTab/obj/Debug/BetterAnimalsTab.pdb
 *.cache
 *.pxd
+*.pdb
