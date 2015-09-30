@@ -231,6 +231,9 @@ namespace FM
         // TODO: make this actually work.
         public override void PostOpen()
         {
+#if DEBUG
+            Log.Message("PostOpen called");
+#endif
             GUI.FocusControl("filterTextfield");
         }
 

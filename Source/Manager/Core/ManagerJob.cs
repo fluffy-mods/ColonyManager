@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using RimWorld;
 using Verse;
 
 namespace FM
@@ -44,5 +45,7 @@ namespace FM
             strout.AppendLine(Priority + " " + Active + "LastAction" + LastAction + "(interval: " + ActionInterval + ", gameTick: " + Find.TickManager.TicksGame + ")");
             return strout.ToString();
         }
+
+        public Area AreaRestriction = new Area_Allowed(AllowedAreaMode.Humanlike);
     }
 }

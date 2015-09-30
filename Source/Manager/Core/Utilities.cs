@@ -37,7 +37,8 @@ namespace FM
         public static int CountProducts(ThingFilter filter)
         {
             int count;
-
+            // todo; implement proper resource count
+            // todo; trigger current count appears to be broken
             if (TryGetCached(filter, out count)) return count;
 
             foreach (Thing thing in filter.AllowedThingDefs.SelectMany(td => Find.ListerThings.ThingsOfDef(td))) // TODO: does this catch minified things?

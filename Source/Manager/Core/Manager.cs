@@ -17,7 +17,9 @@ namespace FM
 
         public static void DoWork()
         {
+#if DEBUG
             Log.Message("Trying to do work");
+#endif
             JobStack.TryDoNextJob();
         }
     }

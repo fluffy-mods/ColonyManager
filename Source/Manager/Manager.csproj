@@ -54,6 +54,7 @@
     <Compile Include="Core\Manager.cs" />
     <Compile Include="Core\ManagerController.cs" />
     <Compile Include="Core\ManagerJob.cs" />
+    <Compile Include="Core\UI\AreaAllowedGUI.cs" />
     <Compile Include="Production\UI\UIThingFilterSearchable.cs" />
     <Compile Include="Production\UI\WindowTriggerThresholdDetails.cs" />
     <Compile Include="Core\Utilities.cs" />

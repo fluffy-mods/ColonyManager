@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using RimWorld;
 using Verse;
 
@@ -12,7 +14,7 @@ namespace FM
             Bill = recipe.UsesUnfinishedThing ? new Bill_ProductionWithUft(recipe) : new Bill_Production(recipe);
             MainProduct = new MainProductTracker(Bill.recipe);
             Trigger = new TriggerThreshold(this);
-            BillGivers = new BillGiverTracker(Bill.recipe);
+            BillGivers = new BillGiverTracker(this);
         }
 
         public BillGiverTracker BillGivers;
@@ -21,7 +23,8 @@ namespace FM
 
         public Bill_Production Bill;
 
-        public List<Bill_Production> AssignedBills = new List<Bill_Production>(); 
+        // todo; move AssignedBills into BillGiverTracker
+        public List<Pair<Bill_Production, Building_WorkTable>> AssignedBills = new List<Pair<Bill_Production, Building_WorkTable>>();
 
         public new TriggerThreshold Trigger;
 
@@ -54,7 +57,7 @@ namespace FM
                 Log.Message("Checking workers for presence of bills");
 #endif
                 List<Building_WorkTable> workers = BillGivers.GetAssignedBillGivers;
-                // TODO: Handle assigned billgiver changes gracefully.
+                CleanNoLongerAllowedBillgivers(workers, AssignedBills, ref actionTaken);
 
                 // If Trigger met, check if there's places we need to add the bill.
                 for (int workerIndex = 0; workerIndex < workers.Count; workerIndex++)
@@ -69,7 +72,7 @@ namespace FM
                         foreach (Bill t in worker.BillStack)
                         {
                             Bill_Production thatBill = t as Bill_Production;
-                            if (thatBill != null && thatBill.recipe == Bill.recipe && AssignedBills.Contains(thatBill))
+                            if (thatBill != null && thatBill.recipe == Bill.recipe && AssignedBills.Contains(new Pair<Bill_Production, Building_WorkTable>(thatBill, worker)))
                             {
                                 billPresent = true;
                                 if (thatBill.suspended != Bill.suspended || thatBill.repeatCount == 0)
@@ -98,7 +101,7 @@ namespace FM
                         copy.repeatMode = BillRepeatMode.RepeatCount;
                         copy.repeatCount = this.CountPerWorker(workerIndex);
                         worker.BillStack?.AddBill(copy);
-                        AssignedBills.Add(copy);
+                        AssignedBills.Add(new Pair<Bill_Production, Building_WorkTable>(copy, worker));
                         actionTaken = true;
                     }
                 }
@@ -108,6 +111,18 @@ namespace FM
                 CleanUp();
             }
             return actionTaken;
+        }
+
+        private void CleanNoLongerAllowedBillgivers(List<Building_WorkTable> workers, List<Pair<Bill_Production, Building_WorkTable>> assignedBills, ref bool actionTaken)
+        {
+            List<Pair<Bill_Production, Building_WorkTable>> toBeDeleted = new List<Pair<Bill_Production, Building_WorkTable>>();
+            foreach (Pair<Bill_Production, Building_WorkTable> pair in assignedBills.Where(pair => !workers.Contains(pair.Second)))
+            {
+                pair.Second.BillStack.Delete(pair.First);
+                toBeDeleted.Add(pair);
+                actionTaken = true;
+            }
+            assignedBills.RemoveAll(pair => toBeDeleted.Contains(pair));
         }
 
         private void Update(Bill_Production thatBill, ref bool actionTaken)
@@ -143,26 +158,18 @@ namespace FM
 #if DEBUG
             Log.Message("Cleaning up obsolete bills");
 #endif
-            foreach (Building_WorkTable worker in BillGivers.GetAssignedBillGivers)
+            foreach (Pair<Bill_Production, Building_WorkTable> pair in AssignedBills)
             {
 #if DEBUG
-                Log.Message("Checking worker " + worker.LabelCap);
+                Log.Message("Checking worker " + pair.First.LabelCap);
 #endif
-                if (worker.BillStack != null && worker.BillStack.Count > 0)
-                {
-                    for (int i = 0; i < worker.BillStack.Count; i++)
-                    {
-                        Bill_Production thatBill = worker.BillStack[i] as Bill_Production;
-                        if (thatBill != null && thatBill.recipe == Bill.recipe && AssignedBills.Contains(thatBill))
-                        {
+
 #if DEBUG
-                            Log.Message("Trying to delete obsolete bill");
+                Log.Message("Trying to delete obsolete bill");
 #endif
-                            worker.BillStack.Delete(thatBill);
-                            AssignedBills.Remove(thatBill);
-                        }
-                    }
-                }
+                pair.Second.BillStack.Delete(pair.First);
+                AssignedBills.Remove(pair);
+
             }
         }
 

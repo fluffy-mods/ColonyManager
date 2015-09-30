@@ -11,7 +11,7 @@ namespace FM
         public override void PreOpen()
         {
             base.PreOpen();
-            _input = BillGivers.UserBillGiverCount.ToString();
+            _input = Job.BillGivers.UserBillGiverCount.ToString();
         }
 
         private string _input;
@@ -32,7 +32,7 @@ namespace FM
             Rect allLabel = new Rect(36f, y, contentRect.width - 36f, 30f);
             y += 30;
 
-            if (BillGivers.BillGiverAssignment == AssignedBillGiverOptions.All)
+            if (Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.All)
             {
                 Widgets.DrawMenuSection(all);
                 GUI.DrawTexture(allCheck, Widgets.CheckboxOnTex);
@@ -43,7 +43,7 @@ namespace FM
                 if (Mouse.IsOver(all)) GUI.DrawTexture(all, TexUI.HighlightTex);
                 if (Widgets.InvisibleButton(all))
                 {
-                    BillGivers.BillGiverAssignment = AssignedBillGiverOptions.All;
+                    Job.BillGivers.BillGiverAssignment = AssignedBillGiverOptions.All;
                 }
             }
             Widgets.Label(allLabel, "FMP.AllWorkstations".Translate());
@@ -55,7 +55,7 @@ namespace FM
             Rect areaLabel = new Rect(36f, y, contentRect.width - 36f, 30f);
             y += 30f;
 
-            if (BillGivers.BillGiverAssignment == AssignedBillGiverOptions.Count)
+            if (Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.Count)
             {
                 area.height += 60f;
                 Widgets.DrawMenuSection(area);
@@ -68,11 +68,11 @@ namespace FM
                 y += 30;
 
                 Widgets.Label(areaAreaLabel, "FMP.AllowedAreas".Translate());
-                // todo: area selector row
+                AreaAllowedGUI.DoAllowedAreaSelectors(areaAreaSelector, Job);
                 Color oldColor = GUI.color;
                 if (_input.IsInt())
                 {
-                    BillGivers.UserBillGiverCount = int.Parse(_input);
+                    Job.BillGivers.UserBillGiverCount = int.Parse(_input);
                 }
                 else
                 {
@@ -88,7 +88,7 @@ namespace FM
                 if (Mouse.IsOver(area)) GUI.DrawTexture(area, TexUI.HighlightTex);
                 if (Widgets.InvisibleButton(area))
                 {
-                    BillGivers.BillGiverAssignment = AssignedBillGiverOptions.Count;
+                    Job.BillGivers.BillGiverAssignment = AssignedBillGiverOptions.Count;
                 }
             }
             Widgets.Label(areaLabel, "FMP.ByAreaAndCount".Translate());
@@ -100,14 +100,14 @@ namespace FM
             Rect specificLabel = new Rect(36f, y, contentRect.width - 36f, 30f);
             y += 30;
 
-            if (BillGivers.BillGiverAssignment == AssignedBillGiverOptions.Specific)
+            if (Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.Specific)
             {
 
-                specific.height += 24f * BillGivers.GetPotentialBillGivers.Count;
+                specific.height += 24f * Job.BillGivers.GetPotentialBillGivers.Count;
                 Widgets.DrawMenuSection(specific);
                 GUI.DrawTexture(specificCheck, Widgets.CheckboxOnTex);
 
-                foreach (Building_WorkTable billgiver in BillGivers.GetPotentialBillGivers)
+                foreach (Building_WorkTable billgiver in Job.BillGivers.GetPotentialBillGivers)
                 {
                     Rect row = new Rect(x, y, contentRect.width, 24f);
                     DrawRow(billgiver, row);
@@ -121,7 +121,7 @@ namespace FM
                 TooltipHandler.TipRegion(specific, "FMP.SpecificWorkstationsTooltip");
                 if (Widgets.InvisibleButton(specific))
                 {
-                    BillGivers.BillGiverAssignment = AssignedBillGiverOptions.Specific;
+                    Job.BillGivers.BillGiverAssignment = AssignedBillGiverOptions.Specific;
                 }
             }
             Widgets.Label(specificLabel, "FMP.SpecificWorkstations".Translate());
@@ -142,19 +142,19 @@ namespace FM
             Text.Font = GameFont.Tiny;
             Widgets.Label(labelRect, billgiver.LabelCap + ", " + billgiver.GetRoom().Role.LabelCap);
             Text.Font = GameFont.Small;
-            if (BillGivers.SpecificBillGivers.Contains(billgiver))
+            if (Job.BillGivers.SpecificBillGivers.Contains(billgiver))
             {
                 GUI.DrawTexture(iconRect, Widgets.CheckboxOnTex);
                 if (Widgets.InvisibleButton(row))
                 {
-                    BillGivers.SpecificBillGivers.Remove(billgiver);
+                    Job.BillGivers.SpecificBillGivers.Remove(billgiver);
                 }
             }
             else
             {
                 if (Widgets.InvisibleButton(row))
                 {
-                    BillGivers.SpecificBillGivers.Add(billgiver);
+                    Job.BillGivers.SpecificBillGivers.Add(billgiver);
                 }
             }
 
@@ -165,7 +165,7 @@ namespace FM
             }
         }
 
-        public BillGiverTracker BillGivers;
+        public ManagerJobProduction Job;
 
         public Vector2 Scrollposition = new Vector2(0f, 0f);
     }

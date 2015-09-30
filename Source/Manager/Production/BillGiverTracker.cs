@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
 using Verse;
+using Verse.AI;
 
 namespace FM
 {
@@ -15,9 +16,10 @@ namespace FM
 
     public class BillGiverTracker
     {
-        public BillGiverTracker(RecipeDef recipe)
+        public BillGiverTracker(ManagerJobProduction job)
         {
-            _recipe = recipe;
+            _recipe = job.Bill.recipe;
+            _job = job;
         }
 
         public RecipeDef Recipe => _recipe;
@@ -48,6 +50,7 @@ namespace FM
         public int UserBillGiverCount;
 
         private readonly RecipeDef _recipe;
+        private ManagerJobProduction _job;
 
         /// <summary>
         /// All billgiver defs (by recipe).
@@ -69,6 +72,7 @@ namespace FM
                 switch (BillGiverAssignment)
                 {
                     case AssignedBillGiverOptions.Count:
+                        if (_job.AreaRestriction != null) list = list.Where(bw => _job.AreaRestriction.ActiveCells.Contains(bw.Position)).ToList();
                         list = list.Take(UserBillGiverCount).ToList();
                         break;
                     case AssignedBillGiverOptions.Specific:
@@ -94,7 +98,7 @@ namespace FM
             string potentialString = String.Join("\n", GetPotentialBillGivers.Select(b => b.LabelCap).ToArray());
             string assignedString = String.Join("\n", GetAssignedBillGivers.Select(b => b.LabelCap).ToArray());
             string stationsTooltip = "FMP.BillGiversTooltip".Translate(potentialString, assignedString);
-            // todo, fix that tooltip. 
+            // todo, fix that tooltip. Possible?
             // TooltipHandler.TipRegion(stations, stationsTooltip);
 
             // workstation selector
@@ -110,7 +114,7 @@ namespace FM
             {
                 WindowBillGiverDetails window = new WindowBillGiverDetails
                 {
-                    BillGivers = this,
+                    Job = _job,
                     closeOnClickedOutside = true,
                     draggable = true
                 };
