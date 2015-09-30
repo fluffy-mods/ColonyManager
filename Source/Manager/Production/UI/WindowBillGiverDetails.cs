@@ -95,6 +95,7 @@ namespace FM
             y += 6f;
 
             // Specific billgivers
+            // todo; add scrolling region.
             Rect specific = new Rect(x, y, contentRect.width, 30f);
             Rect specificCheck = new Rect(x, y, 30f, 30f);
             Rect specificLabel = new Rect(36f, y, contentRect.width - 36f, 30f);
