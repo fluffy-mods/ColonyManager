@@ -65,6 +65,7 @@ namespace FM
         }
 
         public static ManagerJobProduction Job;
+        private bool _postOpenFocus;
 
         public override void DoWindowContents(Rect canvas)
         {
@@ -227,14 +228,10 @@ namespace FM
 
         }
 
-        // focus on the filter on open.
-        // TODO: make this actually work.
         public override void PostOpen()
         {
-#if DEBUG
-            Log.Message("PostOpen called");
-#endif
-            GUI.FocusControl("filterTextfield");
+            // focus on the filter on open, flag is checked after the field is actually drawn.
+            _postOpenFocus = false;
         }
 
         public void DoLeftRow(Rect canvas)
@@ -243,8 +240,16 @@ namespace FM
 
             // filter
             Rect filterRect = new Rect(10f, canvas.yMin + 5f, canvas.width - 50f, 30f);
+
             GUI.SetNextControlName("filterTextfield");
             SourceFilter = Widgets.TextField(filterRect, SourceFilter);
+
+            if (!_postOpenFocus)
+            {
+                GUI.FocusControl("filterTextfield");
+                _postOpenFocus = true;
+            }
+
             if (SourceFilter != "")
             {
                 Rect clearFilter = new Rect(filterRect.width + 10f, filterRect.yMin, 30f, 30f);
