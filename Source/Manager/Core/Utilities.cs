@@ -39,7 +39,6 @@ namespace FM
         public static int CountProducts(ThingFilter filter)
         {
             int count = 0;
-            // todo; implement proper resource count
             if (filter != null && TryGetCached(filter, out count)) return count;
 
 #if DEBUG_COUNTS
@@ -49,7 +48,6 @@ namespace FM
             if (filter != null)
             {
                 foreach (ThingDef td in filter.AllowedThingDefs)
-                // TODO: does this catch minified things?
                 {
                     // if it counts as a resource, use the ingame counter (e.g. only steel in stockpiles.)
                     if (td.CountAsResource)
@@ -63,8 +61,8 @@ namespace FM
                     {
                         foreach (Thing t in Find.ListerThings.ThingsOfDef(td))
                         {
-
                             // otherwise, go look for stuff that matches our filters.
+                            // TODO: does this catch minified things?
                             QualityCategory quality;
                             if (t.TryGetQuality(out quality))
                             {
