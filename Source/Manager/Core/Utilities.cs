@@ -25,35 +25,48 @@ namespace FM
 
         private static bool TryGetCached(ThingFilter filter, out int count)
         {
-            if (_lastCache < Find.TickManager.TicksGame + 250 && _cachedFilter == filter)
+            if (_lastCache - Find.TickManager.TicksGame < 250 && _cachedFilter == filter)
             {
-                count = 0;
-                return false;
+                count = _cachedCount;
+                return true;
             }
-            count = _cachedCount;
-            return true;
+#if DEBUG_COUNTS
+            Log.Message("not cached");
+#endif
+            count = 0;
+            return false;
         }
 
         public static int CountProducts(ThingFilter filter)
         {
-            int count;
+            int count = 0;
             // todo; implement proper resource count
             // todo; trigger current count appears to be broken
-            if (TryGetCached(filter, out count)) return count;
+            if (filter != null && TryGetCached(filter, out count)) return count;
 
-            foreach (Thing thing in filter.AllowedThingDefs.SelectMany(td => Find.ListerThings.ThingsOfDef(td))) // TODO: does this catch minified things?
+#if DEBUG_COUNTS
+            Log.Message("Obtaining new count");
+#endif
+
+            if (filter != null)
             {
-                QualityCategory quality;
-                if (thing.TryGetQuality(out quality))
+                foreach (Thing thing in filter.AllowedThingDefs.SelectMany(td => Find.ListerThings.ThingsOfDef(td))) // TODO: does this catch minified things?
                 {
-                    if (!filter.AllowedQualityLevels.Includes(quality)) continue;
+                    QualityCategory quality;
+                    if (thing.TryGetQuality(out quality))
+                    {
+                        if (!filter.AllowedQualityLevels.Includes(quality)) continue;
+                    }
+                    if (filter.AllowedHitPointsPercents.IncludesEpsilon(thing.HitPoints)) continue;
+
+                    Log.Message(thing.LabelCap + ": " + CountProducts(thing));
+
+                    count += CountProducts(thing);
                 }
-                if (filter.AllowedHitPointsPercents.IncludesEpsilon(thing.HitPoints)) continue;
-                
-                count += CountProducts(thing);
+                _cachedFilter = filter;
             }
-            _cachedFilter = filter;
             _lastCache = Find.TickManager.TicksGame;
+            _cachedFilter = filter;
             _cachedCount = count;
             return count;
         }

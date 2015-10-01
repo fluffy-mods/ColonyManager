@@ -18,9 +18,18 @@ namespace FM
 
         public int MaxUpperThreshold;
 
-        public bool IsValid => ThresholdFilter.AllowedDefCount > 0;
+        public bool IsValid
+        {
+            get { return ThresholdFilter.AllowedDefCount > 0; }
+        }
 
-        public int CurCount => Utilities.CountProducts(ThresholdFilter);
+        public int CurCount
+        {
+            get
+            {
+                return Utilities.CountProducts(ThresholdFilter);
+            }
+        }
 
         public ThingFilter ThresholdFilter;
 
