@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using RimWorld;
+﻿using RimWorld;
 using Verse;
 
 namespace FM
@@ -25,7 +24,7 @@ namespace FM
 
         private static bool TryGetCached(ThingFilter filter, out int count)
         {
-            if (_lastCache - Find.TickManager.TicksGame < 250 && _cachedFilter == filter)
+            if (Find.TickManager.TicksGame - _lastCache < 250 && _cachedFilter == filter)
             {
                 count = _cachedCount;
                 return true;
@@ -41,7 +40,6 @@ namespace FM
         {
             int count = 0;
             // todo; implement proper resource count
-            // todo; trigger current count appears to be broken
             if (filter != null && TryGetCached(filter, out count)) return count;
 
 #if DEBUG_COUNTS
@@ -50,18 +48,37 @@ namespace FM
 
             if (filter != null)
             {
-                foreach (Thing thing in filter.AllowedThingDefs.SelectMany(td => Find.ListerThings.ThingsOfDef(td))) // TODO: does this catch minified things?
+                foreach (ThingDef td in filter.AllowedThingDefs)
+                // TODO: does this catch minified things?
                 {
-                    QualityCategory quality;
-                    if (thing.TryGetQuality(out quality))
+                    // if it counts as a resource, use the ingame counter (e.g. only steel in stockpiles.)
+                    if (td.CountAsResource)
                     {
-                        if (!filter.AllowedQualityLevels.Includes(quality)) continue;
+#if DEBUG_COUNTS
+                        Log.Message(td.LabelCap + ", " + Find.ResourceCounter.GetCount(td));
+                        count += Find.ResourceCounter.GetCount(td);
+#endif
                     }
-                    if (filter.AllowedHitPointsPercents.IncludesEpsilon(thing.HitPoints)) continue;
+                    else
+                    {
+                        foreach (Thing t in Find.ListerThings.ThingsOfDef(td))
+                        {
 
-                    Log.Message(thing.LabelCap + ": " + CountProducts(thing));
+                            // otherwise, go look for stuff that matches our filters.
+                            QualityCategory quality;
+                            if (t.TryGetQuality(out quality))
+                            {
+                                if (!filter.AllowedQualityLevels.Includes(quality)) continue;
+                            }
+                            if (filter.AllowedHitPointsPercents.IncludesEpsilon(t.HitPoints)) continue;
 
-                    count += CountProducts(thing);
+#if DEBUG_COUNTS
+                            Log.Message(t.LabelCap + ": " + CountProducts(t));
+#endif
+
+                            count += CountProducts(t);
+                        }
+                    }
                 }
                 _cachedFilter = filter;
             }
