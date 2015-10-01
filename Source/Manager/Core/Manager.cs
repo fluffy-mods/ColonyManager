@@ -17,7 +17,7 @@ namespace FM
 
         public static void DoWork()
         {
-#if DEBUG
+#if DEBUG_JOB_ASSIGNMENT
             Log.Message("Trying to do work");
 #endif
             JobStack.TryDoNextJob();
@@ -56,7 +56,7 @@ namespace FM
             ManagerJob job = NextJob;
             if (job == null)
             {
-#if DEBUG
+#if DEBUG_JOB_ASSIGNMENT
                 Log.Message("Tried to do job, but stack is empty");
 #endif
                 return;
