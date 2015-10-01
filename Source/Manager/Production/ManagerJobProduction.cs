@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using RimWorld;
 using Verse;
@@ -22,9 +21,6 @@ namespace FM
         public MainProductTracker MainProduct;
 
         public Bill_Production Bill;
-
-        // todo; move AssignedBills into BillGiverTracker
-        public List<Pair<Bill_Production, Building_WorkTable>> AssignedBills = new List<Pair<Bill_Production, Building_WorkTable>>();
 
         public new TriggerThreshold Trigger;
 
@@ -57,7 +53,7 @@ namespace FM
                 Log.Message("Checking workers for presence of bills");
 #endif
                 List<Building_WorkTable> workers = BillGivers.GetAssignedBillGivers;
-                CleanNoLongerAllowedBillgivers(workers, AssignedBills, ref actionTaken);
+                CleanNoLongerAllowedBillgivers(workers, BillGivers.AssignedBills, ref actionTaken);
 
                 // If Trigger met, check if there's places we need to add the bill.
                 for (int workerIndex = 0; workerIndex < workers.Count; workerIndex++)
@@ -72,7 +68,7 @@ namespace FM
                         foreach (Bill t in worker.BillStack)
                         {
                             Bill_Production thatBill = t as Bill_Production;
-                            if (thatBill != null && thatBill.recipe == Bill.recipe && AssignedBills.Contains(new Pair<Bill_Production, Building_WorkTable>(thatBill, worker)))
+                            if (thatBill != null && thatBill.recipe == Bill.recipe && BillGivers.AssignedBills.Contains(new Pair<Bill_Production, Building_WorkTable>(thatBill, worker)))
                             {
                                 billPresent = true;
                                 if (thatBill.suspended != Bill.suspended || thatBill.repeatCount == 0)
@@ -101,7 +97,7 @@ namespace FM
                         copy.repeatMode = BillRepeatMode.RepeatCount;
                         copy.repeatCount = this.CountPerWorker(workerIndex);
                         worker.BillStack?.AddBill(copy);
-                        AssignedBills.Add(new Pair<Bill_Production, Building_WorkTable>(copy, worker));
+                        BillGivers.AssignedBills.Add(new Pair<Bill_Production, Building_WorkTable>(copy, worker));
                         actionTaken = true;
                     }
                 }
@@ -158,7 +154,7 @@ namespace FM
 #if DEBUG
             Log.Message("Cleaning up obsolete bills");
 #endif
-            foreach (Pair<Bill_Production, Building_WorkTable> pair in AssignedBills)
+            foreach (Pair<Bill_Production, Building_WorkTable> pair in BillGivers.AssignedBills)
             {
 #if DEBUG
                 Log.Message("Checking worker " + pair.First.LabelCap);
@@ -168,7 +164,7 @@ namespace FM
                 Log.Message("Trying to delete obsolete bill");
 #endif
                 pair.Second.BillStack.Delete(pair.First);
-                AssignedBills.Remove(pair);
+                BillGivers.AssignedBills.Remove(pair);
 
             }
         }

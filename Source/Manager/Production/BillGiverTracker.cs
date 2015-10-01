@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
 using Verse;
-using Verse.AI;
 
 namespace FM
 {
@@ -86,6 +85,8 @@ namespace FM
                 return list;
             }
         }
+
+        public List<Pair<Bill_Production, Building_WorkTable>> AssignedBills = new List<Pair<Bill_Production, Building_WorkTable>>();
 
         public void DrawBillGiverConfig(ref Listing_Standard listing)
         {
