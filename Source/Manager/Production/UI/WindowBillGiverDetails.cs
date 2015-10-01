@@ -18,7 +18,7 @@ namespace FM
 
         public override void DoWindowContents(Rect inRect)
         {
-            Rect contentRect = new Rect(inRect.ContractedBy(6f));
+            Rect contentRect = new Rect(inRect);
             GUI.BeginGroup(contentRect);
             //TextAnchor oldAnchor = Text.Anchor;
             Text.Anchor = TextAnchor.MiddleLeft;
@@ -28,14 +28,13 @@ namespace FM
 
             // All workstations
             Rect all = new Rect(x, y, contentRect.width, 30f);
-            Rect allCheck = new Rect(x, y, 30f, 30f);
-            Rect allLabel = new Rect(36f, y, contentRect.width - 36f, 30f);
+            Rect allLabel = new Rect(30f, y + 3f, contentRect.width - 30f, 27f);
             y += 30;
+
 
             if (Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.All)
             {
                 Widgets.DrawMenuSection(all);
-                GUI.DrawTexture(allCheck, Widgets.CheckboxOnTex);
             }
             else
             {
@@ -46,29 +45,33 @@ namespace FM
                     Job.BillGivers.BillGiverAssignment = AssignedBillGiverOptions.All;
                 }
             }
+            Widgets.RadioButton(new Vector2(all.xMin + 3f, all.yMin + 3f),
+                Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.All);
             Widgets.Label(allLabel, "FMP.AllWorkstations".Translate());
             y += 6;
 
             // By area / count
             Rect area = new Rect(x, y, contentRect.width, 30f);
-            Rect areaCheck = new Rect(x, y, 30f, 30f);
-            Rect areaLabel = new Rect(36f, y, contentRect.width - 36f, 30f);
+            Rect areaLabel = new Rect(30f, y + 3f, contentRect.width - 30f, 27f);
             y += 30f;
 
             if (Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.Count)
             {
                 area.height += 60f;
                 Widgets.DrawMenuSection(area);
-                GUI.DrawTexture(areaCheck, Widgets.CheckboxOnTex);
-                Rect areaAreaLabel = new Rect(6f, y, 100f, 30f);
-                Rect areaAreaSelector = new Rect(106f, y, contentRect.width - 106f, 30f);
+                Rect areaAreaLabel = new Rect(6f, y, 50f, 30f);
+                Rect areaAreaSelector = new Rect(56f, y, contentRect.width - 56f, 30f);
                 y += 30;
-                Rect areaCountLabel = new Rect(6f, y, 100f, 30f);
-                Rect areaCountSelector = new Rect(106f, y, contentRect.width - 106f, 30f);
+                Rect areaCountLabel = new Rect(6f, y, 50f, 30f);
+                Rect areaCountSelector = new Rect(56f, y, contentRect.width - 56f, 30f);
                 y += 30;
 
                 Widgets.Label(areaAreaLabel, "FMP.AllowedAreas".Translate());
+
+                Text.Font = GameFont.Tiny;
                 AreaAllowedGUI.DoAllowedAreaSelectors(areaAreaSelector, Job);
+                Text.Font = GameFont.Small;
+
                 Color oldColor = GUI.color;
                 if (_input.IsInt())
                 {
@@ -78,6 +81,8 @@ namespace FM
                 {
                     GUI.color = new Color(1f, 0f, 0f);
                 }
+                Widgets.RadioButton(new Vector2(area.xMin + 3f, area.yMin + 3f),
+                    Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.Count);
                 Widgets.Label(areaCountLabel, "FMP.AllowedWorkstationCount".Translate());
                 _input = Widgets.TextField(areaCountSelector, _input);
                 GUI.color = oldColor;
@@ -97,7 +102,6 @@ namespace FM
             // Specific billgivers
             // todo; add scrolling region.
             Rect specific = new Rect(x, y, contentRect.width, 30f);
-            Rect specificCheck = new Rect(x, y, 30f, 30f);
             Rect specificLabel = new Rect(36f, y, contentRect.width - 36f, 30f);
             y += 30;
 
@@ -105,8 +109,8 @@ namespace FM
             {
 
                 specific.height += 24f * Job.BillGivers.GetPotentialBillGivers.Count;
-                Widgets.DrawMenuSection(specific);
-                GUI.DrawTexture(specificCheck, Widgets.CheckboxOnTex);
+
+                Widgets.DrawMenuSection(specific, true);
 
                 foreach (Building_WorkTable billgiver in Job.BillGivers.GetPotentialBillGivers)
                 {
@@ -125,6 +129,8 @@ namespace FM
                     Job.BillGivers.BillGiverAssignment = AssignedBillGiverOptions.Specific;
                 }
             }
+            Widgets.RadioButton(new Vector2(specific.xMin + 3f, specific.yMin + 3f),
+                Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.Specific);
             Widgets.Label(specificLabel, "FMP.SpecificWorkstations".Translate());
             
 
