@@ -9,7 +9,7 @@ namespace FM
     class AreaAllowedGUI
     {
         // RimWorld.AreaAllowedGUI
-        public static void DoAllowedAreaSelectors(Rect rect, ManagerJob job, AllowedAreaMode mode = AllowedAreaMode.Humanlike)
+        public static void DoAllowedAreaSelectors(Rect rect, ManagerJobProduction job, AllowedAreaMode mode = AllowedAreaMode.Humanlike)
         {
             List<Area> allAreas = Find.AreaManager.AllAreas;
             int areaCount = 1;
@@ -40,7 +40,7 @@ namespace FM
         }
 
         // RimWorld.AreaAllowedGUI
-        private static void DoAreaSelector(Rect rect, ManagerJob job, Area area)
+        private static void DoAreaSelector(Rect rect, ManagerJobProduction job, Area area)
         {
             rect = rect.ContractedBy(1f);
             GUI.DrawTexture(rect, (area == null) ? BaseContent.GreyTex : area.ColorTexture);
@@ -50,7 +50,7 @@ namespace FM
             rect2.xMin += 3f;
             rect2.yMin += 2f;
             Widgets.Label(rect2, text);
-            if (job.AreaRestriction == area)
+            if (job.BillGivers.AreaRestriction == area)
             {
                 Widgets.DrawBox(rect, 2);
             }
@@ -60,9 +60,9 @@ namespace FM
                 {
                     area.MarkForDraw();
                 }
-                if (Input.GetMouseButton(0) && job.AreaRestriction != area)
+                if (Input.GetMouseButton(0) && job.BillGivers.AreaRestriction != area)
                 {
-                    job.AreaRestriction = area;
+                    job.BillGivers.AreaRestriction = area;
                     SoundDefOf.DesignateDragStandardChanged.PlayOneShotOnCamera();
                 }
             }

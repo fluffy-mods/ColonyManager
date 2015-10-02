@@ -11,7 +11,7 @@ namespace FM
             base.CompTick();
             if (parent.IsHashIntervalTick(Props.Speed))
             {
-                Manager.DoWork();
+                Manager.Get.DoWork();
             }
         }
 

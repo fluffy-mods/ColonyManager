@@ -24,7 +24,7 @@
 
   <!-- BillGivers -->
   <FMP.BillGivers>Workstations</FMP.BillGivers>
-  <FMP.BillGiversCount>{0} available, {1} selected</FMP.BillGiversCount>
+  <FMP.BillGiversCount>{0} available, {1} selected, {2} assigned.</FMP.BillGiversCount>
   <FMP.BillGiversTooltip>Available:\n{0}\n\nSelected:{1}</FMP.BillGiversTooltip>
   <FMP.BillGiversDetails>Select workstations</FMP.BillGiversDetails>
 

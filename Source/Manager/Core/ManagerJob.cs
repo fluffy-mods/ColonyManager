@@ -9,7 +9,7 @@ namespace FM
         bool TryDoJob();
     }
 
-    public abstract class ManagerJob : IManagerJob
+    public abstract class ManagerJob : IManagerJob, IExposable
     {
         public virtual bool TryDoJob()
         {
@@ -46,6 +46,11 @@ namespace FM
             return strout.ToString();
         }
 
-        public Area AreaRestriction = new Area_Allowed(AllowedAreaMode.Humanlike);
+        public virtual void ExposeData()
+        {
+            Scribe_Values.LookValue(ref ActionInterval, "ActionInterval");
+            Scribe_Values.LookValue(ref LastAction, "LastAction");
+            Scribe_Values.LookValue(ref Priority, "Priority");
+        }
     }
 }

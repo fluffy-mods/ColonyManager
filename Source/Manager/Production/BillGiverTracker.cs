@@ -13,9 +13,31 @@ namespace FM
         Specific
     }
 
-    public class BillGiverTracker
+    public class BillGiverTracker : IExposable
     {
+        public void ExposeData()
+        {
+            Scribe_Values.LookValue(ref BillGiverSelection, "BillGiverSelection");
+            Scribe_Values.LookValue(ref UserBillGiverCount, "UserBillGiverCount");
+            Scribe_References.LookReference(ref AreaRestriction, "AreaRestriction");
+            Scribe_Collections.LookDictionary(ref AssignedBills, "AssignedBills", LookMode.MapReference, LookMode.MapReference);
+            Scribe_Collections.LookList(ref SpecificBillGivers, "SpecificBillGivers", LookMode.MapReference);
+
+            foreach (KeyValuePair<Bill_Production, Building_WorkTable> pair in AssignedBills)
+            {
+                Log.Message(pair.Key.LabelCap + " | " + pair.Value.LabelCap);
+            }
+        }
+
         public BillGiverTracker(ManagerJobProduction job)
+        {
+            _recipe = job.Bill.recipe;
+            _job = job;
+            AssignedBills = new Dictionary<Bill_Production, Building_WorkTable>();
+            SpecificBillGivers = new List<Building_WorkTable>();
+        }
+
+        public BillGiverTracker(ManagerJobProduction job, Boolean thisIsAScribeConstructor)
         {
             _recipe = job.Bill.recipe;
             _job = job;
@@ -26,29 +48,34 @@ namespace FM
         /// <summary>
         /// Specific billgivers set by user
         /// </summary>
-        public List<Building_WorkTable> SpecificBillGivers = new List<Building_WorkTable>();
+        public List<Building_WorkTable> SpecificBillGivers;
 
         /// <summary>
         /// Assignment mode for billgivers
         /// </summary>
-        public AssignedBillGiverOptions BillGiverAssignment = AssignedBillGiverOptions.All;
+        public AssignedBillGiverOptions BillGiverSelection = AssignedBillGiverOptions.All;
 
         /// <summary>
         /// All potential billgivers count
         /// </summary>
         public int AllBillGiverCount => GetBillGiverDefs.Count;
 
+        public Area AreaRestriction = null;
+
+        public Dictionary<Bill_Production, Building_WorkTable> AssignedBills;
+
         /// <summary>
         /// Currently allowed billgivers count (these do not necessarily actually have the bill)
         /// </summary>
-        public int CurBillGiverCount => GetAssignedBillGivers.Count;
+        public int CurBillGiverCount => GetSelectedBillGivers.Count;
 
         /// <summary>
         /// User requested billgiver count, when using count assignment mode.
         /// </summary>
         public int UserBillGiverCount;
 
-        private readonly RecipeDef _recipe;
+        private RecipeDef _recipe;
+
         private ManagerJobProduction _job;
 
         /// <summary>
@@ -62,16 +89,16 @@ namespace FM
         /// All currently assigned billgivers
         /// </summary>
         /// <returns></returns>
-        public List<Building_WorkTable> GetAssignedBillGivers
+        public List<Building_WorkTable> GetSelectedBillGivers
         {
             get
             {
                 List<Building_WorkTable> list = Recipe.GetCurrentRecipeUsers();
 
-                switch (BillGiverAssignment)
+                switch (BillGiverSelection)
                 {
                     case AssignedBillGiverOptions.Count:
-                        if (_job.AreaRestriction != null) list = list.Where(bw => _job.AreaRestriction.ActiveCells.Contains(bw.Position)).ToList();
+                        if (AreaRestriction != null) list = list.Where(bw => AreaRestriction.ActiveCells.Contains(bw.Position)).ToList();
                         list = list.Take(UserBillGiverCount).ToList();
                         break;
                     case AssignedBillGiverOptions.Specific:
@@ -86,7 +113,10 @@ namespace FM
             }
         }
 
-        public List<Pair<Bill_Production, Building_WorkTable>> AssignedBills = new List<Pair<Bill_Production, Building_WorkTable>>();
+        public List<Building_WorkTable> GetAssignedBillGivers
+        {
+            get { return AssignedBills.Values.ToList(); }
+        }
 
         public void DrawBillGiverConfig(ref Listing_Standard listing)
         {
@@ -94,10 +124,10 @@ namespace FM
 
             // workstation info
             listing.DoLabel("FMP.BillGivers".Translate());
-            listing.DoLabel("FMP.BillGiversCount".Translate(GetPotentialBillGivers.Count, GetAssignedBillGivers.Count));
+            listing.DoLabel("FMP.BillGiversCount".Translate(GetPotentialBillGivers.Count, GetSelectedBillGivers.Count, GetAssignedBillGivers.Count));
 
             string potentialString = String.Join("\n", GetPotentialBillGivers.Select(b => b.LabelCap).ToArray());
-            string assignedString = String.Join("\n", GetAssignedBillGivers.Select(b => b.LabelCap).ToArray());
+            string assignedString = String.Join("\n", GetSelectedBillGivers.Select(b => b.LabelCap).ToArray());
             string stationsTooltip = "FMP.BillGiversTooltip".Translate(potentialString, assignedString);
             // todo, fix that tooltip. Possible?
             // TooltipHandler.TipRegion(stations, stationsTooltip);

@@ -12,11 +12,6 @@ namespace FM
 {
     public class ManagerTabProduction : ManagerTab
     {
-        public ManagerTabProduction()
-        {
-            RefreshSourceList();
-        }
-
         public override string Label { get; } = "FMP.Production".Translate();
 
         public float LeftRowSize = 300f;
@@ -50,16 +45,14 @@ namespace FM
                     SourceList = (from rd in DefDatabase<RecipeDef>.AllDefsListForReading
                                   where rd.HasBuildingRecipeUser(true)
                                   select (new ManagerJobProduction(rd))).ToList();
-                                  // select (rd.UsesUnfinishedThing ? new Bill_Managed(rd) : (Bill_Managed) new Bill_ManagedWithUft(rd))).ToList();
                     break;
                 case SourceOptions.Current:
-                    SourceList = Manager.JobStack.FullStack.OfType<ManagerJobProduction>().ToList();
+                    SourceList = Manager.Get.JobStack.FullStack.OfType<ManagerJobProduction>().ToList();
                     break;
                 case SourceOptions.All:
                     SourceList = (from rd in DefDatabase<RecipeDef>.AllDefsListForReading
                                   where rd.HasBuildingRecipeUser()
                                   select (new ManagerJobProduction(rd))).ToList();
-                    // select (rd.UsesUnfinishedThing ? new Bill_Managed(rd) : (Bill_Managed) new Bill_ManagedWithUft(rd))).ToList();
                     break;
             }
         }
@@ -97,7 +90,7 @@ namespace FM
                 {
                     if (Widgets.TextButton(add, "FM.Delete".Translate()))
                     {
-                        Manager.JobStack.Delete(Job);
+                        Manager.Get.JobStack.Delete(Job);
                         Job = null;
                         RefreshSourceList();
                         return; // hopefully that'll just skip to the next tick without any further errors?
@@ -110,7 +103,7 @@ namespace FM
                     {
                         if (Widgets.TextButton(add, "FM.Manage".Translate()))
                         {
-                            Manager.JobStack.Add(Job);
+                            Manager.Get.JobStack.Add(Job);
 
                             Source = SourceOptions.Current;
                             RefreshSourceList();
@@ -232,6 +225,7 @@ namespace FM
         {
             // focus on the filter on open, flag is checked after the field is actually drawn.
             _postOpenFocus = false;
+            RefreshSourceList();
         }
 
         public void DoLeftRow(Rect canvas)

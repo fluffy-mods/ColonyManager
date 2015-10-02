@@ -18,7 +18,7 @@ namespace FM
 
         private string _label;
 
-        private readonly RecipeDef _recipe;
+        private RecipeDef _recipe;
 
         private ThingDef _thingDef;
 

@@ -12,7 +12,7 @@ namespace FM
             if (CurrentTab == null) CurrentTab = DefaultTab;
         }
 
-        public ManagerTab DefaultTab = Manager.ManagerTabs[0];
+        public ManagerTab DefaultTab = Manager.Get.ManagerTabs[0];
 
         public ManagerTab CurrentTab;
 
@@ -46,9 +46,9 @@ namespace FM
             if (Widgets.TextButton(buttonRect, CurrentTab.Label))
             {
                 List<FloatMenuOption> list = new List<FloatMenuOption>();
-                for (int i = 0; i < Manager.ManagerTabs.Length; i++)
+                for (int i = 0; i < Manager.Get.ManagerTabs.Length; i++)
                 {
-                    ManagerTab current = Manager.ManagerTabs[i];
+                    ManagerTab current = Manager.Get.ManagerTabs[i];
                     list.Add(new FloatMenuOption(current.Label, delegate
                     {
                         CurrentTab = current;

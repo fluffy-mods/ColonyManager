@@ -1,43 +1,81 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
+using Verse;
 
 // TODO: save / load.
 
 namespace FM
 {
-    public static class Manager
+    public class Manager : MapComponent
     {
-        public static ManagerTab[] ManagerTabs =  {
+        public Manager()
+        {
+            _stack = new JobStack();
+        }
+
+        public override void ExposeData()
+        {
+            Scribe_Deep.LookDeep(ref _stack, "JobStack");
+            base.ExposeData();
+
+            if (_stack == null) _stack = new JobStack();
+        }
+
+        public ManagerTab[] ManagerTabs =
+        {
             new ManagerTabProduction()
         };
 
-        private static JobStack _stack;
+        private JobStack _stack;
 
-        public static JobStack JobStack => _stack ?? (_stack = new JobStack());
+        public JobStack JobStack => _stack ?? (_stack = new JobStack());
 
-        public static void DoWork()
+        public void DoWork()
         {
-#if DEBUG_JOB_ASSIGNMENT
+#if DEBUG_JOBS
             Log.Message("Trying to do work");
 #endif
             JobStack.TryDoNextJob();
         }
+
+        // copypasta from AutoEquip.
+        public static Manager Get
+        {
+            get
+            {
+                Manager getComponent =
+                    Find.Map.components.OfType<Manager>().FirstOrDefault();
+                if (getComponent == null)
+                {
+                    getComponent = new Manager();
+                    Find.Map.components.Add(getComponent);
+                }
+
+                return getComponent;
+            }
+        }
     }
 
-    public class JobStack
+    public class JobStack : IExposable
     {
         public JobStack()
         {
-            stack = new List<ManagerJob>();
+            _stack = new List<ManagerJob>();
         }
 
-        private List<ManagerJob> stack;
+        public void ExposeData()
+        {
+            Scribe_Collections.LookList(ref _stack, "JobStack", LookMode.Deep);
+        }
+
+        private List<ManagerJob> _stack;
 
         public List<ManagerJob> FullStack
         {
             get
             {
-                return stack.OrderBy(mj => mj.Priority).ToList();
+                return _stack.OrderBy(mj => mj.Priority).ToList();
             }
         } 
 
@@ -45,7 +83,7 @@ namespace FM
         {
             get
             {
-                return stack.Where(mj => mj.ShouldDoNow).OrderBy(mj => mj.Priority).ToList();
+                return _stack.Where(mj => mj.ShouldDoNow).OrderBy(mj => mj.Priority).ToList();
             }
         }
 
@@ -56,8 +94,8 @@ namespace FM
             ManagerJob job = NextJob;
             if (job == null)
             {
-#if DEBUG_JOB_ASSIGNMENT
-                Log.Message("Tried to do job, but stack is empty");
+#if DEBUG_JOBS
+                Log.Message("Tried to do job, but _stack is empty");
 #endif
                 return;
             }
@@ -68,14 +106,14 @@ namespace FM
         
         public void Add(ManagerJob job)
         {
-            job.Priority = stack.Count + 1;
-            stack.Add(job);
+            job.Priority = _stack.Count + 1;
+            _stack.Add(job);
         }
 
         public void Delete(ManagerJob job)
         {
             job.CleanUp();
-            stack.Remove(job);
+            _stack.Remove(job);
         }
     }
 }

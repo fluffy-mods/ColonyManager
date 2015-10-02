@@ -87,6 +87,14 @@ namespace FM
 
         public int Count;
 
+        public override void ExposeData()
+        {
+            Scribe_Values.LookValue(ref Count, "Count");
+            Scribe_Values.LookValue(ref MaxUpperThreshold, "MaxUpperThreshold");
+            Scribe_Values.LookValue(ref Op, "Operator");
+            Scribe_Deep.LookDeep(ref ThresholdFilter, "ThresholdFilter");
+        }
+
         public override void DrawThresholdConfig(ref Listing_Standard listing)
         {
             // target threshold

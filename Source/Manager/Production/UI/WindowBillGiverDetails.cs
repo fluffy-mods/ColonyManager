@@ -31,8 +31,7 @@ namespace FM
             Rect allLabel = new Rect(30f, y + 3f, contentRect.width - 30f, 27f);
             y += 30;
 
-
-            if (Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.All)
+            if (Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.All)
             {
                 Widgets.DrawMenuSection(all);
             }
@@ -42,11 +41,11 @@ namespace FM
                 if (Mouse.IsOver(all)) GUI.DrawTexture(all, TexUI.HighlightTex);
                 if (Widgets.InvisibleButton(all))
                 {
-                    Job.BillGivers.BillGiverAssignment = AssignedBillGiverOptions.All;
+                    Job.BillGivers.BillGiverSelection = AssignedBillGiverOptions.All;
                 }
             }
             Widgets.RadioButton(new Vector2(all.xMin + 3f, all.yMin + 3f),
-                Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.All);
+                Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.All);
             Widgets.Label(allLabel, "FMP.AllWorkstations".Translate());
             y += 6;
 
@@ -55,7 +54,7 @@ namespace FM
             Rect areaLabel = new Rect(30f, y + 3f, contentRect.width - 30f, 27f);
             y += 30f;
 
-            if (Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.Count)
+            if (Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.Count)
             {
                 area.height += 60f;
                 Widgets.DrawMenuSection(area);
@@ -82,7 +81,7 @@ namespace FM
                     GUI.color = new Color(1f, 0f, 0f);
                 }
                 Widgets.RadioButton(new Vector2(area.xMin + 3f, area.yMin + 3f),
-                    Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.Count);
+                    Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.Count);
                 Widgets.Label(areaCountLabel, "FMP.AllowedWorkstationCount".Translate());
                 _input = Widgets.TextField(areaCountSelector, _input);
                 GUI.color = oldColor;
@@ -93,7 +92,7 @@ namespace FM
                 if (Mouse.IsOver(area)) GUI.DrawTexture(area, TexUI.HighlightTex);
                 if (Widgets.InvisibleButton(area))
                 {
-                    Job.BillGivers.BillGiverAssignment = AssignedBillGiverOptions.Count;
+                    Job.BillGivers.BillGiverSelection = AssignedBillGiverOptions.Count;
                 }
             }
             Widgets.Label(areaLabel, "FMP.ByAreaAndCount".Translate());
@@ -105,7 +104,7 @@ namespace FM
             Rect specificLabel = new Rect(36f, y, contentRect.width - 36f, 30f);
             y += 30;
 
-            if (Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.Specific)
+            if (Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.Specific)
             {
 
                 specific.height += 24f * Job.BillGivers.GetPotentialBillGivers.Count;
@@ -126,11 +125,11 @@ namespace FM
                 TooltipHandler.TipRegion(specific, "FMP.SpecificWorkstationsTooltip");
                 if (Widgets.InvisibleButton(specific))
                 {
-                    Job.BillGivers.BillGiverAssignment = AssignedBillGiverOptions.Specific;
+                    Job.BillGivers.BillGiverSelection = AssignedBillGiverOptions.Specific;
                 }
             }
             Widgets.RadioButton(new Vector2(specific.xMin + 3f, specific.yMin + 3f),
-                Job.BillGivers.BillGiverAssignment == AssignedBillGiverOptions.Specific);
+                Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.Specific);
             Widgets.Label(specificLabel, "FMP.SpecificWorkstations".Translate());
             
 
