@@ -26,7 +26,7 @@ namespace FM
             base.ExposeData();
 
             Scribe_Deep.LookDeep(ref Bill, "Bill");
-            Scribe_Deep.LookDeep(ref BillGivers, "BillGivers", this, true);
+            Scribe_Deep.LookDeep(ref BillGivers, "BillGivers", this);
             // init main product, required by trigger.
             if (MainProduct == null) MainProduct = new MainProductTracker(Bill.recipe);
             Scribe_Deep.LookDeep(ref Trigger, "Trigger", this);

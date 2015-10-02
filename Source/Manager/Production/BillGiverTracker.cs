@@ -37,12 +37,6 @@ namespace FM
             SpecificBillGivers = new List<Building_WorkTable>();
         }
 
-        public BillGiverTracker(ManagerJobProduction job, Boolean thisIsAScribeConstructor)
-        {
-            _recipe = job.Bill.recipe;
-            _job = job;
-        }
-
         public RecipeDef Recipe => _recipe;
 
         /// <summary>
