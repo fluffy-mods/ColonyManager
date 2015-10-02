@@ -59,6 +59,9 @@ namespace FM
 
     public class JobStack : IExposable
     {
+        /// <summary>
+        /// Full jobstack, in order of assignment
+        /// </summary>
         public JobStack()
         {
             _stack = new List<ManagerJob>();
@@ -71,6 +74,9 @@ namespace FM
 
         private List<ManagerJob> _stack;
 
+        /// <summary>
+        /// Full jobstack, in order of priority
+        /// </summary>
         public List<ManagerJob> FullStack
         {
             get
@@ -79,6 +85,9 @@ namespace FM
             }
         } 
 
+        /// <summary>
+        /// Jobstack of jobs that are available now
+        /// </summary>
         public List<ManagerJob> CurStack
         {
             get
@@ -87,8 +96,14 @@ namespace FM
             }
         }
 
+        /// <summary>
+        /// Highest priority available job
+        /// </summary>
         public ManagerJob NextJob => CurStack.DefaultIfEmpty(null).FirstOrDefault();
 
+        /// <summary>
+        /// Call the worker for the next available job
+        /// </summary>
         public void TryDoNextJob()
         {
             ManagerJob job = NextJob;
@@ -100,7 +115,10 @@ namespace FM
                 return;
             }
 
+            // update lastAction
             job.Touch();
+
+            // perform next job if no action was taken
             if (!job.TryDoJob()) TryDoNextJob();
         }
         

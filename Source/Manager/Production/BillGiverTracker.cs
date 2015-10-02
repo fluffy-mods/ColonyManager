@@ -42,6 +42,7 @@ namespace FM
         /// <summary>
         /// Specific billgivers set by user
         /// </summary>
+        /// todo: load specific billgivers properly
         public List<Building_WorkTable> SpecificBillGivers;
 
         /// <summary>
@@ -54,8 +55,15 @@ namespace FM
         /// </summary>
         public int AllBillGiverCount => GetBillGiverDefs.Count;
 
+        /// <summary>
+        /// Area restriction
+        /// </summary>
         public Area AreaRestriction = null;
 
+        /// <summary>
+        /// Current list of assigned bill/worksations
+        /// </summary>
+        /// todo: load assignedbills properly
         public Dictionary<Bill_Production, Building_WorkTable> AssignedBills;
 
         /// <summary>
@@ -77,10 +85,13 @@ namespace FM
         /// </summary>
         public List<ThingDef> GetBillGiverDefs => Recipe.GetRecipeUsers();
 
+        /// <summary>
+        /// Get workstations that can perform the current bill/recipe (nothwithstanding area/count restrictions etc).
+        /// </summary>
         public List<Building_WorkTable> GetPotentialBillGivers => Recipe.GetCurrentRecipeUsers();
 
         /// <summary>
-        /// All currently assigned billgivers
+        /// Get workstations that can perform the current bill/recipe, and meet selection criteria set by player.
         /// </summary>
         /// <returns></returns>
         public List<Building_WorkTable> GetSelectedBillGivers
@@ -107,11 +118,18 @@ namespace FM
             }
         }
 
+        /// <summary>
+        /// Get workstations to which a bill was actually assigned
+        /// </summary>
         public List<Building_WorkTable> GetAssignedBillGivers
         {
             get { return AssignedBills.Values.ToList(); }
         }
 
+        /// <summary>
+        /// Draw billgivers info + details button
+        /// </summary>
+        /// <param name="listing"></param>
         public void DrawBillGiverConfig(ref Listing_Standard listing)
         {
             listing.DoGap();
