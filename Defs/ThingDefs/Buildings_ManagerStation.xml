@@ -25,7 +25,7 @@
   <ThingDef ParentName="BenchBase">
     <DefName>FM_ManagerStation</DefName>
     <label>Manager Station</label>
-    <ThingClass>Building_WorkTable</ThingClass>
+    <ThingClass>FM.Building_ManagerStation</ThingClass>
     <Description>A simple table with allowing a manager to do his work.</Description>
     <graphicData>
       <texPath>Things/Building/Production/TableButcher</texPath>
@@ -39,6 +39,7 @@
     <stuffCategories>
       <li>Metallic</li>
       <li>Woody</li>
+      <li>Stony</li>
     </stuffCategories>
     <AltitudeLayer>Waist</AltitudeLayer>
     <fillPercent>0.5</fillPercent>
@@ -63,8 +64,8 @@
         <glowRadius>10</glowRadius>
         <glowColor>(255,0,0,0)</glowColor>
       </li>
-      <li Class="FM.CompPropertiesManagerStation">
-        <compClass>FM.CompManagerStation</compClass>
+      <li Class="FM.CompProperties_ManagerStation">
+        <compClass>FM.Comp_ManagerStation</compClass>
         <speed>500</speed>
       </li>     
     </comps>

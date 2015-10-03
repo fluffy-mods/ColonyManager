@@ -29,14 +29,14 @@ namespace FM
 
         private JobStack _stack;
 
-        public JobStack JobStack => _stack ?? (_stack = new JobStack());
+        public JobStack GetJobStack => _stack ?? (_stack = new JobStack());
 
         public void DoWork()
         {
 #if DEBUG_JOBS
             Log.Message("Trying to do work");
 #endif
-            JobStack.TryDoNextJob();
+            GetJobStack.TryDoNextJob();
         }
 
         // copypasta from AutoEquip.

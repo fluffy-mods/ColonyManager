@@ -47,7 +47,7 @@ namespace FM
                                   select (new ManagerJobProduction(rd))).ToList();
                     break;
                 case SourceOptions.Current:
-                    SourceList = Manager.Get.JobStack.FullStack.OfType<ManagerJobProduction>().ToList();
+                    SourceList = Manager.Get.GetJobStack.FullStack.OfType<ManagerJobProduction>().ToList();
                     break;
                 case SourceOptions.All:
                     SourceList = (from rd in DefDatabase<RecipeDef>.AllDefsListForReading
@@ -90,7 +90,7 @@ namespace FM
                 {
                     if (Widgets.TextButton(add, "FM.Delete".Translate()))
                     {
-                        Manager.Get.JobStack.Delete(Job);
+                        Manager.Get.GetJobStack.Delete(Job);
                         Job = null;
                         RefreshSourceList();
                         return; // hopefully that'll just skip to the next tick without any further errors?
@@ -103,7 +103,7 @@ namespace FM
                     {
                         if (Widgets.TextButton(add, "FM.Manage".Translate()))
                         {
-                            Manager.Get.JobStack.Add(Job);
+                            Manager.Get.GetJobStack.Add(Job);
 
                             Source = SourceOptions.Current;
                             RefreshSourceList();

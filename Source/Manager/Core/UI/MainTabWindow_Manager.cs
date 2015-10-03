@@ -5,9 +5,9 @@ using Verse;
 
 namespace FM
 {
-    class MainTabWindowManager : MainTabWindow
+    class MainTabWindow_Manager : MainTabWindow
     {
-        public MainTabWindowManager()
+        public MainTabWindow_Manager()
         {
             if (CurrentTab == null) CurrentTab = DefaultTab;
         }
