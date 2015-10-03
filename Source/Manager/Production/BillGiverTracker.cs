@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using RimWorld;
 using Verse;
 
@@ -17,15 +19,25 @@ namespace FM
     {
         public void ExposeData()
         {
+            if (Scribe.mode == LoadSaveMode.Saving)
+            {
+                _assignedWorkersScribeID = _assignedBills.Values.Select(b => b.GetUniqueLoadID()).ToList();
+                _assignedBillsScribeID = _assignedBills.Keys.Select(b => b.GetUniqueLoadID()).ToList();
+            }
+
             Scribe_Values.LookValue(ref BillGiverSelection, "BillGiverSelection");
             Scribe_Values.LookValue(ref UserBillGiverCount, "UserBillGiverCount");
             Scribe_References.LookReference(ref AreaRestriction, "AreaRestriction");
-            Scribe_Collections.LookDictionary(ref AssignedBills, "AssignedBills", LookMode.MapReference, LookMode.MapReference);
+            Scribe_Collections.LookList(ref _assignedBillsScribeID, "AssignedBills", LookMode.Value);
+            Scribe_Collections.LookList(ref _assignedWorkersScribeID, "AssignedWorkers", LookMode.Value);
             Scribe_Collections.LookList(ref SpecificBillGivers, "SpecificBillGivers", LookMode.MapReference);
 
-            foreach (KeyValuePair<Bill_Production, Building_WorkTable> pair in AssignedBills)
+            // rather complicated post-load workaround to find buildings by unique ID, since the scribe won't do things the simple way.
+            // i.e. scribing dictionary with reference keys and values does not appear to work.
+            // since buildings dont appear in the standard finding methods at this point, set a flag to initialize assignedbillgivers the next time Assigned bill givers is called.
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                Log.Message(pair.Key.LabelCap + " | " + pair.Value.LabelCap);
+                _assignedBillGiversInitialized = false;
             }
         }
 
@@ -33,9 +45,21 @@ namespace FM
         {
             _recipe = job.Bill.recipe;
             _job = job;
-            AssignedBills = new Dictionary<Bill_Production, Building_WorkTable>();
+            _assignedBills = new Dictionary<Bill_Production, Building_WorkTable>();
             SpecificBillGivers = new List<Building_WorkTable>();
         }
+
+        public List<string> AssignedBillsScribe
+        {
+            get { return _assignedBills.Keys.Select(b => b.GetUniqueLoadID()).ToList(); }
+            set { _assignedBillsScribeID = value; }
+        }
+
+        public List<string> AssignedWorkersScribe
+        {
+            get { return _assignedBills.Values.Select(b => b.GetUniqueLoadID()).ToList(); }
+            set { _assignedWorkersScribeID = value; }
+        } 
 
         public RecipeDef Recipe => _recipe;
 
@@ -64,7 +88,7 @@ namespace FM
         /// Current list of assigned bill/worksations
         /// </summary>
         /// todo: load assignedbills properly
-        public Dictionary<Bill_Production, Building_WorkTable> AssignedBills;
+        private Dictionary<Bill_Production, Building_WorkTable> _assignedBills;
 
         /// <summary>
         /// Currently allowed billgivers count (these do not necessarily actually have the bill)
@@ -79,6 +103,12 @@ namespace FM
         private RecipeDef _recipe;
 
         private ManagerJobProduction _job;
+
+        private List<string> _assignedBillsScribeID;
+
+        private List<string> _assignedWorkersScribeID;
+
+        private bool _assignedBillGiversInitialized = true;
 
         /// <summary>
         /// All billgiver defs (by recipe).
@@ -118,12 +148,67 @@ namespace FM
             }
         }
 
+        public Dictionary<Bill_Production, Building_WorkTable> GetAssignedBillGiversAndBillsDictionary
+        {
+            get
+            {
+                if (!_assignedBillGiversInitialized)
+                {
+                    bool error = false;
+                    _assignedBills = new Dictionary<Bill_Production, Building_WorkTable>();
+                    for (int i = 0; i < _assignedBillsScribeID.Count; i++)
+                    {
+#if DEBUG_SCRIBE
+                        Log.Message("Trying to find " + _assignedWorkersScribeID[i] + " | " + _assignedBillsScribeID[i]);
+                        if (_recipe != null) Log.Message("Recipe: " + _recipe.label);
+                        Log.Message(_recipe.GetCurrentRecipeUsers().Count.ToString());
+#endif
+                        try
+                        {
+                            Building_WorkTable worker = Recipe.GetCurrentRecipeUsers().DefaultIfEmpty(null)
+                                    .FirstOrDefault(b => b.GetUniqueLoadID() == _assignedWorkersScribeID[i]);
+                            Bill_Production bill = null;
+                            if (worker == null) throw new Exception("worker not found");
+                            if (worker.billStack == null) throw new Exception("Billstack not initialized");
+                            for (int j = 0; j < worker.billStack.Count; j++)
+                            {
+                                if (worker.billStack[j].GetUniqueLoadID() == _assignedBillsScribeID[i])
+                                {
+                                    bill = (Bill_Production)worker.billStack[j];
+                                }
+                            }
+                            if (bill == null) throw new Exception("Bill not found");
+                            _assignedBills.Add(bill, worker);
+                        }
+                        catch (Exception e)
+                        {
+                            error = true;
+#if DEBUG_SCRIBE
+                            StringBuilder message = new StringBuilder();
+                            message.AppendLine(e.Message);
+                            message.AppendLine("in " + e.Source);
+                            message.AppendLine(e.StackTrace);
+                            Log.Warning(message.ToString());
+#endif
+                        }
+                    }
+
+                    if (!error) _assignedBillGiversInitialized = true;
+                }
+
+                return _assignedBills;
+            }
+        } 
+
         /// <summary>
         /// Get workstations to which a bill was actually assigned
         /// </summary>
         public List<Building_WorkTable> GetAssignedBillGivers
         {
-            get { return AssignedBills.Values.ToList(); }
+            get
+            {
+                return GetAssignedBillGiversAndBillsDictionary.Values.ToList();
+            }
         }
 
         /// <summary>

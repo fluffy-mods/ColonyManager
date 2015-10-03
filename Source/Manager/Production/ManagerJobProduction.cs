@@ -95,7 +95,7 @@ namespace FM
                 List<Building_WorkTable> workers = BillGivers.GetSelectedBillGivers;
 
                 // clean up bills on workstations that do not meet selection criteria (area, count, etc) (anymore).
-                CleanNoLongerAllowedBillgivers(workers, BillGivers.AssignedBills, ref actionTaken);
+                CleanNoLongerAllowedBillgivers(workers, BillGivers.GetAssignedBillGiversAndBillsDictionary, ref actionTaken);
 
                 // If Trigger met, check if there's places we need to add the bill.
                 for (int workerIndex = 0; workerIndex < workers.Count; workerIndex++)
@@ -110,7 +110,7 @@ namespace FM
                     if (worker.BillStack != null && worker.BillStack.Count > 0)
                     {
 #if DEBUG_JOBS
-                        foreach (KeyValuePair<Bill_Production, Building_WorkTable> pair in BillGivers.AssignedBills)
+                        foreach (KeyValuePair<Bill_Production, Building_WorkTable> pair in BillGivers.GetAssignedBillGiversAndBillsDictionary)
                         {
                             Log.Message("saved" + pair.Key.GetUniqueLoadID() + " | " + pair.Value.GetUniqueLoadID());
                         }
@@ -127,7 +127,7 @@ namespace FM
                             }
 #endif
                             // if there is a bill, and it's managed by us, check to see if it's up-to-date.
-                            if (thatBill != null && thatBill.recipe == Bill.recipe && BillGivers.AssignedBills.Contains(new KeyValuePair<Bill_Production, Building_WorkTable>(thatBill, worker)))
+                            if (thatBill != null && thatBill.recipe == Bill.recipe && BillGivers.GetAssignedBillGiversAndBillsDictionary.Contains(new KeyValuePair<Bill_Production, Building_WorkTable>(thatBill, worker)))
                             {
                                 billPresent = true;
                                 if (thatBill.suspended != Bill.suspended || thatBill.repeatCount == 0)
@@ -159,7 +159,7 @@ namespace FM
                         copy.repeatMode = BillRepeatMode.RepeatCount;
                         copy.repeatCount = this.CountPerWorker(workerIndex);
                         worker.BillStack?.AddBill(copy);
-                        BillGivers.AssignedBills.Add(copy, worker);
+                        BillGivers.GetAssignedBillGiversAndBillsDictionary.Add(copy, worker);
                         actionTaken = true;
                     }
                 }
@@ -240,7 +240,7 @@ namespace FM
             Log.Message("Cleaning up obsolete bills");
 #endif
             List<Bill_Production> toBeDeleted = new List<Bill_Production>();
-            foreach (KeyValuePair<Bill_Production, Building_WorkTable> pair in BillGivers.AssignedBills)
+            foreach (KeyValuePair<Bill_Production, Building_WorkTable> pair in BillGivers.GetAssignedBillGiversAndBillsDictionary)
             {
                 pair.Value.BillStack.Delete(pair.Key);
                 toBeDeleted.Add(pair.Key);
@@ -253,7 +253,7 @@ namespace FM
 #if DEBUG_JOBS
                 Log.Message("Deleting bill " + key.LabelCap);
 #endif
-                BillGivers.AssignedBills.Remove(key);
+                BillGivers.GetAssignedBillGiversAndBillsDictionary.Remove(key);
             }
         }
 
