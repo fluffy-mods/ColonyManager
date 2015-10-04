@@ -27,6 +27,8 @@ namespace FM
             Log.Message("Comp" + (t.TryGetComp<Comp_ManagerStation>() != null));
             Log.Message("Incap" + (!pawn.Dead && !pawn.Downed && !pawn.IsBurning() && !t.IsBurning()));
             Log.Message("CanReserve and reach" + (pawn.CanReserveAndReach(t, PathEndMode, Danger.Some)));
+            CompPowerTrader powera = t.TryGetComp<CompPowerTrader>();
+            Log.Message("Power" + (powera == null || powera.PowerOn));
             Log.Message("Job" + (Manager.Get.GetJobStack.NextJob != null));
 #endif
             if ((t as Building_ManagerStation) == null) return false;
@@ -36,6 +38,9 @@ namespace FM
             if (pawn.Dead || pawn.Downed || pawn.IsBurning() || t.IsBurning()) return false;
 
             if (!pawn.CanReserveAndReach(t, PathEndMode, Danger.Some)) return false;
+
+            CompPowerTrader power = t.TryGetComp<CompPowerTrader>();
+            if (power != null && !power.PowerOn) return false;
 
             if (Manager.Get.GetJobStack.NextJob != null) return true;
 

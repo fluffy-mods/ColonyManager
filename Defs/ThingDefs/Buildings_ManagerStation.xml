@@ -23,19 +23,17 @@
 
 
   <ThingDef ParentName="BenchBase">
-    <DefName>FM_ManagerStation</DefName>
-    <label>Manager Station</label>
+    <DefName>FM_BasicManagerStation</DefName>
+    <label>basic manager desk</label>
     <ThingClass>FM.Building_ManagerStation</ThingClass>
-    <Description>A simple table with allowing a manager to do his work.</Description>
+    <Description>A simple table with all the stationary required to allow a manager to do his work.</Description>
     <graphicData>
-      <texPath>Things/Building/Production/TableButcher</texPath>
+      <texPath>Buildings/BasicManagerStation</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
       <drawSize>(3.5,1.5)</drawSize>
     </graphicData>
     <costStuffCount>75</costStuffCount>
-    <CostList>
-      <WoodLog>20</WoodLog>
-    </CostList>
     <stuffCategories>
       <li>Metallic</li>
       <li>Woody</li>
@@ -48,7 +46,51 @@
       <WorkToMake>2000</WorkToMake>
       <MaxHitPoints>180</MaxHitPoints>
       <Flammability>1.0</Flammability>
-      <Cleanliness>-15</Cleanliness>
+    </statBases>
+    <Size>(3,1)</Size>
+    <DesignationCategory>Production</DesignationCategory>
+    <Passability>PassThroughOnly</Passability>
+    <pathCost>60</pathCost>
+    <hasInteractionCell>True</hasInteractionCell>
+    <interactionCellOffset>(0,0,-1)</interactionCellOffset>
+    <surfaceType>Item</surfaceType>
+    <tickerType>Normal</tickerType>
+    <comps>
+      <li Class="FM.CompProperties_ManagerStation">
+        <compClass>FM.Comp_ManagerStation</compClass>
+        <speed>1000</speed>
+      </li>     
+    </comps>
+  </ThingDef>
+
+    <ThingDef ParentName="BenchBase">
+    <DefName>FM_ManagerStation</DefName>
+    <label>manager desk</label>
+    <ThingClass>FM.Building_ManagerStation</ThingClass>
+    <Description>A desk with a computer and all the stationary required to allow a manager to do his work efficiently.</Description>
+    <graphicData>
+      <texPath>Buildings/ManagerStation</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(3.5,1.5)</drawSize>
+    </graphicData>
+    <costStuffCount>100</costStuffCount>
+    <costList>
+      <Steel>50</Steel>
+      <Silver>1</Silver>
+    </costList>
+    <stuffCategories>
+      <li>Metallic</li>
+      <li>Woody</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <AltitudeLayer>Waist</AltitudeLayer>
+    <fillPercent>0.5</fillPercent>
+    <useHitPoints>True</useHitPoints>
+    <statBases>
+      <WorkToMake>3000</WorkToMake>
+      <MaxHitPoints>180</MaxHitPoints>
+      <Flammability>1.0</Flammability>
     </statBases>
     <Size>(3,1)</Size>
     <DesignationCategory>Production</DesignationCategory>
@@ -60,15 +102,18 @@
     <tickerType>Normal</tickerType>
     <comps>
       <li>
-        <compClass>CompGlower</compClass>
-        <glowRadius>10</glowRadius>
-        <glowColor>(255,0,0,0)</glowColor>
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>100</basePowerConsumption>
+        <startElectricalFires>true</startElectricalFires>
+        <soundPowerOn>PowerOnSmall</soundPowerOn>
+        <soundPowerOff>PowerOffSmall</soundPowerOff>
       </li>
       <li Class="FM.CompProperties_ManagerStation">
         <compClass>FM.Comp_ManagerStation</compClass>
         <speed>500</speed>
       </li>     
     </comps>
+    <researchPrerequisite>ManagingSoftware</researchPrerequisite>
   </ThingDef>
 
 </ThingDefs>

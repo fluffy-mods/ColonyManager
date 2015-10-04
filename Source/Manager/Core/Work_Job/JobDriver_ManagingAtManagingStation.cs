@@ -14,8 +14,7 @@ namespace FM
         protected override IEnumerable<Toil> MakeNewToils()
         {
             yield return Toils_Reserve.Reserve(TargetIndex.A).FailOnDespawnedOrForbiddenPlacedTargets();
-            yield return
-                Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.InteractionCell)
+            yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.InteractionCell)
                     .FailOnDespawnedOrForbiddenPlacedTargets();
             yield return Manage(TargetIndex.A).FailOnDespawnedOrForbiddenPlacedTargets();
             yield return Toils_Reserve.Release(TargetIndex.A);
@@ -37,7 +36,10 @@ namespace FM
                 return null;
             }
             Toil toil = new Toil();
-            toil.defaultDuration = (int) (comp.Props.Speed * (pawn.GetStatValue(StatDef.Named("ManagingSpeed")) + .5));
+            toil.defaultDuration = (int) (comp.Props.Speed * (1 - pawn.GetStatValue(StatDef.Named("ManagingSpeed")) + .5));
+#if DEBUG_WORKGIVER
+            Log.Message("Pawn stat: " + pawn.GetStatValue(StatDef.Named("ManagingSpeed")) + " (+0.5) Station speed: " + comp.Props.Speed + "Total time: " + toil.defaultDuration);
+#endif
             toil.defaultCompleteMode = ToilCompleteMode.Delay;
             toil.tickAction = delegate
             {

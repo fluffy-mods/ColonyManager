@@ -3,7 +3,7 @@ using System.Linq;
 using RimWorld;
 using Verse;
 
-// TODO: save / load.
+// todo: implement reservations for managerjobs.
 
 namespace FM
 {

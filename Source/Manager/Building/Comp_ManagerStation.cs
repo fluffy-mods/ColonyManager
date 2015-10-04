@@ -4,7 +4,8 @@ namespace FM
 {
     class Comp_ManagerStation : ThingComp
     {
-        //todo add automatic work setup.
+        // todo add automatic work setup.
+        // todo add research and more workstations.
         public CompProperties_ManagerStation Props;
 
         public override void CompTick()
