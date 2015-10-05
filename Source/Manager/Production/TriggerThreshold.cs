@@ -98,7 +98,8 @@ namespace FM
         public override void DrawThresholdConfig(ref Listing_Standard listing)
         {
             // target threshold
-            listing.DoGap();
+            listing.DoGap(24f);
+
             listing.DoLabel("FMP.Threshold".Translate() + ":");
             listing.DoLabel("FMP.ThresholdCount".Translate(CurCount, Count));
             // TODO: implement trade screen sliders - they're so pretty! :D

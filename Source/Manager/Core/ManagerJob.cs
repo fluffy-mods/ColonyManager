@@ -52,5 +52,10 @@ namespace FM
             Scribe_Values.LookValue(ref LastAction, "LastAction");
             Scribe_Values.LookValue(ref Priority, "Priority");
         }
+
+        public virtual void Tick()
+        {
+
+        }
     }
 }

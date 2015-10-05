@@ -55,6 +55,16 @@ namespace FM
                 return getComponent;
             }
         }
+
+        public override void MapComponentTick()
+        {
+            base.MapComponentTick();
+
+            foreach (ManagerJob job in GetJobStack.FullStack)
+            {
+                job.Tick();
+            }
+        }
     }
 
     public class JobStack : IExposable

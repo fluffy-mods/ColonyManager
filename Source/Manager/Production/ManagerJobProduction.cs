@@ -28,6 +28,7 @@ namespace FM
 
             Scribe_Deep.LookDeep(ref Bill, "Bill");
             Scribe_Deep.LookDeep(ref BillGivers, "BillGivers", this);
+            Scribe_Values.LookValue(ref maxSkil, "maxSkill", false);
             // init main product, required by trigger.
             if (MainProduct == null) MainProduct = new MainProductTracker(Bill.recipe);
             Scribe_Deep.LookDeep(ref Trigger, "Trigger", this);
@@ -54,6 +55,8 @@ namespace FM
         /// Threshold for starting/stopping bill assignments
         /// </summary>
         public new TriggerThreshold Trigger;
+
+        public bool maxSkil = false;
 
         /// <summary>
         /// Should we be handing out the bill?
@@ -262,6 +265,17 @@ namespace FM
             string strout = base.ToString();
             strout += "\n" + Bill;
             return strout;
+        }
+
+        public override void Tick()
+        {
+            if (Find.TickManager.TicksGame % 250 == 0)
+            {
+                if (maxSkil)
+                    Bill.minSkillLevel =
+                        Find.ListerPawns.FreeColonistsSpawned.Max(
+                            pawn => pawn.skills.GetSkill(Bill.recipe.workSkill).level);
+            }
         }
     }
 }

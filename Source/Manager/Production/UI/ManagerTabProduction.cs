@@ -162,6 +162,7 @@ namespace FM
                 {
                     listingStandard.DoLabel("MinimumSkillLevel".Translate(Job.Bill.recipe.workSkill.label.ToLower()) + ": " + Job.Bill.minSkillLevel.ToString("#####0"));
                     Job.Bill.minSkillLevel = Mathf.RoundToInt(listingStandard.DoSlider(Job.Bill.minSkillLevel, 0f, 20f));
+                    listingStandard.DoLabelCheckbox("Highest colonist skill", ref Job.maxSkil);
                 }
 
                 // draw threshold config

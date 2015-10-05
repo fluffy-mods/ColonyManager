@@ -217,7 +217,7 @@ namespace FM
         /// <param name="listing"></param>
         public void DrawBillGiverConfig(ref Listing_Standard listing)
         {
-            listing.DoGap();
+            listing.DoGap(24f);
 
             // workstation info
             listing.DoLabel("FMP.BillGivers".Translate());

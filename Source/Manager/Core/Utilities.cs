@@ -54,8 +54,8 @@ namespace FM
                     {
 #if DEBUG_COUNTS
                         Log.Message(td.LabelCap + ", " + Find.ResourceCounter.GetCount(td));
-                        count += Find.ResourceCounter.GetCount(td);
 #endif
+                        count += Find.ResourceCounter.GetCount(td);
                     }
                     else
                     {
