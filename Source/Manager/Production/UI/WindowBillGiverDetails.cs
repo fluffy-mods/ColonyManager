@@ -80,8 +80,6 @@ namespace FM
                 {
                     GUI.color = new Color(1f, 0f, 0f);
                 }
-                Widgets.RadioButton(new Vector2(area.xMin + 3f, area.yMin + 3f),
-                    Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.Count);
                 Widgets.Label(areaCountLabel, "FMP.AllowedWorkstationCount".Translate());
                 _input = Widgets.TextField(areaCountSelector, _input);
                 GUI.color = oldColor;
@@ -96,6 +94,8 @@ namespace FM
                 }
             }
             Widgets.Label(areaLabel, "FMP.ByAreaAndCount".Translate());
+            Widgets.RadioButton( new Vector2( area.xMin + 3f, area.yMin + 3f ),
+                Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.Count );
             y += 6f;
 
             // Specific billgivers

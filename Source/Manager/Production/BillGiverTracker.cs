@@ -66,7 +66,6 @@ namespace FM
         /// <summary>
         /// Specific billgivers set by user
         /// </summary>
-        /// todo: load specific billgivers properly
         public List<Building_WorkTable> SpecificBillGivers;
 
         /// <summary>
@@ -87,7 +86,6 @@ namespace FM
         /// <summary>
         /// Current list of assigned bill/worksations
         /// </summary>
-        /// todo: load assignedbills properly
         private Dictionary<Bill_Production, Building_WorkTable> _assignedBills;
 
         /// <summary>
