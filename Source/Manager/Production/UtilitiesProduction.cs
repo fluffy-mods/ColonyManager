@@ -66,11 +66,12 @@ namespace FM
         public static int CountPerWorker(this ManagerJobProduction job, int i)
         {
             int n = job.BillGivers.CurBillGiverCount;
-            int diff = Mathf.CeilToInt(Math.Abs(job.Trigger.Count - Utilities.CountProducts(job.Trigger.ThresholdFilter) / job.MainProduct.Count));
-            float naive = diff / n;
-            if (diff % n > i)
+            int diff = Mathf.CeilToInt(job.Trigger.Count - Utilities.CountProducts(job.Trigger.ThresholdFilter));
+            int bills = Mathf.CeilToInt(diff / job.MainProduct.Count);
+            float naive = (float)bills / (float)n;
+            if (bills % n > i)
             {
-                return (int) Math.Ceiling(naive);
+                return (int)Math.Ceiling(naive);
             }
             return (int)Math.Floor(naive);
         }

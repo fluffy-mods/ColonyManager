@@ -14,15 +14,12 @@ namespace FM
             Unknown
         }
 
-        private ThingCategoryDef _categoryDef;
+        private         ThingCategoryDef    _categoryDef;
+        private         string              _label;
+        private         RecipeDef           _recipe;
+        private         ThingDef            _thingDef;
+        public          Types               Type            = Types.Unknown;
 
-        private string _label;
-
-        private RecipeDef _recipe;
-
-        private ThingDef _thingDef;
-
-        public Types Type = Types.Unknown;
 
         public MainProductTracker(RecipeDef recipe)
         {
@@ -34,7 +31,7 @@ namespace FM
         {
             get
             {
-                if (Type == Types.Thing || Type == Types.None || Type == Types.Unknown)
+                if (Type != Types.Category)
                 {
                     return null;
                 }
@@ -47,7 +44,7 @@ namespace FM
         {
             get
             {
-                if (Type == Types.Category || Type == Types.None || Type == Types.Unknown)
+                if (Type != Types.Thing)
                 {
                     return null;
                 }
@@ -106,7 +103,7 @@ namespace FM
         /// <summary>
         ///     Number of output for product
         /// </summary>
-        public int Count { get; private set; } = -1;
+        public int Count { get; private set; } = 1;
 
         public void Clear()
         {
@@ -114,7 +111,7 @@ namespace FM
             _thingDef = null;
             _categoryDef = null;
             _label = null;
-            Count = -1;
+            Count = 1;
         }
 
         public void Set()

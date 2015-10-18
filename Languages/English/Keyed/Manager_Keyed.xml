@@ -5,6 +5,12 @@
   <FM.Details>Details</FM.Details>
   <FM.Manage>Manage!</FM.Manage>
   <FM.Delete>Delete</FM.Delete>
+  
+  <!-- Overview Tab -->
+  <FM.Overview>Overview</FM.Overview>
+  
+  <!--Import/Export Tab-->
+  <FM.ImportExport>Import &amp; Export</FM.ImportExport>
 
   <!-- Production Tab -->
   <!-- Miscelaneous -->
@@ -39,7 +45,6 @@
   <FMP.SpecificWorkstationsTooltip>Set the manager to allow assigning this bill to specific workstations.</FMP.SpecificWorkstationsTooltip>
 
   <!-- Tab headers -->
-  <FMP.All>All</FMP.All>
   <FMP.Current>Current</FMP.Current>
   <FMP.Available>Available</FMP.Available>
 

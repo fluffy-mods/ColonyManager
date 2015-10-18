@@ -51,7 +51,12 @@ namespace FM
                     ManagerTab current = Manager.Get.ManagerTabs[i];
                     list.Add(new FloatMenuOption(current.Label, delegate
                     {
+                        ManagerTab old = CurrentTab;
+                        old.PreClose();
+                        current.PreOpen();
                         CurrentTab = current;
+                        old.PostClose();
+                        current.PostOpen();
                     }));
                 }
                 Find.WindowStack.Add(new FloatMenu(list));

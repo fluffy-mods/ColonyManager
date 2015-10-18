@@ -182,11 +182,7 @@ namespace FM
                         {
                             error = true;
 #if DEBUG_SCRIBE
-                            StringBuilder message = new StringBuilder();
-                            message.AppendLine(e.Message);
-                            message.AppendLine("in " + e.Source);
-                            message.AppendLine(e.StackTrace);
-                            Log.Warning(message.ToString());
+                            Log.Warning(e.ToString());
 #endif
                         }
                     }

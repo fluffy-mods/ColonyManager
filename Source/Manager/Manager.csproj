@@ -52,6 +52,8 @@
     <Compile Include="Core\Trigger.cs" />
     <Compile Include="Core\Work_Job\JobDriver_ManagingAtManagingStation.cs" />
     <Compile Include="Core\Work_Job\WorkGiver_Manager.cs" />
+    <Compile Include="ImportExport\ManagerTab_ImportExport.cs" />
+    <Compile Include="Overview\ManagerTab_Overview.cs" />
     <Compile Include="Production\TriggerThreshold.cs" />
     <Compile Include="Core\UI\IManagerTab.cs" />
     <Compile Include="Core\Manager.cs" />
@@ -66,12 +68,11 @@
     <Compile Include="Production\BillGiverTracker.cs" />
     <Compile Include="Production\MainProductTracker.cs" />
     <Compile Include="Production\ManagerJobProduction.cs" />
-    <Compile Include="Production\UI\ManagerTabProduction.cs" />
+    <Compile Include="Production\UI\ManagerTab_Production.cs" />
     <Compile Include="Production\UI\WindowBillGiverDetails.cs" />
     <Compile Include="Production\UtilitiesProduction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

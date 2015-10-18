@@ -10,20 +10,20 @@ using Verse.Sound;
 
 namespace FM
 {
-    public class ManagerTabProduction : ManagerTab
+    public class ManagerTab_Production : ManagerTab
     {
+        //TODO: Add priority switchers to current tab. (After overview tab is done).
         public override string Label { get; } = "FMP.Production".Translate();
 
         public float LeftRowSize = 300f;
 
         public enum SourceOptions
         {
-            All,
             Available,
             Current
         }
 
-        public static SourceOptions Source = SourceOptions.All;
+        public static SourceOptions Source = SourceOptions.Available;
 
         public static Vector2 LeftRowScrollPosition = new Vector2(0f, 0f);
 
@@ -48,11 +48,6 @@ namespace FM
                     break;
                 case SourceOptions.Current:
                     SourceList = Manager.Get.GetJobStack.FullStack.OfType<ManagerJobProduction>().ToList();
-                    break;
-                case SourceOptions.All:
-                    SourceList = (from rd in DefDatabase<RecipeDef>.AllDefsListForReading
-                                  where rd.HasBuildingRecipeUser()
-                                  select (new ManagerJobProduction(rd))).ToList();
                     break;
             }
         }
@@ -222,11 +217,16 @@ namespace FM
 
         }
 
+        public override void PreOpen()
+        {
+            base.PreOpen();
+            RefreshSourceList();
+        }
+
         public override void PostOpen()
         {
             // focus on the filter on open, flag is checked after the field is actually drawn.
             _postOpenFocus = false;
-            RefreshSourceList();
         }
 
         public void DoLeftRow(Rect canvas)
@@ -258,24 +258,18 @@ namespace FM
 
             // tabs
             List<TabRecord> list = new List<TabRecord>();
-            TabRecord item = new TabRecord("FMP.All".Translate(), delegate
-            {
-                Source = SourceOptions.All;
-                RefreshSourceList();
-            }, Source == SourceOptions.All);
-            list.Add(item);
-            TabRecord item2 = new TabRecord("FMP.Available".Translate(), delegate
+            TabRecord availableTabRecord = new TabRecord("FMP.Available".Translate(), delegate
             {
                 Source = SourceOptions.Available;
                 RefreshSourceList();
             }, Source == SourceOptions.Available);
-            list.Add(item2);
-            TabRecord item3 = new TabRecord("FMP.Current".Translate(), delegate
+            list.Add( availableTabRecord );
+            TabRecord currentTabRecord = new TabRecord("FMP.Current".Translate(), delegate
             {
                 Source = SourceOptions.Current;
                 RefreshSourceList();
             }, Source == SourceOptions.Current);
-            list.Add(item3);
+            list.Add(currentTabRecord);
             TabDrawer.DrawTabs(canvas, list);
 
             // content

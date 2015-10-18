@@ -24,7 +24,12 @@ namespace FM
 
         public ManagerTab[] ManagerTabs =
         {
-            new ManagerTabProduction()
+            new ManagerTab_Overview(),
+            new ManagerTab_Production(),
+            // TODO: new ManagerTabLifestock(),
+            // TODO: new ManagerTabHunting(),
+            // TODO: new ManagerTabForestry(),
+            new ManagerTab_ImportExport()
         };
 
         private JobStack _stack;
