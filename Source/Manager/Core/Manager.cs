@@ -9,6 +9,8 @@ namespace FM
 {
     public class Manager : MapComponent
     {
+        public const float Margin = 6f;
+
         public Manager()
         {
             _stack = new JobStack();
@@ -28,8 +30,7 @@ namespace FM
             new ManagerTab_Production(),
             // TODO: new ManagerTabLifestock(),
             // TODO: new ManagerTabHunting(),
-            // TODO: new ManagerTabForestry(),
-            new ManagerTab_ImportExport()
+            // TODO: new ManagerTabForestry()
         };
 
         private JobStack _stack;
@@ -69,84 +70,6 @@ namespace FM
             {
                 job.Tick();
             }
-        }
-    }
-
-    public class JobStack : IExposable
-    {
-        /// <summary>
-        /// Full jobstack, in order of assignment
-        /// </summary>
-        public JobStack()
-        {
-            _stack = new List<ManagerJob>();
-        }
-
-        public void ExposeData()
-        {
-            Scribe_Collections.LookList(ref _stack, "JobStack", LookMode.Deep);
-        }
-
-        private List<ManagerJob> _stack;
-
-        /// <summary>
-        /// Full jobstack, in order of priority
-        /// </summary>
-        public List<ManagerJob> FullStack
-        {
-            get
-            {
-                return _stack.OrderBy(mj => mj.Priority).ToList();
-            }
-        } 
-
-        /// <summary>
-        /// Jobstack of jobs that are available now
-        /// </summary>
-        public List<ManagerJob> CurStack
-        {
-            get
-            {
-                return _stack.Where(mj => mj.ShouldDoNow).OrderBy(mj => mj.Priority).ToList();
-            }
-        }
-
-        /// <summary>
-        /// Highest priority available job
-        /// </summary>
-        public ManagerJob NextJob => CurStack.DefaultIfEmpty(null).FirstOrDefault();
-
-        /// <summary>
-        /// Call the worker for the next available job
-        /// </summary>
-        public void TryDoNextJob()
-        {
-            ManagerJob job = NextJob;
-            if (job == null)
-            {
-#if DEBUG_JOBS
-                Log.Message("Tried to do job, but _stack is empty");
-#endif
-                return;
-            }
-
-            // update lastAction
-            job.Touch();
-
-            // perform next job if no action was taken
-            if (!job.TryDoJob()) TryDoNextJob();
-        }
-        
-        public void Add(ManagerJob job)
-        {
-            job.Priority = _stack.Count + 1;
-            _stack.Add(job);
-        }
-
-        public void Delete(ManagerJob job)
-        {
-            job.CleanUp();
-            _stack.Remove(job);
         }
     }
 }

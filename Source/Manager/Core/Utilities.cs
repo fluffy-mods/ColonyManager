@@ -36,6 +36,22 @@ namespace FM
             return false;
         }
 
+        public static string TimeString(this int ticks )
+        {
+            int days = ticks / GenDate.TicksPerDay,
+                hours = ticks % GenDate.TicksPerDay / GenDate.TicksPerHour;
+
+            string s = string.Empty;
+
+            if ( days > 0 )
+            {
+                s += days + "LetterDay".Translate( ) + " ";
+            }
+            s += hours + "LetterHour".Translate( );
+
+            return s;
+        }
+
         public static int CountProducts(ThingFilter filter)
         {
             int count = 0;
