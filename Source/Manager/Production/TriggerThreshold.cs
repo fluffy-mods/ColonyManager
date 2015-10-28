@@ -5,18 +5,20 @@ namespace FM
 {
     public class TriggerThreshold : Trigger
     {
-        public TriggerThreshold(ManagerJobProduction job)
+        public enum Ops
         {
-            Op = Ops.LowerThan;
-            MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
-            Count = MaxUpperThreshold / 5;
-            ThresholdFilter = new ThingFilter();
-            ThresholdFilter.SetDisallowAll();
-            if (job.MainProduct.ThingDef != null) ThresholdFilter.SetAllow(job.MainProduct.ThingDef, true);
-            if (job.MainProduct.CategoryDef != null) ThresholdFilter.SetAllow(job.MainProduct.CategoryDef, true);
+            LowerThan,
+            Equals,
+            HigherThan
         }
 
+        public int Count;
+
         public int MaxUpperThreshold;
+
+        public Ops Op;
+
+        public ThingFilter ThresholdFilter;
 
         public bool IsValid
         {
@@ -25,28 +27,14 @@ namespace FM
 
         public int CurCount
         {
-            get
-            {
-                return Utilities.CountProducts(ThresholdFilter);
-            }
+            get { return Utilities.CountProducts( ThresholdFilter ); }
         }
-
-        public ThingFilter ThresholdFilter;
-
-        public enum Ops
-        {
-            LowerThan,
-            Equals,
-            HigherThan
-        }
-
-        public Ops Op;
 
         public virtual string OpString
         {
             get
             {
-                switch (Op)
+                switch ( Op )
                 {
                     case Ops.LowerThan:
                         return " < ";
@@ -64,7 +52,7 @@ namespace FM
         {
             get
             {
-                switch (Op)
+                switch ( Op )
                 {
                     case Ops.LowerThan:
                         return CurCount < Count;
@@ -73,41 +61,9 @@ namespace FM
                     case Ops.HigherThan:
                         return CurCount > Count;
                     default:
-                        Log.Warning("Trigger_ThingThreshold was defined without a correct operator");
+                        Log.Warning( "Trigger_ThingThreshold was defined without a correct operator" );
                         return true;
                 }
-            }
-        }
-
-
-        public override string ToString()
-        {
-            return "Trigger_Threshold.ToString() not implemented";
-        }
-
-        public int Count;
-
-        public override void ExposeData()
-        {
-            Scribe_Values.LookValue(ref Count, "Count");
-            Scribe_Values.LookValue(ref MaxUpperThreshold, "MaxUpperThreshold");
-            Scribe_Values.LookValue(ref Op, "Operator");
-            Scribe_Deep.LookDeep(ref ThresholdFilter, "ThresholdFilter");
-        }
-
-        public override void DrawThresholdConfig(ref Listing_Standard listing)
-        {
-            // target threshold
-            listing.DoGap(24f);
-
-            listing.DoLabel("FMP.Threshold".Translate() + ":");
-            listing.DoLabel("FMP.ThresholdCount".Translate(CurCount, Count));
-            // TODO: implement trade screen sliders - they're so pretty! :D
-            Count = Mathf.RoundToInt(listing.DoSlider(Count, 0, MaxUpperThreshold));
-            listing.DoGap(6f);
-            if (listing.DoTextButton("FMP.ThresholdDetails".Translate()))
-            {
-                Find.WindowStack.Add(DetailsWindow);
             }
         }
 
@@ -122,6 +78,54 @@ namespace FM
                     draggable = true
                 };
                 return window;
+            }
+        }
+
+        public TriggerThreshold( ManagerJobProduction job )
+        {
+            Op = Ops.LowerThan;
+            MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
+            Count = MaxUpperThreshold / 5;
+            ThresholdFilter = new ThingFilter();
+            ThresholdFilter.SetDisallowAll();
+            if ( job.MainProduct.ThingDef != null )
+            {
+                ThresholdFilter.SetAllow( job.MainProduct.ThingDef, true );
+            }
+            if ( job.MainProduct.CategoryDef != null )
+            {
+                ThresholdFilter.SetAllow( job.MainProduct.CategoryDef, true );
+            }
+        }
+
+
+        public override string ToString()
+        {
+            return "Trigger_Threshold.ToString() not implemented";
+        }
+
+        public override void ExposeData()
+        {
+            Scribe_Values.LookValue( ref Count, "Count" );
+            Scribe_Values.LookValue( ref MaxUpperThreshold, "MaxUpperThreshold" );
+            Scribe_Values.LookValue( ref Op, "Operator" );
+            Scribe_Deep.LookDeep( ref ThresholdFilter, "ThresholdFilter" );
+        }
+
+        public override void DrawThresholdConfig( ref Listing_Standard listing )
+        {
+            // target threshold
+            listing.DoGap( 24f );
+
+            listing.DoLabel( "FMP.Threshold".Translate() + ":" );
+            listing.DoLabel( "FMP.ThresholdCount".Translate( CurCount, Count ) );
+
+            // TODO: implement trade screen sliders - they're so pretty! :D
+            Count = Mathf.RoundToInt( listing.DoSlider( Count, 0, MaxUpperThreshold ) );
+            listing.DoGap( 6f );
+            if ( listing.DoTextButton( "FMP.ThresholdDetails".Translate() ) )
+            {
+                Find.WindowStack.Add( DetailsWindow );
             }
         }
     }

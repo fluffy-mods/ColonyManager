@@ -5,26 +5,29 @@ namespace FM
 {
     public static class Utilities
     {
-        /// <summary>
-        /// Returns current count of ThingDef thing, as used by core bill screens. (Bill_Production).
-        /// </summary>
-        /// <param name="thing"></param>
-        /// <returns>int</returns>
-        public static int CountProducts(Thing thing)
-        {
-            if (thing == null) return 0;
-            return thing.stackCount;
-        }
-
         private static int _cachedCount;
 
         private static ThingFilter _cachedFilter;
 
         private static int _lastCache;
 
-        private static bool TryGetCached(ThingFilter filter, out int count)
+        /// <summary>
+        ///     Returns current count of ThingDef thing, as used by core bill screens. (Bill_Production).
+        /// </summary>
+        /// <param name="thing"></param>
+        /// <returns>int</returns>
+        public static int CountProducts( Thing thing )
         {
-            if (Find.TickManager.TicksGame - _lastCache < 250 && _cachedFilter == filter)
+            if ( thing == null )
+            {
+                return 0;
+            }
+            return thing.stackCount;
+        }
+
+        private static bool TryGetCached( ThingFilter filter, out int count )
+        {
+            if ( Find.TickManager.TicksGame - _lastCache < 250 && _cachedFilter == filter )
             {
                 count = _cachedCount;
                 return true;
@@ -36,7 +39,7 @@ namespace FM
             return false;
         }
 
-        public static string TimeString(this int ticks )
+        public static string TimeString( this int ticks )
         {
             int days = ticks / GenDate.TicksPerDay,
                 hours = ticks % GenDate.TicksPerDay / GenDate.TicksPerHour;
@@ -45,52 +48,61 @@ namespace FM
 
             if ( days > 0 )
             {
-                s += days + "LetterDay".Translate( ) + " ";
+                s += days + "LetterDay".Translate() + " ";
             }
-            s += hours + "LetterHour".Translate( );
+            s += hours + "LetterHour".Translate();
 
             return s;
         }
 
-        public static int CountProducts(ThingFilter filter)
+        public static int CountProducts( ThingFilter filter )
         {
             int count = 0;
-            if (filter != null && TryGetCached(filter, out count)) return count;
+            if ( filter != null && TryGetCached( filter, out count ) )
+            {
+                return count;
+            }
 
 #if DEBUG_COUNTS
             Log.Message("Obtaining new count");
 #endif
 
-            if (filter != null)
+            if ( filter != null )
             {
-                foreach (ThingDef td in filter.AllowedThingDefs)
+                foreach ( ThingDef td in filter.AllowedThingDefs )
                 {
                     // if it counts as a resource, use the ingame counter (e.g. only steel in stockpiles.)
-                    if (td.CountAsResource)
+                    if ( td.CountAsResource )
                     {
 #if DEBUG_COUNTS
                         Log.Message(td.LabelCap + ", " + Find.ResourceCounter.GetCount(td));
 #endif
-                        count += Find.ResourceCounter.GetCount(td);
+                        count += Find.ResourceCounter.GetCount( td );
                     }
                     else
                     {
-                        foreach (Thing t in Find.ListerThings.ThingsOfDef(td))
+                        foreach ( Thing t in Find.ListerThings.ThingsOfDef( td ) )
                         {
                             // otherwise, go look for stuff that matches our filters.
                             // TODO: does this catch minified things?
                             QualityCategory quality;
-                            if (t.TryGetQuality(out quality))
+                            if ( t.TryGetQuality( out quality ) )
                             {
-                                if (!filter.AllowedQualityLevels.Includes(quality)) continue;
+                                if ( !filter.AllowedQualityLevels.Includes( quality ) )
+                                {
+                                    continue;
+                                }
                             }
-                            if (filter.AllowedHitPointsPercents.IncludesEpsilon(t.HitPoints)) continue;
+                            if ( filter.AllowedHitPointsPercents.IncludesEpsilon( t.HitPoints ) )
+                            {
+                                continue;
+                            }
 
 #if DEBUG_COUNTS
                             Log.Message(t.LabelCap + ": " + CountProducts(t));
 #endif
 
-                            count += CountProducts(t);
+                            count += CountProducts( t );
                         }
                     }
                 }
@@ -102,10 +114,10 @@ namespace FM
             return count;
         }
 
-        public static bool IsInt(this string text)
+        public static bool IsInt( this string text )
         {
             int num;
-            return int.TryParse(text, out num);
+            return int.TryParse( text, out num );
         }
     }
 }

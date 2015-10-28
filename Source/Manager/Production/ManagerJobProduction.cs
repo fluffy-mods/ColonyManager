@@ -9,8 +9,8 @@ namespace FM
 {
     public class ManagerJobProduction : ManagerJob
     {
-        private float _margin = Manager.Margin;
-        private float _lastUpdateRectWidth = 100f;
+        private readonly float _lastUpdateRectWidth = 50f;
+        private readonly float _margin = Manager.Margin;
 
         /// <summary>
         ///     The managed bill, basically a placeholder bill that gets copied and handed out
@@ -22,31 +22,6 @@ namespace FM
         /// </summary>
         public BillGiverTracker BillGivers;
 
-        public override void DrawOverviewSummary( Rect rect )
-        {
-            // detailButton | name (current/target) | last update
-
-            Rect labelRect = new Rect( _margin, _margin,
-                                       rect.width - _lastUpdateRectWidth - 3 * _margin,
-                                       rect.height - 2 * _margin ),
-                 lastUpdateRect = new Rect( labelRect.xMax + _margin, _margin,
-                                            rect.width - labelRect.width - 3 * _margin,
-                                            rect.height - 2 * _margin );
-
-            GUI.BeginGroup(rect);
-            try
-            {
-                Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label( labelRect, MainProduct.Label + " (" + Trigger.CurCount + "/" + Trigger.Count + ")" );
-                Text.Anchor = TextAnchor.MiddleCenter;
-                Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - LastAction ).TimeString() );
-                Text.Anchor = TextAnchor.UpperLeft;
-            }
-            finally
-            {
-                GUI.EndGroup();
-            }
-        }
         // TODO: Production jobs that are based on the same bill point to the same reference
         // TODO: Hour should not be shown when date != 0 and hour == 0
         // TODO: Click on overview row links to correct managerTab
@@ -75,7 +50,7 @@ namespace FM
             set { Bill.suspended = !value; }
         }
 
-        public ManagerJobProduction( )
+        public ManagerJobProduction()
         {
             // for scribe loading
         }
@@ -88,9 +63,42 @@ namespace FM
             BillGivers = new BillGiverTracker( this );
         }
 
-        public override void ExposeData( )
+        public override void DrawListEntry( Rect rect )
         {
-            base.ExposeData( );
+            // detailButton | name (current/target) | last update
+
+            Rect labelRect = new Rect( _margin, _margin,
+                                       rect.width - _lastUpdateRectWidth - 3 * _margin,
+                                       rect.height - 2 * _margin ),
+                 lastUpdateRect = new Rect( labelRect.xMax + _margin, _margin,
+                                            rect.width - labelRect.width - 3 * _margin,
+                                            rect.height - 2 * _margin );
+
+            string text = Bill.recipe.LabelCap + " (" +
+                          string.Join( ", ", BillGivers.GetBillGiverDefs.Select( bg => bg.LabelCap ).ToArray() ) + ")";
+
+#if DEBUG
+            text += Priority;
+#endif
+
+            GUI.BeginGroup( rect );
+            try
+            {
+                Text.Anchor = TextAnchor.MiddleLeft;
+                Widgets.Label( labelRect, text );
+                Text.Anchor = TextAnchor.MiddleCenter;
+                Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - LastAction ).TimeString() );
+                Text.Anchor = TextAnchor.UpperLeft;
+            }
+            finally
+            {
+                GUI.EndGroup();
+            }
+        }
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
 
             Scribe_Deep.LookDeep( ref Bill, "Bill" );
             Scribe_Deep.LookDeep( ref BillGivers, "BillGivers", this );
@@ -108,15 +116,15 @@ namespace FM
         ///     Try to assign / clean up assignments
         /// </summary>
         /// <returns></returns>
-        public override bool TryDoJob( )
+        public override bool TryDoJob()
         {
 #if DEBUG_JOBS
             Log.Message( "Starting job for Production Manager." );
-            Log.Message( "Job: " + ToString( ) );
+            Log.Message( "Job: " + ToString() );
 #endif
 
             // flag to see if anything meaningful was done, if false at end, manager will also do next job.
-            var actionTaken = false;
+            bool actionTaken = false;
 
             if ( Trigger.State )
             {
@@ -125,47 +133,48 @@ namespace FM
 #endif
 
                 // BillGivers that we should work with.
-                var workers = BillGivers.GetSelectedBillGivers;
+                List< Building_WorkTable > workers = BillGivers.GetSelectedBillGivers;
 
                 // clean up bills on workstations that do not meet selection criteria (area, count, etc) (anymore).
                 CleanNoLongerAllowedBillgivers( workers, BillGivers.GetAssignedBillGiversAndBillsDictionary,
                                                 ref actionTaken );
 
                 // If Trigger met, check if there's places we need to add the bill.
-                for ( var workerIndex = 0; workerIndex < workers.Count; workerIndex++ )
+                for ( int workerIndex = 0; workerIndex < workers.Count; workerIndex++ )
                 {
-                    var worker = workers[workerIndex];
+                    Building_WorkTable worker = workers[workerIndex];
 #if DEBUG_JOBS
                     Log.Message( "Checking worker " + worker.LabelCap );
 #endif
-                    var billPresent = false;
+                    bool billPresent = false;
 
                     // loop over workstations
                     if ( worker.BillStack != null && worker.BillStack.Count > 0 )
                     {
 #if DEBUG_JOBS
-                        foreach ( var pair in BillGivers.GetAssignedBillGiversAndBillsDictionary )
+                        foreach (
+                            KeyValuePair< Bill_Production, Building_WorkTable > pair in
+                                BillGivers.GetAssignedBillGiversAndBillsDictionary )
                         {
-                            Log.Message( "saved" + pair.Key.GetUniqueLoadID( ) + " | " + pair.Value.GetUniqueLoadID( ) );
+                            Log.Message( "saved" + pair.Key.GetUniqueLoadID() + " | " + pair.Value.GetUniqueLoadID() );
                         }
 #endif
 
                         // loop over billstack to see if our bill is set.
-                        // todo: targeted bill selection, if/when assignedbills will store properly.
-                        foreach ( var t in worker.BillStack )
+                        foreach ( Bill t in worker.BillStack )
                         {
-                            var thatBill = t as Bill_Production;
+                            Bill_Production thatBill = t as Bill_Production;
 #if DEBUG_JOBS
                             if ( thatBill != null )
                             {
-                                Log.Message( "real" + thatBill.GetUniqueLoadID( ) + " | " + worker.GetUniqueLoadID( ) );
+                                Log.Message( "real" + thatBill.GetUniqueLoadID() + " | " + worker.GetUniqueLoadID() );
                             }
 #endif
 
                             // if there is a bill, and it's managed by us, check to see if it's up-to-date.
                             if ( thatBill != null && thatBill.recipe == Bill.recipe &&
                                  BillGivers.GetAssignedBillGiversAndBillsDictionary.Contains(
-                                     new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )
+                                     new KeyValuePair< Bill_Production, Building_WorkTable >( thatBill, worker ) ) )
                             {
                                 billPresent = true;
                                 if ( thatBill.suspended != Bill.suspended || thatBill.repeatCount == 0 )
@@ -193,7 +202,7 @@ namespace FM
 #if DEBUG_JOBS
                         Log.Message( "Trying to add bill" );
 #endif
-                        var copy = Bill.Copy( );
+                        Bill_Production copy = Bill.Copy();
                         copy.repeatMode = BillRepeatMode.RepeatCount;
                         copy.repeatCount = this.CountPerWorker( workerIndex );
                         worker.BillStack?.AddBill( copy );
@@ -204,7 +213,7 @@ namespace FM
             }
             else // Trigger false, clean up.
             {
-                CleanUp( );
+                CleanUp();
             }
             return actionTaken;
         }
@@ -215,15 +224,18 @@ namespace FM
         /// <param name="workers">Allowed workstations</param>
         /// <param name="assignedBills">Assigned bills/workstations</param>
         /// <param name="actionTaken">Was anything done?</param>
-        private void CleanNoLongerAllowedBillgivers( List<Building_WorkTable> workers,
-                                                     Dictionary<Bill_Production, Building_WorkTable> assignedBills,
+        private void CleanNoLongerAllowedBillgivers( List< Building_WorkTable > workers,
+                                                     Dictionary< Bill_Production, Building_WorkTable > assignedBills,
                                                      ref bool actionTaken )
         {
 #if DEBUG_JOBS
             Log.Message( "Cleaning no longer allowed billgivers" );
 #endif
-            var toBeDeleted = new Dictionary<Bill_Production, Building_WorkTable>( );
-            foreach ( var pair in assignedBills.Where( pair => !workers.Contains( pair.Value ) ) )
+            Dictionary< Bill_Production, Building_WorkTable > toBeDeleted =
+                new Dictionary< Bill_Production, Building_WorkTable >();
+            foreach (
+                KeyValuePair< Bill_Production, Building_WorkTable > pair in
+                    assignedBills.Where( pair => !workers.Contains( pair.Value ) ) )
             {
 #if DEBUG_JOBS
                 Log.Message( "Deleting " + pair.Key.LabelCap + " from " + pair.Value.LabelCap );
@@ -232,7 +244,7 @@ namespace FM
                 toBeDeleted.Add( pair.Key, pair.Value );
                 actionTaken = true;
             }
-            foreach ( var pair in toBeDeleted )
+            foreach ( KeyValuePair< Bill_Production, Building_WorkTable > pair in toBeDeleted )
             {
                 assignedBills.Remove( pair.Key );
             }
@@ -273,13 +285,15 @@ namespace FM
         /// <summary>
         ///     Delete all outstanding managed bills for this job.
         /// </summary>
-        public override void CleanUp( )
+        public override void CleanUp()
         {
 #if DEBUG_JOBS
             Log.Message( "Cleaning up obsolete bills" );
 #endif
-            var toBeDeleted = new List<Bill_Production>( );
-            foreach ( var pair in BillGivers.GetAssignedBillGiversAndBillsDictionary )
+            List< Bill_Production > toBeDeleted = new List< Bill_Production >();
+            foreach (
+                KeyValuePair< Bill_Production, Building_WorkTable > pair in
+                    BillGivers.GetAssignedBillGiversAndBillsDictionary )
             {
                 pair.Value.BillStack.Delete( pair.Key );
                 toBeDeleted.Add( pair.Key );
@@ -287,7 +301,7 @@ namespace FM
                 Log.Message( "Checking worker " + pair.Value.LabelCap );
 #endif
             }
-            foreach ( var key in toBeDeleted )
+            foreach ( Bill_Production key in toBeDeleted )
             {
 #if DEBUG_JOBS
                 Log.Message( "Deleting bill " + key.LabelCap );
@@ -296,14 +310,14 @@ namespace FM
             }
         }
 
-        public override string ToString( )
+        public override string ToString()
         {
-            var strout = base.ToString( );
+            string strout = base.ToString();
             strout += "\n" + Bill;
             return strout;
         }
 
-        public override void Tick( )
+        public override void Tick()
         {
             if ( Find.TickManager.TicksGame % 250 == 0 )
             {

@@ -4,6 +4,6 @@ namespace FM
 {
     public interface IManagerTab
     {
-        void DoWindowContents(Rect canvas);
+        void DoWindowContents( Rect canvas );
     }
 }

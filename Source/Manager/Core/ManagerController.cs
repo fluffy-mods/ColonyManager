@@ -1,23 +1,19 @@
-﻿using System.Collections.Generic;
-using RimWorld;
-using UnityEngine;
+﻿using UnityEngine;
 using Verse;
 
 namespace FM
 {
-    class ManagerController : MonoBehaviour
+    internal class ManagerController : MonoBehaviour
     {
         public readonly string GameObjectName = "Fluffy Manager";
 
         public void Start()
         {
-            Log.Message("Manager Controller loaded.");
+            Log.Message( "Manager Controller loaded." );
             enabled = true;
         }
 
-        public void OnLevelWasLoaded()
-        {
-        }
+        public void OnLevelWasLoaded() {}
     }
 
     public class Bootstrap : ITab
@@ -26,14 +22,15 @@ namespace FM
 
         public Bootstrap()
         {
-            if (GameObject != null) return;
-            GameObject = new GameObject("Manager_Controller");
-            GameObject.AddComponent<ManagerController>();
-            Object.DontDestroyOnLoad(GameObject);
+            if ( GameObject != null )
+            {
+                return;
+            }
+            GameObject = new GameObject( "Manager_Controller" );
+            GameObject.AddComponent< ManagerController >();
+            Object.DontDestroyOnLoad( GameObject );
         }
 
-        protected override void FillTab()
-        {
-        }
+        protected override void FillTab() {}
     }
 }

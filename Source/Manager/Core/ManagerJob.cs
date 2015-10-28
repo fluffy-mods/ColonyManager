@@ -6,7 +6,7 @@ namespace FM
 {
     internal interface IManagerJob
     {
-        bool TryDoJob( );
+        bool TryDoJob();
     }
 
     public abstract class ManagerJob : IManagerJob, IExposable
@@ -23,40 +23,40 @@ namespace FM
 
         public bool ShouldDoNow => Active && ( LastAction + ActionInterval ) < Find.TickManager.TicksGame;
 
-        public virtual void ExposeData( )
+        public virtual void ExposeData()
         {
             Scribe_Values.LookValue( ref ActionInterval, "ActionInterval" );
             Scribe_Values.LookValue( ref LastAction, "LastAction" );
             Scribe_Values.LookValue( ref Priority, "Priority" );
         }
 
-        public virtual bool TryDoJob( )
+        public virtual bool TryDoJob()
         {
             Log.Warning( "Tried to perform job, but the dispatch was not correctly implemented" );
             return false;
         }
 
-        public abstract void CleanUp( );
+        public abstract void CleanUp();
 
-        public void Touch( )
+        public void Touch()
         {
             LastAction = Find.TickManager.TicksGame;
         }
 
-        public override string ToString( )
+        public override string ToString()
         {
-            var strout = new StringBuilder( );
+            StringBuilder strout = new StringBuilder();
             strout.AppendLine( Priority + " " + Active + "LastAction" + LastAction + "(interval: " + ActionInterval +
                                ", gameTick: " + Find.TickManager.TicksGame + ")" );
-            return strout.ToString( );
+            return strout.ToString();
         }
 
-        public virtual void Tick( ) {}
+        public virtual void Tick() {}
 
-        public virtual void DrawOverviewSummary( Rect rect )
+        public virtual void DrawListEntry( Rect rect )
         {
             Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label( rect, ToString( ) );
+            Widgets.Label( rect, ToString() );
             Text.Anchor = TextAnchor.UpperLeft;
         }
     }

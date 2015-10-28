@@ -5,16 +5,19 @@ using Verse;
 
 namespace FM
 {
-    class MainTabWindow_Manager : MainTabWindow
+    internal class MainTabWindow_Manager : MainTabWindow
     {
-        public MainTabWindow_Manager()
-        {
-            if (CurrentTab == null) CurrentTab = DefaultTab;
-        }
+        public ManagerTab CurrentTab;
 
         public ManagerTab DefaultTab = Manager.Get.ManagerTabs[0];
 
-        public ManagerTab CurrentTab;
+        public MainTabWindow_Manager()
+        {
+            if ( CurrentTab == null )
+            {
+                CurrentTab = DefaultTab;
+            }
+        }
 
         public override void PostOpen()
         {
@@ -40,16 +43,16 @@ namespace FM
             CurrentTab.PostClose();
         }
 
-        public override void DoWindowContents(Rect canvas)
+        public override void DoWindowContents( Rect canvas )
         {
-            Rect buttonRect = new Rect(0f, 0f, 200f, 30f);
-            if (Widgets.TextButton(buttonRect, CurrentTab.Label))
+            Rect buttonRect = new Rect( 0f, 0f, 200f, 30f );
+            if ( Widgets.TextButton( buttonRect, CurrentTab.Label ) )
             {
-                List<FloatMenuOption> list = new List<FloatMenuOption>();
-                for (int i = 0; i < Manager.Get.ManagerTabs.Length; i++)
+                List< FloatMenuOption > list = new List< FloatMenuOption >();
+                for ( int i = 0; i < Manager.Get.ManagerTabs.Length; i++ )
                 {
                     ManagerTab current = Manager.Get.ManagerTabs[i];
-                    list.Add(new FloatMenuOption(current.Label, delegate
+                    list.Add( new FloatMenuOption( current.Label, delegate
                     {
                         ManagerTab old = CurrentTab;
                         old.PreClose();
@@ -57,22 +60,22 @@ namespace FM
                         CurrentTab = current;
                         old.PostClose();
                         current.PostOpen();
-                    }));
+                    } ) );
                 }
-                Find.WindowStack.Add(new FloatMenu(list));
+                Find.WindowStack.Add( new FloatMenu( list ) );
             }
 
             // Title
             Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label(new Rect(0f, 0f, canvas.width, 55f), "FM.Manager".Translate() + " - " + CurrentTab.Label);
+            Widgets.Label( new Rect( 0f, 0f, canvas.width, 55f ), "FM.Manager".Translate() + " - " + CurrentTab.Label );
             Text.Anchor = TextAnchor.UpperLeft;
             Text.Font = GameFont.Small;
 
             // delegate actual content to the specific manager.
-            Rect contentCanvas = new Rect(0f, 55f, canvas.width, canvas.height - 55f);
-            GUI.BeginGroup(contentCanvas);
-            CurrentTab.DoWindowContents(contentCanvas);
+            Rect contentCanvas = new Rect( 0f, 55f, canvas.width, canvas.height - 55f );
+            GUI.BeginGroup( contentCanvas );
+            CurrentTab.DoWindowContents( contentCanvas );
             GUI.EndGroup();
         }
     }

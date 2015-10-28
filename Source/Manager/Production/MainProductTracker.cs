@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Verse;
 
@@ -14,24 +15,17 @@ namespace FM
             Unknown
         }
 
-        private         ThingCategoryDef    _categoryDef;
-        private         string              _label;
-        private         RecipeDef           _recipe;
-        private         ThingDef            _thingDef;
-        public          Types               Type            = Types.Unknown;
-
-
-        public MainProductTracker(RecipeDef recipe)
-        {
-            _recipe = recipe;
-            Set();
-        }
+        private ThingCategoryDef _categoryDef;
+        private string _label;
+        private readonly RecipeDef _recipe;
+        private ThingDef _thingDef;
+        public Types Type = Types.Unknown;
 
         public ThingCategoryDef CategoryDef
         {
             get
             {
-                if (Type != Types.Category)
+                if ( Type != Types.Category )
                 {
                     return null;
                 }
@@ -44,7 +38,7 @@ namespace FM
         {
             get
             {
-                if (Type != Types.Thing)
+                if ( Type != Types.Thing )
                 {
                     return null;
                 }
@@ -57,9 +51,12 @@ namespace FM
         {
             get
             {
-                if (_label != null) return _label;
+                if ( _label != null )
+                {
+                    return _label;
+                }
 
-                switch (Type)
+                switch ( Type )
                 {
                     case Types.Thing:
                         _label = _thingDef.LabelCap;
@@ -90,9 +87,9 @@ namespace FM
             get
             {
                 // go from stacksize
-                if (ThingDef != null)
+                if ( ThingDef != null )
                 {
-                    return Math.Max(ThingDef.stackLimit*40, 100); // stacksize * 40, 100 min.
+                    return Math.Max( ThingDef.stackLimit * 40, 100 ); // stacksize * 40, 100 min.
                 }
 
                 // if product is not resolved (stone blocks, weapon smelting, category)
@@ -104,6 +101,13 @@ namespace FM
         ///     Number of output for product
         /// </summary>
         public int Count { get; private set; } = 1;
+
+
+        public MainProductTracker( RecipeDef recipe )
+        {
+            _recipe = recipe;
+            Set();
+        }
 
         public void Clear()
         {
@@ -119,8 +123,8 @@ namespace FM
             try
             {
                 // get the (main) product
-                if (_recipe.products != null && _recipe.products.Count > 0 &&
-                    _recipe.products.First().thingDef.BaseMarketValue > 0)
+                if ( _recipe.products != null && _recipe.products.Count > 0 &&
+                     _recipe.products.First().thingDef.BaseMarketValue > 0 )
                 {
                     Clear();
                     _thingDef = _recipe.products.First().thingDef;
@@ -130,30 +134,37 @@ namespace FM
                 }
 
                 // no main, is there a special?
-                if (_recipe.specialProducts == null)
+                if ( _recipe.specialProducts == null )
                 {
                     Clear();
                     Type = Types.None;
                     Count = 0;
                 }
-                if (_recipe.specialProducts != null && _recipe.specialProducts.Count > 0)
+                if ( _recipe.specialProducts != null && _recipe.specialProducts.Count > 0 )
                 {
                     // get the first special product of the first thingdef allowed by the fixedFilter.
-                    if (_recipe.defaultIngredientFilter.AllowedThingDefs == null)
-                        throw new Exception("AllowedThingDefs NULL");
-                    var allowedThingDef =
-                        _recipe.fixedIngredientFilter.AllowedThingDefs.DefaultIfEmpty(null).FirstOrDefault();
-                    if (allowedThingDef == null) throw new Exception("AllowedThingDef NULL");
-
-
-                    if (_recipe.specialProducts[0] == SpecialProductType.Butchery)
+                    if ( _recipe.defaultIngredientFilter.AllowedThingDefs == null )
                     {
-                        if (allowedThingDef.butcherProducts != null && allowedThingDef.butcherProducts.Count > 0)
+                        throw new Exception( "AllowedThingDefs NULL" );
+                    }
+                    ThingDef allowedThingDef =
+                        _recipe.fixedIngredientFilter.AllowedThingDefs.DefaultIfEmpty( null ).FirstOrDefault();
+                    if ( allowedThingDef == null )
+                    {
+                        throw new Exception( "AllowedThingDef NULL" );
+                    }
+
+
+                    if ( _recipe.specialProducts[0] == SpecialProductType.Butchery )
+                    {
+                        if ( allowedThingDef.butcherProducts != null && allowedThingDef.butcherProducts.Count > 0 )
                         {
                             // butcherproducts are defined, no problem. 
-                            var butcherProducts = allowedThingDef.butcherProducts;
-                            if (butcherProducts.Count == 0)
-                                throw new Exception("No butcherproducts defined: " + allowedThingDef.defName);
+                            List< ThingCount > butcherProducts = allowedThingDef.butcherProducts;
+                            if ( butcherProducts.Count == 0 )
+                            {
+                                throw new Exception( "No butcherproducts defined: " + allowedThingDef.defName );
+                            }
 
                             Clear();
                             _thingDef = butcherProducts.First().thingDef;
@@ -161,21 +172,23 @@ namespace FM
                             Count = butcherProducts.First().count;
                             return;
                         }
+
                         // still not defined, see if we can catch corpses.
-                        if (allowedThingDef.defName.Contains("Corpse") && !allowedThingDef.defName.Contains("Mechanoid"))
+                        if ( allowedThingDef.defName.Contains( "Corpse" ) &&
+                             !allowedThingDef.defName.Contains( "Mechanoid" ) )
                         {
                             // meat for non-mech corpses
                             Clear();
-                            _categoryDef = ThingCategoryDef.Named("MeatRaw");
+                            _categoryDef = ThingCategoryDef.Named( "MeatRaw" );
                             Type = Types.Category;
                             Count = 50;
                         }
-                        else if (allowedThingDef.defName.Contains("Corpse") &&
-                                 allowedThingDef.defName.Contains("Mechanoid"))
+                        else if ( allowedThingDef.defName.Contains( "Corpse" ) &&
+                                  allowedThingDef.defName.Contains( "Mechanoid" ) )
                         {
                             // plasteel for mech corpses
                             Clear();
-                            _thingDef = ThingDef.Named("Plasteel");
+                            _thingDef = ThingDef.Named( "Plasteel" );
                             Type = Types.Thing;
                             Count = 20;
                         }
@@ -187,16 +200,16 @@ namespace FM
                         }
                     }
 
-                    if (_recipe.specialProducts[0] == SpecialProductType.Smelted)
+                    if ( _recipe.specialProducts[0] == SpecialProductType.Smelted )
                     {
-                        if (allowedThingDef.smeltProducts == null)
+                        if ( allowedThingDef.smeltProducts == null )
                         {
                             Clear();
                             return;
                         }
 
-                        var smeltingProducts = allowedThingDef.smeltProducts;
-                        if (smeltingProducts.Count == 0)
+                        List< ThingCount > smeltingProducts = allowedThingDef.smeltProducts;
+                        if ( smeltingProducts.Count == 0 )
                         {
                             Clear();
                             return;
@@ -207,18 +220,19 @@ namespace FM
                         _thingDef = smeltingProducts.First().thingDef;
                         Type = Types.Thing;
                         Count = smeltingProducts.First().count;
-                        if (_thingDef == null)
+                        if ( _thingDef == null )
                         {
                             Clear();
                         }
                     }
                 }
             }
+
                 // ReSharper disable once UnusedVariable
-            catch (Exception e)
+            catch ( Exception e )
             {
 #if DEBUG
-                Log.Warning(e.Message);
+                Log.Warning( e.Message );
 #endif
                 Clear();
             }
