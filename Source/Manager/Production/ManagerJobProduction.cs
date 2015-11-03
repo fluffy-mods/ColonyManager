@@ -24,8 +24,7 @@ namespace FM
         public BillGiverTracker BillGivers;
         
         // TODO: Hour should not be shown when date != 0 and hour == 0
-        // TODO: Click on overview row links to correct managerTab
-        // TODO: Collect data on counts
+        // TODO: Collect data on counts ( three sets of data of set max size; day, month, year - each with max 100 datapoints)
         // TODO: Draw count graph
 
         /// <summary>
