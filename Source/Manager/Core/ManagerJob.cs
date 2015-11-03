@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using UnityEngine;
 using Verse;
 
@@ -57,6 +58,15 @@ namespace FM
         {
             Text.Anchor = TextAnchor.MiddleCenter;
             Widgets.Label( rect, ToString() );
+            Text.Anchor = TextAnchor.UpperLeft;
+        }
+
+        public virtual void DrawOverviewDetails( Rect rect )
+        {
+            GUI.color = Color.gray;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label( rect, "Details are not implemented for " + this.GetType() + "." );
+            GUI.color = Color.white;
             Text.Anchor = TextAnchor.UpperLeft;
         }
     }

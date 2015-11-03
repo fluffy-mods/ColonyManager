@@ -37,14 +37,26 @@ namespace FM
             Rect sideRectLower = new Rect( overviewRect.xMax + Margin, sideRectUpper.yMax + Margin, sideRectUpper.width,
                                            sideRectUpper.height - 1 );
 
+            // draw the listing of current jobs.
             Widgets.DrawMenuSection( overviewRect );
             DrawOverview( overviewRect );
+            
+            // draw the selected job's details
             Widgets.DrawMenuSection( sideRectUpper );
+            if (_selectedJob != null )
+            {
+                _selectedJob.DrawOverviewDetails( sideRectUpper );
+            }
 
-            //DrawStats(sideRectUpper.ContractedBy(Margin));
+            // draw some stuff I haven't thought of yet.
+            // Save/load here?
+            // Overview of managers?
             Widgets.DrawMenuSection( sideRectLower );
-
-            //DrawSaveLoad(sideRectLower.ContractedBy(Margin));
+            GUI.color = Color.gray;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label( sideRectLower, "Not implemented." );
+            GUI.color = Color.white;
+            Text.Anchor = TextAnchor.UpperLeft;
         }
 
         public void DrawOverview( Rect rect )
