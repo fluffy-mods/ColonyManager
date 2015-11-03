@@ -106,9 +106,9 @@ namespace FM
                     GUI.color = Color.white;
 
                     // draw the bar
-                    // if the job is active and pending, make the bar green - otherwise white.
+                    // if the job is active and pending, make the bar blueish green - otherwise white.
                     // Note; active here means the job is currently being handed out.
-                    Color barColour = this.Active ? new Color( 0f, 1f, 0f ) : new Color( 1f, 1f, 1f );
+                    Color barColour = this.Active ? new Color( 0.2f, 0.8f, 0.85f ) : new Color( 1f, 1f, 1f );
                     Texture2D barTex = SolidColorMaterials.NewSolidColorTexture(barColour);
                     GUI.DrawTexture( progressBarRect, barTex );
 
