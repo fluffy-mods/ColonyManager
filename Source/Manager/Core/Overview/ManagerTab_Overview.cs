@@ -17,10 +17,9 @@ namespace FM
                                          ArrowDown = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowDown" ),
                                          ArrowBottom = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowBottom" );
 
-        private Vector2 _overviewScrollPosition = Vector2.zero;
-
-        private ManagerJob _selectedJob;
-        public float OverviewHeight = 9999f;
+        private Vector2         _overviewScrollPosition     = Vector2.zero;
+        private ManagerJob      _selectedJob;
+        public float            OverviewHeight              = 9999f;
 
         public static List< ManagerJob > Jobs
         {
@@ -81,18 +80,21 @@ namespace FM
                     {
                         GUI.DrawTexture( row, OddRowBg );
                     }
+                    if ( Jobs[i] == _selectedJob )
+                    {
+                        Widgets.DrawHighlightSelected( row );
+                    }
 
                     DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), Jobs[i] );
 
                     Rect jobRect = row;
                     jobRect.width -= 50f;
-                    Jobs[i].DrawListEntry( jobRect );
-                    Widgets.DrawHighlightIfMouseover( jobRect );
+                    Jobs[i].DrawListEntry( jobRect, true, true );
+                    Widgets.DrawHighlightIfMouseover( row );
                     if ( Widgets.InvisibleButton( jobRect ) )
                     {
-                        // TODO: Goto job.
+                        _selectedJob = Jobs[i];
                     }
-
 
                     cur.y += 50f;
                 }

@@ -5,6 +5,9 @@
   <FM.Details>Details</FM.Details>
   <FM.Manage>Manage!</FM.Manage>
   <FM.Delete>Delete</FM.Delete>
+
+  <!-- Common -->
+  <FM.LastUpdateTooltip>This job was last updated {0} ago.</FM.LastUpdateTooltip>
   
   <!-- Overview Tab -->
   <FM.Overview>Overview</FM.Overview>

@@ -283,7 +283,7 @@ namespace FM
             TabDrawer.DrawTabs( canvas, list );
 
             // content
-            Rect scrollCanvas = canvas.ContractedBy( 10f );
+            Rect scrollCanvas = canvas; //.ContractedBy( 10f );
             scrollCanvas.yMin = scrollCanvas.yMin + 40f;
             float height = SourceListHeight + 20f;
             Rect scrollView = new Rect( 0f, 0f, scrollCanvas.width, height );
@@ -309,6 +309,10 @@ namespace FM
             {
                 Rect row = new Rect( 0f, y, scrollContent.width, Manager.ListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
+                if ( Job == current )
+                {
+                    Widgets.DrawHighlightSelected( row );
+                }
 
                 if ( i++ % 2 == 1 )
                 {
@@ -327,7 +331,7 @@ namespace FM
                     jobRect.width -= 50f;
                 }
 
-                current.DrawListEntry( jobRect );
+                current.DrawListEntry( jobRect, false, Source == SourceOptions.Current );
                 if ( Widgets.InvisibleButton( jobRect ) )
                 {
                     Job = current;

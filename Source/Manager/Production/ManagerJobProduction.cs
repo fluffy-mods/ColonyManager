@@ -9,7 +9,8 @@ namespace FM
 {
     public class ManagerJobProduction : ManagerJob
     {
-        private readonly float _lastUpdateRectWidth = 50f;
+        private readonly float _lastUpdateRectWidth = 50f,
+                               _progressRectWidth = 10f;
         private readonly float _margin = Manager.Margin;
 
         /// <summary>
@@ -21,8 +22,7 @@ namespace FM
         ///     BillGiver tracker, keeps track of billgiver settings and current assignments
         /// </summary>
         public BillGiverTracker BillGivers;
-
-        // TODO: Production jobs that are based on the same bill point to the same reference
+        
         // TODO: Hour should not be shown when date != 0 and hour == 0
         // TODO: Click on overview row links to correct managerTab
         // TODO: Collect data on counts
@@ -63,19 +63,22 @@ namespace FM
             BillGivers = new BillGiverTracker( this );
         }
 
-        public override void DrawListEntry( Rect rect )
+        public override void DrawListEntry( Rect rect, bool overview = true, bool active = true)
         {
             // detailButton | name (current/target) | last update
 
             Rect labelRect = new Rect( _margin, _margin,
-                                       rect.width - _lastUpdateRectWidth - 3 * _margin,
+                                       rect.width - (active ? (_lastUpdateRectWidth + _progressRectWidth + 4 * _margin) : 2 * _margin),
                                        rect.height - 2 * _margin ),
-                 lastUpdateRect = new Rect( labelRect.xMax + _margin, _margin,
-                                            rect.width - labelRect.width - 3 * _margin,
+                 progressRect = new Rect( labelRect.xMax + _margin, _margin,
+                                            _progressRectWidth,
+                                            rect.height - 2 * _margin ),
+                 lastUpdateRect = new Rect( progressRect.xMax + _margin, _margin,
+                                            _lastUpdateRectWidth,
                                             rect.height - 2 * _margin );
 
-            string text = Bill.recipe.LabelCap + " (" +
-                          string.Join( ", ", BillGivers.GetBillGiverDefs.Select( bg => bg.LabelCap ).ToArray() ) + ")";
+            string text = Bill.recipe.LabelCap + "\n<i>" +
+                          string.Join( ", ", BillGivers.GetBillGiverDefs.Select( bg => bg.LabelCap ).ToArray() ) + "</i>";
 
 #if DEBUG
             text += Priority;
@@ -86,12 +89,46 @@ namespace FM
             {
                 Text.Anchor = TextAnchor.MiddleLeft;
                 Widgets.Label( labelRect, text );
-                Text.Anchor = TextAnchor.MiddleCenter;
-                Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - LastAction ).TimeString() );
-                Text.Anchor = TextAnchor.UpperLeft;
+                // if the bill has a manager job, give some more info.
+                if ( active )
+                {
+                    // bar always goes a little beyond the actual target
+                    int max = Math.Max((int)(Trigger.Count * 1.2f), Trigger.CurCount);
+
+                    // get the bar rect
+                    float barHeight = progressRect.height / max * Trigger.CurCount;
+                    float markHeight = progressRect.height / max * Trigger.Count;
+                    Rect progressBarRect = new Rect(progressRect.xMin + 1f, progressRect.yMax - barHeight, 6f, barHeight);
+
+                    // draw a box for the bar
+                    GUI.color = Color.gray;
+                    Widgets.DrawBox( progressRect.ContractedBy( 1f ) );
+                    GUI.color = Color.white;
+
+                    // draw the bar
+                    // if the job is active and pending, make the bar green - otherwise white.
+                    // Note; active here means the job is currently being handed out.
+                    Color barColour = this.Active ? new Color( 0f, 1f, 0f ) : new Color( 1f, 1f, 1f );
+                    Texture2D barTex = SolidColorMaterials.NewSolidColorTexture(barColour);
+                    GUI.DrawTexture( progressBarRect, barTex );
+
+                    // draw a mark at the treshold
+                    Widgets.DrawLineHorizontal( progressRect.xMin, progressRect.yMax - markHeight, progressRect.width );
+                    
+                    // draw time since last action
+                    Text.Anchor = TextAnchor.MiddleCenter;
+                    Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - LastAction ).TimeString() );
+
+                    // set tooltips
+                    TooltipHandler.TipRegion( progressRect, "FMP.ThresholdCount".Translate( Trigger.CurCount, Trigger.Count ) );
+                    TooltipHandler.TipRegion( lastUpdateRect, "FM.LastUpdateTooltip".Translate( ( Find.TickManager.TicksGame - LastAction ).TimeString() ) );
+                }
             }
             finally
             {
+                // make sure everything is always properly closed / reset to defaults.
+                GUI.color = Color.white;
+                Text.Anchor = TextAnchor.UpperLeft;
                 GUI.EndGroup();
             }
         }

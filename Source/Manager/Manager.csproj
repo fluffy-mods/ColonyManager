@@ -46,14 +46,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Building\Building_ManagerStation.cs" />
-    <Compile Include="Building\CompProperties_ManagerStation.cs" />
-    <Compile Include="Building\Comp_ManagerStation.cs" />
+    <Compile Include="Core\Building\Building_ManagerStation.cs" />
+    <Compile Include="Core\Building\CompProperties_ManagerStation.cs" />
+    <Compile Include="Core\Building\Comp_ManagerStation.cs" />
     <Compile Include="Core\JobStack.cs" />
     <Compile Include="Core\Trigger.cs" />
     <Compile Include="Core\Work_Job\JobDriver_ManagingAtManagingStation.cs" />
     <Compile Include="Core\Work_Job\WorkGiver_Manager.cs" />
-    <Compile Include="Overview\ManagerTab_Overview.cs" />
+    <Compile Include="Core\Overview\ManagerTab_Overview.cs" />
     <Compile Include="Production\TriggerThreshold.cs" />
     <Compile Include="Core\UI\IManagerTab.cs" />
     <Compile Include="Core\Manager.cs" />

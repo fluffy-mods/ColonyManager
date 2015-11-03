@@ -53,7 +53,7 @@ namespace FM
 
         public virtual void Tick() {}
 
-        public virtual void DrawListEntry( Rect rect )
+        public virtual void DrawListEntry( Rect rect, bool overview = true, bool active = true )
         {
             Text.Anchor = TextAnchor.MiddleCenter;
             Widgets.Label( rect, ToString() );
