@@ -106,6 +106,13 @@ namespace FM
             }
         }
 
+        /// <summary>
+        /// Draw a square group of ordering buttons for a job in rect.
+        /// This is an OVERALL method that does not care about job types.
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="job"></param>
+        /// <returns></returns>
         public static bool DrawOrderButtons( Rect rect, ManagerJob job )
         {
             bool ret = false;
@@ -123,6 +130,7 @@ namespace FM
 
             if ( !top )
             {
+                DrawOrderTooltips( upRect, topRect );
                 if ( Widgets.ImageButton( topRect, ArrowTop ) )
                 {
                     Manager.Get.GetJobStack.TopPriority( job );
@@ -138,6 +146,7 @@ namespace FM
 
             if ( !bottom )
             {
+                DrawOrderTooltips( downRect, bottomRect, false );
                 if ( Widgets.ImageButton( downRect, ArrowDown ) )
                 {
                     Manager.Get.GetJobStack.DecreasePriority( job );
@@ -153,6 +162,14 @@ namespace FM
             return ret;
         }
 
+        /// <summary>
+        /// Draw a square group of ordering buttons for a job in rect.
+        /// This is an LOCAL method that within the specified job type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="rect"></param>
+        /// <param name="job"></param>
+        /// <returns></returns>
         public static bool DrawOrderButtons< T >( Rect rect, T job ) where T : ManagerJob
         {
             bool ret = false;
@@ -172,34 +189,50 @@ namespace FM
 
             if ( !top )
             {
+                DrawOrderTooltips( upRect, topRect );
                 if ( Widgets.ImageButton( topRect, ArrowTop ) )
                 {
-                    Manager.Get.GetJobStack.TopPriority( job );
+                    Manager.Get.GetJobStack.TopPriority<T>( job );
                     ret = true;
                 }
 
                 if ( Widgets.ImageButton( upRect, ArrowUp ) )
                 {
-                    Manager.Get.GetJobStack.IncreasePriority( job );
+                    Manager.Get.GetJobStack.IncreasePriority<T>( job );
                     ret = true;
                 }
             }
 
             if ( !bottom )
             {
+                DrawOrderTooltips( downRect, bottomRect, false );
                 if ( Widgets.ImageButton( downRect, ArrowDown ) )
                 {
-                    Manager.Get.GetJobStack.DecreasePriority( job );
+                    Manager.Get.GetJobStack.DecreasePriority<T>( job );
                     ret = true;
                 }
 
                 if ( Widgets.ImageButton( bottomRect, ArrowBottom ) )
                 {
-                    Manager.Get.GetJobStack.BottomPriority( job );
+                    Manager.Get.GetJobStack.BottomPriority<T>( job );
                     ret = true;
                 }
             }
             return ret;
+        }
+
+        public static void DrawOrderTooltips(Rect step, Rect max, bool up = true )
+        {
+            if ( up )
+            {
+                TooltipHandler.TipRegion( step, "FM.OrderUp".Translate() );
+                TooltipHandler.TipRegion( max, "FM.OrderTop".Translate() );
+            }
+            else
+            {
+                TooltipHandler.TipRegion( step, "FM.OrderDown".Translate() );
+                TooltipHandler.TipRegion( max, "FM.OrderBottom".Translate() );
+            }
         }
     }
 }

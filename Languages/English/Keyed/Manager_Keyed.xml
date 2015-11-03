@@ -8,6 +8,10 @@
 
   <!-- Common -->
   <FM.LastUpdateTooltip>This job was last updated {0} ago.</FM.LastUpdateTooltip>
+  <FM.OrderUp>Increase job priority</FM.OrderUp>
+  <FM.OrderDown>Decrease job priority</FM.OrderDown>
+  <FM.OrderTop>Maximum priority</FM.OrderTop>
+  <FM.OrderBottom>Minimum priority</FM.OrderBottom>
   
   <!-- Overview Tab -->
   <FM.Overview>Overview</FM.Overview>
