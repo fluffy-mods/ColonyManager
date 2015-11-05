@@ -15,12 +15,18 @@
   
   <!-- Overview Tab -->
   <FM.Overview>Overview</FM.Overview>
+  <FM.NoJobs>No jobs set.</FM.NoJobs>
   
   <!--Import/Export Tab-->
   <FM.ImportExport>Import &amp; Export</FM.ImportExport>
+  <FM.CurrentJobs>Current Jobs:</FM.CurrentJobs>
+  <FM.Export>Export</FM.Export>
+  <FM.JobsExported>{0} jobs exported</FM.JobsExported>
+  <FM.Import>Import</FM.Import>
 
   <!-- Production Tab -->
   <!-- Miscelaneous -->
+  <FMP.Production>Production</FMP.Production>
   <FMP.ManageBillTooltip>Assign this bill to be managed by your manager(s).</FMP.ManageBillTooltip>
   <FMP.DeleteBillTooltip>Stop managing this bill, and clean up outstanding bills</FMP.DeleteBillTooltip>
   <FMP.Production>Production</FMP.Production>

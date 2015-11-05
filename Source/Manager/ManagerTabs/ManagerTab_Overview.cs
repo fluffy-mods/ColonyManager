@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
@@ -9,7 +10,8 @@ namespace FM
     {
         public const float Margin = 6f,
                            OverviewWidthRatio = .6f,
-                           RowHeight = 50f;
+                           RowHeight = 50f,
+                           IconSize = 30f;
 
         public static readonly Texture2D OddRowBg = SolidColorMaterials.NewSolidColorTexture( 1f, 1f, 1f, .05f ),
                                          ArrowTop = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowTop" ),
@@ -23,10 +25,23 @@ namespace FM
 
         public static List< ManagerJob > Jobs
         {
-            get { return Manager.Get.GetJobStack.FullStack; }
+            get { return Manager.Get.JobStack.FullStack; }
         }
 
         public override string Label { get; } = "FM.Overview".Translate();
+
+        public override ManagerJob Selected
+        {
+            get
+            {
+                return _selectedJob;
+            }
+
+            set
+            {
+                _selectedJob = value;
+            }
+        }
 
         public override void DoWindowContents( Rect canvas )
         {
@@ -48,7 +63,7 @@ namespace FM
                 _selectedJob.DrawOverviewDetails( sideRectUpper );
             }
 
-            // draw some stuff I haven't thought of yet.
+            // TODO: draw some stuff I haven't thought of yet.
             // Save/load here?
             // Overview of managers?
             Widgets.DrawMenuSection( sideRectLower );
@@ -65,8 +80,6 @@ namespace FM
             {
                 Text.Anchor = TextAnchor.MiddleCenter;
                 GUI.color = Color.grey;
-
-                // TODO: Translation
                 Widgets.Label( rect, "FM.NoJobs".Translate() );
                 Text.Anchor = TextAnchor.UpperLeft;
                 GUI.color = Color.white;
@@ -88,6 +101,8 @@ namespace FM
                 for ( int i = 0; i < Jobs.Count; i++ )
                 {
                     Rect row = new Rect( cur.x, cur.y, contentRect.width, 50f );
+
+                    // highlights
                     if ( i % 2 == 1 )
                     {
                         GUI.DrawTexture( row, OddRowBg );
@@ -97,10 +112,21 @@ namespace FM
                         Widgets.DrawHighlightSelected( row );
                     }
 
+                    // go to job icon
+                    Rect iconRect = new Rect(Margin, row.yMin + (RowHeight - IconSize) / 2, IconSize, IconSize);
+                    if (Widgets.ImageButton( iconRect, Jobs[i].Icon ) )
+                    {
+                        MainTabWindow_Manager.CurrentTab = Jobs[i].Tab;
+                        Jobs[i].Tab.Selected = Jobs[i];
+                    }
+
+                    // order buttons
                     DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), Jobs[i] );
 
+                    // job specific overview.
                     Rect jobRect = row;
-                    jobRect.width -= 50f;
+                    jobRect.width -= RowHeight + IconSize + 2 * Margin; // - (a + b)?
+                    jobRect.x += IconSize + 2 * Margin;
                     Jobs[i].DrawListEntry( jobRect, true, true );
                     Widgets.DrawHighlightIfMouseover( row );
                     if ( Widgets.InvisibleButton( jobRect ) )
@@ -145,13 +171,13 @@ namespace FM
                 DrawOrderTooltips( upRect, topRect );
                 if ( Widgets.ImageButton( topRect, ArrowTop ) )
                 {
-                    Manager.Get.GetJobStack.TopPriority( job );
+                    Manager.Get.JobStack.TopPriority( job );
                     ret = true;
                 }
 
                 if ( Widgets.ImageButton( upRect, ArrowUp ) )
                 {
-                    Manager.Get.GetJobStack.IncreasePriority( job );
+                    Manager.Get.JobStack.IncreasePriority( job );
                     ret = true;
                 }
             }
@@ -161,13 +187,13 @@ namespace FM
                 DrawOrderTooltips( downRect, bottomRect, false );
                 if ( Widgets.ImageButton( downRect, ArrowDown ) )
                 {
-                    Manager.Get.GetJobStack.DecreasePriority( job );
+                    Manager.Get.JobStack.DecreasePriority( job );
                     ret = true;
                 }
 
                 if ( Widgets.ImageButton( bottomRect, ArrowBottom ) )
                 {
-                    Manager.Get.GetJobStack.BottomPriority( job );
+                    Manager.Get.JobStack.BottomPriority( job );
                     ret = true;
                 }
             }
@@ -204,13 +230,13 @@ namespace FM
                 DrawOrderTooltips( upRect, topRect );
                 if ( Widgets.ImageButton( topRect, ArrowTop ) )
                 {
-                    Manager.Get.GetJobStack.TopPriority<T>( job );
+                    Manager.Get.JobStack.TopPriority<T>( job );
                     ret = true;
                 }
 
                 if ( Widgets.ImageButton( upRect, ArrowUp ) )
                 {
-                    Manager.Get.GetJobStack.IncreasePriority<T>( job );
+                    Manager.Get.JobStack.IncreasePriority<T>( job );
                     ret = true;
                 }
             }
@@ -220,13 +246,13 @@ namespace FM
                 DrawOrderTooltips( downRect, bottomRect, false );
                 if ( Widgets.ImageButton( downRect, ArrowDown ) )
                 {
-                    Manager.Get.GetJobStack.DecreasePriority<T>( job );
+                    Manager.Get.JobStack.DecreasePriority<T>( job );
                     ret = true;
                 }
 
                 if ( Widgets.ImageButton( bottomRect, ArrowBottom ) )
                 {
-                    Manager.Get.GetJobStack.BottomPriority<T>( job );
+                    Manager.Get.JobStack.BottomPriority<T>( job );
                     ret = true;
                 }
             }

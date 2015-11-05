@@ -22,7 +22,19 @@ namespace FM
         public static List< ManagerJobProduction > SourceList;
         public static string SourceFilter = "";
         public static float SourceListHeight;
-        public static ManagerJobProduction Job;
+        private static ManagerJobProduction _selected;
+        public override ManagerJob Selected
+        { 
+            get
+            {
+                return _selected;
+            }
+            set
+            {
+                _selected = (ManagerJobProduction)value;
+            }
+        }
+
         private bool _postOpenFocus;
         public float LeftRowSize = 300f;
 
@@ -42,7 +54,7 @@ namespace FM
                                    select ( new ManagerJobProduction( rd ) ) ).ToList();
                     break;
                 case SourceOptions.Current:
-                    SourceList = Manager.Get.GetJobStack.FullStack.OfType< ManagerJobProduction >().ToList();
+                    SourceList = Manager.Get.JobStack.FullStack.OfType< ManagerJobProduction >().ToList();
                     break;
             }
         }
@@ -61,7 +73,7 @@ namespace FM
         {
             Widgets.DrawMenuSection( canvas );
 
-            if ( Job != null )
+            if ( _selected != null )
             {
                 // leave some space for bottom buttons.
                 float bottomButtonsHeight = 30f;
@@ -79,8 +91,8 @@ namespace FM
                 {
                     if ( Widgets.TextButton( add, "FM.Delete".Translate() ) )
                     {
-                        Manager.Get.GetJobStack.Delete( Job );
-                        Job = null;
+                        Manager.Get.JobStack.Delete( _selected );
+                        _selected = null;
                         RefreshSourceList();
                         return; // hopefully that'll just skip to the next tick without any further errors?
                     }
@@ -88,11 +100,11 @@ namespace FM
                 }
                 else
                 {
-                    if ( Job.Trigger.IsValid )
+                    if ( _selected.Trigger.IsValid )
                     {
                         if ( Widgets.TextButton( add, "FM.Manage".Translate() ) )
                         {
-                            Manager.Get.GetJobStack.Add( Job );
+                            Manager.Get.JobStack.Add( _selected );
 
                             // refresh source list so that the next added job is not an exact copy.
                             RefreshSourceList();
@@ -123,29 +135,29 @@ namespace FM
                 Text.Anchor = TextAnchor.MiddleCenter;
                 Text.Font = GameFont.Medium;
                 Rect recta = new Rect( 0f, 0f, canvas.width, 50f );
-                Widgets.Label( recta, Job.Bill.LabelCap );
+                Widgets.Label( recta, _selected.Bill.LabelCap );
                 Text.Anchor = TextAnchor.UpperLeft;
                 Text.Font = GameFont.Small;
                 Rect rect2 = new Rect( 6f, 50f, canvas.width * .3f, canvas.height - 50f );
                 Listing_Standard listingStandard = new Listing_Standard( rect2 );
-                if ( Job.Bill.suspended )
+                if ( _selected.Bill.suspended )
                 {
                     if ( listingStandard.DoTextButton( "Suspended".Translate() ) )
                     {
-                        Job.Bill.suspended = false;
+                        _selected.Bill.suspended = false;
                     }
                 }
                 else if ( listingStandard.DoTextButton( "NotSuspended".Translate() ) )
                 {
-                    Job.Bill.suspended = true;
+                    _selected.Bill.suspended = true;
                 }
-                string billStoreModeLabel = ( "BillStoreMode_" + Job.Bill.storeMode ).Translate();
+                string billStoreModeLabel = ( "BillStoreMode_" + _selected.Bill.storeMode ).Translate();
                 if ( listingStandard.DoTextButton( billStoreModeLabel ) )
                 {
                     List< FloatMenuOption > list = ( from BillStoreMode mode in Enum.GetValues( typeof (BillStoreMode) )
                                                      select
                                                          new FloatMenuOption( ( "BillStoreMode_" + mode ).Translate(),
-                                                                              delegate { Job.Bill.storeMode = mode; } ) )
+                                                                              delegate { _selected.Bill.storeMode = mode; } ) )
                         .ToList();
                     Find.WindowStack.Add( new FloatMenu( list ) );
                 }
@@ -153,29 +165,29 @@ namespace FM
                 // other stuff
                 listingStandard.DoGap();
                 listingStandard.DoLabel( "IngredientSearchRadius".Translate() + ": " +
-                                         Job.Bill.ingredientSearchRadius.ToString( "#####0" ) );
-                Job.Bill.ingredientSearchRadius =
-                    Mathf.RoundToInt( listingStandard.DoSlider( Job.Bill.ingredientSearchRadius, 0f, 250f ) );
+                                         _selected.Bill.ingredientSearchRadius.ToString( "#####0" ) );
+                _selected.Bill.ingredientSearchRadius =
+                    Mathf.RoundToInt( listingStandard.DoSlider( _selected.Bill.ingredientSearchRadius, 0f, 250f ) );
 
-                if ( Job.Bill.recipe.workSkill != null )
+                if ( _selected.Bill.recipe.workSkill != null )
                 {
                     listingStandard.DoLabel(
-                        "MinimumSkillLevel".Translate( Job.Bill.recipe.workSkill.label.ToLower() ) + ": " +
-                        Job.Bill.minSkillLevel.ToString( "#####0" ) );
-                    Job.Bill.minSkillLevel =
-                        Mathf.RoundToInt( listingStandard.DoSlider( Job.Bill.minSkillLevel, 0f, 20f ) );
-                    listingStandard.DoLabelCheckbox( "Highest colonist skill", ref Job.maxSkil );
+                        "MinimumSkillLevel".Translate( _selected.Bill.recipe.workSkill.label.ToLower() ) + ": " +
+                        _selected.Bill.minSkillLevel.ToString( "#####0" ) );
+                    _selected.Bill.minSkillLevel =
+                        Mathf.RoundToInt( listingStandard.DoSlider( _selected.Bill.minSkillLevel, 0f, 20f ) );
+                    listingStandard.DoLabelCheckbox( "Highest colonist skill", ref _selected.maxSkil );
                 }
 
                 // draw threshold config
-                Job.Trigger.DrawThresholdConfig( ref listingStandard );
-                Job.BillGivers.DrawBillGiverConfig( ref listingStandard );
+                _selected.Trigger.DrawThresholdConfig( ref listingStandard );
+                _selected.BillGivers.DrawBillGiverConfig( ref listingStandard );
                 listingStandard.End();
 
                 // ingredient picker
                 Rect rect3 = new Rect( rect2.xMax + 6f, 50f, canvas.width * .4f, canvas.height - 50f );
-                ThingFilterUI.DoThingFilterConfigWindow( rect3, ref BillScrollPosition, Job.Bill.ingredientFilter,
-                                                         Job.Bill.recipe.fixedIngredientFilter, 4 );
+                ThingFilterUI.DoThingFilterConfigWindow( rect3, ref BillScrollPosition, _selected.Bill.ingredientFilter,
+                                                         _selected.Bill.recipe.fixedIngredientFilter, 4 );
 
                 // description
                 Rect rect4 = new Rect( rect3.xMax + 6f, rect3.y + 30f, canvas.width - rect3.xMax - 12f,
@@ -183,34 +195,34 @@ namespace FM
                 StringBuilder stringBuilder = new StringBuilder();
 
                 // add mainproduct line
-                stringBuilder.AppendLine( "FMP.MainProduct".Translate( Job.MainProduct.Label, Job.MainProduct.Count ) );
+                stringBuilder.AppendLine( "FMP.MainProduct".Translate( _selected.MainProduct.Label, _selected.MainProduct.Count ) );
                 stringBuilder.AppendLine();
 
-                if ( Job.Bill.recipe.description != null )
+                if ( _selected.Bill.recipe.description != null )
                 {
-                    stringBuilder.AppendLine( Job.Bill.recipe.description );
+                    stringBuilder.AppendLine( _selected.Bill.recipe.description );
                     stringBuilder.AppendLine();
                 }
                 stringBuilder.AppendLine( "WorkAmount".Translate() + ": " +
-                                          Job.Bill.recipe.WorkAmountTotal( null ).ToStringWorkAmount() );
+                                          _selected.Bill.recipe.WorkAmountTotal( null ).ToStringWorkAmount() );
                 stringBuilder.AppendLine();
-                foreach ( IngredientCount ingredientCount in Job.Bill.recipe.ingredients )
+                foreach ( IngredientCount ingredientCount in _selected.Bill.recipe.ingredients )
                 {
                     if ( !ingredientCount.filter.Summary.NullOrEmpty() )
                     {
                         stringBuilder.AppendLine(
-                            Job.Bill.recipe.IngredientValueGetter.BillRequirementsDescription( ingredientCount ) );
+                            _selected.Bill.recipe.IngredientValueGetter.BillRequirementsDescription( ingredientCount ) );
                     }
                 }
                 stringBuilder.AppendLine();
-                string text4 = Job.Bill.recipe.IngredientValueGetter.ExtraDescriptionLine();
+                string text4 = _selected.Bill.recipe.IngredientValueGetter.ExtraDescriptionLine();
                 if ( text4 != null )
                 {
                     stringBuilder.AppendLine( text4 );
                     stringBuilder.AppendLine();
                 }
                 stringBuilder.AppendLine( "MinimumSkills".Translate() );
-                stringBuilder.AppendLine( Job.Bill.recipe.MinSkillString );
+                stringBuilder.AppendLine( _selected.Bill.recipe.MinSkillString );
                 Text.Font = GameFont.Small;
                 string text5 = stringBuilder.ToString();
                 if ( Text.CalcHeight( text5, rect4.width ) > rect4.height )
@@ -219,9 +231,9 @@ namespace FM
                 }
                 Widgets.Label( rect4, text5 );
                 Text.Font = GameFont.Small;
-                if ( Job.Bill.recipe.products.Count == 1 )
+                if ( _selected.Bill.recipe.products.Count == 1 )
                 {
-                    Widgets.InfoCardButton( rect4.x, rect3.y, Job.Bill.recipe.products[0].thingDef );
+                    Widgets.InfoCardButton( rect4.x, rect3.y, _selected.Bill.recipe.products[0].thingDef );
                 }
             }
             GUI.EndGroup();
@@ -309,7 +321,7 @@ namespace FM
             {
                 Rect row = new Rect( 0f, y, scrollContent.width, Manager.ListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
-                if ( Job == current )
+                if ( _selected == current )
                 {
                     Widgets.DrawHighlightSelected( row );
                 }
@@ -334,7 +346,7 @@ namespace FM
                 current.DrawListEntry( jobRect, false, Source == SourceOptions.Current );
                 if ( Widgets.InvisibleButton( jobRect ) )
                 {
-                    Job = current;
+                    _selected = current;
                 }
 
                 y += Manager.ListEntryHeight;

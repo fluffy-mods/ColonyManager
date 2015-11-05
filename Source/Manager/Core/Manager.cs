@@ -15,14 +15,15 @@ namespace FM
         public ManagerTab[] ManagerTabs =
         {
             new ManagerTab_Overview(),
-            new ManagerTab_Production()
+            new ManagerTab_Production(),
+            new ManagerTab_ImportExport()
 
             // TODO: new ManagerTabLifestock(),
             // TODO: new ManagerTabHunting(),
             // TODO: new ManagerTabForestry()
         };
 
-        public JobStack GetJobStack => _stack ?? ( _stack = new JobStack() );
+        public JobStack JobStack => _stack ?? ( _stack = new JobStack() );
 
         // copypasta from AutoEquip.
         public static Manager Get
@@ -62,14 +63,14 @@ namespace FM
 #if DEBUG_JOBS
             Log.Message( "Trying to do work" );
 #endif
-            GetJobStack.TryDoNextJob();
+            JobStack.TryDoNextJob();
         }
 
         public override void MapComponentTick()
         {
             base.MapComponentTick();
 
-            foreach ( ManagerJob job in GetJobStack.FullStack )
+            foreach ( ManagerJob job in JobStack.FullStack )
             {
                 job.Tick();
             }

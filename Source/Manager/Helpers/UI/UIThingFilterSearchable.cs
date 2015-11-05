@@ -9,28 +9,7 @@ namespace FM
     [SuppressMessage( "ReSharper", "InconsistentNaming" )]
     public class ThingFilterUiSearchable
     {
-        /*
-        private const float ExtraViewHeight = 90f;
-*/
-
-        /*
-        private const float RangeLabelTab = 10f;
-*/
-
-        /*
-        private const float RangeLabelHeight = 19f;
-*/
-
-        /*
-        private const float SliderHeight = 26f;
-*/
-
-        /*
-        private const float SliderTab = 20f;
-*/
-
         private static float viewHeight;
-
         public void DoThingFilterConfigWindow( Rect rect, ref Vector2 scrollPosition, ThingFilter filter,
                                                ThingFilter parentFilter = null, int openMask = 1 )
         {

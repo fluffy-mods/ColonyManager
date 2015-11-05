@@ -13,14 +13,30 @@ namespace FM
     public abstract class ManagerJob : IManagerJob, IExposable
     {
         public int ActionInterval = 3600; // should be 1 minute.
-
         public int LastAction;
-
         public int Priority;
-
+        public static Texture2D _icon = ContentFinder<Texture2D>.Get("UI/Icon/Hammer");
+        public static ManagerTab _tab = new ManagerTab_Overview();
+        
         public Trigger Trigger;
 
         public virtual bool Active { get; set; }
+
+        public virtual Texture2D Icon
+        {
+            get
+            {
+                return _icon;
+            }
+        }
+
+        public virtual ManagerTab Tab
+        {
+            get
+            {
+                return _tab;
+            }
+        }
 
         public bool ShouldDoNow => Active && ( LastAction + ActionInterval ) < Find.TickManager.TicksGame;
 

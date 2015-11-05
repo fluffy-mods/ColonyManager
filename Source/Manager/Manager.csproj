@@ -46,33 +46,36 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Building\Building_ManagerStation.cs" />
-    <Compile Include="Core\Building\CompProperties_ManagerStation.cs" />
-    <Compile Include="Core\Building\Comp_ManagerStation.cs" />
+    <Compile Include="Helpers\History.cs" />
+    <Compile Include="ManagerTabs\ManagerTab_ImportExport.cs" />
+    <Compile Include="Things\Building_ManagerStation.cs" />
+    <Compile Include="Comps\CompProperties_ManagerStation.cs" />
+    <Compile Include="Comps\Comp_ManagerStation.cs" />
     <Compile Include="Core\JobStack.cs" />
-    <Compile Include="Core\Trigger.cs" />
-    <Compile Include="Core\Work_Job\JobDriver_ManagingAtManagingStation.cs" />
-    <Compile Include="Core\Work_Job\WorkGiver_Manager.cs" />
-    <Compile Include="Core\Overview\ManagerTab_Overview.cs" />
-    <Compile Include="Production\TriggerThreshold.cs" />
-    <Compile Include="Core\UI\IManagerTab.cs" />
+    <Compile Include="Triggers\Trigger.cs" />
+    <Compile Include="JobDrivers\JobDriver_ManagingAtManagingStation.cs" />
+    <Compile Include="WorkGivers\WorkGiver_Manager.cs" />
+    <Compile Include="ManagerTabs\ManagerTab_Overview.cs" />
+    <Compile Include="Triggers\TriggerThreshold.cs" />
+    <Compile Include="ManagerTabs\IManagerTab.cs" />
     <Compile Include="Core\Manager.cs" />
     <Compile Include="Core\ManagerController.cs" />
-    <Compile Include="Core\ManagerJob.cs" />
-    <Compile Include="Core\UI\AreaAllowedGUI.cs" />
-    <Compile Include="Production\UI\UIThingFilterSearchable.cs" />
-    <Compile Include="Production\UI\WindowTriggerThresholdDetails.cs" />
-    <Compile Include="Core\Utilities.cs" />
-    <Compile Include="Core\UI\MainTabWindow_Manager.cs" />
-    <Compile Include="Core\UI\ManagerTab.cs" />
-    <Compile Include="Production\BillGiverTracker.cs" />
-    <Compile Include="Production\MainProductTracker.cs" />
-    <Compile Include="Production\ManagerJobProduction.cs" />
-    <Compile Include="Production\UI\ManagerTab_Production.cs" />
-    <Compile Include="Production\UI\WindowBillGiverDetails.cs" />
-    <Compile Include="Production\UtilitiesProduction.cs" />
+    <Compile Include="ManagerJobs\ManagerJob.cs" />
+    <Compile Include="Helpers\UI\AreaAllowedGUI.cs" />
+    <Compile Include="Helpers\UI\UIThingFilterSearchable.cs" />
+    <Compile Include="Windows\Window_TriggerThresholdDetails.cs" />
+    <Compile Include="Helpers\Utilities.cs" />
+    <Compile Include="MainTabWindow\MainTabWindow_Manager.cs" />
+    <Compile Include="ManagerTabs\ManagerTab.cs" />
+    <Compile Include="Helpers\Production\BillGiverTracker.cs" />
+    <Compile Include="Helpers\Production\MainProductTracker.cs" />
+    <Compile Include="ManagerJobs\ManagerJobProduction.cs" />
+    <Compile Include="ManagerTabs\ManagerTab_Production.cs" />
+    <Compile Include="Windows\Window_BillGiverDetails.cs" />
+    <Compile Include="Helpers\Production\UtilitiesProduction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

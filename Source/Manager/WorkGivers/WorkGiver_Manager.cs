@@ -42,7 +42,7 @@ namespace FM
             CompPowerTrader power = t.TryGetComp<CompPowerTrader>();
             if (power != null && !power.PowerOn) return false;
 
-            if (Manager.Get.GetJobStack.NextJob != null) return true;
+            if (Manager.Get.JobStack.NextJob != null) return true;
 
             return false;
         }

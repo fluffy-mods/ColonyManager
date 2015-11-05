@@ -10,8 +10,27 @@ namespace FM
     public class ManagerJobProduction : ManagerJob
     {
         private readonly float _lastUpdateRectWidth = 50f,
-                               _progressRectWidth = 10f;
-        private readonly float _margin = Manager.Margin;
+                               _progressRectWidth = 10f,
+                               _margin = Manager.Margin;
+        private static int     _histSize = 100;
+        private Texture2D      _cogTex = ContentFinder<Texture2D>.Get("UI/Buttons/Cog");
+        public static ManagerTab ManagerTab = new ManagerTab_Production();
+
+        public override Texture2D Icon
+        {
+            get
+            {
+                return base.Icon;
+            }
+        }
+
+        public override ManagerTab Tab
+        {
+            get
+            {
+                return ManagerTab;
+            }
+        }
 
         /// <summary>
         ///     The managed bill, basically a placeholder bill that gets copied and handed out
@@ -48,6 +67,11 @@ namespace FM
 
             set { Bill.suspended = !value; }
         }
+
+        public History day = new History(_histSize);
+        public History month = new History(_histSize, History.period.month);
+        public History year = new History(_histSize, History.period.year);
+        public History historyShown;
 
         public ManagerJobProduction()
         {
@@ -353,6 +377,27 @@ namespace FM
             return strout;
         }
 
+        public override void DrawOverviewDetails( Rect rect )
+        {
+            if (historyShown == null )
+            {
+                historyShown = day;
+            }
+            historyShown.DrawPlot( rect, Trigger.Count );
+
+            Rect switchRect = new Rect(rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f);
+            Widgets.DrawHighlightIfMouseover( switchRect );
+            if(Widgets.ImageButton( switchRect, _cogTex ) )
+            {
+                List<FloatMenuOption> options = new List<FloatMenuOption> {
+                    new FloatMenuOption("day", delegate { historyShown = day; } ),
+                    new FloatMenuOption("month", delegate { historyShown = month; } ),
+                    new FloatMenuOption("year", delegate { historyShown = year; })
+                };
+                Find.WindowStack.Add( new FloatMenu( options ) );
+            }
+        }
+
         public override void Tick()
         {
             if ( Find.TickManager.TicksGame % 250 == 0 )
@@ -363,6 +408,18 @@ namespace FM
                         Find.ListerPawns.FreeColonistsSpawned.Max(
                             pawn => pawn.skills.GetSkill( Bill.recipe.workSkill ).level );
                 }
+            }
+            if ( Find.TickManager.TicksGame % day.Interval == 0 )
+            {
+                day.Add( Trigger.CurCount );
+            }
+            if( Find.TickManager.TicksGame % month.Interval == 0 )
+            {
+                month.Add( Trigger.CurCount );
+            }
+            if( Find.TickManager.TicksGame % year.Interval == 0 )
+            {
+                year.Add( Trigger.CurCount );
             }
         }
     }

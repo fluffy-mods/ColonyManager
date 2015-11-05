@@ -7,8 +7,7 @@ namespace FM
 {
     internal class MainTabWindow_Manager : MainTabWindow
     {
-        public ManagerTab CurrentTab;
-
+        public static ManagerTab CurrentTab;
         public ManagerTab DefaultTab = Manager.Get.ManagerTabs[0];
 
         public MainTabWindow_Manager()

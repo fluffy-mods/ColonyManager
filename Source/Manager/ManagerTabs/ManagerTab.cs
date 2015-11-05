@@ -10,6 +10,11 @@ namespace FM
             get;
         }
 
+        public abstract ManagerJob Selected
+        {
+            get; set;
+        }
+
         public virtual void PostOpen()
         {
 
