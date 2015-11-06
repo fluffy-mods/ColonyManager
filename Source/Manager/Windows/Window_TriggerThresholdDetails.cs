@@ -10,7 +10,7 @@ namespace FM
 
         public string Input;
 
-        public TriggerThreshold Trigger;
+        public Trigger_Threshold Trigger;
         public override Vector2 InitialWindowSize => new Vector2( 300f, 500 );
 
         public override void PreOpen()
@@ -30,9 +30,9 @@ namespace FM
             {
                 List< FloatMenuOption > list = new List< FloatMenuOption >
                 {
-                    new FloatMenuOption( "Lower than", delegate { Trigger.Op = TriggerThreshold.Ops.LowerThan; } ),
-                    new FloatMenuOption( "Equal to", delegate { Trigger.Op = TriggerThreshold.Ops.Equals; } ),
-                    new FloatMenuOption( "Greater than", delegate { Trigger.Op = TriggerThreshold.Ops.HigherThan; } )
+                    new FloatMenuOption( "Lower than", delegate { Trigger.Op = Trigger_Threshold.Ops.LowerThan; } ),
+                    new FloatMenuOption( "Equal to", delegate { Trigger.Op = Trigger_Threshold.Ops.Equals; } ),
+                    new FloatMenuOption( "Greater than", delegate { Trigger.Op = Trigger_Threshold.Ops.HigherThan; } )
                 };
                 Find.WindowStack.Add( new FloatMenu( list ) );
             }

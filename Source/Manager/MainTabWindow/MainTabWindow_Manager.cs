@@ -42,23 +42,28 @@ namespace FM
             CurrentTab.PostClose();
         }
 
+        public static void GoTo( ManagerTab tab, ManagerJob job = null )
+        {
+            ManagerTab old = MainTabWindow_Manager.CurrentTab;
+            old.PreClose();
+            tab.PreOpen();
+            CurrentTab = tab;
+            old.PostClose();
+            tab.PostOpen();
+        }
+
         public override void DoWindowContents( Rect canvas )
         {
             Rect buttonRect = new Rect( 0f, 0f, 200f, 30f );
             if ( Widgets.TextButton( buttonRect, CurrentTab.Label ) )
             {
                 List< FloatMenuOption > list = new List< FloatMenuOption >();
-                for ( int i = 0; i < Manager.Get.ManagerTabs.Length; i++ )
+                for ( int i = 0; i < Manager.Get.ManagerTabs.Count; i++ )
                 {
                     ManagerTab current = Manager.Get.ManagerTabs[i];
                     list.Add( new FloatMenuOption( current.Label, delegate
                     {
-                        ManagerTab old = CurrentTab;
-                        old.PreClose();
-                        current.PreOpen();
-                        CurrentTab = current;
-                        old.PostClose();
-                        current.PostOpen();
+                        GoTo( current );
                     } ) );
                 }
                 Find.WindowStack.Add( new FloatMenu( list ) );

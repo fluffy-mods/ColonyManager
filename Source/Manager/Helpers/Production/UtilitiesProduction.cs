@@ -80,7 +80,7 @@ namespace FM
         /// <param name="job"></param>
         /// <param name="i"></param>
         /// <returns></returns>
-        public static int CountPerWorker( this ManagerJobProduction job, int i )
+        public static int CountPerWorker( this ManagerJob_Production job, int i )
         {
             int n = job.BillGivers.CurBillGiverCount;
             int diff = Mathf.CeilToInt( job.Trigger.Count - Utilities.CountProducts( job.Trigger.ThresholdFilter ) );

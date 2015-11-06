@@ -26,7 +26,7 @@ namespace FM
 
         private List< string > _assignedWorkersScribeID;
 
-        private readonly ManagerJobProduction _job;
+        private readonly ManagerJob_Production _job;
 
         /// <summary>
         ///     Area restriction
@@ -200,7 +200,7 @@ namespace FM
             }
         }
 
-        public BillGiverTracker( ManagerJobProduction job )
+        public BillGiverTracker( ManagerJob_Production job )
         {
             Recipe = job.Bill.recipe;
             _job = job;

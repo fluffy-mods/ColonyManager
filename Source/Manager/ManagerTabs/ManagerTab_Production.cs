@@ -19,10 +19,10 @@ namespace FM
         public static SourceOptions Source = SourceOptions.Available;
         public static Vector2 LeftRowScrollPosition = new Vector2( 0f, 0f );
         public static Vector2 BillScrollPosition = new Vector2( 0f, 0f );
-        public static List< ManagerJobProduction > SourceList;
+        public static List< ManagerJob_Production > SourceList;
         public static string SourceFilter = "";
         public static float SourceListHeight;
-        private static ManagerJobProduction _selected;
+        private static ManagerJob_Production _selected;
         public override ManagerJob Selected
         { 
             get
@@ -31,19 +31,17 @@ namespace FM
             }
             set
             {
-                _selected = (ManagerJobProduction)value;
+                _selected = (ManagerJob_Production)value;
             }
         }
 
         private bool _postOpenFocus;
         public float LeftRowSize = 300f;
-
-        //TODO: Add priority switchers to current tab. (After overview tab is done).
         public override string Label { get; } = "FMP.Production".Translate();
 
         public static void RefreshSourceList()
         {
-            SourceList = new List< ManagerJobProduction >();
+            SourceList = new List< ManagerJob_Production >();
 
             switch ( Source )
             {
@@ -51,10 +49,10 @@ namespace FM
                     SourceList = ( from rd in DefDatabase< RecipeDef >.AllDefsListForReading
                                    where rd.HasBuildingRecipeUser( true )
                                    orderby rd.LabelCap
-                                   select ( new ManagerJobProduction( rd ) ) ).ToList();
+                                   select ( new ManagerJob_Production( rd ) ) ).ToList();
                     break;
                 case SourceOptions.Current:
-                    SourceList = Manager.Get.JobStack.FullStack.OfType< ManagerJobProduction >().ToList();
+                    SourceList = Manager.Get.JobStack.FullStack.OfType< ManagerJob_Production >().ToList();
                     break;
             }
         }
@@ -91,7 +89,7 @@ namespace FM
                 {
                     if ( Widgets.TextButton( add, "FM.Delete".Translate() ) )
                     {
-                        Manager.Get.JobStack.Delete( _selected );
+                        _selected.Delete();
                         _selected = null;
                         RefreshSourceList();
                         return; // hopefully that'll just skip to the next tick without any further errors?
@@ -140,16 +138,16 @@ namespace FM
                 Text.Font = GameFont.Small;
                 Rect rect2 = new Rect( 6f, 50f, canvas.width * .3f, canvas.height - 50f );
                 Listing_Standard listingStandard = new Listing_Standard( rect2 );
-                if ( _selected.Bill.suspended )
+                if ( !_selected.Active )
                 {
                     if ( listingStandard.DoTextButton( "Suspended".Translate() ) )
                     {
-                        _selected.Bill.suspended = false;
+                        _selected.Active = true;
                     }
                 }
                 else if ( listingStandard.DoTextButton( "NotSuspended".Translate() ) )
                 {
-                    _selected.Bill.suspended = true;
+                    _selected.Active = false;
                 }
                 string billStoreModeLabel = ( "BillStoreMode_" + _selected.Bill.storeMode ).Translate();
                 if ( listingStandard.DoTextButton( billStoreModeLabel ) )
@@ -311,7 +309,7 @@ namespace FM
             float y = 0;
             int i = 0;
 
-            foreach ( ManagerJobProduction current in from job in SourceList
+            foreach ( ManagerJob_Production current in from job in SourceList
                                                       where
                                                           job.Bill.recipe.label.ToUpper()
                                                              .Contains( SourceFilter.ToUpper() ) ||
@@ -328,7 +326,7 @@ namespace FM
 
                 if ( i++ % 2 == 1 )
                 {
-                    GUI.DrawTexture( row, ManagerTab_Overview.OddRowBg );
+                    GUI.DrawTexture( row, Manager.OddRowBG );
                 }
 
                 Rect jobRect = row;

@@ -8,7 +8,7 @@ namespace FM
     {
         private string _input;
 
-        public ManagerJobProduction Job;
+        public ManagerJob_Production Job;
 
         public Vector2 Scrollposition = new Vector2( 0f, 0f );
         public override Vector2 InitialWindowSize => new Vector2( 300f, 500 );

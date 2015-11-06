@@ -29,7 +29,7 @@ namespace FM
             Log.Message("CanReserve and reach" + (pawn.CanReserveAndReach(t, PathEndMode, Danger.Some)));
             CompPowerTrader powera = t.TryGetComp<CompPowerTrader>();
             Log.Message("Power" + (powera == null || powera.PowerOn));
-            Log.Message("Job" + (Manager.Get.GetJobStack.NextJob != null));
+            Log.Message("Job" + (Manager.Get.JobStack.NextJob != null));
 #endif
             if ((t as Building_ManagerStation) == null) return false;
 

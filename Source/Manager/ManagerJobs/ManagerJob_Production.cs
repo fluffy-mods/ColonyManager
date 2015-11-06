@@ -7,28 +7,17 @@ using Verse;
 
 namespace FM
 {
-    public class ManagerJobProduction : ManagerJob
+    public class ManagerJob_Production : ManagerJob
     {
-        private readonly float _lastUpdateRectWidth = 50f,
-                               _progressRectWidth = 10f,
-                               _margin = Manager.Margin;
+        private readonly float _margin = Manager.Margin;
         private static int     _histSize = 100;
         private Texture2D      _cogTex = ContentFinder<Texture2D>.Get("UI/Buttons/Cog");
-        public static ManagerTab ManagerTab = new ManagerTab_Production();
-
-        public override Texture2D Icon
-        {
-            get
-            {
-                return base.Icon;
-            }
-        }
-
+        
         public override ManagerTab Tab
         {
             get
             {
-                return ManagerTab;
+                return Manager.Get.ManagerTabs.Find(tab => tab is ManagerTab_Production);
             }
         }
 
@@ -51,109 +40,76 @@ namespace FM
         /// </summary>
         public MainProductTracker MainProduct;
 
+        public override bool IsValid
+        {
+            get
+            {
+                if (Bill == null )
+                {
+                    return false;
+                }
+                Log.Message( Bill.ToString() );
+                if (Bill.recipe == null )
+                {
+                    return false;
+                }
+                Log.Message( Bill.recipe.ToString() );
+                return true;
+            }
+        }
+
+        public override string Label
+        {
+            get
+            {
+                return Bill.recipe.LabelCap;
+            }
+        }
+
+        public override string[] Targets
+        {
+            get
+            {
+                return Bill.recipe.GetRecipeUsers().Select( td => td.LabelCap ).ToArray();
+            }
+        }
+
         public bool maxSkil;
 
         /// <summary>
-        ///     Threshold for starting/stopping bill assignments
+        /// Threshold for starting/stopping bill assignments   
         /// </summary>
-        public new TriggerThreshold Trigger;
-
-        /// <summary>
-        ///     Should we be handing out the bill?
-        /// </summary>
-        public override bool Active
+        public new Trigger_Threshold Trigger
         {
-            get { return !Bill.suspended; }
-
-            set { Bill.suspended = !value; }
+            get
+            {
+                return _trigger;
+            }
+            set
+            {
+                // make sure to also populate the hidden base property.
+                _trigger = value;
+                base.Trigger = value;
+            }
         }
-
+        private Trigger_Threshold _trigger;
+        
         public History day = new History(_histSize);
         public History month = new History(_histSize, History.period.month);
         public History year = new History(_histSize, History.period.year);
         public History historyShown;
 
-        public ManagerJobProduction()
+        public ManagerJob_Production()
         {
             // for scribe loading
         }
 
-        public ManagerJobProduction( RecipeDef recipe )
+        public ManagerJob_Production( RecipeDef recipe )
         {
             Bill = recipe.UsesUnfinishedThing ? new Bill_ProductionWithUft( recipe ) : new Bill_Production( recipe );
             MainProduct = new MainProductTracker( Bill.recipe );
-            Trigger = new TriggerThreshold( this );
+            Trigger = new Trigger_Threshold( this );
             BillGivers = new BillGiverTracker( this );
-        }
-
-        public override void DrawListEntry( Rect rect, bool overview = true, bool active = true)
-        {
-            // detailButton | name (current/target) | last update
-
-            Rect labelRect = new Rect( _margin, _margin,
-                                       rect.width - (active ? (_lastUpdateRectWidth + _progressRectWidth + 4 * _margin) : 2 * _margin),
-                                       rect.height - 2 * _margin ),
-                 progressRect = new Rect( labelRect.xMax + _margin, _margin,
-                                            _progressRectWidth,
-                                            rect.height - 2 * _margin ),
-                 lastUpdateRect = new Rect( progressRect.xMax + _margin, _margin,
-                                            _lastUpdateRectWidth,
-                                            rect.height - 2 * _margin );
-
-            string text = Bill.recipe.LabelCap + "\n<i>" +
-                          string.Join( ", ", BillGivers.GetBillGiverDefs.Select( bg => bg.LabelCap ).ToArray() ) + "</i>";
-
-#if DEBUG
-            text += Priority;
-#endif
-
-            GUI.BeginGroup( rect );
-            try
-            {
-                Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label( labelRect, text );
-                // if the bill has a manager job, give some more info.
-                if ( active )
-                {
-                    // bar always goes a little beyond the actual target
-                    int max = Math.Max((int)(Trigger.Count * 1.2f), Trigger.CurCount);
-
-                    // get the bar rect
-                    float barHeight = progressRect.height / max * Trigger.CurCount;
-                    float markHeight = progressRect.height / max * Trigger.Count;
-                    Rect progressBarRect = new Rect(progressRect.xMin + 1f, progressRect.yMax - barHeight, 6f, barHeight);
-
-                    // draw a box for the bar
-                    GUI.color = Color.gray;
-                    Widgets.DrawBox( progressRect.ContractedBy( 1f ) );
-                    GUI.color = Color.white;
-
-                    // draw the bar
-                    // if the job is active and pending, make the bar blueish green - otherwise white.
-                    // Note; active here means the job is currently being handed out.
-                    Color barColour = this.Active ? new Color( 0.2f, 0.8f, 0.85f ) : new Color( 1f, 1f, 1f );
-                    Texture2D barTex = SolidColorMaterials.NewSolidColorTexture(barColour);
-                    GUI.DrawTexture( progressBarRect, barTex );
-
-                    // draw a mark at the treshold
-                    Widgets.DrawLineHorizontal( progressRect.xMin, progressRect.yMax - markHeight, progressRect.width );
-                    
-                    // draw time since last action
-                    Text.Anchor = TextAnchor.MiddleCenter;
-                    Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - LastAction ).TimeString() );
-
-                    // set tooltips
-                    TooltipHandler.TipRegion( progressRect, "FMP.ThresholdCount".Translate( Trigger.CurCount, Trigger.Count ) );
-                    TooltipHandler.TipRegion( lastUpdateRect, "FM.LastUpdateTooltip".Translate( ( Find.TickManager.TicksGame - LastAction ).TimeString() ) );
-                }
-            }
-            finally
-            {
-                // make sure everything is always properly closed / reset to defaults.
-                GUI.color = Color.white;
-                Text.Anchor = TextAnchor.UpperLeft;
-                GUI.EndGroup();
-            }
         }
 
         public override void ExposeData()
@@ -161,7 +117,10 @@ namespace FM
             base.ExposeData();
 
             Scribe_Deep.LookDeep( ref Bill, "Bill" );
-            Scribe_Deep.LookDeep( ref BillGivers, "BillGivers", this );
+            if (Manager.mode == Manager.Mode.normal )
+            {
+                Scribe_Deep.LookDeep( ref BillGivers, "BillGivers", this );
+            }
             Scribe_Values.LookValue( ref maxSkil, "maxSkill", false );
 
             // init main product, required by trigger.
@@ -169,7 +128,13 @@ namespace FM
             {
                 MainProduct = new MainProductTracker( Bill.recipe );
             }
-            Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
+            Scribe_Deep.LookDeep( ref _trigger, "Trigger", this );
+            if ( Scribe.mode == LoadSaveMode.PostLoadInit )
+            {
+                // sets property -> sets base property.
+                Trigger = _trigger;
+            }
+
         }
 
         /// <summary>

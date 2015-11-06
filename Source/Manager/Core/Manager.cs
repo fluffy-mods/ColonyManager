@@ -1,5 +1,9 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 using Verse;
+using UnityEngine;
+using RimWorld;
+using System;
 
 // todo: implement reservations for managerjobs.
 
@@ -8,18 +12,28 @@ namespace FM
     public class Manager : MapComponent
     {
         public const float Margin = 6f;
-        public static float ListEntryHeight = 50f;
+        public const float ListEntryHeight = 50f;
+        public static Texture2D OddRowBG = SolidColorMaterials.NewSolidColorTexture( 1f, 1f, 1f, .05f );
+        public static Texture2D DeleteX = ContentFinder<Texture2D>.Get("UI/Buttons/Delete", true);
+        public static Mode mode = Mode.normal;
+        
+        public enum Mode
+        {
+            importExport,
+            normal
+        }
 
         private JobStack _stack;
 
-        public ManagerTab[] ManagerTabs =
+        public List<ManagerTab> ManagerTabs = new List<ManagerTab>()
         {
             new ManagerTab_Overview(),
             new ManagerTab_Production(),
-            new ManagerTab_ImportExport()
+            new ManagerTab_ImportExport(),
+            new ManagerTab_Hunting(),
+            new ManagerTab_Forestry()
 
             // TODO: new ManagerTabLifestock(),
-            // TODO: new ManagerTabHunting(),
             // TODO: new ManagerTabForestry()
         };
 
@@ -73,6 +87,24 @@ namespace FM
             foreach ( ManagerJob job in JobStack.FullStack )
             {
                 job.Tick();
+            }
+        }
+
+        internal void NewJobStack( JobStack jobstack )
+        {
+            // clean up old jobs
+            foreach (ManagerJob job in _stack.FullStack )
+            {
+                job.CleanUp();
+            }
+
+            // replace stack 
+            _stack = jobstack;
+
+            // touch new jobs in inappropriate places
+            foreach( ManagerJob job in _stack.FullStack )
+            {
+                job.Touch();
             }
         }
     }

@@ -9,7 +9,7 @@ namespace FM
     internal class AreaAllowedGUI
     {
         // RimWorld.AreaAllowedGUI
-        public static void DoAllowedAreaSelectors( Rect rect, ManagerJobProduction job,
+        public static void DoAllowedAreaSelectors( Rect rect, ManagerJob_Production job,
                                                    AllowedAreaMode mode = AllowedAreaMode.Humanlike )
         {
             List< Area > allAreas = Find.AreaManager.AllAreas;
@@ -41,7 +41,7 @@ namespace FM
         }
 
         // RimWorld.AreaAllowedGUI
-        private static void DoAreaSelector( Rect rect, ManagerJobProduction job, Area area )
+        private static void DoAreaSelector( Rect rect, ManagerJob_Production job, Area area )
         {
             rect = rect.ContractedBy( 1f );
             GUI.DrawTexture( rect, ( area == null ) ? BaseContent.GreyTex : area.ColorTexture );

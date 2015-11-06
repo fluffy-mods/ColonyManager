@@ -21,15 +21,24 @@
   <FM.ImportExport>Import &amp; Export</FM.ImportExport>
   <FM.CurrentJobs>Current Jobs:</FM.CurrentJobs>
   <FM.Export>Export</FM.Export>
+  <FM.ConfirmOverwrite>{0} exists.\n\nAre you sure you want to overwrite?</FM.ConfirmOverwrite>
   <FM.JobsExported>{0} jobs exported</FM.JobsExported>
+  <FM.JobsImported>{0} jobs imported</FM.JobsImported>
+  <FM.InvalidJobsDeleted>{0} invalid jobs removed</FM.InvalidJobsDeleted>
   <FM.Import>Import</FM.Import>
+  <FM.NoSaves>No exports found.</FM.NoSaves>
+
+  <!-- Hunting Tab -->
+  <FMH.Hunting>Hunting</FMH.Hunting>
+
+  <!-- Forestry Tab -->
+  <FMF.Forestry>Forestry</FMF.Forestry>
 
   <!-- Production Tab -->
   <!-- Miscelaneous -->
   <FMP.Production>Production</FMP.Production>
   <FMP.ManageBillTooltip>Assign this bill to be managed by your manager(s).</FMP.ManageBillTooltip>
   <FMP.DeleteBillTooltip>Stop managing this bill, and clean up outstanding bills</FMP.DeleteBillTooltip>
-  <FMP.Production>Production</FMP.Production>
   <FMP.FilterDesc>Type a few letters to filter the list</FMP.FilterDesc>
   <FMP.ClearFilterDesc>Clear the current filter</FMP.ClearFilterDesc>
   <FMP.MainProduct>Main product: {0} ({1})</FMP.MainProduct>

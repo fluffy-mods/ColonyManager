@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Verse;
+using RimWorld;
 
 namespace FM
 {
-    public class TriggerThreshold : Trigger
+    public class Trigger_Threshold : Trigger
     {
         public enum Ops
         {
@@ -19,6 +21,9 @@ namespace FM
         public Ops Op;
 
         public ThingFilter ThresholdFilter;
+        public static int DefaultMaxUpperThreshold = 3000;
+        public static int DefaultCount = 500;
+        public static ThingCategoryDef ThingCategoryDef_Meat = DefDatabase<ThingCategoryDef>.GetNamed("MeatRaw");
 
         public bool IsValid
         {
@@ -81,7 +86,15 @@ namespace FM
             }
         }
 
-        public TriggerThreshold( ManagerJobProduction job )
+        public override string StatusTooltip
+        {
+            get
+            {
+                return "FMP.ThresholdCount".Translate( CurCount, Count );
+            }
+        }
+
+        public Trigger_Threshold( ManagerJob_Production job )
         {
             Op = Ops.LowerThan;
             MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
@@ -99,8 +112,19 @@ namespace FM
         }
 
 
+        public Trigger_Threshold( ManagerJob_Hunting job )
+        {
+            Op = Ops.LowerThan;
+            MaxUpperThreshold = DefaultMaxUpperThreshold;
+            Count = DefaultCount;
+            ThresholdFilter = new ThingFilter();
+            ThresholdFilter.SetDisallowAll();
+            ThresholdFilter.SetAllow( ThingCategoryDef_Meat, true );
+        }
+
         public override string ToString()
         {
+            // TODO: Implement Trigger_Threshold.ToString()
             return "Trigger_Threshold.ToString() not implemented";
         }
 
@@ -127,6 +151,33 @@ namespace FM
             {
                 Find.WindowStack.Add( DetailsWindow );
             }
+        }
+
+        public override void DrawProgressBar( Rect rect, bool active )
+        {
+            // bar always goes a little beyond the actual target
+            int max = Math.Max((int)(Count * 1.2f), CurCount);
+
+            // get the bar rect
+            float barHeight = rect.height / max * CurCount;
+            float markHeight = rect.height / max * Count;
+            Rect progressBarRect = new Rect(rect.xMin + 1f, rect.yMax - barHeight, 6f, barHeight);
+
+            // draw a box for the bar
+            GUI.color = Color.gray;
+            Widgets.DrawBox( rect.ContractedBy( 1f ) );
+            GUI.color = Color.white;
+
+            // draw the bar
+            // if the job is active and pending, make the bar blueish green - otherwise white.
+            Color barColour = active ? new Color( 0.2f, 0.8f, 0.85f ) : new Color( 1f, 1f, 1f );
+            Texture2D barTex = SolidColorMaterials.NewSolidColorTexture(barColour);
+            GUI.DrawTexture( progressBarRect, barTex );
+
+            // draw a mark at the treshold
+            Widgets.DrawLineHorizontal( rect.xMin, rect.yMax - markHeight, rect.width );
+
+            TooltipHandler.TipRegion( rect, StatusTooltip );
         }
     }
 }

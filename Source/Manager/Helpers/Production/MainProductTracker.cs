@@ -93,7 +93,7 @@ namespace FM
                 }
 
                 // if product is not resolved (stone blocks, weapon smelting, category)
-                return 3000;
+                return Trigger_Threshold.DefaultMaxUpperThreshold;
             }
         }
 

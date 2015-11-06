@@ -5,12 +5,22 @@ namespace FM
 {
     public abstract class ManagerTab : IManagerTab
     {
+        public static Texture2D _defaultIcon = ContentFinder<Texture2D>.Get("UI/Icons/Hammer");
+
         public abstract string Label
         {
             get;
         }
 
-        public abstract ManagerJob Selected
+        public virtual Texture2D Icon
+        {
+            get
+            {
+                return _defaultIcon;
+            }
+        }
+
+        public virtual ManagerJob Selected
         {
             get; set;
         }

@@ -8,13 +8,12 @@ namespace FM
 {
     internal class ManagerTab_Overview : ManagerTab
     {
-        public const float Margin = 6f,
+        public const float Margin = Manager.Margin,
                            OverviewWidthRatio = .6f,
-                           RowHeight = 50f,
+                           RowHeight = Manager.ListEntryHeight,
                            IconSize = 30f;
 
-        public static readonly Texture2D OddRowBg = SolidColorMaterials.NewSolidColorTexture( 1f, 1f, 1f, .05f ),
-                                         ArrowTop = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowTop" ),
+        public static readonly Texture2D ArrowTop = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowTop" ),
                                          ArrowUp = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowUp" ),
                                          ArrowDown = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowDown" ),
                                          ArrowBottom = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowBottom" );
@@ -105,7 +104,7 @@ namespace FM
                     // highlights
                     if ( i % 2 == 1 )
                     {
-                        GUI.DrawTexture( row, OddRowBg );
+                        GUI.DrawTexture( row, Manager.OddRowBG );
                     }
                     if ( Jobs[i] == _selectedJob )
                     {
@@ -114,10 +113,9 @@ namespace FM
 
                     // go to job icon
                     Rect iconRect = new Rect(Margin, row.yMin + (RowHeight - IconSize) / 2, IconSize, IconSize);
-                    if (Widgets.ImageButton( iconRect, Jobs[i].Icon ) )
+                    if (Widgets.ImageButton( iconRect, Jobs[i].Tab.Icon ) )
                     {
-                        MainTabWindow_Manager.CurrentTab = Jobs[i].Tab;
-                        Jobs[i].Tab.Selected = Jobs[i];
+                        MainTabWindow_Manager.GoTo( Jobs[i].Tab, Jobs[i] );
                     }
 
                     // order buttons
