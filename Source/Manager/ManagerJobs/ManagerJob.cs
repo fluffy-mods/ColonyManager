@@ -1,51 +1,39 @@
-﻿using System;
+﻿// Manager/ManagerJob.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-04 19:29
+
 using System.Text;
 using UnityEngine;
 using Verse;
 
 namespace FM
 {
-    internal interface IManagerJob
-    {
-        bool TryDoJob();
-    }
-
     public abstract class ManagerJob : IManagerJob, IExposable
     {
-        public int ActionInterval = 3600; // should be 1 minute.
-        public int LastAction;
-        public int Priority;
-        public Trigger Trigger { get; set; }
-        public virtual bool Active { get; set; } = true;
-        public abstract string Label { get; }
-        public abstract string[] Targets { get; }
-
         public float _lastUpdateRectWidth = 50f,
                      _progressRectWidth = 10f;
 
-        public abstract ManagerTab Tab
-        {
-            get;
-        }
+        public int ActionInterval = 3600; // should be 1 minute.
+        public int LastAction;
+        public int Priority;
+
+        public virtual bool Active { get; set; } = false;
 
         public virtual bool IsValid
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
         }
 
-        public virtual void Delete( bool cleanup = true )
-        {
-            if( cleanup )
-            {
-                CleanUp();
-            }
-            Manager.Get.JobStack.Delete( this );
-        }
+        public abstract string Label { get; }
+        public bool ShouldDoNow => Active && !Suspended && LastAction + ActionInterval < Find.TickManager.TicksGame;
+        public virtual bool Suspended { get; set; } = false;
 
-        public bool ShouldDoNow => Active && ( LastAction + ActionInterval ) < Find.TickManager.TicksGame;
+        public abstract ManagerTab Tab { get; }
+
+        public abstract string[] Targets { get; }
+        public Trigger Trigger { get; set; }
 
         public virtual void ExposeData()
         {
@@ -58,44 +46,38 @@ namespace FM
 
         public abstract void CleanUp();
 
-        public void Touch()
+        public virtual void Delete( bool cleanup = true )
         {
-            LastAction = Find.TickManager.TicksGame;
+            if ( cleanup )
+            {
+                CleanUp();
+            }
+            Manager.Get.JobStack.Delete( this );
         }
-
-        public override string ToString()
-        {
-            StringBuilder s = new StringBuilder();
-            s.AppendLine( "Priority: " + Priority );
-            s.AppendLine( "Active: " + Active );
-            s.AppendLine( "LastAction: " + LastAction );
-            s.AppendLine( "Interval: " + ActionInterval );
-            s.AppendLine( "GameTick: " + Find.TickManager.TicksGame );
-            return s.ToString();
-        }
-
-        public virtual void Tick() { }
 
         public virtual void DrawListEntry( Rect rect, bool overview = true, bool active = true )
         {
             // (detailButton) | name | bar | last update
 
-            Rect labelRect = new Rect( Manager.Margin, Manager.Margin,
-                                       rect.width - (active ? (_lastUpdateRectWidth + _progressRectWidth + 4 * Manager.Margin) : 2 * Manager.Margin),
-                                       rect.height - 2 * Manager.Margin ),
-                 progressRect = new Rect( labelRect.xMax + Manager.Margin, Manager.Margin,
-                                            _progressRectWidth,
-                                            rect.height - 2 * Manager.Margin ),
-                 lastUpdateRect = new Rect( progressRect.xMax + Manager.Margin, Manager.Margin,
+            Rect labelRect = new Rect( Utilities.Margin, Utilities.Margin,
+                                       rect.width -
+                                       ( active
+                                           ? _lastUpdateRectWidth + _progressRectWidth + 4 * Utilities.Margin
+                                           : 2 * Utilities.Margin ),
+                                       rect.height - 2 * Utilities.Margin ),
+                 progressRect = new Rect( labelRect.xMax + Utilities.Margin, Utilities.Margin,
+                                          _progressRectWidth,
+                                          rect.height - 2 * Utilities.Margin ),
+                 lastUpdateRect = new Rect( progressRect.xMax + Utilities.Margin, Utilities.Margin,
                                             _lastUpdateRectWidth,
-                                            rect.height - 2 * Manager.Margin );
+                                            rect.height - 2 * Utilities.Margin );
 
             string text = Label;
-            if (Targets != null )
+            if ( Targets != null )
             {
                 text += "\n<i>" + string.Join( ", ", Targets ) + "</i>";
             }
-                        
+
             GUI.BeginGroup( rect );
             try
             {
@@ -103,19 +85,20 @@ namespace FM
                 Widgets.Label( labelRect, text );
 
                 // if the bill has a manager job, give some more info.
-                if( active )
+                if ( active )
                 {
                     // draw progress bar
-                    if (Trigger != null )
+                    if ( Trigger != null )
                     {
-                        // TODO: how the heck is this suddenly null...?
-                        Trigger.DrawProgressBar( progressRect, Active );
+                        Trigger.DrawProgressBar( progressRect, Suspended );
                     }
 
                     // draw time since last action
                     Text.Anchor = TextAnchor.MiddleCenter;
                     Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - LastAction ).TimeString() );
-                    TooltipHandler.TipRegion( lastUpdateRect, "FM.LastUpdateTooltip".Translate( ( Find.TickManager.TicksGame - LastAction ).TimeString() ) );
+                    TooltipHandler.TipRegion( lastUpdateRect,
+                                              "FM.LastUpdateTooltip".Translate(
+                                                  ( Find.TickManager.TicksGame - LastAction ).TimeString() ) );
                 }
             }
             finally
@@ -128,5 +111,28 @@ namespace FM
         }
 
         public abstract void DrawOverviewDetails( Rect rect );
+
+        public virtual void Tick() {}
+
+        public override string ToString()
+        {
+            var s = new StringBuilder();
+            s.AppendLine( "Priority: " + Priority );
+            s.AppendLine( "Active: " + Suspended );
+            s.AppendLine( "LastAction: " + LastAction );
+            s.AppendLine( "Interval: " + ActionInterval );
+            s.AppendLine( "GameTick: " + Find.TickManager.TicksGame );
+            return s.ToString();
+        }
+
+        public void Touch()
+        {
+            LastAction = Find.TickManager.TicksGame;
+        }
+    }
+
+    internal interface IManagerJob
+    {
+        bool TryDoJob();
     }
 }

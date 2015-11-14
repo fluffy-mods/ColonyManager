@@ -1,4 +1,10 @@
-﻿using RimWorld;
+﻿// Manager/Window_BillGiverDetails.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-04 19:29
+
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -7,21 +13,14 @@ namespace FM
     public class WindowBillGiverDetails : Window
     {
         private string _input;
-
         public ManagerJob_Production Job;
-
         public Vector2 Scrollposition = new Vector2( 0f, 0f );
-        public override Vector2 InitialWindowSize => new Vector2( 300f, 500 );
 
-        public override void PreOpen()
-        {
-            base.PreOpen();
-            _input = Job.BillGivers.UserBillGiverCount.ToString();
-        }
+        public override Vector2 InitialWindowSize => new Vector2( 300f, 500 );
 
         public override void DoWindowContents( Rect inRect )
         {
-            Rect contentRect = new Rect( inRect );
+            var contentRect = new Rect( inRect );
             GUI.BeginGroup( contentRect );
 
             //TextAnchor oldAnchor = Text.Anchor;
@@ -31,8 +30,8 @@ namespace FM
             float y = 6;
 
             // All workstations
-            Rect all = new Rect( x, y, contentRect.width, 30f );
-            Rect allLabel = new Rect( 30f, y + 3f, contentRect.width - 30f, 27f );
+            var all = new Rect( x, y, contentRect.width, 30f );
+            var allLabel = new Rect( 30f, y + 3f, contentRect.width - 30f, 27f );
             y += 30;
 
             if ( Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.All )
@@ -57,26 +56,24 @@ namespace FM
             y += 6;
 
             // By area / count
-            Rect area = new Rect( x, y, contentRect.width, 30f );
-            Rect areaLabel = new Rect( 30f, y + 3f, contentRect.width - 30f, 27f );
+            var area = new Rect( x, y, contentRect.width, 30f );
+            var areaLabel = new Rect( 30f, y + 3f, contentRect.width - 30f, 27f );
             y += 30f;
 
             if ( Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.Count )
             {
                 area.height += 60f;
                 Widgets.DrawMenuSection( area );
-                Rect areaAreaLabel = new Rect( 6f, y, 50f, 30f );
-                Rect areaAreaSelector = new Rect( 56f, y, contentRect.width - 56f, 30f );
+                var areaAreaLabel = new Rect( 6f, y, 50f, 30f );
+                var areaAreaSelector = new Rect( 56f, y, contentRect.width - 56f, 30f );
                 y += 30;
-                Rect areaCountLabel = new Rect( 6f, y, 50f, 30f );
-                Rect areaCountSelector = new Rect( 56f, y, contentRect.width - 56f, 30f );
+                var areaCountLabel = new Rect( 6f, y, 50f, 30f );
+                var areaCountSelector = new Rect( 56f, y, contentRect.width - 56f, 30f );
                 y += 30;
 
                 Widgets.Label( areaAreaLabel, "FMP.AllowedAreas".Translate() );
 
-                Text.Font = GameFont.Tiny;
-                AreaAllowedGUI.DoAllowedAreaSelectors( areaAreaSelector, Job );
-                Text.Font = GameFont.Small;
+                AreaAllowedGUI.DoAllowedAreaSelectors( areaAreaSelector, ref Job.BillGivers.AreaRestriction );
 
                 Color oldColor = GUI.color;
                 if ( _input.IsInt() )
@@ -110,8 +107,8 @@ namespace FM
 
             // Specific billgivers
             // todo; add scrolling region.
-            Rect specific = new Rect( x, y, contentRect.width, 30f );
-            Rect specificLabel = new Rect( 36f, y, contentRect.width - 36f, 30f );
+            var specific = new Rect( x, y, contentRect.width, 30f );
+            var specificLabel = new Rect( 36f, y, contentRect.width - 36f, 30f );
             y += 30;
 
             if ( Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.Specific )
@@ -122,7 +119,7 @@ namespace FM
 
                 foreach ( Building_WorkTable billgiver in Job.BillGivers.GetPotentialBillGivers )
                 {
-                    Rect row = new Rect( x, y, contentRect.width, 24f );
+                    var row = new Rect( x, y, contentRect.width, 24f );
                     DrawRow( billgiver, row );
                     y += 24f;
                 }
@@ -143,17 +140,16 @@ namespace FM
                                  Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.Specific );
             Widgets.Label( specificLabel, "FMP.SpecificWorkstations".Translate() );
 
-
             Text.Anchor = TextAnchor.UpperLeft;
             GUI.EndGroup();
         }
 
         public void DrawRow( Building_WorkTable billgiver, Rect row )
         {
-            Rect labelRect = new Rect( row );
+            var labelRect = new Rect( row );
             labelRect.width -= 36f;
             labelRect.xMin += 6f;
-            Rect iconRect = new Rect( row );
+            var iconRect = new Rect( row );
             iconRect.xMin = iconRect.xMax - 24f;
 
             Text.Font = GameFont.Tiny;
@@ -180,6 +176,12 @@ namespace FM
                 GUI.DrawTexture( row, TexUI.HighlightTex );
                 Find.CameraMap.JumpTo( billgiver.PositionHeld );
             }
+        }
+
+        public override void PreOpen()
+        {
+            base.PreOpen();
+            _input = Job.BillGivers.UserBillGiverCount.ToString();
         }
     }
 }

@@ -1,115 +1,127 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Manager/History.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-04 19:32
 
 using RimWorld;
-using Verse;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Verse;
 
 namespace FM
 {
     public class History
     {
-        // main cache
-        public int          size { get; set; }
-        private List<int>   _hist           = new List<int> { 0 }; // start with a single entry to avoid issues with .Max()
-
-        // period stuff
-        private period      _period         = period.day;
-        private int         _ticksPerPeriod = 0;
-
         // types
-        public enum period
+        public enum Period
         {
-            day,
-            month,
-            year
+            Day,
+            Month,
+            Year
         }
-        
+
+        private const int Breaks = 5;
+        private const int DashLength = 3;
+        private const float Margin = Utilities.Margin;
+        private List< int > _hist = new List< int > { 0 };
+
+        // Period stuff
+        private readonly Period _period;
+        private readonly Texture2D _plotBG = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .2f );
+
+        // start with a single entry to avoid issues with .Max()
+        private int _ticksPerPeriod;
+        private readonly float _yAxisMargin = 25f;
+
         // plotting stuff
-        public Color        _lineCol        = Color.white;
-        private Texture2D   _plotBG         = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .2f );
-        private float       _margin         = Manager.Margin;
-        private float       _yAxisMargin    = 25f;
-        private int         _breaks         = 5;
-        private int         _dashLength     = 3;
-
-        public void Add(int x )
-        {
-            _hist.Add( x );
-
-            while (_hist.Count > size )
-            {
-                _hist.RemoveAt( 0 );
-            }
-        }
+        public Color LineCol = Color.white;
 
         public int[] Get
         {
-            get
-            {
-                return _hist.ToArray();
-            }
+            get { return _hist.ToArray(); }
         }
 
         public int Interval
         {
             get
             {
-                if (_ticksPerPeriod == 0 )
+                if ( _ticksPerPeriod == 0 )
                 {
                     int ticks;
-                    switch( _period )
+                    switch ( _period )
                     {
-                        case period.day:
+                        case Period.Day:
                             ticks = GenDate.TicksPerDay;
                             break;
-                        case period.month:
+
+                        case Period.Month:
                             ticks = GenDate.TicksPerMonth;
                             break;
-                        case period.year:
+
+                        case Period.Year:
                         default:
                             ticks = GenDate.TicksPerYear;
                             break;
                     }
-                    _ticksPerPeriod = ticks / size;
+                    _ticksPerPeriod = ticks / Size;
                 }
                 return _ticksPerPeriod;
             }
         }
-        
-        public void DrawPlot(Rect rect, int target = 0, string label = "" )
+
+        // main cache
+        public int Size { get; set; }
+
+        public History( int size, Period period = Period.Day )
+        {
+            Size = size;
+            _period = period;
+        }
+
+        public void Add( int x )
+        {
+            _hist.Add( x );
+
+            while ( _hist.Count > Size )
+            {
+                _hist.RemoveAt( 0 );
+            }
+        }
+
+        public void DrawPlot( Rect rect, int target = 0, string label = "" )
         {
             // stuff we need
-            Rect plot   = rect.ContractedBy(Manager.Margin);
-            plot.xMin   += _yAxisMargin;
-            int max     = Math.Max(_hist.Max(), (int)(target * 1.2));
-            float w     = plot.width;
-            float h     = plot.height;
-            float wu    = w / size;             // width per section
-            float hu    = h / max;              // height per count
-            int bi      = max / (_breaks + 1);  // count per break
-            float bu    = hu * bi;              // height per break
-            
+            Rect plot = rect.ContractedBy( Utilities.Margin );
+            plot.xMin += _yAxisMargin;
+            int max = Math.Max( _hist.Max(), (int)( target * 1.2 ) );
+            float w = plot.width;
+            float h = plot.height;
+            float wu = w / Size; // width per section
+            float hu = h / max; // height per count
+            int bi = max / ( Breaks + 1 ); // count per break
+            float bu = hu * bi; // height per break
+
             // plot the line
             GUI.DrawTexture( plot, _plotBG );
             GUI.BeginGroup( plot );
-            if (_hist.Count() > 1 )
+            if ( _hist.Count > 1 )
             {
-                for( int i = 0; i < _hist.Count() - 1; i++ ) // line segments, so up till n-1
+                for ( var i = 0; i < _hist.Count - 1; i++ ) // line segments, so up till n-1
                 {
-                    Vector2 start = new Vector2(wu * i, h - hu * _hist[i]);
-                    Vector2 end = new Vector2(wu * (i + 1), h - hu * _hist[i+1]);
-                    Widgets.DrawLine( start, end, _lineCol, 1f );
+                    var start = new Vector2( wu * i, h - hu * _hist[i] );
+                    var end = new Vector2( wu * ( i + 1 ), h - hu * _hist[i + 1] );
+                    Widgets.DrawLine( start, end, LineCol, 1f );
                 }
             }
 
             // draw target line
             GUI.color = Color.gray;
-            for( int i = 0; i < plot.width / _dashLength; i += 2 )
+            for ( var i = 0; i < plot.width / DashLength; i += 2 )
             {
-                Widgets.DrawLineHorizontal( i * _dashLength, plot.height - target * hu, _dashLength );
+                Widgets.DrawLineHorizontal( i * DashLength, plot.height - target * hu, DashLength );
             }
             GUI.EndGroup();
 
@@ -117,25 +129,19 @@ namespace FM
             GUI.BeginGroup( rect );
             Text.Anchor = TextAnchor.MiddleRight;
             Text.Font = GameFont.Tiny;
-            
+
             // draw ticks + labels
-            for( int i = 1; i < _breaks + 1; i++ )
+            for ( var i = 1; i < Breaks + 1; i++ )
             {
-                Widgets.DrawLineHorizontal( _yAxisMargin + _margin / 2, plot.height - i * bu, _margin );
-                Rect labRect = new Rect(0f, plot.height - i * bu - 4f, _yAxisMargin, 20f);
-                Widgets.Label( labRect, (i * bi).ToString() );
+                Widgets.DrawLineHorizontal( _yAxisMargin + Margin / 2, plot.height - i * bu, Margin );
+                var labRect = new Rect( 0f, plot.height - i * bu - 4f, _yAxisMargin, 20f );
+                Widgets.Label( labRect, ( i * bi ).ToString() );
             }
 
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.UpperLeft;
             GUI.color = Color.white;
             GUI.EndGroup();
-        }
-
-        public History( int size, period period = period.day )
-        {
-            this.size = size;
-            _period = period;
         }
     }
 }

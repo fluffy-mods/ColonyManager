@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿// Manager/Manager.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-05 22:59
+
 using System.Collections.Generic;
+using System.Linq;
 using Verse;
-using UnityEngine;
-using RimWorld;
-using System;
 
 // todo: implement reservations for managerjobs.
 
@@ -11,21 +14,21 @@ namespace FM
 {
     public class Manager : MapComponent
     {
-        public const float Margin = 6f;
-        public const float ListEntryHeight = 50f;
-        public static Texture2D OddRowBG = SolidColorMaterials.NewSolidColorTexture( 1f, 1f, 1f, .05f );
-        public static Texture2D DeleteX = ContentFinder<Texture2D>.Get("UI/Buttons/Delete", true);
-        public static Mode mode = Mode.normal;
-        
-        public enum Mode
+        public enum Modes
         {
-            importExport,
-            normal
+            ImportExport,
+            Normal
         }
+
+        public static Modes Mode = Modes.Normal;
+
+        private List< ManagerTab > _managerTabsLeft;
+        private List< ManagerTab > _managerTabsMiddle;
+        private List< ManagerTab > _managerTabsRight;
 
         private JobStack _stack;
 
-        public List<ManagerTab> ManagerTabs = new List<ManagerTab>()
+        public List< ManagerTab > ManagerTabs = new List< ManagerTab >
         {
             new ManagerTab_Overview(),
             new ManagerTab_Production(),
@@ -34,8 +37,44 @@ namespace FM
             new ManagerTab_Forestry()
 
             // TODO: new ManagerTabLifestock(),
-            // TODO: new ManagerTabForestry()
         };
+
+        public List< ManagerTab > ManagerTabsLeft
+        {
+            get
+            {
+                if ( _managerTabsLeft == null )
+                {
+                    _managerTabsLeft = ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Left ).ToList();
+                }
+                return _managerTabsLeft;
+            }
+        }
+
+        public List< ManagerTab > ManagerTabsMiddle
+        {
+            get
+            {
+                if ( _managerTabsMiddle == null )
+                {
+                    _managerTabsMiddle =
+                        ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Middle ).ToList();
+                }
+                return _managerTabsMiddle;
+            }
+        }
+
+        public List< ManagerTab > ManagerTabsRight
+        {
+            get
+            {
+                if ( _managerTabsRight == null )
+                {
+                    _managerTabsRight = ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Right ).ToList();
+                }
+                return _managerTabsRight;
+            }
+        }
 
         public JobStack JobStack => _stack ?? ( _stack = new JobStack() );
 
@@ -84,7 +123,7 @@ namespace FM
         {
             base.MapComponentTick();
 
-            foreach ( ManagerJob job in JobStack.FullStack )
+            foreach ( ManagerJob job in JobStack.FullStack() )
             {
                 job.Tick();
             }
@@ -93,16 +132,16 @@ namespace FM
         internal void NewJobStack( JobStack jobstack )
         {
             // clean up old jobs
-            foreach (ManagerJob job in _stack.FullStack )
+            foreach ( ManagerJob job in _stack.FullStack() )
             {
                 job.CleanUp();
             }
 
-            // replace stack 
+            // replace stack
             _stack = jobstack;
 
             // touch new jobs in inappropriate places
-            foreach( ManagerJob job in _stack.FullStack )
+            foreach ( ManagerJob job in _stack.FullStack() )
             {
                 job.Touch();
             }

@@ -1,51 +1,79 @@
-﻿using System;
+﻿// Manager/ManagerJob_Hunting.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-05 22:30
+
+using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using RimWorld;
-using Verse;
-using Verse.AI;
 using UnityEngine;
+using Verse;
 
 namespace FM
 {
     public class ManagerJob_Hunting : ManagerJob
     {
-        public List<Pair<PawnKindDef, bool>> AllowedPawnKinds = new List<Pair<PawnKindDef, bool>>();
-        public List<Designation> Designations = new List<Designation>();
+        private static int _histSize = 100;
 
+        private readonly float _margin = Utilities.Margin;
+        private Texture2D _cogTex = ContentFinder< Texture2D >.Get( "UI/Buttons/Cog" );
+        public Dictionary< PawnKindDef, bool > AllowedAnimals = new Dictionary< PawnKindDef, bool >();
 
-        private readonly float _margin = Manager.Margin;
-        private static int     _histSize = 100;
-        private Texture2D      _cogTex = ContentFinder<Texture2D>.Get("UI/Buttons/Cog");
-
-        public History day = new History(_histSize);
-        public History month = new History(_histSize, History.period.month);
-        public History year = new History(_histSize, History.period.year);
+        public History day = new History( _histSize );
+        public List< Designation > Designations = new List< Designation >();
         public History historyShown;
+        public Area HuntingGrounds = null;
+        public History month = new History( _histSize, History.Period.Month );
 
         public new Trigger_Threshold Trigger;
+        public bool UnforbidCorpses = true;
+        public History year = new History( _histSize, History.Period.Year );
 
         public override ManagerTab Tab
         {
+            get { return Manager.Get.ManagerTabs.Find( tab => tab is ManagerTab_Hunting ); }
+        }
+        
+        public override string Label
+        {
+            get { return "Hunting".Translate(); }
+        }
+
+        public override string[] Targets
+        {
             get
             {
-                return Manager.Get.ManagerTabs.Find( tab => tab is ManagerTab_Hunting );
+                return AllowedAnimals.Keys.Where( key => AllowedAnimals[key] ).Select( pk => pk.LabelCap ).ToArray();
             }
+        }
+
+        public static List< Thing > Corpses
+        {
+            get { return Find.ListerThings.ThingsInGroup( ThingRequestGroup.Corpse ) ?? new List< Thing >(); }
         }
 
         public ManagerJob_Hunting()
         {
+            // populate the trigger field, set the root category to meats and allow all but human meat.
             Trigger = new Trigger_Threshold( this );
+            Trigger.ThresholdFilter.DisplayRootCategory = new TreeNode_ThingCategory( Utilities_Hunting.RawMeat );
+            Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
+
+            // Trigger.ThresholdFilter.exceptedThingDefs.Add( Utilities_Hunting.HumanMeat );
+
+            // populate the list of animals from the animals in the biome - allow all by default.
+            AllowedAnimals = Find.Map.Biome.AllWildAnimals.ToDictionary( pk => pk, v => true );
         }
 
         public override void CleanUp()
         {
             // clear the list of obsolete designations
-            CleanDeadDesignations();
+            CleanDesignations();
 
             // cancel outstanding designation
-            foreach( Designation des in Designations )
+            foreach ( Designation des in Designations )
             {
                 des.Delete();
             }
@@ -57,10 +85,11 @@ namespace FM
         /// <summary>
         /// Remove obsolete designations from the list.
         /// </summary>
-        public void CleanDeadDesignations()
+        public void CleanDesignations()
         {
             // get the intersection of bills in the game and bills in our list.
-            var GameDesignations = Find.DesignationManager.DesignationsOfDef(DesignationDefOf.Hunt).ToList();
+            List< Designation > GameDesignations =
+                Find.DesignationManager.DesignationsOfDef( DesignationDefOf.Hunt ).ToList();
             Designations = Designations.Intersect( GameDesignations ).ToList();
         }
 
@@ -69,17 +98,19 @@ namespace FM
             // (detailButton) | name | bar | last update
 
             Rect labelRect = new Rect( _margin, _margin,
-                                       rect.width - (active ? (_lastUpdateRectWidth + _progressRectWidth + 4 * _margin) : 2 * _margin),
+                                       rect.width -
+                                       ( active ? _lastUpdateRectWidth + _progressRectWidth + 4 * _margin : 2 * _margin ),
                                        rect.height - 2 * _margin ),
                  progressRect = new Rect( labelRect.xMax + _margin, _margin,
-                                            _progressRectWidth,
-                                            rect.height - 2 * _margin ),
+                                          _progressRectWidth,
+                                          rect.height - 2 * _margin ),
                  lastUpdateRect = new Rect( progressRect.xMax + _margin, _margin,
                                             _lastUpdateRectWidth,
                                             rect.height - 2 * _margin );
 
-            string text = "FMH.Hunting".Translate() + "\n<i>" +
-                          string.Join( ", ", AllowedPawnKinds.Select( p => p.First.LabelCap ).ToArray() ) + "</i>";
+            string text = Label + "\n<i>" +
+                          ( Targets.Count() < 4 ? string.Join( ", ", Targets ) : "<multiple>" )
+                          + "</i>";
 
 #if DEBUG
             text += Priority;
@@ -90,19 +121,27 @@ namespace FM
             {
                 Text.Anchor = TextAnchor.MiddleLeft;
                 Widgets.Label( labelRect, text );
+
                 // if the bill has a manager job, give some more info.
-                if( active )
+                if ( active )
                 {
                     // draw progress bar
-                    Trigger.DrawProgressBar( progressRect, Active );
+                    Trigger.DrawProgressBar( progressRect, Suspended );
 
                     // draw time since last action
                     Text.Anchor = TextAnchor.MiddleCenter;
                     Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - LastAction ).TimeString() );
 
                     // set tooltips
-                    TooltipHandler.TipRegion( progressRect, "FMP.ThresholdCount".Translate( Trigger.CurCount, Trigger.Count ) );
-                    TooltipHandler.TipRegion( lastUpdateRect, "FM.LastUpdateTooltip".Translate( ( Find.TickManager.TicksGame - LastAction ).TimeString() ) );
+                    TooltipHandler.TipRegion( progressRect,
+                                              "FMP.ThresholdCount".Translate( Trigger.CurCount, Trigger.Count ) );
+                    TooltipHandler.TipRegion( lastUpdateRect,
+                                              "FM.LastUpdateTooltip".Translate(
+                                                  ( Find.TickManager.TicksGame - LastAction ).TimeString() ) );
+                    if ( !( Targets.Count() < 4 ) )
+                    {
+                        TooltipHandler.TipRegion( labelRect, string.Join( ", ", Targets ) );
+                    }
                 }
             }
             finally
@@ -116,66 +155,241 @@ namespace FM
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            if( historyShown == null )
+            if ( historyShown == null )
             {
                 historyShown = day;
             }
             historyShown.DrawPlot( rect, Trigger.Count );
 
-            Rect switchRect = new Rect(rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f);
+            var switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
             Widgets.DrawHighlightIfMouseover( switchRect );
-            if( Widgets.ImageButton( switchRect, _cogTex ) )
+            if ( Widgets.ImageButton( switchRect, _cogTex ) )
             {
-                List<FloatMenuOption> options = new List<FloatMenuOption> {
-                    new FloatMenuOption("day", delegate { historyShown = day; } ),
-                    new FloatMenuOption("month", delegate { historyShown = month; } ),
-                    new FloatMenuOption("year", delegate { historyShown = year; })
+                List< FloatMenuOption > options = new List< FloatMenuOption >
+                {
+                    new FloatMenuOption( "Day", delegate { historyShown = day; } ),
+                    new FloatMenuOption( "Month", delegate { historyShown = month; } ),
+                    new FloatMenuOption( "Year", delegate { historyShown = year; } )
                 };
                 Find.WindowStack.Add( new FloatMenu( options ) );
             }
         }
 
-        public override bool Active
-        {
-            get
-            {
-                return base.Active;
-            }
-        }
-
-        public override string Label
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public override string[] Targets
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         public override bool TryDoJob()
         {
-            // TODO: Implement job logic.
-            return true;
+            // did we do any work?
+            var workDone = false;
+
+            // clean designations not in area
+            CleanAreaDesignations();
+
+            // clean dead designations
+            CleanDesignations();
+
+            // unforbid if required
+            if ( UnforbidCorpses )
+            {
+                DoUnforbidCorpses();
+            }
+
+            // get the total count of meat in storage, expected meat in corpses and expected meat in designations.
+            int totalCount = Trigger.CurCount + GetMeatInCorpses() + GetMeatInDesignations();
+
+            // get a list of huntable animals sorted by distance (ignoring obstacles) and expected meat count.
+            // note; attempt to balance cost and benefit, current formula: value = meat / ( distance ^ 2)
+            List< Pawn > huntableAnimals = GetHuntableAnimalsSorted();
+
+            // while totalCount < count AND we have animals that can be designated, designate animal.
+            for ( var i = 0; i < huntableAnimals.Count && totalCount < Trigger.Count; i++ )
+            {
+                AddDesignation( huntableAnimals[i] );
+                totalCount += huntableAnimals[i].EstimatedMeatCount();
+                workDone = true;
+            }
+
+            return workDone;
+        }
+
+        private void CleanAreaDesignations()
+        {
+            // huntinggrounds of null denotes unrestricted
+            if ( HuntingGrounds != null )
+            {
+                foreach ( Designation des in Designations )
+                {
+                    if ( des.target.HasThing &&
+                         !HuntingGrounds.ActiveCells.Contains( des.target.Thing.Position ) )
+                    {
+                        des.Delete();
+                    }
+                }
+            }
+        }
+
+        private void AddDesignation( Pawn p )
+        {
+            // create designation
+            var des = new Designation( p, DesignationDefOf.Hunt );
+
+            // add to game
+            Find.DesignationManager.AddDesignation( des );
+
+            // add to internal list
+            Designations.Add( des );
+        }
+
+        private List< Pawn > GetHuntableAnimalsSorted()
+        {
+            // we need to define a 'base' position to calculate distances.
+            // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
+            IntVec3 position = IntVec3.Zero;
+            Building managerStation =
+                Find.ListerBuildings.AllBuildingsColonistOfClass< Building_ManagerStation >().FirstOrDefault();
+            if ( managerStation != null )
+            {
+                position = managerStation.Position;
+            }
+
+            // otherwise, use the average of the home area. Not ideal, but it'll do.
+            else
+            {
+                List< IntVec3 > homeCells = Find.AreaManager.Get< Area_Home >().ActiveCells.ToList();
+                for ( var i = 0; i < homeCells.Count(); i++ )
+                {
+                    position += homeCells[i];
+                }
+                position.x /= homeCells.Count;
+                position.y /= homeCells.Count;
+                position.z /= homeCells.Count;
+            }
+
+            // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
+            List< Pawn > list = Find.ListerPawns.AllPawns.Where( p => p.RaceProps.Animal
+                                                                      && !p.health.Dead
+                                                                      && p.SpawnedInWorld
+
+                // wild animals only
+                                                                      && p.Faction == null
+
+                // non-biome animals won't be on the list
+                                                                      && AllowedAnimals.ContainsKey( p.kindDef )
+                                                                      && AllowedAnimals[p.kindDef]
+                                                                      &&
+                                                                      Find.DesignationManager.DesignationOn( p ) == null
+                                                                      &&
+                                                                      ( HuntingGrounds == null ||
+                                                                        HuntingGrounds.ActiveCells.Contains( p.Position ) )
+                                                                      && p.Position.CanReachColony() )
+
+                // OrderBy defaults to ascending, switch sign on estimated meat count to get descending
+                                    .OrderBy(
+                                        p =>
+                                            - p.EstimatedMeatCount() /
+                                            ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) ).ToList();
+
+            return list;
+        }
+
+        // copypasta from autohuntbeacon by Carry
+        // https://ludeon.com/forums/index.php?topic=8930.0
+        private static void DoUnforbidCorpses()
+        {
+            foreach ( Thing current in Corpses )
+            {
+                var corpse = current as Corpse;
+
+                // don't unforbid corpses in storage - we're going to assume they were manually set.
+                if ( corpse != null &&
+                     !corpse.IsInAnyStorage() &&
+                     corpse.IsForbidden( Faction.OfColony ) )
+                {
+                    // only fresh corpses
+                    var comp = corpse.GetComp< CompRottable >();
+                    if ( comp != null &&
+                         comp.Stage == RotStage.Fresh )
+                    {
+                        // unforbid
+                        // note: this doesn't count as work
+                        corpse.SetForbidden( false, false );
+                    }
+                }
+            }
+        }
+
+        public int GetMeatInCorpses()
+        {
+            // get current count + corpses in storage that is not a grave + designated count
+            // current count in storage
+            var count = 0;
+
+            // corpses not buried / forbidden
+            foreach ( Thing current in Corpses )
+            {
+                // make sure it's a real corpse. (I dunno, poke it?)
+                // and that it's not forbidden (anymore) and can be reached.
+                var corpse = current as Corpse;
+                if ( corpse != null &&
+                     !corpse.IsForbidden( Faction.OfColony ) &&
+                     corpse.Position.CanReachColony() )
+                {
+                    // check to see if it's buried.
+                    var buried = false;
+                    SlotGroup slotGroup = Find.SlotGroupManager.SlotGroupAt( corpse.Position );
+                    if ( slotGroup != null )
+                    {
+                        var building_Storage = slotGroup.parent as Building_Storage;
+
+                        // Sarcophagus inherits grave, here's to hoping Ty and modders stick to that in the future.
+                        if ( building_Storage != null &&
+                             building_Storage.def == ThingDefOf.Grave )
+                        {
+                            buried = true;
+                        }
+                    }
+
+                    if ( !buried )
+                    {
+                        count += corpse.GetMeatCount();
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        public int GetMeatInDesignations()
+        {
+            var count = 0;
+
+            // designated animals
+            foreach ( Designation des in Find.DesignationManager.DesignationsOfDef( DesignationDefOf.Hunt ) )
+            {
+                // make sure target is a pawn, is an animal, is not forbidden and somebody can reach it.
+                // note: could be rolled into a fancy LINQ chain, but this is probably clearer.
+                var target = des.target.Thing as Pawn;
+                if ( target != null &&
+                     target.RaceProps.Animal &&
+                     !target.IsForbidden( Faction.OfColony ) &&
+                     target.Position.CanReachColony() )
+                {
+                    count += target.EstimatedMeatCount();
+                }
+            }
+
+            return count;
         }
 
         public override void Tick()
         {
-            if( Find.TickManager.TicksGame % day.Interval == 0 )
+            if ( Find.TickManager.TicksGame % day.Interval == 0 )
             {
                 day.Add( Trigger.CurCount );
             }
-            if( Find.TickManager.TicksGame % month.Interval == 0 )
+            if ( Find.TickManager.TicksGame % month.Interval == 0 )
             {
                 month.Add( Trigger.CurCount );
             }
-            if( Find.TickManager.TicksGame % year.Interval == 0 )
+            if ( Find.TickManager.TicksGame % year.Interval == 0 )
             {
                 year.Add( Trigger.CurCount );
             }

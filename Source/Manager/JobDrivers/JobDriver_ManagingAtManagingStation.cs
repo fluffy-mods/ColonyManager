@@ -1,6 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Manager/JobDriver_ManagingAtManagingStation.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-04 19:25
+
 using RimWorld;
+using System;
+using System.Collections.Generic;
 using Verse;
 using Verse.AI;
 
@@ -19,21 +25,21 @@ namespace FM
 
         private Toil Manage( TargetIndex targetIndex )
         {
-            Building_ManagerStation station = CurJob.GetTarget( targetIndex ).Thing as Building_ManagerStation;
+            var station = CurJob.GetTarget( targetIndex ).Thing as Building_ManagerStation;
             if ( station == null )
             {
                 Log.Error( "Target of manager job was not a manager station. This should never happen." );
                 return null;
             }
-            Comp_ManagerStation comp = station.GetComp< Comp_ManagerStation >();
+            var comp = station.GetComp< Comp_ManagerStation >();
             if ( comp == null )
             {
                 Log.Error( "Target of manager job does not have manager station comp. This should never happen." );
                 return null;
             }
-            Toil toil = new Toil();
+            var toil = new Toil();
             toil.defaultDuration =
-                (int) ( comp.Props.Speed * ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
+                (int)( comp.Props.Speed * ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
 #if DEBUG_WORKGIVER
             Log.Message("Pawn stat: " + pawn.GetStatValue(StatDef.Named("ManagingSpeed")) + " (+0.5) Station speed: " + comp.Props.Speed + "Total time: " + toil.defaultDuration);
 #endif

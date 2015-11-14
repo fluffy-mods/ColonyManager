@@ -1,4 +1,10 @@
-﻿using System;
+﻿// Manager/MainProductTracker.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-04 19:30
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
@@ -15,9 +21,10 @@ namespace FM
             Unknown
         }
 
+        private readonly RecipeDef _recipe;
+
         private ThingCategoryDef _categoryDef;
         private string _label;
-        private readonly RecipeDef _recipe;
         private ThingDef _thingDef;
         public Types Type = Types.Unknown;
 
@@ -61,15 +68,19 @@ namespace FM
                     case Types.Thing:
                         _label = _thingDef.LabelCap;
                         break;
+
                     case Types.Category:
                         _label = _categoryDef.LabelCap;
                         break;
+
                     case Types.None:
                         _label = "None";
                         break;
+
                     case Types.Unknown:
                         _label = "Unkown";
                         break;
+
                     default:
                         _label = "Error";
                         break;
@@ -102,7 +113,6 @@ namespace FM
         /// </summary>
         public int Count { get; private set; } = 1;
 
-
         public MainProductTracker( RecipeDef recipe )
         {
             _recipe = recipe;
@@ -123,7 +133,8 @@ namespace FM
             try
             {
                 // get the (main) product
-                if ( _recipe.products != null && _recipe.products.Count > 0 &&
+                if ( _recipe.products != null &&
+                     _recipe.products.Count > 0 &&
                      _recipe.products.First().thingDef.BaseMarketValue > 0 )
                 {
                     Clear();
@@ -140,7 +151,8 @@ namespace FM
                     Type = Types.None;
                     Count = 0;
                 }
-                if ( _recipe.specialProducts != null && _recipe.specialProducts.Count > 0 )
+                if ( _recipe.specialProducts != null &&
+                     _recipe.specialProducts.Count > 0 )
                 {
                     // get the first special product of the first thingdef allowed by the fixedFilter.
                     if ( _recipe.defaultIngredientFilter.AllowedThingDefs == null )
@@ -154,12 +166,12 @@ namespace FM
                         throw new Exception( "AllowedThingDef NULL" );
                     }
 
-
                     if ( _recipe.specialProducts[0] == SpecialProductType.Butchery )
                     {
-                        if ( allowedThingDef.butcherProducts != null && allowedThingDef.butcherProducts.Count > 0 )
+                        if ( allowedThingDef.butcherProducts != null &&
+                             allowedThingDef.butcherProducts.Count > 0 )
                         {
-                            // butcherproducts are defined, no problem. 
+                            // butcherproducts are defined, no problem.
                             List< ThingCount > butcherProducts = allowedThingDef.butcherProducts;
                             if ( butcherProducts.Count == 0 )
                             {
@@ -192,7 +204,6 @@ namespace FM
                             Type = Types.Thing;
                             Count = 20;
                         }
-
                         else
                         {
                             Clear();
@@ -214,7 +225,6 @@ namespace FM
                             Clear();
                             return;
                         }
-
 
                         Clear();
                         _thingDef = smeltingProducts.First().thingDef;

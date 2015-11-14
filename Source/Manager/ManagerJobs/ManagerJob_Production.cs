@@ -1,7 +1,13 @@
-﻿using System;
+﻿// Manager/ManagerJob_Production.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-05 22:59
+
+using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -9,17 +15,11 @@ namespace FM
 {
     public class ManagerJob_Production : ManagerJob
     {
-        private readonly float _margin = Manager.Margin;
-        private static int     _histSize = 100;
-        private Texture2D      _cogTex = ContentFinder<Texture2D>.Get("UI/Buttons/Cog");
-        
-        public override ManagerTab Tab
-        {
-            get
-            {
-                return Manager.Get.ManagerTabs.Find(tab => tab is ManagerTab_Production);
-            }
-        }
+        private static int _histSize = 100;
+        private readonly float _margin = Utilities.Margin;
+        private Texture2D _cogTex = ContentFinder< Texture2D >.Get( "UI/Buttons/Cog" );
+
+        private Trigger_Threshold _trigger;
 
         /// <summary>
         ///     The managed bill, basically a placeholder bill that gets copied and handed out
@@ -30,9 +30,12 @@ namespace FM
         ///     BillGiver tracker, keeps track of billgiver settings and current assignments
         /// </summary>
         public BillGiverTracker BillGivers;
-        
+
+        public History day = new History( _histSize );
+        public History historyShown;
+
         // TODO: Hour should not be shown when date != 0 and hour == 0
-        // TODO: Collect data on counts ( three sets of data of set max size; day, month, year - each with max 100 datapoints)
+        // TODO: Collect data on counts ( three sets of data of set max Size; Day, Month, Year - each with max 100 datapoints)
         // TODO: Draw count graph
 
         /// <summary>
@@ -40,16 +43,25 @@ namespace FM
         /// </summary>
         public MainProductTracker MainProduct;
 
+        public bool maxSkil;
+        public History month = new History( _histSize, History.Period.Month );
+        public History year = new History( _histSize, History.Period.Year );
+
+        public override ManagerTab Tab
+        {
+            get { return Manager.Get.ManagerTabs.Find( tab => tab is ManagerTab_Production ); }
+        }
+
         public override bool IsValid
         {
             get
             {
-                if (Bill == null )
+                if ( Bill == null )
                 {
                     return false;
                 }
                 Log.Message( Bill.ToString() );
-                if (Bill.recipe == null )
+                if ( Bill.recipe == null )
                 {
                     return false;
                 }
@@ -60,31 +72,20 @@ namespace FM
 
         public override string Label
         {
-            get
-            {
-                return Bill.recipe.LabelCap;
-            }
+            get { return Bill.recipe.LabelCap; }
         }
 
         public override string[] Targets
         {
-            get
-            {
-                return Bill.recipe.GetRecipeUsers().Select( td => td.LabelCap ).ToArray();
-            }
+            get { return Bill.recipe.GetRecipeUsers().Select( td => td.LabelCap ).ToArray(); }
         }
 
-        public bool maxSkil;
-
         /// <summary>
-        /// Threshold for starting/stopping bill assignments   
+        /// Threshold for starting/stopping bill assignments
         /// </summary>
         public new Trigger_Threshold Trigger
         {
-            get
-            {
-                return _trigger;
-            }
+            get { return _trigger; }
             set
             {
                 // make sure to also populate the hidden base property.
@@ -92,12 +93,6 @@ namespace FM
                 base.Trigger = value;
             }
         }
-        private Trigger_Threshold _trigger;
-        
-        public History day = new History(_histSize);
-        public History month = new History(_histSize, History.period.month);
-        public History year = new History(_histSize, History.period.year);
-        public History historyShown;
 
         public ManagerJob_Production()
         {
@@ -117,7 +112,7 @@ namespace FM
             base.ExposeData();
 
             Scribe_Deep.LookDeep( ref Bill, "Bill" );
-            if (Manager.mode == Manager.Mode.normal )
+            if ( Manager.Mode == Manager.Modes.Normal )
             {
                 Scribe_Deep.LookDeep( ref BillGivers, "BillGivers", this );
             }
@@ -134,7 +129,6 @@ namespace FM
                 // sets property -> sets base property.
                 Trigger = _trigger;
             }
-
         }
 
         /// <summary>
@@ -149,7 +143,7 @@ namespace FM
 #endif
 
             // flag to see if anything meaningful was done, if false at end, manager will also do next job.
-            bool actionTaken = false;
+            var actionTaken = false;
 
             if ( Trigger.State )
             {
@@ -165,16 +159,17 @@ namespace FM
                                                 ref actionTaken );
 
                 // If Trigger met, check if there's places we need to add the bill.
-                for ( int workerIndex = 0; workerIndex < workers.Count; workerIndex++ )
+                for ( var workerIndex = 0; workerIndex < workers.Count; workerIndex++ )
                 {
                     Building_WorkTable worker = workers[workerIndex];
 #if DEBUG_JOBS
                     Log.Message( "Checking worker " + worker.LabelCap );
 #endif
-                    bool billPresent = false;
+                    var billPresent = false;
 
                     // loop over workstations
-                    if ( worker.BillStack != null && worker.BillStack.Count > 0 )
+                    if ( worker.BillStack != null &&
+                         worker.BillStack.Count > 0 )
                     {
 #if DEBUG_JOBS
                         foreach (
@@ -188,7 +183,7 @@ namespace FM
                         // loop over billstack to see if our bill is set.
                         foreach ( Bill t in worker.BillStack )
                         {
-                            Bill_Production thatBill = t as Bill_Production;
+                            var thatBill = t as Bill_Production;
 #if DEBUG_JOBS
                             if ( thatBill != null )
                             {
@@ -197,12 +192,14 @@ namespace FM
 #endif
 
                             // if there is a bill, and it's managed by us, check to see if it's up-to-date.
-                            if ( thatBill != null && thatBill.recipe == Bill.recipe &&
+                            if ( thatBill != null &&
+                                 thatBill.recipe == Bill.recipe &&
                                  BillGivers.GetAssignedBillGiversAndBillsDictionary.Contains(
                                      new KeyValuePair< Bill_Production, Building_WorkTable >( thatBill, worker ) ) )
                             {
                                 billPresent = true;
-                                if ( thatBill.suspended != Bill.suspended || thatBill.repeatCount == 0 )
+                                if ( thatBill.suspended != Bill.suspended ||
+                                     thatBill.repeatCount == 0 )
                                 {
 #if DEBUG_JOBS
                                     Log.Message( "Trying to unsuspend and/or bump targetCount" );
@@ -344,20 +341,21 @@ namespace FM
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            if (historyShown == null )
+            if ( historyShown == null )
             {
                 historyShown = day;
             }
             historyShown.DrawPlot( rect, Trigger.Count );
 
-            Rect switchRect = new Rect(rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f);
+            var switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
             Widgets.DrawHighlightIfMouseover( switchRect );
-            if(Widgets.ImageButton( switchRect, _cogTex ) )
+            if ( Widgets.ImageButton( switchRect, _cogTex ) )
             {
-                List<FloatMenuOption> options = new List<FloatMenuOption> {
-                    new FloatMenuOption("day", delegate { historyShown = day; } ),
-                    new FloatMenuOption("month", delegate { historyShown = month; } ),
-                    new FloatMenuOption("year", delegate { historyShown = year; })
+                List< FloatMenuOption > options = new List< FloatMenuOption >
+                {
+                    new FloatMenuOption( "Day", delegate { historyShown = day; } ),
+                    new FloatMenuOption( "Month", delegate { historyShown = month; } ),
+                    new FloatMenuOption( "Year", delegate { historyShown = year; } )
                 };
                 Find.WindowStack.Add( new FloatMenu( options ) );
             }
@@ -378,11 +376,11 @@ namespace FM
             {
                 day.Add( Trigger.CurCount );
             }
-            if( Find.TickManager.TicksGame % month.Interval == 0 )
+            if ( Find.TickManager.TicksGame % month.Interval == 0 )
             {
                 month.Add( Trigger.CurCount );
             }
-            if( Find.TickManager.TicksGame % year.Interval == 0 )
+            if ( Find.TickManager.TicksGame % year.Interval == 0 )
             {
                 year.Add( Trigger.CurCount );
             }

@@ -1,57 +1,51 @@
-﻿using UnityEngine;
+﻿// Manager/ManagerTab.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-04 19:23
+
+using UnityEngine;
 using Verse;
 
 namespace FM
 {
-    public abstract class ManagerTab : IManagerTab
+    public abstract class ManagerTab
     {
-        public static Texture2D _defaultIcon = ContentFinder<Texture2D>.Get("UI/Icons/Hammer");
-
-        public abstract string Label
+        public enum IconAreas
         {
-            get;
+            Left = 0,
+            Middle = 1,
+            Right = 2
         }
+
+        public static Texture2D DefaultIcon = ContentFinder< Texture2D >.Get( "UI/Icons/Hammer" );
+        public float DefaultLeftRowSize = 300f;
 
         public virtual Texture2D Icon
         {
-            get
-            {
-                return _defaultIcon;
-            }
+            get { return DefaultIcon; }
         }
 
-        public virtual ManagerJob Selected
+        public virtual IconAreas IconArea
         {
-            get; set;
+            get { return IconAreas.Middle; }
         }
 
-        public virtual void PostOpen()
+        public virtual string Label
         {
-
+            get { return GetType().ToString(); }
         }
 
-        public virtual void PreOpen()
-        {
+        public abstract ManagerJob Selected { get; set; }
 
-        }
+        public abstract void DoWindowContents( Rect canvas );
 
-        public virtual void PostClose()
-        {
+        public virtual void PostClose() {}
 
-        }
+        public virtual void PostOpen() {}
 
-        public virtual void PreClose()
-        {
+        public virtual void PreClose() {}
 
-        }
-
-        public virtual void DoWindowContents(Rect canvas)
-        {
-            Text.Anchor = TextAnchor.MiddleCenter;
-            GUI.color = Color.grey;
-            Widgets.Label(canvas, "<not implemented>");
-            Text.Anchor = TextAnchor.UpperLeft;
-            GUI.color = Color.white;
-        }
+        public virtual void PreOpen() {}
     }
 }

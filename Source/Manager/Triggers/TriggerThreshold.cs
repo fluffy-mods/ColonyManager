@@ -1,7 +1,12 @@
-﻿using System;
+﻿// Manager/TriggerThreshold.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-04 19:25
+
+using System;
 using UnityEngine;
 using Verse;
-using RimWorld;
 
 namespace FM
 {
@@ -14,25 +19,35 @@ namespace FM
             HigherThan
         }
 
-        public int Count;
-
-        public int MaxUpperThreshold;
-
-        public Ops Op;
-
-        public ThingFilter ThresholdFilter;
-        public static int DefaultMaxUpperThreshold = 3000;
         public static int DefaultCount = 500;
-        public static ThingCategoryDef ThingCategoryDef_Meat = DefDatabase<ThingCategoryDef>.GetNamed("MeatRaw");
-
-        public bool IsValid
-        {
-            get { return ThresholdFilter.AllowedDefCount > 0; }
-        }
+        public static int DefaultMaxUpperThreshold = 3000;
+        public int Count;
+        public int MaxUpperThreshold;
+        public Ops Op;
+        public ThingFilter ThresholdFilter;
 
         public int CurCount
         {
             get { return Utilities.CountProducts( ThresholdFilter ); }
+        }
+
+        public WindowTriggerThresholdDetails DetailsWindow
+        {
+            get
+            {
+                var window = new WindowTriggerThresholdDetails
+                {
+                    Trigger = this,
+                    closeOnClickedOutside = true,
+                    draggable = true
+                };
+                return window;
+            }
+        }
+
+        public bool IsValid
+        {
+            get { return ThresholdFilter.AllowedDefCount > 0; }
         }
 
         public virtual string OpString
@@ -43,10 +58,13 @@ namespace FM
                 {
                     case Ops.LowerThan:
                         return " < ";
+
                     case Ops.Equals:
                         return " = ";
+
                     case Ops.HigherThan:
                         return " > ";
+
                     default:
                         return " ? ";
                 }
@@ -61,10 +79,13 @@ namespace FM
                 {
                     case Ops.LowerThan:
                         return CurCount < Count;
+
                     case Ops.Equals:
                         return CurCount == Count;
+
                     case Ops.HigherThan:
                         return CurCount > Count;
+
                     default:
                         Log.Warning( "Trigger_ThingThreshold was defined without a correct operator" );
                         return true;
@@ -72,26 +93,9 @@ namespace FM
             }
         }
 
-        public WindowTriggerThresholdDetails DetailsWindow
-        {
-            get
-            {
-                WindowTriggerThresholdDetails window = new WindowTriggerThresholdDetails
-                {
-                    Trigger = this,
-                    closeOnClickedOutside = true,
-                    draggable = true
-                };
-                return window;
-            }
-        }
-
         public override string StatusTooltip
         {
-            get
-            {
-                return "FMP.ThresholdCount".Translate( CurCount, Count );
-            }
+            get { return "FMP.ThresholdCount".Translate( CurCount, Count ); }
         }
 
         public Trigger_Threshold( ManagerJob_Production job )
@@ -111,7 +115,6 @@ namespace FM
             }
         }
 
-
         public Trigger_Threshold( ManagerJob_Hunting job )
         {
             Op = Ops.LowerThan;
@@ -119,21 +122,44 @@ namespace FM
             Count = DefaultCount;
             ThresholdFilter = new ThingFilter();
             ThresholdFilter.SetDisallowAll();
-            ThresholdFilter.SetAllow( ThingCategoryDef_Meat, true );
+            ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
         }
 
-        public override string ToString()
+        public Trigger_Threshold( ManagerJob_Forestry job )
         {
-            // TODO: Implement Trigger_Threshold.ToString()
-            return "Trigger_Threshold.ToString() not implemented";
+            Op = Ops.LowerThan;
+            MaxUpperThreshold = DefaultMaxUpperThreshold;
+            Count = DefaultCount;
+            ThresholdFilter = new ThingFilter();
+            ThresholdFilter.SetDisallowAll();
+            ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
         }
 
-        public override void ExposeData()
+        public override void DrawProgressBar( Rect rect, bool active )
         {
-            Scribe_Values.LookValue( ref Count, "Count" );
-            Scribe_Values.LookValue( ref MaxUpperThreshold, "MaxUpperThreshold" );
-            Scribe_Values.LookValue( ref Op, "Operator" );
-            Scribe_Deep.LookDeep( ref ThresholdFilter, "ThresholdFilter" );
+            // bar always goes a little beyond the actual target
+            int max = Math.Max( (int)( Count * 1.2f ), CurCount );
+
+            // get the bar rect
+            float barHeight = rect.height / max * CurCount;
+            float markHeight = rect.height / max * Count;
+            var progressBarRect = new Rect( rect.xMin + 1f, rect.yMax - barHeight, 6f, barHeight );
+
+            // draw a box for the bar
+            GUI.color = Color.gray;
+            Widgets.DrawBox( rect.ContractedBy( 1f ) );
+            GUI.color = Color.white;
+
+            // draw the bar
+            // if the job is active and pending, make the bar blueish green - otherwise white.
+            Color barColour = active ? new Color( 0.2f, 0.8f, 0.85f ) : new Color( 1f, 1f, 1f );
+            Texture2D barTex = SolidColorMaterials.NewSolidColorTexture( barColour );
+            GUI.DrawTexture( progressBarRect, barTex );
+
+            // draw a mark at the treshold
+            Widgets.DrawLineHorizontal( rect.xMin, rect.yMax - markHeight, rect.width );
+
+            TooltipHandler.TipRegion( rect, StatusTooltip );
         }
 
         public override void DrawThresholdConfig( ref Listing_Standard listing )
@@ -153,31 +179,18 @@ namespace FM
             }
         }
 
-        public override void DrawProgressBar( Rect rect, bool active )
+        public override void ExposeData()
         {
-            // bar always goes a little beyond the actual target
-            int max = Math.Max((int)(Count * 1.2f), CurCount);
+            Scribe_Values.LookValue( ref Count, "Count" );
+            Scribe_Values.LookValue( ref MaxUpperThreshold, "MaxUpperThreshold" );
+            Scribe_Values.LookValue( ref Op, "Operator" );
+            Scribe_Deep.LookDeep( ref ThresholdFilter, "ThresholdFilter" );
+        }
 
-            // get the bar rect
-            float barHeight = rect.height / max * CurCount;
-            float markHeight = rect.height / max * Count;
-            Rect progressBarRect = new Rect(rect.xMin + 1f, rect.yMax - barHeight, 6f, barHeight);
-
-            // draw a box for the bar
-            GUI.color = Color.gray;
-            Widgets.DrawBox( rect.ContractedBy( 1f ) );
-            GUI.color = Color.white;
-
-            // draw the bar
-            // if the job is active and pending, make the bar blueish green - otherwise white.
-            Color barColour = active ? new Color( 0.2f, 0.8f, 0.85f ) : new Color( 1f, 1f, 1f );
-            Texture2D barTex = SolidColorMaterials.NewSolidColorTexture(barColour);
-            GUI.DrawTexture( progressBarRect, barTex );
-
-            // draw a mark at the treshold
-            Widgets.DrawLineHorizontal( rect.xMin, rect.yMax - markHeight, rect.width );
-
-            TooltipHandler.TipRegion( rect, StatusTooltip );
+        public override string ToString()
+        {
+            // TODO: Implement Trigger_Threshold.ToString()
+            return "Trigger_Threshold.ToString() not implemented";
         }
     }
 }

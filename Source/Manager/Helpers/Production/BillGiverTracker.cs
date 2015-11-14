@@ -1,7 +1,13 @@
-﻿using System;
+﻿// Manager/BillGiverTracker.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-04 19:30
+
+using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using Verse;
 
 namespace FM
@@ -15,6 +21,7 @@ namespace FM
 
     public class BillGiverTracker : IExposable
     {
+        private readonly ManagerJob_Production _job;
         private bool _assignedBillGiversInitialized = true;
 
         /// <summary>
@@ -26,15 +33,13 @@ namespace FM
 
         private List< string > _assignedWorkersScribeID;
 
-        private readonly ManagerJob_Production _job;
-
         /// <summary>
         ///     Area restriction
         /// </summary>
         public Area AreaRestriction;
 
         /// <summary>
-        ///     Assignment mode for billgivers
+        ///     Assignment Mode for billgivers
         /// </summary>
         public AssignedBillGiverOptions BillGiverSelection = AssignedBillGiverOptions.All;
 
@@ -44,7 +49,7 @@ namespace FM
         public List< Building_WorkTable > SpecificBillGivers;
 
         /// <summary>
-        ///     User requested billgiver count, when using count assignment mode.
+        ///     User requested billgiver count, when using count assignment Mode.
         /// </summary>
         public int UserBillGiverCount;
 
@@ -101,9 +106,11 @@ namespace FM
                         }
                         list = list.Take( UserBillGiverCount ).ToList();
                         break;
+
                     case AssignedBillGiverOptions.Specific:
                         list = SpecificBillGivers;
                         break;
+
                     case AssignedBillGiverOptions.All:
                     default:
                         break;
@@ -119,9 +126,9 @@ namespace FM
             {
                 if ( !_assignedBillGiversInitialized )
                 {
-                    bool error = false;
+                    var error = false;
                     _assignedBills = new Dictionary< Bill_Production, Building_WorkTable >();
-                    for ( int i = 0; i < _assignedBillsScribeID.Count; i++ )
+                    for ( var i = 0; i < _assignedBillsScribeID.Count; i++ )
                     {
 #if DEBUG_SCRIBE
                         Log.Message( "Trying to find " + _assignedWorkersScribeID[i] + " | " + _assignedBillsScribeID[i] );
@@ -146,11 +153,10 @@ namespace FM
                             {
                                 throw new Exception( "Billstack not initialized" );
                             }
-                            for ( int j = 0; j < worker.billStack.Count; j++ )
-                            {
-                                if ( worker.billStack[j].GetUniqueLoadID() == _assignedBillsScribeID[i] )
+                            foreach ( Bill current in worker.billStack ) {
+                                if ( current.GetUniqueLoadID() == _assignedBillsScribeID[i] )
                                 {
-                                    bill = (Bill_Production) worker.billStack[j];
+                                    bill = (Bill_Production)current;
                                 }
                             }
                             if ( bill == null )
@@ -159,6 +165,7 @@ namespace FM
                             }
                             _assignedBills.Add( bill, worker );
                         }
+                        // ReSharper disable once UnusedVariable
                         catch ( Exception e )
                         {
                             error = true;
@@ -190,7 +197,7 @@ namespace FM
         {
             get
             {
-                WindowBillGiverDetails window = new WindowBillGiverDetails
+                var window = new WindowBillGiverDetails
                 {
                     Job = _job,
                     closeOnClickedOutside = true,
@@ -247,6 +254,7 @@ namespace FM
 
             string potentialString = string.Join( "\n", GetPotentialBillGivers.Select( b => b.LabelCap ).ToArray() );
             string assignedString = string.Join( "\n", GetSelectedBillGivers.Select( b => b.LabelCap ).ToArray() );
+            // ReSharper disable once UnusedVariable
             string stationsTooltip = "FMP.BillGiversTooltip".Translate( potentialString, assignedString );
 
             // todo, fix that tooltip. Possible?

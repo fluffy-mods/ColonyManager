@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Manager/Trigger.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-04 19:28
+
 using UnityEngine;
 using Verse;
 
@@ -8,10 +13,11 @@ namespace FM
     {
         public abstract bool State { get; }
         public abstract string StatusTooltip { get; }
+
         public abstract void ExposeData();
+
+        public virtual void DrawProgressBar( Rect progressRect, bool active ) {}
+
         public abstract void DrawThresholdConfig( ref Listing_Standard listing );
-        public virtual void DrawProgressBar( Rect progressRect, bool active ) {
-            return;
-        }
     }
 }

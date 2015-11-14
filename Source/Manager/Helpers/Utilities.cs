@@ -1,36 +1,38 @@
-﻿using RimWorld;
+﻿// Manager/Utilities.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-04 19:28
+
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 
 namespace FM
 {
     public static class Utilities
     {
-        private static int _cachedCount;
+        // globals
+        public const float Margin = 6f;
 
-        private static ThingFilter _cachedFilter;
+        public const float ListEntryHeight = 50f;
+        public static Texture2D SlightlyDarkBackground = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .1f );
+        public static Texture2D DeleteX = ContentFinder< Texture2D >.Get( "UI/Buttons/Delete", true );
 
-        private static int _lastCache;
-
-        /// <summary>
-        ///     Returns current count of ThingDef thing, as used by core bill screens. (Bill_Production).
-        /// </summary>
-        /// <param name="thing"></param>
-        /// <returns>int</returns>
-        public static int CountProducts( Thing thing )
-        {
-            if ( thing == null )
-            {
-                return 0;
-            }
-            return thing.stackCount;
-        }
+        public static Dictionary< ThingFilter, Cache > CountCache = new Dictionary< ThingFilter, Cache >();
 
         private static bool TryGetCached( ThingFilter filter, out int count )
         {
-            if ( Find.TickManager.TicksGame - _lastCache < 250 && _cachedFilter == filter )
+            if ( CountCache.ContainsKey( filter ) )
             {
-                count = _cachedCount;
-                return true;
+                Cache cache = CountCache[filter];
+                if ( Find.TickManager.TicksGame - cache.lastCache < 250 )
+                {
+                    count = cache.cachedCount;
+                    return true;
+                }
             }
 #if DEBUG_COUNTS
             Log.Message("not cached");
@@ -57,8 +59,9 @@ namespace FM
 
         public static int CountProducts( ThingFilter filter )
         {
-            int count = 0;
-            if ( filter != null && TryGetCached( filter, out count ) )
+            var count = 0;
+            if ( filter != null &&
+                 TryGetCached( filter, out count ) )
             {
                 return count;
             }
@@ -102,15 +105,22 @@ namespace FM
                             Log.Message(t.LabelCap + ": " + CountProducts(t));
 #endif
 
-                            count += CountProducts( t );
+                            count += t.stackCount;
                         }
                     }
                 }
-                _cachedFilter = filter;
+
+                // update cache if exists.
+                if ( CountCache.ContainsKey( filter ) )
+                {
+                    CountCache[filter].cachedCount = count;
+                    CountCache[filter].lastCache = Find.TickManager.TicksGame;
+                }
+                else
+                {
+                    CountCache.Add( filter, new Cache( count ) );
+                }
             }
-            _lastCache = Find.TickManager.TicksGame;
-            _cachedFilter = filter;
-            _cachedCount = count;
             return count;
         }
 
@@ -118,6 +128,100 @@ namespace FM
         {
             int num;
             return int.TryParse( text, out num );
+        }
+
+        public static void DrawToggle( Rect rect, string label, ref bool checkOn, float size = 24f,
+                                       float margin = Margin )
+        {
+            // set up rects
+            Rect labelRect = rect;
+            var checkRect = new Rect( rect.xMax - size - margin * 2, 0f, size, size );
+
+            // finetune rects
+            labelRect.xMin += margin;
+            checkRect = checkRect.CenteredOnYIn( labelRect );
+
+            // draw label
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label( labelRect, label );
+            Text.Anchor = TextAnchor.UpperLeft;
+
+            // draw check
+            if ( checkOn )
+            {
+                GUI.DrawTexture( checkRect, Widgets.CheckboxOnTex );
+            }
+            else
+            {
+                GUI.DrawTexture( checkRect, Widgets.CheckboxOffTex );
+            }
+
+            // interactivity
+            Widgets.DrawHighlightIfMouseover( rect );
+            if ( Widgets.InvisibleButton( rect ) )
+            {
+                checkOn = !checkOn;
+            }
+        }
+
+        public static void DrawToggle( Rect rect, string label, bool checkOn, Action on, Action off, float size = 24f,
+                                       float margin = Margin )
+        {
+            // set up rects
+            Rect labelRect = rect;
+            var checkRect = new Rect( rect.xMax - size - margin * 2, 0f, size, size );
+
+            // finetune rects
+            labelRect.xMin += margin;
+            checkRect = checkRect.CenteredOnYIn( labelRect );
+
+            // draw label
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label( labelRect, label );
+            Text.Anchor = TextAnchor.UpperLeft;
+
+            // draw check
+            if ( checkOn )
+            {
+                GUI.DrawTexture( checkRect, Widgets.CheckboxOnTex );
+            }
+            else
+            {
+                GUI.DrawTexture( checkRect, Widgets.CheckboxOffTex );
+            }
+
+            // interactivity
+            Widgets.DrawHighlightIfMouseover( rect );
+            if ( Widgets.InvisibleButton( rect ) )
+            {
+                if ( checkOn )
+                {
+                    off();
+                }
+                else
+                {
+                    on();
+                }
+            }
+        }
+
+        public static void DrawToggle( Rect rect, string label, bool checkOn, Action toggle, float size = 24f,
+                                       float margin = Margin )
+        {
+            DrawToggle( rect, label, checkOn, toggle, toggle, size );
+        }
+
+        // count cache for multiple products
+        public class Cache
+        {
+            public int cachedCount;
+            public int lastCache;
+
+            public Cache( int count )
+            {
+                cachedCount = count;
+                lastCache = Find.TickManager.TicksGame;
+            }
         }
     }
 }

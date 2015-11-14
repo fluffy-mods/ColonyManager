@@ -1,8 +1,14 @@
-﻿using System;
+﻿// Manager/ManagerTab_Production.cs
+// 
+// Copyright Karel Kroeze, 2015.
+// 
+// Created 2015-11-04 19:28
+
+using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -16,28 +22,33 @@ namespace FM
             Current
         }
 
-        public static SourceOptions Source = SourceOptions.Available;
-        public static Vector2 LeftRowScrollPosition = new Vector2( 0f, 0f );
         public static Vector2 BillScrollPosition = new Vector2( 0f, 0f );
-        public static List< ManagerJob_Production > SourceList;
+        public static Vector2 LeftRowScrollPosition = new Vector2( 0f, 0f );
+        public static SourceOptions Source = SourceOptions.Available;
         public static string SourceFilter = "";
+        public static List< ManagerJob_Production > SourceList;
         public static float SourceListHeight;
+
         private static ManagerJob_Production _selected;
-        public override ManagerJob Selected
-        { 
-            get
-            {
-                return _selected;
-            }
-            set
-            {
-                _selected = (ManagerJob_Production)value;
-            }
+        private bool _postOpenFocus;
+
+        public override Texture2D Icon
+        {
+            get { return DefaultIcon; }
         }
 
-        private bool _postOpenFocus;
-        public float LeftRowSize = 300f;
+        public override IconAreas IconArea
+        {
+            get { return IconAreas.Middle; }
+        }
+
         public override string Label { get; } = "FMP.Production".Translate();
+
+        public override ManagerJob Selected
+        {
+            get { return _selected; }
+            set { _selected = (ManagerJob_Production)value; }
+        }
 
         public static void RefreshSourceList()
         {
@@ -49,22 +60,13 @@ namespace FM
                     SourceList = ( from rd in DefDatabase< RecipeDef >.AllDefsListForReading
                                    where rd.HasBuildingRecipeUser( true )
                                    orderby rd.LabelCap
-                                   select ( new ManagerJob_Production( rd ) ) ).ToList();
+                                   select new ManagerJob_Production( rd ) ).ToList();
                     break;
+
                 case SourceOptions.Current:
-                    SourceList = Manager.Get.JobStack.FullStack.OfType< ManagerJob_Production >().ToList();
+                    SourceList = Manager.Get.JobStack.FullStack< ManagerJob_Production >();
                     break;
             }
-        }
-
-        public override void DoWindowContents( Rect canvas )
-        {
-            Rect leftRow = new Rect( 0f, 35f, LeftRowSize, canvas.height - 35f );
-            Rect contentCanvas = new Rect( leftRow.xMax + 10f, 5f, canvas.width - leftRow.width - 10f,
-                                           canvas.height - 5f );
-
-            DoLeftRow( leftRow );
-            DoContent( contentCanvas );
         }
 
         public void DoContent( Rect canvas )
@@ -74,17 +76,17 @@ namespace FM
             if ( _selected != null )
             {
                 // leave some space for bottom buttons.
-                float bottomButtonsHeight = 30f;
-                float bottomButtonsGap = 6f;
+                var bottomButtonsHeight = 30f;
+                var bottomButtonsGap = 6f;
                 canvas.height = canvas.height - bottomButtonsHeight - bottomButtonsGap;
 
                 // bottom buttons
-                Rect bottomButtons = new Rect( canvas.xMin, canvas.height + bottomButtonsGap, canvas.width,
-                                               bottomButtonsHeight );
+                var bottomButtons = new Rect( canvas.xMin, canvas.height + bottomButtonsGap, canvas.width,
+                                              bottomButtonsHeight );
                 GUI.BeginGroup( bottomButtons );
 
                 // add / remove to the stack
-                Rect add = new Rect( bottomButtons.width * .75f, 0f, bottomButtons.width / 4f - 6f, bottomButtons.height );
+                var add = new Rect( bottomButtons.width * .75f, 0f, bottomButtons.width / 4f - 6f, bottomButtons.height );
                 if ( Source == SourceOptions.Current )
                 {
                     if ( Widgets.TextButton( add, "FM.Delete".Translate() ) )
@@ -92,7 +94,7 @@ namespace FM
                         _selected.Delete();
                         _selected = null;
                         RefreshSourceList();
-                        return; // hopefully that'll just skip to the next tick without any further errors?
+                        return; // just skip to the next tick to avoid null reference errors.
                     }
                     TooltipHandler.TipRegion( add, "FMP.DeleteBillTooltip".Translate() );
                 }
@@ -102,6 +104,7 @@ namespace FM
                     {
                         if ( Widgets.TextButton( add, "FM.Manage".Translate() ) )
                         {
+                            _selected.Active = true;
                             Manager.Get.JobStack.Add( _selected );
 
                             // refresh source list so that the next added job is not an exact copy.
@@ -132,22 +135,22 @@ namespace FM
                 GUI.BeginGroup( canvas );
                 Text.Anchor = TextAnchor.MiddleCenter;
                 Text.Font = GameFont.Medium;
-                Rect recta = new Rect( 0f, 0f, canvas.width, 50f );
+                var recta = new Rect( 0f, 0f, canvas.width, 50f );
                 Widgets.Label( recta, _selected.Bill.LabelCap );
                 Text.Anchor = TextAnchor.UpperLeft;
                 Text.Font = GameFont.Small;
-                Rect rect2 = new Rect( 6f, 50f, canvas.width * .3f, canvas.height - 50f );
-                Listing_Standard listingStandard = new Listing_Standard( rect2 );
-                if ( !_selected.Active )
+                var rect2 = new Rect( 6f, 50f, canvas.width * .3f, canvas.height - 50f );
+                var listingStandard = new Listing_Standard( rect2 );
+                if ( !_selected.Suspended )
                 {
                     if ( listingStandard.DoTextButton( "Suspended".Translate() ) )
                     {
-                        _selected.Active = true;
+                        _selected.Suspended = true;
                     }
                 }
                 else if ( listingStandard.DoTextButton( "NotSuspended".Translate() ) )
                 {
-                    _selected.Active = false;
+                    _selected.Suspended = false;
                 }
                 string billStoreModeLabel = ( "BillStoreMode_" + _selected.Bill.storeMode ).Translate();
                 if ( listingStandard.DoTextButton( billStoreModeLabel ) )
@@ -155,7 +158,10 @@ namespace FM
                     List< FloatMenuOption > list = ( from BillStoreMode mode in Enum.GetValues( typeof (BillStoreMode) )
                                                      select
                                                          new FloatMenuOption( ( "BillStoreMode_" + mode ).Translate(),
-                                                                              delegate { _selected.Bill.storeMode = mode; } ) )
+                                                                              delegate
+                                                                              {
+                                                                                  _selected.Bill.storeMode = mode;
+                                                                              } ) )
                         .ToList();
                     Find.WindowStack.Add( new FloatMenu( list ) );
                 }
@@ -183,17 +189,18 @@ namespace FM
                 listingStandard.End();
 
                 // ingredient picker
-                Rect rect3 = new Rect( rect2.xMax + 6f, 50f, canvas.width * .4f, canvas.height - 50f );
+                var rect3 = new Rect( rect2.xMax + 6f, 50f, canvas.width * .4f, canvas.height - 50f );
                 ThingFilterUI.DoThingFilterConfigWindow( rect3, ref BillScrollPosition, _selected.Bill.ingredientFilter,
                                                          _selected.Bill.recipe.fixedIngredientFilter, 4 );
 
                 // description
-                Rect rect4 = new Rect( rect3.xMax + 6f, rect3.y + 30f, canvas.width - rect3.xMax - 12f,
-                                       canvas.height - 50f );
-                StringBuilder stringBuilder = new StringBuilder();
+                var rect4 = new Rect( rect3.xMax + 6f, rect3.y + 30f, canvas.width - rect3.xMax - 12f,
+                                      canvas.height - 50f );
+                var stringBuilder = new StringBuilder();
 
                 // add mainproduct line
-                stringBuilder.AppendLine( "FMP.MainProduct".Translate( _selected.MainProduct.Label, _selected.MainProduct.Count ) );
+                stringBuilder.AppendLine( "FMP.MainProduct".Translate( _selected.MainProduct.Label,
+                                                                       _selected.MainProduct.Count ) );
                 stringBuilder.AppendLine();
 
                 if ( _selected.Bill.recipe.description != null )
@@ -237,24 +244,12 @@ namespace FM
             GUI.EndGroup();
         }
 
-        public override void PreOpen()
-        {
-            base.PreOpen();
-            RefreshSourceList();
-        }
-
-        public override void PostOpen()
-        {
-            // focus on the filter on open, flag is checked after the field is actually drawn.
-            _postOpenFocus = false;
-        }
-
         public void DoLeftRow( Rect canvas )
         {
             Widgets.DrawMenuSection( canvas, false );
 
             // filter
-            Rect filterRect = new Rect( 10f, canvas.yMin + 5f, canvas.width - 50f, 30f );
+            var filterRect = new Rect( 10f, canvas.yMin + 5f, canvas.width - 50f, 30f );
 
             GUI.SetNextControlName( "filterTextfield" );
             SourceFilter = Widgets.TextField( filterRect, SourceFilter );
@@ -267,7 +262,7 @@ namespace FM
 
             if ( SourceFilter != "" )
             {
-                Rect clearFilter = new Rect( filterRect.width + 10f, filterRect.yMin, 30f, 30f );
+                var clearFilter = new Rect( filterRect.width + 10f, filterRect.yMin, 30f, 30f );
                 if ( Widgets.ImageButton( clearFilter, Widgets.CheckboxOffTex ) )
                 {
                     SourceFilter = "";
@@ -278,13 +273,13 @@ namespace FM
 
             // tabs
             List< TabRecord > list = new List< TabRecord >();
-            TabRecord availableTabRecord = new TabRecord( "FMP.Available".Translate(), delegate
+            var availableTabRecord = new TabRecord( "FMP.Available".Translate(), delegate
             {
                 Source = SourceOptions.Available;
                 RefreshSourceList();
             }, Source == SourceOptions.Available );
             list.Add( availableTabRecord );
-            TabRecord currentTabRecord = new TabRecord( "FMP.Current".Translate(), delegate
+            var currentTabRecord = new TabRecord( "FMP.Current".Translate(), delegate
             {
                 Source = SourceOptions.Current;
                 RefreshSourceList();
@@ -296,7 +291,7 @@ namespace FM
             Rect scrollCanvas = canvas; //.ContractedBy( 10f );
             scrollCanvas.yMin = scrollCanvas.yMin + 40f;
             float height = SourceListHeight + 20f;
-            Rect scrollView = new Rect( 0f, 0f, scrollCanvas.width, height );
+            var scrollView = new Rect( 0f, 0f, scrollCanvas.width, height );
             if ( height > scrollCanvas.height )
             {
                 scrollView.width -= 16f;
@@ -307,17 +302,17 @@ namespace FM
 
             GUI.BeginGroup( scrollContent );
             float y = 0;
-            int i = 0;
+            var i = 0;
 
             foreach ( ManagerJob_Production current in from job in SourceList
-                                                      where
-                                                          job.Bill.recipe.label.ToUpper()
-                                                             .Contains( SourceFilter.ToUpper() ) ||
-                                                          job.MainProduct.Label.ToUpper()
-                                                             .Contains( SourceFilter.ToUpper() )
-                                                      select job )
+                                                       where
+                                                           job.Bill.recipe.label.ToUpper()
+                                                              .Contains( SourceFilter.ToUpper() ) ||
+                                                           job.MainProduct.Label.ToUpper()
+                                                              .Contains( SourceFilter.ToUpper() )
+                                                       select job )
             {
-                Rect row = new Rect( 0f, y, scrollContent.width, Manager.ListEntryHeight );
+                var row = new Rect( 0f, y, scrollContent.width, Utilities.ListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
                 if ( _selected == current )
                 {
@@ -326,7 +321,7 @@ namespace FM
 
                 if ( i++ % 2 == 1 )
                 {
-                    GUI.DrawTexture( row, Manager.OddRowBG );
+                    Widgets.DrawAltRect( row );
                 }
 
                 Rect jobRect = row;
@@ -347,11 +342,33 @@ namespace FM
                     _selected = current;
                 }
 
-                y += Manager.ListEntryHeight;
+                y += Utilities.ListEntryHeight;
             }
             SourceListHeight = y;
             GUI.EndGroup();
             Widgets.EndScrollView();
+        }
+
+        public override void DoWindowContents( Rect canvas )
+        {
+            var leftRow = new Rect( 0f, 31f, DefaultLeftRowSize, canvas.height - 31f );
+            var contentCanvas = new Rect( leftRow.xMax + Utilities.Margin, 0f,
+                                          canvas.width - leftRow.width - Utilities.Margin, canvas.height );
+
+            DoLeftRow( leftRow );
+            DoContent( contentCanvas );
+        }
+
+        public override void PostOpen()
+        {
+            // focus on the filter on open, flag is checked after the field is actually drawn.
+            _postOpenFocus = false;
+        }
+
+        public override void PreOpen()
+        {
+            base.PreOpen();
+            RefreshSourceList();
         }
     }
 }
