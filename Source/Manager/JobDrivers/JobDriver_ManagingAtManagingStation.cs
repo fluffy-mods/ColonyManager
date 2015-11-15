@@ -25,19 +25,19 @@ namespace FM
 
         private Toil Manage( TargetIndex targetIndex )
         {
-            var station = CurJob.GetTarget( targetIndex ).Thing as Building_ManagerStation;
+            Building_ManagerStation station = CurJob.GetTarget( targetIndex ).Thing as Building_ManagerStation;
             if ( station == null )
             {
                 Log.Error( "Target of manager job was not a manager station. This should never happen." );
                 return null;
             }
-            var comp = station.GetComp< Comp_ManagerStation >();
+            Comp_ManagerStation comp = station.GetComp< Comp_ManagerStation >();
             if ( comp == null )
             {
                 Log.Error( "Target of manager job does not have manager station comp. This should never happen." );
                 return null;
             }
-            var toil = new Toil();
+            Toil toil = new Toil();
             toil.defaultDuration =
                 (int)( comp.Props.Speed * ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
 #if DEBUG_WORKGIVER

@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -16,6 +17,7 @@ namespace FM
         public const float Margin = Utilities.Margin,
                            OverviewWidthRatio = .6f,
                            RowHeight = Utilities.ListEntryHeight,
+                           RowHeightPawnOverview = 30f,
                            IconSize = 30f;
 
         public static readonly Texture2D ArrowTop = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowTop" ),
@@ -23,11 +25,14 @@ namespace FM
                                          ArrowDown = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowDown" ),
                                          ArrowBottom = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowBottom" );
 
-        private Texture2D _icon = ContentFinder< Texture2D >.Get( "UI/Icons/Overview" );
-        private Vector2 _overviewScrollPosition = Vector2.zero;
-        private ManagerJob _selectedJob;
-
-        public float OverviewHeight = 9999f;
+        private Texture2D   _icon                   = ContentFinder< Texture2D >.Get( "UI/Icons/Overview" );
+        private Vector2     _overviewScrollPosition = Vector2.zero;
+        private Vector2     _workersScrollPosition  = Vector2.zero;
+        private ManagerJob  _selectedJob;
+        private SkillDef    _skillDef;
+        private WorkTypeDef _workType;
+        public float        OverviewHeight          = 9999f;
+        private List< Pawn > Workers                = new List< Pawn >();
 
         public static List< ManagerJob > Jobs
         {
@@ -50,7 +55,35 @@ namespace FM
         {
             get { return _selectedJob; }
 
-            set { _selectedJob = value; }
+            set
+            {
+                _selectedJob = value;
+                WorkType = _selectedJob.WorkTypeDef;
+                SkillDef = _selectedJob.SkillDef;
+            }
+        }
+
+        private WorkTypeDef WorkType
+        {
+            get
+            {
+                if ( _workType == null )
+                {
+                    _workType = Utilities.WorkTypeDefOf_Managing;
+                }
+                return _workType;
+            }
+            set
+            {
+                _workType = value;
+                RefreshWorkers();
+            }
+        }
+
+        private SkillDef SkillDef
+        {
+            get { return _skillDef; }
+            set { _skillDef = value; }
         }
 
         /// <summary>
@@ -63,7 +96,7 @@ namespace FM
         /// <returns></returns>
         public static bool DrawOrderButtons< T >( Rect rect, T job ) where T : ManagerJob
         {
-            var ret = false;
+            bool ret = false;
 
             float width = rect.width / 2,
                   height = rect.height / 2;
@@ -128,12 +161,12 @@ namespace FM
 
         public override void DoWindowContents( Rect canvas )
         {
-            var overviewRect = new Rect( 0f, 0f, OverviewWidthRatio * canvas.width, canvas.height );
-            var sideRectUpper = new Rect( overviewRect.xMax + Margin, 0f,
-                                          ( 1 - OverviewWidthRatio ) * canvas.width - Margin,
-                                          ( canvas.height - Margin ) / 2 );
-            var sideRectLower = new Rect( overviewRect.xMax + Margin, sideRectUpper.yMax + Margin, sideRectUpper.width,
-                                          sideRectUpper.height - 1 );
+            Rect overviewRect = new Rect( 0f, 0f, OverviewWidthRatio * canvas.width, canvas.height );
+            Rect sideRectUpper = new Rect( overviewRect.xMax + Margin, 0f,
+                                           ( 1 - OverviewWidthRatio ) * canvas.width - Margin,
+                                           ( canvas.height - Margin ) / 2 );
+            Rect sideRectLower = new Rect( overviewRect.xMax + Margin, sideRectUpper.yMax + Margin, sideRectUpper.width,
+                                           sideRectUpper.height - 1 );
 
             // draw the listing of current jobs.
             Widgets.DrawMenuSection( overviewRect );
@@ -146,15 +179,117 @@ namespace FM
                 _selectedJob.DrawOverviewDetails( sideRectUpper );
             }
 
-            // TODO: draw some stuff I haven't thought of yet.
-            // Save/load here?
-            // Overview of managers?
+            // overview of managers & pawns (capable of) doing this job.
             Widgets.DrawMenuSection( sideRectLower );
-            GUI.color = Color.gray;
-            Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label( sideRectLower, "Not implemented." );
-            GUI.color = Color.white;
-            Text.Anchor = TextAnchor.UpperLeft;
+            DrawPawnOverview( sideRectLower );
+        }
+
+        private void RefreshWorkers()
+        {
+            Workers =
+                Find.ListerPawns.FreeColonistsSpawned.Where( pawn => !pawn.story.WorkTypeIsDisabled( WorkType ) )
+                    .ToList();
+        }
+
+        public void DrawPawnOverview( Rect rect )
+        {
+            // table body viewport
+            Rect tableOutRect = new Rect( 0f, RowHeightPawnOverview, rect.width, rect.height - RowHeightPawnOverview );
+            Rect tableViewRect = new Rect( 0f, RowHeightPawnOverview, rect.width, Workers.Count * RowHeightPawnOverview );
+            if ( tableViewRect.height > tableOutRect.height )
+            {
+                // scrollbar
+                tableViewRect.width -= 16f;
+            }
+
+            // column width
+            float colWidth = tableViewRect.width / 4 - Margin;
+
+            // column headers
+            Rect nameColumnHeaderRect = new Rect( colWidth * 0, 0f, colWidth, RowHeightPawnOverview );
+            Rect activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth, RowHeightPawnOverview );
+            Rect skillColumnHeaderRect = new Rect( colWidth * 2, 0f, colWidth, RowHeightPawnOverview );
+            Rect priorityColumnHeaderRect = new Rect( colWidth * 3, 0f, colWidth, RowHeightPawnOverview );
+
+            // label for priority column
+            string workLabel = Find.Map.playSettings.useWorkPriorities
+                ? "FM.Priority".Translate()
+                : "FM.Enabled".Translate();
+
+            // begin drawing
+            GUI.BeginGroup( rect );
+
+            // draw labels
+            Utilities.Label( nameColumnHeaderRect, WorkType.pawnLabel + "s", null, TextAnchor.LowerCenter );
+            Utilities.Label( activityColumnHeaderRect, "FM.Activity".Translate(), null, TextAnchor.LowerCenter );
+            Utilities.Label( skillColumnHeaderRect, "FM.Skill".Translate(), null, TextAnchor.LowerCenter );
+            Utilities.Label( priorityColumnHeaderRect, workLabel, null, TextAnchor.LowerCenter );
+
+            // begin scrolling area
+            Widgets.BeginScrollView( tableOutRect, ref _workersScrollPosition, tableViewRect );
+            GUI.BeginGroup( tableViewRect );
+
+            // draw pawn rows
+            Vector2 cur = Vector2.zero;
+            for ( int i = 0; i < Workers.Count; i++ )
+            {
+                Rect row = new Rect( cur.x, cur.y, tableViewRect.width, RowHeightPawnOverview );
+                if ( i % 2 == 0 )
+                {
+                    Widgets.DrawAltRect( row );
+                }
+                DrawPawnOverviewRow( Workers[i], row );
+                cur.y += RowHeightPawnOverview;
+            }
+
+            // end scrolling area
+            GUI.EndGroup();
+            Widgets.EndScrollView();
+
+            // done!
+            GUI.EndGroup();
+        }
+
+        private void DrawPawnOverviewRow( Pawn pawn, Rect rect )
+        {
+            // column width
+            float colWidth = rect.width / 4 - Margin;
+
+            // cell rects
+            Rect nameRect     = new Rect( colWidth * 0, rect.yMin, colWidth, RowHeightPawnOverview );
+            Rect activityRect = new Rect( colWidth * 1, rect.yMin, colWidth, RowHeightPawnOverview );
+            Rect skillRect    = new Rect( colWidth * 2, rect.yMin, colWidth, RowHeightPawnOverview );
+            Rect priorityRect = new Rect( colWidth * 3, rect.yMin, colWidth, RowHeightPawnOverview );
+
+            // name
+            Widgets.DrawHighlightIfMouseover( nameRect );
+
+            // on click select and jump to location
+            if ( Widgets.InvisibleButton( nameRect ) )
+            {
+                Find.MainTabsRoot.EscapeCurrentTab();
+                Find.CameraMap.JumpTo( pawn.PositionHeld );
+                Find.Selector.ClearSelection();
+                if ( pawn.SpawnedInWorld )
+                {
+                    Find.Selector.Select( pawn );
+                }
+            }
+            Utilities.Label( nameRect, pawn.NameStringShort, "FM.ClickToJumpTo".Translate( pawn.LabelCap ),
+                             TextAnchor.MiddleLeft, Margin );
+
+            // current activity
+            Utilities.Label( activityRect, pawn.CurJob.def.reportString, pawn.CurJob.def.reportString, TextAnchor.MiddleLeft,
+                             Margin );
+
+            // skill
+            float skill = SkillDef == null
+                ? pawn.skills.AverageOfRelevantSkillsFor( WorkType )
+                : pawn.skills.GetSkill( SkillDef ).level;
+            Utilities.Label( skillRect, skill.ToString(), null, TextAnchor.MiddleCenter, Margin );
+
+            // priority button
+            Utilities.Label( priorityRect, "X", anchor: TextAnchor.MiddleCenter );
         }
 
         public void DrawOverview( Rect rect )
@@ -181,22 +316,22 @@ namespace FM
 
                 Vector2 cur = Vector2.zero;
 
-                for ( var i = 0; i < Jobs.Count; i++ )
+                for ( int i = 0; i < Jobs.Count; i++ )
                 {
-                    var row = new Rect( cur.x, cur.y, contentRect.width, 50f );
+                    Rect row = new Rect( cur.x, cur.y, contentRect.width, 50f );
 
                     // highlights
                     if ( i % 2 == 1 )
                     {
                         Widgets.DrawAltRect( row );
                     }
-                    if ( Jobs[i] == _selectedJob )
+                    if ( Jobs[i] == Selected )
                     {
                         Widgets.DrawHighlightSelected( row );
                     }
 
                     // go to job icon
-                    var iconRect = new Rect( Margin, row.yMin + ( RowHeight - IconSize ) / 2, IconSize, IconSize );
+                    Rect iconRect = new Rect( Margin, row.yMin + ( RowHeight - IconSize ) / 2, IconSize, IconSize );
                     if ( Widgets.ImageButton( iconRect, Jobs[i].Tab.Icon ) )
                     {
                         MainTabWindow_Manager.GoTo( Jobs[i].Tab, Jobs[i] );
@@ -213,7 +348,7 @@ namespace FM
                     Widgets.DrawHighlightIfMouseover( row );
                     if ( Widgets.InvisibleButton( jobRect ) )
                     {
-                        _selectedJob = Jobs[i];
+                        Selected = Jobs[i];
                     }
 
                     cur.y += 50f;
@@ -225,5 +360,14 @@ namespace FM
                 OverviewHeight = cur.y;
             }
         }
+
+        #region Overrides of ManagerTab
+
+        public override void PreOpen()
+        {
+            RefreshWorkers();
+        }
+
+        #endregion
     }
 }

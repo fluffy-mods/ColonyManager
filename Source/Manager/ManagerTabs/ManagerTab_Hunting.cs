@@ -14,15 +14,15 @@ namespace FM
 {
     internal class ManagerTab_Hunting : ManagerTab
     {
-        private static float _entryHeight = 30f;
-        private static Texture2D _icon = ContentFinder< Texture2D >.Get( "UI/Icons/Hunting" );
-        private static ManagerJob_Hunting _selected = new ManagerJob_Hunting();
-        private Vector2 _animalsScrollPosition = Vector2.zero;
-        private Vector2 _button = new Vector2( 200f, 40f );
-        private float _leftRowHeight = 9999f;
-        private float _margin = Utilities.Margin;
-        private Vector2 _scrollPosition = Vector2.zero;
-        private float _topAreaHeight = 30f;
+        private static float     _entryHeight                  = 30f;
+        private static Texture2D _icon                         = ContentFinder< Texture2D >.Get( "UI/Icons/Hunting" );
+        private static ManagerJob_Hunting _selected            = new ManagerJob_Hunting();
+        private Vector2          _animalsScrollPosition        = Vector2.zero;
+        private Vector2          _button                       = new Vector2( 200f, 40f );
+        private float            _leftRowHeight                = 9999f;
+        private float            _margin                       = Utilities.Margin;
+        private Vector2          _scrollPosition               = Vector2.zero;
+        private float            _topAreaHeight                = 30f;
         public List< ManagerJob_Hunting > Jobs;
 
         public override Texture2D Icon
@@ -54,20 +54,19 @@ namespace FM
             Widgets.DrawMenuSection( rect );
 
             // some variables
-            float width = rect.width;
-            float height = rect.height - _topAreaHeight - _button.y - _margin;
-            var cols = 2;
-            float colWidth = width / cols - _margin;
-            List< Rect > colRects = new List< Rect >();
+            float width                = rect.width;
+            float height               = rect.height - _topAreaHeight - _button.y - _margin;
+            int cols                   = 2;
+            float colWidth             = width / cols - _margin;
+            List< Rect > colRects      = new List< Rect >();
             List< Rect > colTitleRects = new List< Rect >();
-            var buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - _margin,
-                                       _button.y - _margin );
+            Rect buttonRect             = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - _margin, _button.y - _margin );
 
             // set up rects
-            for ( var j = 0; j < cols; j++ )
+            for ( int j = 0; j < cols; j++ )
             {
                 colRects.Add( new Rect( j * colWidth + j * _margin + _margin / 2, _topAreaHeight, colWidth, height ) );
-                colTitleRects.Add( new Rect( j * colWidth + j * _margin + _margin * 2.5f, 0f, colWidth, _topAreaHeight ) );
+                colTitleRects.Add( new Rect( j * colWidth + j * _margin + _margin / 2, 0f, colWidth, _topAreaHeight ) );
             }
 
             // keep track of location
@@ -77,59 +76,57 @@ namespace FM
             GUI.BeginGroup( rect );
 
             // settings.
-            Text.Anchor = TextAnchor.LowerLeft;
-            Text.Font = GameFont.Tiny;
-            Widgets.Label( colTitleRects[0], "FMH.Options".Translate() );
-            Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.UpperLeft;
+            Utilities.Label( colTitleRects[0], "FMH.Options".Translate(), lrMargin: _margin * 2, anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
 
             GUI.DrawTexture( colRects[0], Utilities.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[0] );
             cur = Vector2.zero;
 
-            // target count
-            var targetCountTitleRect = new Rect( cur.x + _margin, cur.y, colWidth - 2 * _margin, _entryHeight );
-            int currentCount = _selected.Trigger.CurCount;
-            int corpseCount = _selected.GetMeatInCorpses();
-            int designatedCount = _selected.GetMeatInDesignations();
-            int targetCount = _selected.Trigger.Count;
-            Widgets.Label( targetCountTitleRect,
-                           "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ) );
-            TooltipHandler.TipRegion( targetCountTitleRect,
-                                      "FMH.TargetCountTooltip".Translate( currentCount, corpseCount, designatedCount,
-                                                                          targetCount ) );
+            // target count (1)
+            Rect targetCountTitleRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
+            int currentCount          = _selected.Trigger.CurCount;
+            int corpseCount           = _selected.GetMeatInCorpses();
+            int designatedCount       = _selected.GetMeatInDesignations();
+            int targetCount           = _selected.Trigger.Count;
+            Utilities.Label( targetCountTitleRect,
+                           "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ),
+                           "FMH.TargetCountTooltip".Translate( currentCount, corpseCount, designatedCount, targetCount ),
+                           TextAnchor.MiddleLeft,
+                           _margin);
+            Widgets.DrawAltRect( targetCountTitleRect );
             cur.y += _entryHeight;
 
-            var targetCountRect = new Rect( cur.x + _margin, cur.y, colWidth - 2 * _margin, _entryHeight );
-            GUI.skin.horizontalSlider.alignment = TextAnchor.MiddleCenter;
+            Rect targetCountRect = new Rect( cur.x, cur.y, colWidth, Utilities.SliderHeight );
+            Widgets.DrawAltRect( targetCountRect );
             _selected.Trigger.Count = (int)GUI.HorizontalSlider( targetCountRect, _selected.Trigger.Count, 0, 2000 );
-            cur.y += _entryHeight;
+            cur.y += Utilities.SliderHeight;
 
-            // allow human meat
-            var humanMeatRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
+            // allow human meat (2)
+            Rect humanMeatRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Utilities.DrawToggle( humanMeatRect, "FMH.AllowHumanMeat".Translate(),
                                   _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.HumanMeat ),
-                                  delegate
+                                  on: delegate
                                   {
                                       _selected.Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, true );
                                   },
-                                  delegate
+                                  off: delegate
                                   {
                                       _selected.Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, false );
                                   } );
             cur.y += _entryHeight;
 
-            // unforbid corpses
-            var ufCorpseRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
+            // unforbid corpses (3)
+            Rect ufCorpseRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
+            Widgets.DrawAltRect( ufCorpseRect );
             Utilities.DrawToggle( ufCorpseRect, "FMH.UnforbidCorpses".Translate(), ref _selected.UnforbidCorpses );
             cur.y += _entryHeight;
 
-            // hunting grounds
-            var huntingGroundsTitleRect = new Rect( cur.x + _margin, cur.y, colWidth - 2 * _margin, _entryHeight );
-            Widgets.Label( huntingGroundsTitleRect, "FMH.HuntingGrounds".Translate() );
+            // hunting grounds (4)
+            Rect huntingGroundsTitleRect = new Rect( cur.x, cur.y, colWidth - 2 * _margin, _entryHeight );
+            Utilities.Label( huntingGroundsTitleRect, "FMH.HuntingGrounds".Translate(), anchor: TextAnchor.MiddleLeft, lrMargin: _margin );
             cur.y += _entryHeight;
 
-            var huntingGroundsRect = new Rect( cur.x + _margin, cur.y, colWidth - 2 * _margin, _entryHeight );
+            Rect huntingGroundsRect = new Rect( cur.x + _margin, cur.y, colWidth - 2 * _margin, _entryHeight );
             AreaAllowedGUI.DoAllowedAreaSelectors( huntingGroundsRect, ref _selected.HuntingGrounds,
                                                    AllowedAreaMode.Humanlike );
             cur.y += _entryHeight;
@@ -137,18 +134,14 @@ namespace FM
             GUI.EndGroup();
 
             // animals.
-            Text.Anchor = TextAnchor.LowerLeft;
-            Text.Font = GameFont.Tiny;
-            Widgets.Label( colTitleRects[1], "FMH.Animals".Translate() );
-            Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.UpperLeft;
+            Utilities.Label( colTitleRects[1], "FMH.Animals".Translate(), lrMargin: _margin * 2, anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
 
             GUI.DrawTexture( colRects[1], Utilities.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[1] );
             cur = Vector2.zero;
 
             Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
-            var viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedAnimals.Count * _entryHeight );
+            Rect viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedAnimals.Count * _entryHeight );
             if ( viewRect.height > outRect.height )
             {
                 viewRect.width -= 16f;
@@ -161,7 +154,7 @@ namespace FM
             List< PawnKindDef > PawnKinds = new List< PawnKindDef >( _selected.AllowedAnimals.Keys );
 
             // toggle all
-            var toggleAllRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
+            Rect toggleAllRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Widgets.DrawAltRect( toggleAllRect );
             Dictionary< PawnKindDef, bool >.ValueCollection test = _selected.AllowedAnimals.Values;
             Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
@@ -182,11 +175,11 @@ namespace FM
             cur.y += _entryHeight;
 
             // toggle for each animal
-            var i = 1;
+            int i = 1;
 
             foreach ( PawnKindDef kind in PawnKinds )
             {
-                var toggleRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
+                Rect toggleRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
 
                 // highlight alternate rows
                 if ( i++ % 2 == 0 )
@@ -228,6 +221,9 @@ namespace FM
                     // inactivate job, remove from the stack.
                     Manager.Get.JobStack.Delete( _selected );
 
+                    // remove content from UI
+                    _selected = null;
+
                     // refresh source list
                     Refresh();
                 }
@@ -243,7 +239,7 @@ namespace FM
 
             // content
             float height = _leftRowHeight;
-            var scrollView = new Rect( 0f, 0f, rect.width, height );
+            Rect scrollView = new Rect( 0f, 0f, rect.width, height );
             if ( height > rect.height )
             {
                 scrollView.width -= 16f;
@@ -254,11 +250,11 @@ namespace FM
 
             GUI.BeginGroup( scrollContent );
             Vector2 cur = Vector2.zero;
-            var i = 0;
+            int i = 0;
 
             foreach ( ManagerJob_Hunting job in Jobs )
             {
-                var row = new Rect( 0f, cur.y, scrollContent.width, Utilities.ListEntryHeight );
+                Rect row = new Rect( 0f, cur.y, scrollContent.width, Utilities.ListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
                 if ( _selected == job )
                 {
@@ -288,7 +284,7 @@ namespace FM
             }
 
             // row for new job.
-            var newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.ListEntryHeight );
+            Rect newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.ListEntryHeight );
             Widgets.DrawHighlightIfMouseover( newRect );
 
             if ( i++ % 2 == 1 )
@@ -317,8 +313,8 @@ namespace FM
         public override void DoWindowContents( Rect canvas )
         {
             // set up rects
-            var leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
-            var contentCanvas = new Rect( leftRow.xMax + _margin, 0f, canvas.width - leftRow.width - _margin,
+            Rect leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
+            Rect contentCanvas = new Rect( leftRow.xMax + _margin, 0f, canvas.width - leftRow.width - _margin,
                                           canvas.height );
 
             // draw overview row

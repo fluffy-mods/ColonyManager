@@ -56,8 +56,8 @@ namespace FM
 
         public override void DoWindowContents( Rect canvas )
         {
-            var loadRect = new Rect( 0f, 0f, ( canvas.width - _margin ) * _loadAreaRatio, canvas.height );
-            var saveRect = new Rect( loadRect.xMax + _margin, 0f, canvas.width - _margin - loadRect.width, canvas.height );
+            Rect loadRect = new Rect( 0f, 0f, ( canvas.width - _margin ) * _loadAreaRatio, canvas.height );
+            Rect saveRect = new Rect( loadRect.xMax + _margin, 0f, canvas.width - _margin - loadRect.width, canvas.height );
             Widgets.DrawMenuSection( loadRect );
             Widgets.DrawMenuSection( saveRect );
 
@@ -92,7 +92,7 @@ namespace FM
         private string DefaultSaveName()
         {
             // TODO: actually check saves and find a new one rather than rely on random gen.
-            var i = 1;
+            int i = 1;
             string name = _saveNameBase + i;
             while ( SaveExists( name ) )
             {
@@ -138,7 +138,7 @@ namespace FM
             {
                 // load stuff
                 Scribe.InitLoading( _folder + "/" + file.FileInfo.Name );
-                Manager.Mode = Manager.Modes.ImportExport;
+                Manager.LoadSaveMode = Manager.Modes.ImportExport;
                 ScribeHeaderUtility.LoadGameDataHeader( ScribeHeaderUtility.ScribeHeaderMode.Map );
                 Scribe.EnterNode( "JobStack" );
                 _jobStackIO.ExposeData();
@@ -154,7 +154,7 @@ namespace FM
                 Manager.Get.NewJobStack( _jobStackIO );
 
                 // remove invalid jobs
-                var invalid = 0;
+                int invalid = 0;
                 foreach ( ManagerJob job in Manager.Get.JobStack.FullStack() )
                 {
                     if ( !job.IsValid )
@@ -179,7 +179,7 @@ namespace FM
             {
                 // done?
                 Scribe.mode = LoadSaveMode.Inactive;
-                Manager.Mode = Manager.Modes.Normal;
+                Manager.LoadSaveMode = Manager.Modes.Normal;
                 Messages.Message( "FM.JobsImported".Translate( _jobStackIO.FullStack().Count ), MessageSound.Standard );
                 Refresh();
             }
@@ -193,9 +193,9 @@ namespace FM
             Rect nameRect = rect.AtZero();
             nameRect.width -= 200f + _iconSize + 4 * _margin;
             nameRect.xMin += _margin;
-            var timeRect = new Rect( nameRect.xMax + _margin, 0f, 100f, rect.height );
-            var buttonRect = new Rect( timeRect.xMax + _margin, 1f, 100f, rect.height - 2f );
-            var deleteRect = new Rect( buttonRect.xMax + _margin, ( rect.height - _iconSize ) / 2, _iconSize, _iconSize );
+            Rect timeRect = new Rect( nameRect.xMax + _margin, 0f, 100f, rect.height );
+            Rect buttonRect = new Rect( timeRect.xMax + _margin, 1f, 100f, rect.height - 2f );
+            Rect deleteRect = new Rect( buttonRect.xMax + _margin, ( rect.height - _iconSize ) / 2, _iconSize, _iconSize );
 
             // name
             Text.Anchor = TextAnchor.MiddleLeft;
@@ -245,10 +245,10 @@ namespace FM
                 try
                 {
                     // TODO: Scrollable
-                    var i = 1;
+                    int i = 1;
                     foreach ( SaveFileInfo file in _saveFiles )
                     {
-                        var row = new Rect( 0f, cur.y, rect.width, _rowHeight );
+                        Rect row = new Rect( 0f, cur.y, rect.width, _rowHeight );
                         if ( i++ % 2 == 0 )
                         {
                             Widgets.DrawAltRect( row );
@@ -267,12 +267,12 @@ namespace FM
 
         private void DrawSaveSection( Rect rect )
         {
-            var infoRect = new Rect( rect.ContractedBy( _margin ) );
+            Rect infoRect = new Rect( rect.ContractedBy( _margin ) );
             infoRect.height -= 30f + _margin;
-            var nameRect = new Rect( rect.xMin + _margin, infoRect.yMax, ( rect.width - 3 * _margin ) / 2, 30f );
-            var buttonRect = new Rect( nameRect.xMax + _margin, infoRect.yMax, nameRect.width, 30f );
+            Rect nameRect = new Rect( rect.xMin + _margin, infoRect.yMax, ( rect.width - 3 * _margin ) / 2, 30f );
+            Rect buttonRect = new Rect( nameRect.xMax + _margin, infoRect.yMax, nameRect.width, 30f );
 
-            var info = new StringBuilder();
+            StringBuilder info = new StringBuilder();
             info.AppendLine( "FM.CurrentJobs".Translate() );
             foreach ( Pair< string, int > jobCount in _jobCounts )
             {
@@ -311,7 +311,7 @@ namespace FM
 
         private List< SaveFileInfo > GetSavedFilesList()
         {
-            var directoryInfo = new DirectoryInfo( _folder );
+            DirectoryInfo directoryInfo = new DirectoryInfo( _folder );
 
             // raw files
             IOrderedEnumerable< FileInfo > files = from f in directoryInfo.GetFiles()

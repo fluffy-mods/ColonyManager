@@ -22,17 +22,17 @@ namespace FM
 
         public override void DoWindowContents( Rect inRect )
         {
-            var filterRect = new Rect( inRect.ContractedBy( 6f ) );
-            filterRect.height -= 30f;
-            var filterUi = new ThingFilterUiSearchable();
-            filterUi.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter, null, 4 );
-            var buttonRect = new Rect( filterRect.xMin, filterRect.yMax + 3, ( filterRect.width - 6 ) / 2, 25f );
+            Rect filterRect        = new Rect( inRect.ContractedBy( 6f ) );
+            filterRect.height     -= 30f;
+            ThingFilterUI filterUI = new ThingFilterUI();
+            filterUI.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter, null, 4 );
+            Rect buttonRect        = new Rect( filterRect.xMin, filterRect.yMax + 3, ( filterRect.width - 6 ) / 2, 25f );
             if ( Widgets.TextButton( buttonRect, Trigger.OpString ) )
             {
                 List< FloatMenuOption > list = new List< FloatMenuOption >
                 {
-                    new FloatMenuOption( "Lower than", delegate { Trigger.Op = Trigger_Threshold.Ops.LowerThan; } ),
-                    new FloatMenuOption( "Equal to", delegate { Trigger.Op = Trigger_Threshold.Ops.Equals; } ),
+                    new FloatMenuOption( "Lower than",   delegate { Trigger.Op = Trigger_Threshold.Ops.LowerThan; } ),
+                    new FloatMenuOption( "Equal to",     delegate { Trigger.Op = Trigger_Threshold.Ops.Equals; } ),
                     new FloatMenuOption( "Greater than", delegate { Trigger.Op = Trigger_Threshold.Ops.HigherThan; } )
                 };
                 Find.WindowStack.Add( new FloatMenu( list ) );

@@ -15,13 +15,32 @@ namespace FM
     public static class Utilities
     {
         // globals
-        public const float Margin = 6f;
-
-        public const float ListEntryHeight = 50f;
-        public static Texture2D SlightlyDarkBackground = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .1f );
-        public static Texture2D DeleteX = ContentFinder< Texture2D >.Get( "UI/Buttons/Delete", true );
-
+        public const float Margin                                 = 6f;
+        public const float ListEntryHeight                        = 50f;
+        public static Texture2D SlightlyDarkBackground            = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .4f );
+        public static Texture2D DeleteX                           = ContentFinder< Texture2D >.Get( "UI/Buttons/Delete", true );
         public static Dictionary< ThingFilter, Cache > CountCache = new Dictionary< ThingFilter, Cache >();
+        public static WorkTypeDef WorkTypeDefOf_Managing          = DefDatabase<WorkTypeDef>.GetNamed("Managing");
+        public const float SliderHeight                           = 20f;
+
+        public static void Label( Rect rect, string label, string tooltip = null, TextAnchor anchor = TextAnchor.UpperLeft, float lrMargin = 0f, float tbMargin = 0f, GameFont font = GameFont.Small )
+        {
+            // apply margins
+            Rect labelRect = new Rect(rect.xMin + lrMargin, rect.yMin + tbMargin, rect.width - 2 * lrMargin, rect.height - 2 * tbMargin);
+            
+            // draw label with anchor - reset anchor
+            Text.Anchor = anchor;
+            Text.Font = font;
+            Widgets.Label( labelRect, label );
+            Text.Font = GameFont.Small;
+            Text.Anchor = TextAnchor.UpperLeft;
+
+            // if set, draw tooltip
+            if ( tooltip != null )
+            {
+                TooltipHandler.TipRegion(rect, tooltip);
+            }
+        }
 
         private static bool TryGetCached( ThingFilter filter, out int count )
         {
@@ -59,7 +78,7 @@ namespace FM
 
         public static int CountProducts( ThingFilter filter )
         {
-            var count = 0;
+            int count = 0;
             if ( filter != null &&
                  TryGetCached( filter, out count ) )
             {
@@ -135,16 +154,13 @@ namespace FM
         {
             // set up rects
             Rect labelRect = rect;
-            var checkRect = new Rect( rect.xMax - size - margin * 2, 0f, size, size );
+            Rect checkRect = new Rect( rect.xMax - size - margin * 2, 0f, size, size );
 
             // finetune rects
-            labelRect.xMin += margin;
             checkRect = checkRect.CenteredOnYIn( labelRect );
 
             // draw label
-            Text.Anchor = TextAnchor.MiddleLeft;
-            Widgets.Label( labelRect, label );
-            Text.Anchor = TextAnchor.UpperLeft;
+            Label(rect, label, null, TextAnchor.MiddleLeft, margin);
 
             // draw check
             if ( checkOn )
@@ -169,16 +185,13 @@ namespace FM
         {
             // set up rects
             Rect labelRect = rect;
-            var checkRect = new Rect( rect.xMax - size - margin * 2, 0f, size, size );
+            Rect checkRect = new Rect( rect.xMax - size - margin * 2, 0f, size, size );
 
             // finetune rects
-            labelRect.xMin += margin;
             checkRect = checkRect.CenteredOnYIn( labelRect );
 
             // draw label
-            Text.Anchor = TextAnchor.MiddleLeft;
-            Widgets.Label( labelRect, label );
-            Text.Anchor = TextAnchor.UpperLeft;
+            Label( rect, label, null, TextAnchor.MiddleLeft, margin );
 
             // draw check
             if ( checkOn )

@@ -107,7 +107,7 @@ namespace FM
         private void CleanPriorities()
         {
             List< ManagerJob > orderedStack = _stack.OrderBy( mj => mj.Priority ).ToList();
-            for ( var i = 1; i <= _stack.Count; i++ )
+            for ( int i = 1; i <= _stack.Count; i++ )
             {
                 orderedStack[i - 1].Priority = i;
             }
@@ -157,7 +157,7 @@ namespace FM
             jobsOfType = jobsOfType.OrderBy( j => j.Priority ).ToList();
 
             // fill in priorities, making sure we don't affect other types.
-            for ( var i = 0; i < jobsOfType.Count; i++ )
+            for ( int i = 0; i < jobsOfType.Count; i++ )
             {
                 jobsOfType[i].Priority = priorities[i];
             }
@@ -176,7 +176,7 @@ namespace FM
             jobsOfType = jobsOfType.OrderBy( j => j.Priority ).ToList();
 
             // fill in priorities, making sure we don't affect other types.
-            for ( var i = 0; i < jobsOfType.Count; i++ )
+            for ( int i = 0; i < jobsOfType.Count; i++ )
             {
                 jobsOfType[i].Priority = priorities[i];
             }

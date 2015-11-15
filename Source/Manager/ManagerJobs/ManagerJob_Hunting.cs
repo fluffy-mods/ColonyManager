@@ -38,7 +38,7 @@ namespace FM
         
         public override string Label
         {
-            get { return "Hunting".Translate(); }
+            get { return "FMH.Hunting".Translate(); }
         }
 
         public override string[] Targets
@@ -58,13 +58,38 @@ namespace FM
         {
             // populate the trigger field, set the root category to meats and allow all but human meat.
             Trigger = new Trigger_Threshold( this );
-            Trigger.ThresholdFilter.DisplayRootCategory = new TreeNode_ThingCategory( Utilities_Hunting.RawMeat );
+            Trigger.ThresholdFilter.SetDisallowAll();
             Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
-
-            // Trigger.ThresholdFilter.exceptedThingDefs.Add( Utilities_Hunting.HumanMeat );
+            Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, false );
 
             // populate the list of animals from the animals in the biome - allow all by default.
             AllowedAnimals = Find.Map.Biome.AllWildAnimals.ToDictionary( pk => pk, v => true );
+        }
+
+        public override void ExposeData()
+        {
+            // scribe base things
+            base.ExposeData();
+
+            // settings
+            Scribe_References.LookReference( ref HuntingGrounds, "HuntingGrounds" );
+            Scribe_Collections.LookDictionary( ref AllowedAnimals, "AllowedAnimals", LookMode.DefReference, LookMode.Value );
+            // human meat is saved in trigger's thingfilter.
+            Scribe_Values.LookValue( ref UnforbidCorpses, "UnforbidCorpses", true );
+
+            // trigger
+            Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
+
+            if( Manager.LoadSaveMode == Manager.Modes.Normal )
+            {
+                // current designations
+                Scribe_Collections.LookList( ref Designations, "Designations", LookMode.MapReference );
+
+                // scribe history
+                Scribe_Deep.LookDeep( ref day, "histDay", _histSize );
+                Scribe_Deep.LookDeep( ref month, "histMonth", _histSize, History.Period.Month );
+                Scribe_Deep.LookDeep( ref year, "histYear", _histSize, History.Period.Year );
+            }
         }
 
         public override void CleanUp()
@@ -161,7 +186,7 @@ namespace FM
             }
             historyShown.DrawPlot( rect, Trigger.Count );
 
-            var switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
+            Rect switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
             Widgets.DrawHighlightIfMouseover( switchRect );
             if ( Widgets.ImageButton( switchRect, _cogTex ) )
             {
@@ -178,7 +203,7 @@ namespace FM
         public override bool TryDoJob()
         {
             // did we do any work?
-            var workDone = false;
+            bool workDone = false;
 
             // clean designations not in area
             CleanAreaDesignations();
@@ -200,7 +225,7 @@ namespace FM
             List< Pawn > huntableAnimals = GetHuntableAnimalsSorted();
 
             // while totalCount < count AND we have animals that can be designated, designate animal.
-            for ( var i = 0; i < huntableAnimals.Count && totalCount < Trigger.Count; i++ )
+            for ( int i = 0; i < huntableAnimals.Count && totalCount < Trigger.Count; i++ )
             {
                 AddDesignation( huntableAnimals[i] );
                 totalCount += huntableAnimals[i].EstimatedMeatCount();
@@ -229,7 +254,7 @@ namespace FM
         private void AddDesignation( Pawn p )
         {
             // create designation
-            var des = new Designation( p, DesignationDefOf.Hunt );
+            Designation des = new Designation( p, DesignationDefOf.Hunt );
 
             // add to game
             Find.DesignationManager.AddDesignation( des );
@@ -254,7 +279,7 @@ namespace FM
             else
             {
                 List< IntVec3 > homeCells = Find.AreaManager.Get< Area_Home >().ActiveCells.ToList();
-                for ( var i = 0; i < homeCells.Count(); i++ )
+                for ( int i = 0; i < homeCells.Count(); i++ )
                 {
                     position += homeCells[i];
                 }
@@ -296,7 +321,7 @@ namespace FM
         {
             foreach ( Thing current in Corpses )
             {
-                var corpse = current as Corpse;
+                Corpse corpse = current as Corpse;
 
                 // don't unforbid corpses in storage - we're going to assume they were manually set.
                 if ( corpse != null &&
@@ -304,7 +329,7 @@ namespace FM
                      corpse.IsForbidden( Faction.OfColony ) )
                 {
                     // only fresh corpses
-                    var comp = corpse.GetComp< CompRottable >();
+                    CompRottable comp = corpse.GetComp< CompRottable >();
                     if ( comp != null &&
                          comp.Stage == RotStage.Fresh )
                     {
@@ -320,24 +345,24 @@ namespace FM
         {
             // get current count + corpses in storage that is not a grave + designated count
             // current count in storage
-            var count = 0;
+            int count = 0;
 
             // corpses not buried / forbidden
             foreach ( Thing current in Corpses )
             {
                 // make sure it's a real corpse. (I dunno, poke it?)
                 // and that it's not forbidden (anymore) and can be reached.
-                var corpse = current as Corpse;
+                Corpse corpse = current as Corpse;
                 if ( corpse != null &&
                      !corpse.IsForbidden( Faction.OfColony ) &&
                      corpse.Position.CanReachColony() )
                 {
                     // check to see if it's buried.
-                    var buried = false;
+                    bool buried = false;
                     SlotGroup slotGroup = Find.SlotGroupManager.SlotGroupAt( corpse.Position );
                     if ( slotGroup != null )
                     {
-                        var building_Storage = slotGroup.parent as Building_Storage;
+                        Building_Storage building_Storage = slotGroup.parent as Building_Storage;
 
                         // Sarcophagus inherits grave, here's to hoping Ty and modders stick to that in the future.
                         if ( building_Storage != null &&
@@ -359,14 +384,14 @@ namespace FM
 
         public int GetMeatInDesignations()
         {
-            var count = 0;
+            int count = 0;
 
             // designated animals
             foreach ( Designation des in Find.DesignationManager.DesignationsOfDef( DesignationDefOf.Hunt ) )
             {
                 // make sure target is a pawn, is an animal, is not forbidden and somebody can reach it.
                 // note: could be rolled into a fancy LINQ chain, but this is probably clearer.
-                var target = des.target.Thing as Pawn;
+                Pawn target = des.target.Thing as Pawn;
                 if ( target != null &&
                      target.RaceProps.Animal &&
                      !target.IsForbidden( Faction.OfColony ) &&
@@ -378,6 +403,8 @@ namespace FM
 
             return count;
         }
+
+        public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Hunting;
 
         public override void Tick()
         {

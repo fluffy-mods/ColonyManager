@@ -15,26 +15,56 @@ namespace FM
 {
     public class ManagerJob_Forestry : ManagerJob
     {
-        private static int _histSize = 100;
-        private readonly float _margin = Utilities.Margin;
-        private Texture2D _cogTex = ContentFinder< Texture2D >.Get( "UI/Buttons/Cog" );
-        public Dictionary< ThingDef, bool > AllowedTrees = new Dictionary< ThingDef, bool >();
-        public bool AllowSaplings = false;
-        public bool ClearWindCells = true;
-        public History day = new History( _histSize );
-        public List< Designation > Designations = new List< Designation >();
+        private static int _histSize                     = 100;
+        private readonly float _margin                   = Utilities.Margin;
+        private Texture2D _cogTex                        = ContentFinder< Texture2D >.Get( "UI/Buttons/Cog" );
+
+        public Area LoggingArea                          = null;
+        public Dictionary< ThingDef, bool > AllowedTrees;
+        public bool AllowSaplings                        = false;
+        public bool ClearWindCells                       = true;
+        public List< Designation > Designations          = new List< Designation >();
+        public new Trigger_Threshold Trigger;
 
         public History historyShown;
-
-        public Area LoggingArea = null;
-        public History month = new History( _histSize, History.Period.Month );
-        public new Trigger_Threshold Trigger;
-        public History year = new History( _histSize, History.Period.Year );
+        public History day                               = new History( _histSize );
+        public History month                             = new History( _histSize, History.Period.Month );
+        public History year                              = new History( _histSize, History.Period.Year );
 
         public override string Label
         {
             get { return "FMF.Forestry".Translate(); }
         }
+
+        #region Overrides of ManagerJob
+
+        public override void ExposeData()
+        {
+            // scribe base things
+            base.ExposeData();
+            
+            // settings
+            Scribe_References.LookReference(ref LoggingArea, "LoggingArea");
+            Scribe_Collections.LookDictionary(ref AllowedTrees, "AllowedTrees", LookMode.DefReference, LookMode.Value);
+            Scribe_Values.LookValue(ref AllowSaplings, "AllowSaplings", false);
+            Scribe_Values.LookValue(ref ClearWindCells, "ClearWindCells", true);
+
+            // trigger
+            Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
+
+            if ( Manager.LoadSaveMode == Manager.Modes.Normal )
+            {
+                // current designations
+                Scribe_Collections.LookList(ref Designations, "Designations", LookMode.MapReference);
+
+                // scribe history
+                Scribe_Deep.LookDeep( ref day, "histDay", _histSize );
+                Scribe_Deep.LookDeep( ref month, "histMonth", _histSize, History.Period.Month );
+                Scribe_Deep.LookDeep( ref year, "histYear", _histSize, History.Period.Year );
+            }
+        }
+
+        #endregion
 
         public override ManagerTab Tab
         {
@@ -53,12 +83,11 @@ namespace FM
         {
             // populate the trigger field, set the root category to meats and allow all but human meat.
             Trigger = new Trigger_Threshold( this );
-            Trigger.ThresholdFilter.DisplayRootCategory = new TreeNode_ThingCategory( Utilities_Hunting.RawMeat );
-            Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
-
-            // Trigger.ThresholdFilter.exceptedThingDefs.Add( Utilities_Hunting.HumanMeat );
-
-            // populate the list of animals from the animals in the biome - allow all by default.
+            Trigger.ThresholdFilter.SetDisallowAll();
+            Trigger.ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
+            
+            // populate the list of trees from the plants in the biome - allow all by default.
+            // A tree is defined as any plant that yields wood
             AllowedTrees =
                 Find.Map.Biome.AllWildPlants.Where( pd => pd.plant.harvestedThingDef == Utilities_Forestry.Wood )
                     .ToDictionary( pk => pk, v => true );
@@ -86,9 +115,9 @@ namespace FM
         public void CleanDesignations()
         {
             // get the intersection of bills in the game and bills in our list.
-            List< Designation > GameDesignations =
+            List< Designation > gameDesignations =
                 Find.DesignationManager.DesignationsOfDef( DesignationDefOf.HarvestPlant ).ToList();
-            Designations = Designations.Intersect( GameDesignations ).ToList();
+            Designations = Designations.Intersect( gameDesignations ).ToList();
         }
 
         public override void CleanUp()
@@ -123,7 +152,7 @@ namespace FM
                                             rect.height - 2 * _margin );
 
             string text = Label + "\n<i>" +
-                          ( Targets.Count() < 4 ? string.Join( ", ", Targets ) : "<multiple>" )
+                          ( Targets.Length < 4 ? string.Join( ", ", Targets ) : "<multiple>" )
                           + "</i>";
 
 #if DEBUG
@@ -152,7 +181,7 @@ namespace FM
                     TooltipHandler.TipRegion( lastUpdateRect,
                                               "FM.LastUpdateTooltip".Translate(
                                                   ( Find.TickManager.TicksGame - LastAction ).TimeString() ) );
-                    if ( !( Targets.Count() < 4 ) )
+                    if ( !( Targets.Length < 4 ) )
                     {
                         TooltipHandler.TipRegion( labelRect, string.Join( ", ", Targets ) );
                     }
@@ -175,7 +204,7 @@ namespace FM
             }
             historyShown.DrawPlot( rect, Trigger.Count );
 
-            var switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
+            Rect switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
             Widgets.DrawHighlightIfMouseover( switchRect );
             if ( Widgets.ImageButton( switchRect, _cogTex ) )
             {
@@ -189,10 +218,12 @@ namespace FM
             }
         }
 
+        public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.PlantCutting;
+
         public override bool TryDoJob()
         {
             // keep track if any actual work was done.
-            var workDone = false;
+            bool workDone = false;
 
             // remove designations not in zone.
             if ( LoggingArea != null )
@@ -216,7 +247,7 @@ namespace FM
             List< Plant > trees = GetLoggableTreesSorted();
 
             // designate untill we're either out of trees or we have enough designated.
-            for ( var i = 0; i < trees.Count && count < Trigger.Count; i++ )
+            for ( int i = 0; i < trees.Count && count < Trigger.Count; i++ )
             {
                 workDone = true;
                 AddDesignation( trees[i], DesignationDefOf.HarvestPlant );
@@ -229,7 +260,7 @@ namespace FM
         private void AddDesignation( Plant p, DesignationDef def = null )
         {
             // create designation
-            var des = new Designation( p, def );
+            Designation des = new Designation( p, def );
 
             // add to game
             Find.DesignationManager.AddDesignation( des );
@@ -296,7 +327,7 @@ namespace FM
             else
             {
                 List< IntVec3 > homeCells = Find.AreaManager.Get< Area_Home >().ActiveCells.ToList();
-                for ( var i = 0; i < homeCells.Count(); i++ )
+                for ( int i = 0; i < homeCells.Count; i++ )
                 {
                     position += homeCells[i];
                 }
@@ -307,26 +338,17 @@ namespace FM
 
             // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
             List< Plant > list = Find.ListerThings.AllThings.Where( p => p.def.plant != null
-                                                                         && p is Plant
-                                                                         && p.SpawnedInWorld
-
-                // non-biome trees won't be on the list
+                                                                         // non-biome trees won't be on the list
                                                                          && AllowedTrees.ContainsKey( p.def )
-
-                // also filters out non-tree plants
+                                                                         // also filters out non-tree plants
                                                                          && AllowedTrees[p.def]
-                                                                         &&
-                                                                         Find.DesignationManager.DesignationOn( p ) ==
-                                                                         null
-
-                // cut only fully matured trees.
-                                                                         &&
-                                                                         ( AllowSaplings ||
-                                                                           ( (Plant)p ).LifeStage ==
-                                                                           PlantLifeStage.Mature )
-                                                                         &&
-                                                                         ( LoggingArea == null ||
-                                                                           LoggingArea.ActiveCells.Contains( p.Position ) )
+                                                                         && p.SpawnedInWorld
+                                                                         && Find.DesignationManager.DesignationOn( p ) == null
+                                                                         // cut only mature trees, or saplings that yield wood.
+                                                                         && ( ( AllowSaplings && ((Plant)p).YieldNow() > 1) 
+                                                                            || ( (Plant)p ).LifeStage == PlantLifeStage.Mature )
+                                                                         && ( LoggingArea == null 
+                                                                            || LoggingArea.ActiveCells.Contains( p.Position ) )
                                                                          && p.Position.CanReachColony() )
 
                 // OrderBy defaults to ascending, switch sign on current yield to get descending
@@ -347,14 +369,14 @@ namespace FM
 
         public int GetWoodInDesignations()
         {
-            var count = 0;
+            int count = 0;
 
             foreach ( Designation des in Designations )
             {
                 if ( des.target.HasThing &&
                      des.target.Thing is Plant )
                 {
-                    var plant = des.target.Thing as Plant;
+                    Plant plant = des.target.Thing as Plant;
                     count += plant.YieldNow();
                 }
             }

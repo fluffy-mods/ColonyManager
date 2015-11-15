@@ -45,12 +45,15 @@ namespace FM
 
         public override void DoWindowContents( Rect canvas )
         {
+            // zooming in seems to cause Text.Font to start at Tiny, make sure it's set to Small for our panels.
+            Text.Font = GameFont.Small;
+
             // three areas of icons for tabs, left middle and right.
-            var leftIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsLeft.Count * ( _iconSize + _margin ),
+            Rect leftIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsLeft.Count * ( _iconSize + _margin ),
                                       _iconSize );
-            var middleIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsMiddle.Count * ( _iconSize + _margin ),
+            Rect middleIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsMiddle.Count * ( _iconSize + _margin ),
                                         _iconSize );
-            var rightIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsRight.Count * ( _iconSize + _margin ),
+            Rect rightIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsRight.Count * ( _iconSize + _margin ),
                                        _iconSize );
 
             // finetune rects
@@ -59,10 +62,10 @@ namespace FM
 
             // left icons (probably only overview, but hey...)
             GUI.BeginGroup( leftIcons );
-            var cur = new Vector2( _margin, 0f );
+            Vector2 cur = new Vector2( _margin, 0f );
             foreach ( ManagerTab tab in Manager.Get.ManagerTabsLeft )
             {
-                var iconRect = new Rect( cur.x, cur.y, _iconSize, _iconSize );
+                Rect iconRect = new Rect( cur.x, cur.y, _iconSize, _iconSize );
                 DrawTabIcon( iconRect, tab );
                 cur.x += _iconSize + _margin;
             }
@@ -73,7 +76,7 @@ namespace FM
             cur = new Vector2( _margin, 0f );
             foreach ( ManagerTab tab in Manager.Get.ManagerTabsMiddle )
             {
-                var iconRect = new Rect( cur.x, cur.y, _iconSize, _iconSize );
+                Rect iconRect = new Rect( cur.x, cur.y, _iconSize, _iconSize );
                 DrawTabIcon( iconRect, tab );
                 cur.x += _iconSize + _margin;
             }
@@ -84,14 +87,14 @@ namespace FM
             cur = new Vector2( _margin, 0f );
             foreach ( ManagerTab tab in Manager.Get.ManagerTabsRight )
             {
-                var iconRect = new Rect( cur.x, cur.y, _iconSize, _iconSize );
+                Rect iconRect = new Rect( cur.x, cur.y, _iconSize, _iconSize );
                 DrawTabIcon( iconRect, tab );
                 cur.x += _iconSize + _margin;
             }
             GUI.EndGroup();
 
             // delegate actual content to the specific manager.
-            var contentCanvas = new Rect( 0f, _iconSize + _margin, canvas.width, canvas.height - _iconSize - _margin );
+            Rect contentCanvas = new Rect( 0f, _iconSize + _margin, canvas.width, canvas.height - _iconSize - _margin );
             GUI.BeginGroup( contentCanvas );
             CurrentTab.DoWindowContents( contentCanvas );
             GUI.EndGroup();

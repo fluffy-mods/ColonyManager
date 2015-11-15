@@ -5,6 +5,7 @@
 // Created 2015-11-04 19:29
 
 using System.Text;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -19,7 +20,11 @@ namespace FM
         public int LastAction;
         public int Priority;
 
-        public virtual bool Active { get; set; } = false;
+        private bool _active;
+        public virtual bool Active {
+            get { return _active; }
+            set { _active = value; }
+        }
 
         public virtual bool IsValid
         {
@@ -33,7 +38,7 @@ namespace FM
         public abstract ManagerTab Tab { get; }
 
         public abstract string[] Targets { get; }
-        public Trigger Trigger { get; set; }
+        public Trigger Trigger;
 
         public virtual void ExposeData()
         {
@@ -55,68 +60,19 @@ namespace FM
             Manager.Get.JobStack.Delete( this );
         }
 
-        public virtual void DrawListEntry( Rect rect, bool overview = true, bool active = true )
-        {
-            // (detailButton) | name | bar | last update
-
-            Rect labelRect = new Rect( Utilities.Margin, Utilities.Margin,
-                                       rect.width -
-                                       ( active
-                                           ? _lastUpdateRectWidth + _progressRectWidth + 4 * Utilities.Margin
-                                           : 2 * Utilities.Margin ),
-                                       rect.height - 2 * Utilities.Margin ),
-                 progressRect = new Rect( labelRect.xMax + Utilities.Margin, Utilities.Margin,
-                                          _progressRectWidth,
-                                          rect.height - 2 * Utilities.Margin ),
-                 lastUpdateRect = new Rect( progressRect.xMax + Utilities.Margin, Utilities.Margin,
-                                            _lastUpdateRectWidth,
-                                            rect.height - 2 * Utilities.Margin );
-
-            string text = Label;
-            if ( Targets != null )
-            {
-                text += "\n<i>" + string.Join( ", ", Targets ) + "</i>";
-            }
-
-            GUI.BeginGroup( rect );
-            try
-            {
-                Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label( labelRect, text );
-
-                // if the bill has a manager job, give some more info.
-                if ( active )
-                {
-                    // draw progress bar
-                    if ( Trigger != null )
-                    {
-                        Trigger.DrawProgressBar( progressRect, Suspended );
-                    }
-
-                    // draw time since last action
-                    Text.Anchor = TextAnchor.MiddleCenter;
-                    Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - LastAction ).TimeString() );
-                    TooltipHandler.TipRegion( lastUpdateRect,
-                                              "FM.LastUpdateTooltip".Translate(
-                                                  ( Find.TickManager.TicksGame - LastAction ).TimeString() ) );
-                }
-            }
-            finally
-            {
-                // make sure everything is always properly closed / reset to defaults.
-                GUI.color = Color.white;
-                Text.Anchor = TextAnchor.UpperLeft;
-                GUI.EndGroup();
-            }
-        }
+        public abstract void DrawListEntry( Rect rect, bool overview = true, bool active = true );
 
         public abstract void DrawOverviewDetails( Rect rect );
+
+        public virtual SkillDef SkillDef { get; } = null;
+
+        public abstract WorkTypeDef WorkTypeDef { get; }
 
         public virtual void Tick() {}
 
         public override string ToString()
         {
-            var s = new StringBuilder();
+            StringBuilder s = new StringBuilder();
             s.AppendLine( "Priority: " + Priority );
             s.AppendLine( "Active: " + Suspended );
             s.AppendLine( "LastAction: " + LastAction );
@@ -129,6 +85,11 @@ namespace FM
         {
             LastAction = Find.TickManager.TicksGame;
         }
+    }
+
+    public interface IThreshold
+    {
+        
     }
 
     internal interface IManagerJob

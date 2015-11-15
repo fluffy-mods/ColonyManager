@@ -20,7 +20,7 @@ namespace FM
             Normal
         }
 
-        public static Modes Mode = Modes.Normal;
+        public static Modes LoadSaveMode = Modes.Normal;
 
         private List< ManagerTab > _managerTabsLeft;
         private List< ManagerTab > _managerTabsMiddle;

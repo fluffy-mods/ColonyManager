@@ -18,6 +18,6 @@ namespace FM
 
         public virtual void DrawProgressBar( Rect progressRect, bool active ) {}
 
-        public abstract void DrawThresholdConfig( ref Listing_Standard listing );
+        public abstract void DrawThresholdConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false );
     }
 }

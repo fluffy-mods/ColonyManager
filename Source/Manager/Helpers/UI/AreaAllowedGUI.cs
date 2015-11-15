@@ -19,8 +19,8 @@ namespace FM
                                                    AllowedAreaMode mode = AllowedAreaMode.Humanlike )
         {
             List< Area > allAreas = Find.AreaManager.AllAreas;
-            var areaCount = 1;
-            for ( var i = 0; i < allAreas.Count; i++ )
+            int areaCount = 1;
+            for ( int i = 0; i < allAreas.Count; i++ )
             {
                 if ( allAreas[i].AssignableAsAllowed( mode ) )
                 {
@@ -30,15 +30,15 @@ namespace FM
             float widthPerArea = rect.width / areaCount;
             Text.WordWrap = false;
             Text.Font = GameFont.Tiny;
-            var nullAreaRect = new Rect( rect.x, rect.y, widthPerArea, rect.height );
+            Rect nullAreaRect = new Rect( rect.x, rect.y, widthPerArea, rect.height );
             DoAreaSelector( nullAreaRect, ref area, null );
-            var areaIndex = 1;
-            for ( var j = 0; j < allAreas.Count; j++ )
+            int areaIndex = 1;
+            for ( int j = 0; j < allAreas.Count; j++ )
             {
                 if ( allAreas[j].AssignableAsAllowed( mode ) )
                 {
                     float xOffset = areaIndex * widthPerArea;
-                    var areaRect = new Rect( rect.x + xOffset, rect.y, widthPerArea, rect.height );
+                    Rect areaRect = new Rect( rect.x + xOffset, rect.y, widthPerArea, rect.height );
                     DoAreaSelector( areaRect, ref area, allAreas[j] );
                     areaIndex++;
                 }

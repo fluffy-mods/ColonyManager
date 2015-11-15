@@ -8,6 +8,7 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace FM
@@ -39,7 +40,7 @@ namespace FM
         public Area AreaRestriction;
 
         /// <summary>
-        ///     Assignment Mode for billgivers
+        ///     Assignment LoadSaveMode for billgivers
         /// </summary>
         public AssignedBillGiverOptions BillGiverSelection = AssignedBillGiverOptions.All;
 
@@ -49,7 +50,7 @@ namespace FM
         public List< Building_WorkTable > SpecificBillGivers;
 
         /// <summary>
-        ///     User requested billgiver count, when using count assignment Mode.
+        ///     User requested billgiver count, when using count assignment LoadSaveMode.
         /// </summary>
         public int UserBillGiverCount;
 
@@ -126,9 +127,9 @@ namespace FM
             {
                 if ( !_assignedBillGiversInitialized )
                 {
-                    var error = false;
+                    bool error = false;
                     _assignedBills = new Dictionary< Bill_Production, Building_WorkTable >();
-                    for ( var i = 0; i < _assignedBillsScribeID.Count; i++ )
+                    for ( int i = 0; i < _assignedBillsScribeID.Count; i++ )
                     {
 #if DEBUG_SCRIBE
                         Log.Message( "Trying to find " + _assignedWorkersScribeID[i] + " | " + _assignedBillsScribeID[i] );
@@ -197,7 +198,7 @@ namespace FM
         {
             get
             {
-                var window = new WindowBillGiverDetails
+                WindowBillGiverDetails window = new WindowBillGiverDetails
                 {
                     Job = _job,
                     closeOnClickedOutside = true,
@@ -242,29 +243,27 @@ namespace FM
         /// <summary>
         ///     Draw billgivers info + details button
         /// </summary>
-        /// <param name="listing"></param>
-        public void DrawBillGiverConfig( ref Listing_Standard listing )
+        public void DrawBillGiverConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false )
         {
-            listing.DoGap( 24f );
+            // target threshold
+            string potentialString  = string.Join( "\n", GetPotentialBillGivers.Select( b => b.LabelCap ).ToArray() );
+            string selectedString   = string.Join( "\n", GetSelectedBillGivers.Select( b => b.LabelCap ).ToArray() );
+            string assignedString   = string.Join( "\n", GetAssignedBillGivers.Select( b => b.LabelCap ).ToArray() );
+            string billgiverTooltip = "FMP.BillGiversTooltip".Translate( potentialString, selectedString, assignedString );
 
-            // workstation info
-            listing.DoLabel( "FMP.BillGivers".Translate() );
-            listing.DoLabel( "FMP.BillGiversCount".Translate( GetPotentialBillGivers.Count, GetSelectedBillGivers.Count,
-                                                              GetAssignedBillGivers.Count ) );
-
-            string potentialString = string.Join( "\n", GetPotentialBillGivers.Select( b => b.LabelCap ).ToArray() );
-            string assignedString = string.Join( "\n", GetSelectedBillGivers.Select( b => b.LabelCap ).ToArray() );
-            // ReSharper disable once UnusedVariable
-            string stationsTooltip = "FMP.BillGiversTooltip".Translate( potentialString, assignedString );
-
-            // todo, fix that tooltip. Possible?
-            // TooltipHandler.TipRegion(stations, stationsTooltip);
-
-            // workstation selector
-            if ( listing.DoTextButton( "FMP.BillGiversDetails".Translate() ) )
+            Rect billgiverLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
+            if (alt) Widgets.DrawAltRect(billgiverLabelRect);
+            Widgets.DrawHighlightIfMouseover(billgiverLabelRect);
+            Utilities.Label( billgiverLabelRect,
+                             "FMP.BillGiversCount".Translate( GetPotentialBillGivers.Count, GetSelectedBillGivers.Count, GetAssignedBillGivers.Count ),
+                             billgiverTooltip,
+                             TextAnchor.MiddleLeft,
+                             Utilities.Margin );
+            if ( Widgets.InvisibleButton( billgiverLabelRect ) )
             {
                 Find.WindowStack.Add( DetailsWindow );
             }
+            cur.y += entryHeight;
         }
     }
 }

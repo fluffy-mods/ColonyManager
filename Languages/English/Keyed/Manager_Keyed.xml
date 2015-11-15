@@ -38,11 +38,20 @@
   <FMH.HuntingGrounds>Allow hunting in:</FMH.HuntingGrounds>
   <FMH.Options>Options</FMH.Options>
   <FMH.Animals>Allowed animals</FMH.Animals>
-  <FMH.TargetCount>Target count ({3}):</FMH.TargetCount>
-  <FMH.TargetCountTooltip>Target: {3}\n{0} in storage, {1} expected from butchery, {2} expected from current designations.</FMH.TargetCountTooltip>
+  <FMH.TargetCount>Target count: {0}+{1}+{2}/{3}</FMH.TargetCount>
+  <FMH.TargetCountTooltip>Target: {3}\n{0} in storage\n{1} expected from butchery\n{2} expected from current designations.</FMH.TargetCountTooltip>
 
   <!-- Forestry Tab -->
   <FMF.Forestry>Forestry</FMF.Forestry>
+  <FMF.NewForestryJob>New job</FMF.NewForestryJob>
+  <FMF.NewForestryJobTooltip>Create a new forestry job</FMF.NewForestryJobTooltip>
+  <FMF.Options>Options</FMF.Options>
+  <FMF.Trees>Allowed trees</FMF.Trees>
+  <FMF.ClearWindCells>Clear wind turbine cells</FMF.ClearWindCells>
+  <FMF.AllowSaplings>Allow cutting non-mature trees</FMF.AllowSaplings>
+  <FMF.LoggingArea>Alllow logging in:</FMF.LoggingArea>
+  <FMF.TargetCount>Target count: {0}+{1}+{2}/{3}</FMF.TargetCount>
+  <FMF.TargetCountTooltip>Target: {3}\n{0} in storage\n{1} waiting for hauling\n{2} expected from current designations.</FMF.TargetCountTooltip>
 
   <!-- Production Tab -->
   <!-- Miscelaneous -->
@@ -51,19 +60,22 @@
   <FMP.DeleteBillTooltip>Stop managing this bill, and clean up outstanding bills</FMP.DeleteBillTooltip>
   <FMP.FilterDesc>Type a few letters to filter the list</FMP.FilterDesc>
   <FMP.ClearFilterDesc>Clear the current filter</FMP.ClearFilterDesc>
-  <FMP.MainProduct>Main product: {0} ({1})</FMP.MainProduct>
+  <FMP.MainProduct>Main product: {0} x{1}</FMP.MainProduct>
   <FMP.NoThreshold>No threshold</FMP.NoThreshold>
   <FMP.NoThresholdTooltip>No threshold set</FMP.NoThresholdTooltip>
+  <FMP.SnapToHighestSkill>Restrict to highest skilled colonist(s)</FMP.SnapToHighestSkill>
+  <FMP.Options>Options</FMP.Options>
+  <FMP.Bill>Bill</FMP.Bill>
+  <FMP.AllowedIngredients>Allowed ingredients:</FMP.AllowedIngredients>
 
   <!-- Thresholds -->
-  <FMP.Threshold>Threshold</FMP.Threshold>
-  <FMP.ThresholdCount>Current: {0}, target: {1}</FMP.ThresholdCount>
+  <FMP.ThresholdCount>Threshold: {0}/{1}</FMP.ThresholdCount>
+  <FMP.ThresholdCountTooltip>Click to open threshold details.\n\nTarget: {1}\nIn production: {0}</FMP.ThresholdCountTooltip>
   <FMP.ThresholdDetails>Theshold details</FMP.ThresholdDetails>
 
   <!-- BillGivers -->
-  <FMP.BillGivers>Workstations</FMP.BillGivers>
-  <FMP.BillGiversCount>{0} available, {1} selected, {2} assigned.</FMP.BillGiversCount>
-  <FMP.BillGiversTooltip>Available:\n{0}\n\nSelected:{1}</FMP.BillGiversTooltip>
+  <FMP.BillGiversCount>Workstations ({0}/{1}/{2})</FMP.BillGiversCount>
+  <FMP.BillGiversTooltip>Click to change selected billgivers.\n\nAvailable:\n{0}\n\nSelected:\n{1}\n\nAssigned:\n{2}</FMP.BillGiversTooltip>
   <FMP.BillGiversDetails>Select workstations</FMP.BillGiversDetails>
 
   <!-- BillGiversDetailsWindow -->

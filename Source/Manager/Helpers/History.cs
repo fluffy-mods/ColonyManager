@@ -13,7 +13,7 @@ using Verse;
 
 namespace FM
 {
-    public class History
+    public class History : IExposable
     {
         // types
         public enum Period
@@ -75,7 +75,13 @@ namespace FM
         // main cache
         public int Size { get; set; }
 
-        public History( int size, Period period = Period.Day )
+        public History( int size )
+        {
+            Size = size;
+            _period = Period.Day;
+        }
+
+        public History( int size, Period period )
         {
             Size = size;
             _period = period;
@@ -109,17 +115,17 @@ namespace FM
             GUI.BeginGroup( plot );
             if ( _hist.Count > 1 )
             {
-                for ( var i = 0; i < _hist.Count - 1; i++ ) // line segments, so up till n-1
+                for ( int i = 0; i < _hist.Count - 1; i++ ) // line segments, so up till n-1
                 {
-                    var start = new Vector2( wu * i, h - hu * _hist[i] );
-                    var end = new Vector2( wu * ( i + 1 ), h - hu * _hist[i + 1] );
+                    Vector2 start = new Vector2( wu * i, h - hu * _hist[i] );
+                    Vector2 end = new Vector2( wu * ( i + 1 ), h - hu * _hist[i + 1] );
                     Widgets.DrawLine( start, end, LineCol, 1f );
                 }
             }
 
             // draw target line
             GUI.color = Color.gray;
-            for ( var i = 0; i < plot.width / DashLength; i += 2 )
+            for ( int i = 0; i < plot.width / DashLength; i += 2 )
             {
                 Widgets.DrawLineHorizontal( i * DashLength, plot.height - target * hu, DashLength );
             }
@@ -131,10 +137,10 @@ namespace FM
             Text.Font = GameFont.Tiny;
 
             // draw ticks + labels
-            for ( var i = 1; i < Breaks + 1; i++ )
+            for ( int i = 1; i < Breaks + 1; i++ )
             {
                 Widgets.DrawLineHorizontal( _yAxisMargin + Margin / 2, plot.height - i * bu, Margin );
-                var labRect = new Rect( 0f, plot.height - i * bu - 4f, _yAxisMargin, 20f );
+                Rect labRect = new Rect( 0f, plot.height - i * bu - 4f, _yAxisMargin, 20f );
                 Widgets.Label( labRect, ( i * bi ).ToString() );
             }
 
@@ -143,5 +149,14 @@ namespace FM
             GUI.color = Color.white;
             GUI.EndGroup();
         }
+
+        #region Implementation of IExposable
+
+        public void ExposeData()
+        {
+            Scribe_Collections.LookList(ref _hist, "History", LookMode.Value);
+        }
+
+        #endregion
     }
 }

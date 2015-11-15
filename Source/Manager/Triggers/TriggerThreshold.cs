@@ -35,7 +35,7 @@ namespace FM
         {
             get
             {
-                var window = new WindowTriggerThresholdDetails
+                WindowTriggerThresholdDetails window = new WindowTriggerThresholdDetails
                 {
                     Trigger = this,
                     closeOnClickedOutside = true,
@@ -143,7 +143,7 @@ namespace FM
             // get the bar rect
             float barHeight = rect.height / max * CurCount;
             float markHeight = rect.height / max * Count;
-            var progressBarRect = new Rect( rect.xMin + 1f, rect.yMax - barHeight, 6f, barHeight );
+            Rect progressBarRect = new Rect( rect.xMin + 1f, rect.yMax - barHeight, 6f, barHeight );
 
             // draw a box for the bar
             GUI.color = Color.gray;
@@ -162,21 +162,27 @@ namespace FM
             TooltipHandler.TipRegion( rect, StatusTooltip );
         }
 
-        public override void DrawThresholdConfig( ref Listing_Standard listing )
+        public override void DrawThresholdConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false )
         {
             // target threshold
-            listing.DoGap( 24f );
-
-            listing.DoLabel( "FMP.Threshold".Translate() + ":" );
-            listing.DoLabel( "FMP.ThresholdCount".Translate( CurCount, Count ) );
-
-            // TODO: implement trade screen sliders - they're so pretty! :D
-            Count = Mathf.RoundToInt( listing.DoSlider( Count, 0, MaxUpperThreshold ) );
-            listing.DoGap( 6f );
-            if ( listing.DoTextButton( "FMP.ThresholdDetails".Translate() ) )
+            Rect thresholdLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
+            if (alt) Widgets.DrawAltRect(thresholdLabelRect);
+            Widgets.DrawHighlightIfMouseover(thresholdLabelRect);
+            Utilities.Label( thresholdLabelRect, 
+                             "FMP.ThresholdCount".Translate( CurCount, Count ) + ":",
+                             "FMP.ThresholdCountTooltip".Translate( CurCount, Count),
+                             TextAnchor.MiddleLeft,
+                             Utilities.Margin );
+            cur.y += entryHeight;
+            if ( Widgets.InvisibleButton( thresholdLabelRect ) )
             {
                 Find.WindowStack.Add( DetailsWindow );
             }
+
+            Rect thresholdRect = new Rect( cur.x, cur.y, width, Utilities.SliderHeight);
+            if( alt ) Widgets.DrawAltRect( thresholdRect );
+            Count = (int)GUI.HorizontalSlider( thresholdRect, Count, 0, MaxUpperThreshold );
+            cur.y += Utilities.SliderHeight;
         }
 
         public override void ExposeData()

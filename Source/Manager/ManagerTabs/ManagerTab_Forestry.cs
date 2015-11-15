@@ -13,15 +13,15 @@ namespace FM
 {
     internal class ManagerTab_Forestry : ManagerTab
     {
-        private const float EntryHeight = 30f;
-        private const float Margin = Utilities.Margin;
-        private static ManagerJob_Forestry _selected = new ManagerJob_Forestry();
-        private readonly float _topAreaHeight = 30f;
-        private Vector2 _animalsScrollPosition = Vector2.zero;
-        private Vector2 _button = new Vector2( 200f, 40f );
+        private const float                 EntryHeight                    = 30f;
+        private const float                 Margin                         = Utilities.Margin;
+        private static ManagerJob_Forestry  _selected                      = new ManagerJob_Forestry();
+        private readonly float              _topAreaHeight                 = 30f;
+        private Vector2                     _animalsScrollPosition         = Vector2.zero;
+        private Vector2                     _button                        = new Vector2( 200f, 40f );
         private List< ManagerJob_Forestry > _jobs;
-        private float _leftRowHeight = 9999f;
-        private Vector2 _scrollPosition = Vector2.zero;
+        private float                       _leftRowHeight                 = 9999f;
+        private Vector2                     _scrollPosition                = Vector2.zero;
 
         public override Texture2D Icon { get; } = ContentFinder< Texture2D >.Get( "UI/Icons/Tree" );
 
@@ -49,17 +49,17 @@ namespace FM
             Widgets.DrawMenuSection( rect );
 
             // some variables
-            float width = rect.width;
-            float height = rect.height - _topAreaHeight - _button.y - Margin;
-            var cols = 2;
-            float colWidth = width / cols - Margin;
-            List< Rect > colRects = new List< Rect >();
+            float width                = rect.width;
+            float height               = rect.height - _topAreaHeight - _button.y - Margin;
+            int cols                   = 2;
+            float colWidth             = width / cols - Margin;
+            List< Rect > colRects      = new List< Rect >();
             List< Rect > colTitleRects = new List< Rect >();
-            var buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - Margin,
+            Rect buttonRect             = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - Margin,
                                        _button.y - Margin );
 
             // set up rects
-            for ( var j = 0; j < cols; j++ )
+            for ( int j = 0; j < cols; j++ )
             {
                 colRects.Add( new Rect( j * colWidth + j * Margin + Margin / 2, _topAreaHeight, colWidth, height ) );
                 colTitleRects.Add( new Rect( j * colWidth + j * Margin + Margin * 2.5f, 0f, colWidth, _topAreaHeight ) );
@@ -82,40 +82,41 @@ namespace FM
             GUI.BeginGroup( colRects[0] );
             cur = Vector2.zero;
 
-            // target count
-            var targetCountTitleRect = new Rect( cur.x + Margin, cur.y, colWidth - 2 * Margin, EntryHeight );
-            int currentCount = _selected.Trigger.CurCount;
-            int corpseCount = _selected.GetWoodLyingAround();
-            int designatedCount = _selected.GetWoodInDesignations();
-            int targetCount = _selected.Trigger.Count;
-            Widgets.Label( targetCountTitleRect,
-                           "FMF.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ) );
-            TooltipHandler.TipRegion( targetCountTitleRect,
-                                      "FMF.TargetCountTooltip".Translate( currentCount, corpseCount, designatedCount,
-                                                                          targetCount ) );
+            // target count (1)
+            Rect targetCountTitleRect    = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            int currentCount             = _selected.Trigger.CurCount;
+            int toHaulCount              = _selected.GetWoodLyingAround();
+            int designatedCount          = _selected.GetWoodInDesignations();
+            int targetCount              = _selected.Trigger.Count;
+            Widgets.DrawAltRect( targetCountTitleRect );
+            Utilities.Label( targetCountTitleRect, 
+                             "FMF.TargetCount".Translate( currentCount, toHaulCount, designatedCount, targetCount ),
+                             "FMF.TargetCountTooltip".Translate( currentCount, toHaulCount, designatedCount, targetCount),
+                             TextAnchor.MiddleLeft, Margin);
             cur.y += EntryHeight;
 
-            var targetCountRect = new Rect( cur.x + Margin, cur.y, colWidth - 2 * Margin, EntryHeight );
-            GUI.skin.horizontalSlider.alignment = TextAnchor.MiddleCenter;
+            Rect targetCountRect = new Rect( cur.x, cur.y, colWidth, Utilities.SliderHeight );
+            Widgets.DrawAltRect(targetCountRect);
             _selected.Trigger.Count = (int)GUI.HorizontalSlider( targetCountRect, _selected.Trigger.Count, 0, 2000 );
-            cur.y += EntryHeight;
+            cur.y += Utilities.SliderHeight;
 
-            // Clear wind cells
-            var clearWindCellsRect = new Rect( cur.x + Margin, cur.y, colWidth - 2 * Margin, EntryHeight );
+            // Clear wind cells (2)
+            Rect clearWindCellsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Utilities.DrawToggle( clearWindCellsRect, "FMF.ClearWindCells".Translate(), ref _selected.ClearWindCells );
             cur.y += EntryHeight;
 
-            // Allow saplings
-            var allowSaplingsRect = new Rect( cur.x + Margin, cur.y, colWidth - 2 * Margin, EntryHeight );
+            // Allow saplings (3)
+            Rect allowSaplingsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            Widgets.DrawAltRect(allowSaplingsRect);
             Utilities.DrawToggle( allowSaplingsRect, "FMF.AllowSaplings".Translate(), ref _selected.AllowSaplings );
             cur.y += EntryHeight;
 
-            // Logging area
-            var loggingAreaTitleRect = new Rect( cur.x + Margin, cur.y, colWidth - 2 * Margin, EntryHeight );
-            Widgets.Label( loggingAreaTitleRect, "FMF.LoggingArea".Translate() );
+            // Logging area (4)
+            Rect loggingAreaTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            Utilities.Label( loggingAreaTitleRect, "FMF.LoggingArea".Translate(), anchor: TextAnchor.MiddleLeft, lrMargin: Margin );
             cur.y += EntryHeight;
 
-            var loggingAreaRect = new Rect( cur.x + Margin, cur.y, colWidth - 2 * Margin, EntryHeight );
+            Rect loggingAreaRect = new Rect( cur.x + Margin, cur.y, colWidth - 2 * Margin, EntryHeight );
             AreaAllowedGUI.DoAllowedAreaSelectors( loggingAreaRect, ref _selected.LoggingArea );
             cur.y += EntryHeight;
 
@@ -133,7 +134,7 @@ namespace FM
             cur = Vector2.zero;
 
             Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
-            var viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedTrees.Count * EntryHeight );
+            Rect viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedTrees.Count * EntryHeight );
             if ( viewRect.height > outRect.height )
             {
                 viewRect.width -= 16f;
@@ -146,7 +147,7 @@ namespace FM
             List< ThingDef > treeDefs = new List< ThingDef >( _selected.AllowedTrees.Keys );
 
             // toggle all
-            var toggleAllRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            Rect toggleAllRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( toggleAllRect );
             Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
                                   _selected.AllowedTrees.Values.All( v => v ), delegate
@@ -166,11 +167,11 @@ namespace FM
             cur.y += EntryHeight;
 
             // toggle for each tree
-            var i = 1;
+            int i = 1;
 
             foreach ( ThingDef def in treeDefs )
             {
-                var toggleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+                Rect toggleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
 
                 // highlight alternate rows
                 if ( i++ % 2 == 0 )
@@ -212,6 +213,9 @@ namespace FM
                     // inactivate job, remove from the stack.
                     Manager.Get.JobStack.Delete( _selected );
 
+                    // remove content from UI
+                    _selected = null;
+
                     // refresh source list
                     Refresh();
                 }
@@ -227,7 +231,7 @@ namespace FM
 
             // content
             float height = _leftRowHeight;
-            var scrollView = new Rect( 0f, 0f, rect.width, height );
+            Rect scrollView = new Rect( 0f, 0f, rect.width, height );
             if ( height > rect.height )
             {
                 scrollView.width -= 16f;
@@ -238,11 +242,11 @@ namespace FM
 
             GUI.BeginGroup( scrollContent );
             Vector2 cur = Vector2.zero;
-            var i = 0;
+            int i = 0;
 
             foreach ( ManagerJob_Forestry job in _jobs )
             {
-                var row = new Rect( 0f, cur.y, scrollContent.width, Utilities.ListEntryHeight );
+                Rect row = new Rect( 0f, cur.y, scrollContent.width, Utilities.ListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
                 if ( _selected == job )
                 {
@@ -272,7 +276,7 @@ namespace FM
             }
 
             // row for new job.
-            var newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.ListEntryHeight );
+            Rect newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.ListEntryHeight );
             Widgets.DrawHighlightIfMouseover( newRect );
 
             if ( i % 2 == 1 )
@@ -301,8 +305,8 @@ namespace FM
         public override void DoWindowContents( Rect canvas )
         {
             // set up rects
-            var leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
-            var contentCanvas = new Rect( leftRow.xMax + Margin, 0f, canvas.width - leftRow.width - Margin,
+            Rect leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
+            Rect contentCanvas = new Rect( leftRow.xMax + Margin, 0f, canvas.width - leftRow.width - Margin,
                                           canvas.height );
 
             // draw overview row

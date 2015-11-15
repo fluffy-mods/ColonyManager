@@ -59,7 +59,7 @@ namespace FM
                 return false;
             }
 
-            var power = t.TryGetComp< CompPowerTrader >();
+            CompPowerTrader power = t.TryGetComp< CompPowerTrader >();
             if ( power != null &&
                  !power.PowerOn )
             {
