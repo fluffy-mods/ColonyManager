@@ -201,19 +201,14 @@ namespace FM
             // table body viewport
             Rect tableOutRect = new Rect( 0f, RowHeightPawnOverview, rect.width, rect.height - RowHeightPawnOverview );
             Rect tableViewRect = new Rect( 0f, RowHeightPawnOverview, rect.width, Workers.Count * RowHeightPawnOverview );
-            if ( tableViewRect.height > tableOutRect.height )
-            {
-                // scrollbar
-                tableViewRect.width -= 16f;
-            }
 
             // column width
             float colWidth = tableViewRect.width / 4 - Margin;
 
             // column headers
             Rect nameColumnHeaderRect = new Rect( colWidth * 0, 0f, colWidth, RowHeightPawnOverview );
-            Rect activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth * 2, RowHeightPawnOverview );
-            Rect priorityColumnHeaderRect = new Rect( colWidth * 3, 0f, colWidth, RowHeightPawnOverview );
+            Rect activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth * 2.5f, RowHeightPawnOverview );
+            Rect priorityColumnHeaderRect = new Rect( colWidth * 3.5f, 0f, colWidth * .5f, RowHeightPawnOverview );
 
             // label for priority column
             string workLabel = Find.Map.playSettings.useWorkPriorities
@@ -260,8 +255,8 @@ namespace FM
 
             // cell rects
             Rect nameRect     = new Rect( colWidth * 0, rect.yMin, colWidth, RowHeightPawnOverview );
-            Rect activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2, RowHeightPawnOverview );
-            Rect priorityRect = new Rect( colWidth * 3, rect.yMin, colWidth, RowHeightPawnOverview );
+            Rect activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2.5f, RowHeightPawnOverview );
+            Rect priorityRect = new Rect( colWidth * 3.5f, rect.yMin, colWidth * .5f, RowHeightPawnOverview );
 
             // name
             Widgets.DrawHighlightIfMouseover( nameRect );
@@ -281,8 +276,12 @@ namespace FM
                              TextAnchor.MiddleLeft, Margin );
 
             // current activity (if curDriver != null)
-            Utilities.Label( activityRect, pawn.jobs.curDriver?.GetReport() ?? "FM.NoCurJob".Translate(), pawn.jobs.curDriver?.GetReport(), TextAnchor.MiddleLeft,
-                             Margin );
+            string activityString = pawn.jobs.curDriver?.GetReport() ?? "FM.NoCurJob".Translate();
+            GameFont fontSize = Text.CalcSize( activityString ).y > activityRect.y 
+                ? GameFont.Tiny 
+                : GameFont.Small;
+            Utilities.Label( activityRect, activityString, pawn.jobs.curDriver?.GetReport(), TextAnchor.MiddleCenter,
+                             Margin, font: fontSize);
             
             // priority button
             Rect priorityPosition = new Rect( 0f, 0f, 24f, 24f ).CenteredOnXIn( priorityRect )
