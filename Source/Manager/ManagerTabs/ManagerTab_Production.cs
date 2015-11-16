@@ -118,13 +118,10 @@ namespace FM
                     }
                     else
                     {
-                        Text.Anchor = TextAnchor.MiddleCenter;
                         GUI.color = new Color( .6f, .6f, .6f );
                         Widgets.DrawBox( buttonRect );
-                        GUI.Label( buttonRect, "FMP.NoThreshold".Translate() );
-                        Text.Anchor = TextAnchor.UpperLeft ;
+                        Utilities.Label( buttonRect, "FMP.NoThreshold".Translate(), "FMP.NoThresholdTooltip".Translate(), TextAnchor.MiddleCenter);
                         GUI.color = Color.white;
-                        TooltipHandler.TipRegion( buttonRect, "FMP.NoThresholdTooltip".Translate() );
                     }
                 }
                 
