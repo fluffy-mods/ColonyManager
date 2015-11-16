@@ -24,7 +24,7 @@ namespace FM
         public History day = new History( _histSize );
         public List< Designation > Designations = new List< Designation >();
         public History historyShown;
-        public Area HuntingGrounds = null;
+        public Area HuntingGrounds;
         public History month = new History( _histSize, History.Period.Month );
 
         public new Trigger_Threshold Trigger;
@@ -35,7 +35,7 @@ namespace FM
         {
             get { return Manager.Get.ManagerTabs.Find( tab => tab is ManagerTab_Hunting ); }
         }
-        
+
         public override string Label
         {
             get { return "FMH.Hunting".Translate(); }
@@ -54,6 +54,8 @@ namespace FM
             get { return Find.ListerThings.ThingsInGroup( ThingRequestGroup.Corpse ) ?? new List< Thing >(); }
         }
 
+        public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Hunting;
+
         public ManagerJob_Hunting()
         {
             // populate the trigger field, set the root category to meats and allow all but human meat.
@@ -66,6 +68,41 @@ namespace FM
             AllowedAnimals = Find.Map.Biome.AllWildAnimals.ToDictionary( pk => pk, v => true );
         }
 
+        private void AddRelevantGameDesignations()
+        {
+            foreach (
+                Designation des in
+                    Find.DesignationManager.DesignationsOfDef( DesignationDefOf.Hunt )
+                        .Except( Designations )
+                        .Where( des => IsValidHuntingTarget( des.target ) ) )
+            {
+                AddDesignation( des );
+            }
+        }
+
+        private bool IsValidHuntingTarget( TargetInfo t )
+        {
+            return t.HasThing
+                   && t.Thing is Pawn
+                   && IsValidHuntingTarget( (Pawn)t.Thing );
+        }
+
+        private bool IsValidHuntingTarget( Pawn p )
+        {
+            return p.RaceProps.Animal
+                   && !p.health.Dead
+                   && p.SpawnedInWorld
+                   // wild animals only
+                   && p.Faction == null
+                   // non-biome animals won't be on the list
+                   && AllowedAnimals.ContainsKey( p.kindDef )
+                   && AllowedAnimals[p.kindDef]
+                   && Find.DesignationManager.DesignationOn( p ) == null
+                   && ( HuntingGrounds == null 
+                      || HuntingGrounds.ActiveCells.Contains( p.Position ) )
+                   && p.Position.CanReachColony();
+        }
+
         public override void ExposeData()
         {
             // scribe base things
@@ -73,18 +110,17 @@ namespace FM
 
             // settings
             Scribe_References.LookReference( ref HuntingGrounds, "HuntingGrounds" );
-            Scribe_Collections.LookDictionary( ref AllowedAnimals, "AllowedAnimals", LookMode.DefReference, LookMode.Value );
+            Scribe_Collections.LookDictionary( ref AllowedAnimals, "AllowedAnimals", LookMode.DefReference,
+                                               LookMode.Value );
+
             // human meat is saved in trigger's thingfilter.
             Scribe_Values.LookValue( ref UnforbidCorpses, "UnforbidCorpses", true );
 
             // trigger
             Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
 
-            if( Manager.LoadSaveMode == Manager.Modes.Normal )
+            if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
-                // current designations
-                Scribe_Collections.LookList( ref Designations, "Designations", LookMode.MapReference );
-
                 // scribe history
                 Scribe_Deep.LookDeep( ref day, "histDay", _histSize );
                 Scribe_Deep.LookDeep( ref month, "histMonth", _histSize, History.Period.Month );
@@ -211,6 +247,9 @@ namespace FM
             // clean dead designations
             CleanDesignations();
 
+            // add designations that could have been handed out by us
+            AddRelevantGameDesignations();
+
             // unforbid if required
             if ( UnforbidCorpses )
             {
@@ -251,16 +290,22 @@ namespace FM
             }
         }
 
-        private void AddDesignation( Pawn p )
+        private void AddDesignation( Designation des )
         {
-            // create designation
-            Designation des = new Designation( p, DesignationDefOf.Hunt );
-
             // add to game
             Find.DesignationManager.AddDesignation( des );
 
             // add to internal list
             Designations.Add( des );
+        }
+
+        private void AddDesignation( Pawn p )
+        {
+            // create designation
+            Designation des = new Designation( p, DesignationDefOf.Hunt );
+
+            // pass to adder
+            AddDesignation( des );
         }
 
         private List< Pawn > GetHuntableAnimalsSorted()
@@ -289,22 +334,7 @@ namespace FM
             }
 
             // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
-            List< Pawn > list = Find.ListerPawns.AllPawns.Where( p => p.RaceProps.Animal
-                                                                      && !p.health.Dead
-                                                                      && p.SpawnedInWorld
-
-                // wild animals only
-                                                                      && p.Faction == null
-
-                // non-biome animals won't be on the list
-                                                                      && AllowedAnimals.ContainsKey( p.kindDef )
-                                                                      && AllowedAnimals[p.kindDef]
-                                                                      &&
-                                                                      Find.DesignationManager.DesignationOn( p ) == null
-                                                                      &&
-                                                                      ( HuntingGrounds == null ||
-                                                                        HuntingGrounds.ActiveCells.Contains( p.Position ) )
-                                                                      && p.Position.CanReachColony() )
+            List< Pawn > list = Find.ListerPawns.AllPawns.Where( p => IsValidHuntingTarget( p ) )
 
                 // OrderBy defaults to ascending, switch sign on estimated meat count to get descending
                                     .OrderBy(
@@ -403,8 +433,6 @@ namespace FM
 
             return count;
         }
-
-        public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Hunting;
 
         public override void Tick()
         {

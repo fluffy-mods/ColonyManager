@@ -15,56 +15,26 @@ namespace FM
 {
     public class ManagerJob_Forestry : ManagerJob
     {
-        private static int _histSize                     = 100;
-        private readonly float _margin                   = Utilities.Margin;
-        private Texture2D _cogTex                        = ContentFinder< Texture2D >.Get( "UI/Buttons/Cog" );
-
-        public Area LoggingArea                          = null;
+        private static int _histSize = 100;
+        private readonly float _margin = Utilities.Margin;
+        private Texture2D _cogTex = ContentFinder< Texture2D >.Get( "UI/Buttons/Cog" );
         public Dictionary< ThingDef, bool > AllowedTrees;
-        public bool AllowSaplings                        = false;
-        public bool ClearWindCells                       = true;
-        public List< Designation > Designations          = new List< Designation >();
-        public new Trigger_Threshold Trigger;
+        public bool AllowSaplings;
+        public bool ClearWindCells = true;
+        public History day = new History( _histSize );
+        public List< Designation > Designations = new List< Designation >();
 
         public History historyShown;
-        public History day                               = new History( _histSize );
-        public History month                             = new History( _histSize, History.Period.Month );
-        public History year                              = new History( _histSize, History.Period.Year );
+
+        public Area LoggingArea;
+        public History month = new History( _histSize, History.Period.Month );
+        public new Trigger_Threshold Trigger;
+        public History year = new History( _histSize, History.Period.Year );
 
         public override string Label
         {
             get { return "FMF.Forestry".Translate(); }
         }
-
-        #region Overrides of ManagerJob
-
-        public override void ExposeData()
-        {
-            // scribe base things
-            base.ExposeData();
-            
-            // settings
-            Scribe_References.LookReference(ref LoggingArea, "LoggingArea");
-            Scribe_Collections.LookDictionary(ref AllowedTrees, "AllowedTrees", LookMode.DefReference, LookMode.Value);
-            Scribe_Values.LookValue(ref AllowSaplings, "AllowSaplings", false);
-            Scribe_Values.LookValue(ref ClearWindCells, "ClearWindCells", true);
-
-            // trigger
-            Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
-
-            if ( Manager.LoadSaveMode == Manager.Modes.Normal )
-            {
-                // current designations
-                Scribe_Collections.LookList(ref Designations, "Designations", LookMode.MapReference);
-
-                // scribe history
-                Scribe_Deep.LookDeep( ref day, "histDay", _histSize );
-                Scribe_Deep.LookDeep( ref month, "histMonth", _histSize, History.Period.Month );
-                Scribe_Deep.LookDeep( ref year, "histYear", _histSize, History.Period.Year );
-            }
-        }
-
-        #endregion
 
         public override ManagerTab Tab
         {
@@ -79,19 +49,48 @@ namespace FM
             }
         }
 
+        public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.PlantCutting;
+
         public ManagerJob_Forestry()
         {
             // populate the trigger field, set the root category to meats and allow all but human meat.
             Trigger = new Trigger_Threshold( this );
             Trigger.ThresholdFilter.SetDisallowAll();
             Trigger.ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
-            
+
             // populate the list of trees from the plants in the biome - allow all by default.
             // A tree is defined as any plant that yields wood
             AllowedTrees =
                 Find.Map.Biome.AllWildPlants.Where( pd => pd.plant.harvestedThingDef == Utilities_Forestry.Wood )
                     .ToDictionary( pk => pk, v => true );
         }
+
+        #region Overrides of ManagerJob
+
+        public override void ExposeData()
+        {
+            // scribe base things
+            base.ExposeData();
+
+            // settings
+            Scribe_References.LookReference( ref LoggingArea, "LoggingArea" );
+            Scribe_Collections.LookDictionary( ref AllowedTrees, "AllowedTrees", LookMode.DefReference, LookMode.Value );
+            Scribe_Values.LookValue( ref AllowSaplings, "AllowSaplings", false );
+            Scribe_Values.LookValue( ref ClearWindCells, "ClearWindCells", true );
+
+            // trigger
+            Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
+
+            if ( Manager.LoadSaveMode == Manager.Modes.Normal )
+            {
+                // scribe history
+                Scribe_Deep.LookDeep( ref day, "histDay", _histSize );
+                Scribe_Deep.LookDeep( ref month, "histMonth", _histSize, History.Period.Month );
+                Scribe_Deep.LookDeep( ref year, "histYear", _histSize, History.Period.Year );
+            }
+        }
+
+        #endregion
 
         public override void Tick()
         {
@@ -133,6 +132,49 @@ namespace FM
 
             // clear the list completely
             Designations.Clear();
+        }
+
+        public void AddRelevantGameDesignations()
+        {
+            // get list of game designations not managed by this job that could be assigned by this job.
+            foreach ( Designation des in Find.DesignationManager.DesignationsOfDef( DesignationDefOf.CutPlant )
+                                   .Except( Designations )
+                                   .Where( des => IsValidForestryTarget( des.target ) ) )
+            {
+                AddDesignation( des );
+            }
+        }
+
+        private bool IsValidForestryTarget( TargetInfo t )
+        {
+            return t.HasThing
+                   && IsValidForestryTarget( t.Thing );
+        }
+
+        private bool IsValidForestryTarget( Thing t )
+        {
+            return t is Plant
+                   && IsValidForestryTarget( (Plant) t );
+        }
+
+        private bool IsValidForestryTarget( Plant p )
+        {
+            return p.def.plant != null
+
+                    // non-biome trees won't be on the list
+                   && AllowedTrees.ContainsKey( p.def )
+
+                    // also filters out non-tree plants
+                   && AllowedTrees[p.def]
+                   && p.SpawnedInWorld
+                   && Find.DesignationManager.DesignationOn( p ) == null
+
+                    // cut only mature trees, or saplings that yield wood.
+                   && ( ( AllowSaplings && p.YieldNow() > 1 )
+                        || p.LifeStage == PlantLifeStage.Mature )
+                   && ( LoggingArea == null
+                        || LoggingArea.ActiveCells.Contains( p.Position ) )
+                   && p.Position.CanReachColony();
         }
 
         // TODO: Refactor into utilities - hardly any changes between Forestry / Hunting / Production.
@@ -218,8 +260,6 @@ namespace FM
             }
         }
 
-        public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.PlantCutting;
-
         public override bool TryDoJob()
         {
             // keep track if any actual work was done.
@@ -233,6 +273,9 @@ namespace FM
 
             // clean dead designations
             CleanDesignations();
+
+            // add external designations
+            AddRelevantGameDesignations();
 
             // designate wind cells
             if ( ClearWindCells )
@@ -257,16 +300,22 @@ namespace FM
             return workDone;
         }
 
-        private void AddDesignation( Plant p, DesignationDef def = null )
+        private void AddDesignation( Designation des )
         {
-            // create designation
-            Designation des = new Designation( p, def );
-
             // add to game
             Find.DesignationManager.AddDesignation( des );
 
             // add to internal list
             Designations.Add( des );
+        }
+
+        private void AddDesignation( Plant p, DesignationDef def = null )
+        {
+            // create designation
+            Designation des = new Designation( p, def );
+
+            // pass to adder
+            AddDesignation( des );
         }
 
         public void DesignateWindCells()
@@ -337,19 +386,7 @@ namespace FM
             }
 
             // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
-            List< Plant > list = Find.ListerThings.AllThings.Where( p => p.def.plant != null
-                                                                         // non-biome trees won't be on the list
-                                                                         && AllowedTrees.ContainsKey( p.def )
-                                                                         // also filters out non-tree plants
-                                                                         && AllowedTrees[p.def]
-                                                                         && p.SpawnedInWorld
-                                                                         && Find.DesignationManager.DesignationOn( p ) == null
-                                                                         // cut only mature trees, or saplings that yield wood.
-                                                                         && ( ( AllowSaplings && ((Plant)p).YieldNow() > 1) 
-                                                                            || ( (Plant)p ).LifeStage == PlantLifeStage.Mature )
-                                                                         && ( LoggingArea == null 
-                                                                            || LoggingArea.ActiveCells.Contains( p.Position ) )
-                                                                         && p.Position.CanReachColony() )
+            List< Plant > list = Find.ListerThings.AllThings.Where( p => IsValidForestryTarget(p) )
 
                 // OrderBy defaults to ascending, switch sign on current yield to get descending
                                      .Select( p => p as Plant )
