@@ -36,6 +36,11 @@ namespace FM
             get { return "FMF.Forestry".Translate(); }
         }
 
+        public override bool Completed
+        {
+            get { return Trigger.CurCount + GetWoodLyingAround() + GetWoodInDesignations() >= Trigger.Count; }
+        }
+
         public override ManagerTab Tab
         {
             get { return Manager.Get.ManagerTabs.Find( tab => tab is ManagerTab_Forestry ); }
@@ -184,13 +189,13 @@ namespace FM
 
             Rect labelRect = new Rect( _margin, _margin,
                                        rect.width -
-                                       ( active ? _lastUpdateRectWidth + _progressRectWidth + 4 * _margin : 2 * _margin ),
+                                       ( active ? LastUpdateRectWidth + ProgressRectWidth + 4 * _margin : 2 * _margin ),
                                        rect.height - 2 * _margin ),
                  progressRect = new Rect( labelRect.xMax + _margin, _margin,
-                                          _progressRectWidth,
+                                          ProgressRectWidth,
                                           rect.height - 2 * _margin ),
                  lastUpdateRect = new Rect( progressRect.xMax + _margin, _margin,
-                                            _lastUpdateRectWidth,
+                                            LastUpdateRectWidth,
                                             rect.height - 2 * _margin );
 
             string text = Label + "\n<i>" +
@@ -211,7 +216,7 @@ namespace FM
                 if ( active )
                 {
                     // draw progress bar
-                    Trigger.DrawProgressBar( progressRect, Suspended );
+                    Trigger.DrawProgressBar( progressRect, !Suspended && !Completed );
 
                     // draw time since last action
                     Text.Anchor = TextAnchor.MiddleCenter;

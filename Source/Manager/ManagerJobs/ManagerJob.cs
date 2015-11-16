@@ -13,18 +13,14 @@ namespace FM
 {
     public abstract class ManagerJob : IManagerJob, IExposable
     {
-        public float _lastUpdateRectWidth = 50f,
-                     _progressRectWidth = 10f;
+        public float LastUpdateRectWidth = 50f,
+                     ProgressRectWidth = 10f;
 
         public int ActionInterval = 3600; // should be 1 minute.
         public int LastAction;
         public int Priority;
 
-        private bool _active;
-        public virtual bool Active {
-            get { return _active; }
-            set { _active = value; }
-        }
+        public virtual bool Assigned { get; set; }
 
         public virtual bool IsValid
         {
@@ -32,8 +28,10 @@ namespace FM
         }
 
         public abstract string Label { get; }
-        public bool ShouldDoNow => Active && !Suspended && LastAction + ActionInterval < Find.TickManager.TicksGame;
+        public bool ShouldDoNow => Assigned && !Suspended && !Completed && LastAction + ActionInterval < Find.TickManager.TicksGame;
         public virtual bool Suspended { get; set; } = false;
+
+        public abstract bool Completed { get; }
 
         public abstract ManagerTab Tab { get; }
 

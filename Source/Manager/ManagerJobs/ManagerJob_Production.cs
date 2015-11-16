@@ -30,6 +30,11 @@ namespace FM
         public bool               maxSkil;
         public new Trigger_Threshold Trigger;
 
+        public override bool Completed
+        {
+            get { return Trigger.CurCount >= Trigger.Count; }
+        }
+
         public override ManagerTab Tab
         {
             get { return Manager.Get.ManagerTabs.Find( tab => tab is ManagerTab_Production ); }
@@ -389,14 +394,14 @@ namespace FM
             Rect labelRect = new Rect( Utilities.Margin, Utilities.Margin,
                                        rect.width -
                                        ( active
-                                           ? _lastUpdateRectWidth + _progressRectWidth + 4 * Utilities.Margin
+                                           ? LastUpdateRectWidth + ProgressRectWidth + 4 * Utilities.Margin
                                            : 2 * Utilities.Margin ),
                                        rect.height - 2 * Utilities.Margin ),
                  progressRect = new Rect( labelRect.xMax + Utilities.Margin, Utilities.Margin,
-                                          _progressRectWidth,
+                                          ProgressRectWidth,
                                           rect.height - 2 * Utilities.Margin ),
                  lastUpdateRect = new Rect( progressRect.xMax + Utilities.Margin, Utilities.Margin,
-                                            _lastUpdateRectWidth,
+                                            LastUpdateRectWidth,
                                             rect.height - 2 * Utilities.Margin );
 
             string text = Label;
@@ -417,7 +422,7 @@ namespace FM
                     // draw progress bar
                     if ( Trigger != null )
                     {
-                        Trigger.DrawProgressBar( progressRect, Suspended );
+                        Trigger.DrawProgressBar( progressRect, !Suspended && !Completed );
                     }
 
                     // draw time since last action

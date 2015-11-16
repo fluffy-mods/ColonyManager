@@ -104,7 +104,7 @@ namespace FM
                     {
                         if( Widgets.TextButton( buttonRect, "FM.Manage".Translate() ) )
                         {
-                            _selected.Active = true;
+                            _selected.Assigned = true;
                             Manager.Get.JobStack.Add( _selected );
 
                             // refresh source list so that the next added job is not an exact copy.

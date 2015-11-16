@@ -161,7 +161,7 @@ namespace FM
             GUI.DrawTexture( barRect, barTex );
 
             // draw a mark at the treshold
-            Widgets.DrawLineHorizontal( rect.xMin, rect.yMax - markHeight, rect.width );
+            Widgets.DrawLineHorizontal( rect.xMin, markHeight, rect.width );
 
             TooltipHandler.TipRegion( rect, StatusTooltip );
         }

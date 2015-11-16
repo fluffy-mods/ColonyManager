@@ -20,10 +20,12 @@ namespace FM
                            RowHeightPawnOverview = 30f,
                            IconSize = 30f;
 
-        public static readonly Texture2D ArrowTop = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowTop" ),
-                                         ArrowUp = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowUp" ),
-                                         ArrowDown = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowDown" ),
-                                         ArrowBottom = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowBottom" );
+        public static readonly Texture2D ArrowTop       = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowTop" ),
+                                         ArrowUp        = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowUp" ),
+                                         ArrowDown      = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowDown" ),
+                                         ArrowBottom    = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowBottom" ),
+                                         StampCompleted = ContentFinder< Texture2D >.Get( "UI/Stamps/Completed" ),
+                                         StampSuspended = ContentFinder< Texture2D >.Get( "UI/Stamps/Suspended" );
 
         private Texture2D   _icon                   = ContentFinder< Texture2D >.Get( "UI/Icons/Overview" );
         private Vector2     _overviewScrollPosition = Vector2.zero;
@@ -201,6 +203,10 @@ namespace FM
             // table body viewport
             Rect tableOutRect = new Rect( 0f, RowHeightPawnOverview, rect.width, rect.height - RowHeightPawnOverview );
             Rect tableViewRect = new Rect( 0f, RowHeightPawnOverview, rect.width, Workers.Count * RowHeightPawnOverview );
+            if ( tableViewRect.height > tableOutRect.height )
+            {
+                tableViewRect.width -= 16f;
+            }
 
             // column width
             float colWidth = tableViewRect.width / 4 - Margin;
@@ -277,16 +283,15 @@ namespace FM
 
             // current activity (if curDriver != null)
             string activityString = pawn.jobs.curDriver?.GetReport() ?? "FM.NoCurJob".Translate();
-            GameFont fontSize = Text.CalcSize( activityString ).y > activityRect.y 
-                ? GameFont.Tiny 
-                : GameFont.Small;
             Utilities.Label( activityRect, activityString, pawn.jobs.curDriver?.GetReport(), TextAnchor.MiddleCenter,
-                             Margin, font: fontSize);
+                             Margin, font: GameFont.Tiny);
             
             // priority button
             Rect priorityPosition = new Rect( 0f, 0f, 24f, 24f ).CenteredOnXIn( priorityRect )
                                                               .CenteredOnYIn( priorityRect );
+            Text.Font = GameFont.Medium;
             WidgetsWork.DrawWorkBoxFor(new Vector2(priorityPosition.xMin, priorityPosition.yMin), pawn, WorkTypeDef );
+            Text.Font = GameFont.Small;
         }
 
         public void DrawOverview( Rect rect )
@@ -347,6 +352,20 @@ namespace FM
                     {
                         Selected = Jobs[i];
                     }
+
+                    // draw stamps
+                    Rect stampRect = new Rect( 0f, 0f, 150f, 45f ).CenteredOnXIn( row ).CenteredOnYIn( row );
+                    if ( Jobs[i].Completed )
+                    {
+                        GUI.DrawTexture( row, Utilities.SlightlyDarkBackground );
+                        GUI.DrawTexture( stampRect, StampCompleted );
+                    }
+                    else if (Jobs[i].Suspended)
+                    {
+                        GUI.DrawTexture( row, Utilities.SlightlyDarkBackground );
+                        GUI.DrawTexture( stampRect, StampSuspended );
+                    }
+
 
                     cur.y += 50f;
                 }
