@@ -58,8 +58,8 @@ namespace FM
             set
             {
                 _selectedJob = value;
-                WorkTypeDef = _selectedJob.WorkTypeDef;
-                SkillDef = _selectedJob.SkillDef;
+                WorkTypeDef = _selectedJob?.WorkTypeDef ?? Utilities.WorkTypeDefOf_Managing;
+                SkillDef = _selectedJob?.SkillDef;
             }
         }
 
