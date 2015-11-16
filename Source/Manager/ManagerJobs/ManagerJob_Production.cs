@@ -91,6 +91,20 @@ namespace FM
                             {
                                 continue;
                             }
+#if DEBUG_OVERVIEW
+                            Log.Message( Bill.recipe.LabelCap + " > " + workGiver.defName + " > " + workGiver.Worker.GetType().ToString() );
+#endif
+
+                            // skip workgiver if it applies only to pawns (cooks are not repairers!)
+                            if ( workGiver.billGiversAllAnimals
+                                 || workGiver.billGiversAllAnimalsCorpses
+                                 || workGiver.billGiversAllHumanlikes
+                                 || workGiver.billGiversAllHumanlikesCorpses
+                                 || workGiver.billGiversAllMechanoids
+                                 || workGiver.billGiversAllMechanoidsCorpses )
+                            {
+                                continue;
+                            }
 
                             // skip workgiver if it doesn't assign work to our tables
                             if ( !workTables.Any( workTable => scanner.PotentialWorkThingRequest.Accepts( workTable ) ) )
