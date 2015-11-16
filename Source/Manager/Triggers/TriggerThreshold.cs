@@ -141,7 +141,7 @@ namespace FM
         {
             // bar always goes a little beyond the actual target
             int max = Math.Max( (int)( Count * 1.2f ), CurCount );
-
+            
             // draw a box for the bar
             GUI.color = Color.gray;
             Widgets.DrawBox( rect.ContractedBy( 1f ) );
@@ -149,8 +149,9 @@ namespace FM
 
             // get the bar rect
             Rect barRect = rect.ContractedBy( 2f );
-            barRect.height *= CurCount / max;
-            float markHeight = barRect.height * Count / max;
+            float unit = barRect.height / max;
+            float markHeight = barRect.yMin + ( max - Count ) * unit;
+            barRect.yMin += (max - CurCount) * unit;
             
             // draw the bar
             // if the job is active and pending, make the bar blueish green - otherwise white.
