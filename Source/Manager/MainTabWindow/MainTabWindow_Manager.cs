@@ -105,7 +105,10 @@ namespace FM
             if ( tab == CurrentTab )
             {
                 GUI.color = GenUI.MouseoverColor;
-                GUI.DrawTexture( rect, tab.Icon );
+                if( Widgets.ImageButton( rect, tab.Icon, GenUI.MouseoverColor) )
+                {
+                    tab.Selected = null;
+                }
                 GUI.color = Color.white;
             }
             else if ( Widgets.ImageButton( rect, tab.Icon ) )

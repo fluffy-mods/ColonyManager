@@ -58,12 +58,12 @@ namespace FM
             set
             {
                 _selectedJob = value;
-                WorkType = _selectedJob.WorkTypeDef;
+                WorkTypeDef = _selectedJob.WorkTypeDef;
                 SkillDef = _selectedJob.SkillDef;
             }
         }
 
-        private WorkTypeDef WorkType
+        private WorkTypeDef WorkTypeDef
         {
             get
             {
@@ -186,9 +186,14 @@ namespace FM
 
         private void RefreshWorkers()
         {
-            Workers =
-                Find.ListerPawns.FreeColonistsSpawned.Where( pawn => !pawn.story.WorkTypeIsDisabled( WorkType ) )
-                    .ToList();
+            var temp = Find.ListerPawns.FreeColonistsSpawned.Where( pawn => !pawn.story.WorkTypeIsDisabled( WorkTypeDef ) );
+
+            // sort by either specific skill def or average over job - depending on which is known.
+            temp = SkillDef != null
+                ? temp.OrderByDescending( pawn => pawn.skills.GetSkill( SkillDef ).level )
+                : temp.OrderByDescending( pawn => pawn.skills.AverageOfRelevantSkillsFor( WorkTypeDef ) );
+
+            Workers = temp.ToList();
         }
 
         public void DrawPawnOverview( Rect rect )
@@ -207,8 +212,7 @@ namespace FM
 
             // column headers
             Rect nameColumnHeaderRect = new Rect( colWidth * 0, 0f, colWidth, RowHeightPawnOverview );
-            Rect activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth, RowHeightPawnOverview );
-            Rect skillColumnHeaderRect = new Rect( colWidth * 2, 0f, colWidth, RowHeightPawnOverview );
+            Rect activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth * 2, RowHeightPawnOverview );
             Rect priorityColumnHeaderRect = new Rect( colWidth * 3, 0f, colWidth, RowHeightPawnOverview );
 
             // label for priority column
@@ -220,9 +224,8 @@ namespace FM
             GUI.BeginGroup( rect );
 
             // draw labels
-            Utilities.Label( nameColumnHeaderRect, WorkType.pawnLabel + "s", null, TextAnchor.LowerCenter );
+            Utilities.Label( nameColumnHeaderRect, WorkTypeDef.pawnLabel + "s", null, TextAnchor.LowerCenter );
             Utilities.Label( activityColumnHeaderRect, "FM.Activity".Translate(), null, TextAnchor.LowerCenter );
-            Utilities.Label( skillColumnHeaderRect, "FM.Skill".Translate(), null, TextAnchor.LowerCenter );
             Utilities.Label( priorityColumnHeaderRect, workLabel, null, TextAnchor.LowerCenter );
 
             // begin scrolling area
@@ -257,8 +260,7 @@ namespace FM
 
             // cell rects
             Rect nameRect     = new Rect( colWidth * 0, rect.yMin, colWidth, RowHeightPawnOverview );
-            Rect activityRect = new Rect( colWidth * 1, rect.yMin, colWidth, RowHeightPawnOverview );
-            Rect skillRect    = new Rect( colWidth * 2, rect.yMin, colWidth, RowHeightPawnOverview );
+            Rect activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2, RowHeightPawnOverview );
             Rect priorityRect = new Rect( colWidth * 3, rect.yMin, colWidth, RowHeightPawnOverview );
 
             // name
@@ -278,18 +280,14 @@ namespace FM
             Utilities.Label( nameRect, pawn.NameStringShort, "FM.ClickToJumpTo".Translate( pawn.LabelCap ),
                              TextAnchor.MiddleLeft, Margin );
 
-            // current activity
-            Utilities.Label( activityRect, pawn.CurJob.def.reportString, pawn.CurJob.def.reportString, TextAnchor.MiddleLeft,
+            // current activity (if curDriver != null)
+            Utilities.Label( activityRect, pawn.jobs.curDriver?.GetReport() ?? "FM.NoCurJob".Translate(), pawn.jobs.curDriver?.GetReport(), TextAnchor.MiddleLeft,
                              Margin );
-
-            // skill
-            float skill = SkillDef == null
-                ? pawn.skills.AverageOfRelevantSkillsFor( WorkType )
-                : pawn.skills.GetSkill( SkillDef ).level;
-            Utilities.Label( skillRect, skill.ToString(), null, TextAnchor.MiddleCenter, Margin );
-
+            
             // priority button
-            Utilities.Label( priorityRect, "X", anchor: TextAnchor.MiddleCenter );
+            Rect priorityPosition = new Rect( 0f, 0f, 24f, 24f ).CenteredOnXIn( priorityRect )
+                                                              .CenteredOnYIn( priorityRect );
+            WidgetsWork.DrawWorkBoxFor(new Vector2(priorityPosition.xMin, priorityPosition.yMin), pawn, WorkTypeDef );
         }
 
         public void DrawOverview( Rect rect )

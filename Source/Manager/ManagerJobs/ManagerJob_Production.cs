@@ -15,17 +15,20 @@ namespace FM
 {
     public class ManagerJob_Production : ManagerJob
     {
-        private static int _histSize   = 100;
-        private readonly float _margin = Utilities.Margin;
-        private Texture2D _cogTex      = ContentFinder< Texture2D >.Get( "UI/Buttons/Cog" );
-        public Bill_Production Bill;
-        public BillGiverTracker BillGivers;
-        public History day             = new History( _histSize );
-        public History historyShown;
+        private static int             _histSize    = 100;
+        private readonly float         _margin      = Utilities.Margin;
+        private Texture2D              _cogTex      = ContentFinder< Texture2D >.Get( "UI/Buttons/Cog" );
+
+        private WorkTypeDef       _workTypeDef;
+        public Bill_Production    Bill;
+        public BillGiverTracker   BillGivers;
+        public History            day               = new History( _histSize );
+        public History            month             = new History( _histSize, History.Period.Month );
+        public History            year              = new History( _histSize, History.Period.Year );
+        public History            historyShown;
         public MainProductTracker MainProduct;
-        public bool maxSkil;
-        public History month           = new History( _histSize, History.Period.Month );
-        public History year            = new History( _histSize, History.Period.Year );
+        public bool               maxSkil;
+        public new Trigger_Threshold Trigger;
 
         public override ManagerTab Tab
         {
@@ -36,12 +39,12 @@ namespace FM
         {
             get
             {
-                if( Bill == null )
+                if ( Bill == null )
                 {
                     return false;
                 }
                 Log.Message( Bill.ToString() );
-                if( Bill.recipe == null )
+                if ( Bill.recipe == null )
                 {
                     return false;
                 }
@@ -60,10 +63,55 @@ namespace FM
             get { return Bill.recipe.GetRecipeUsers().Select( td => td.LabelCap ).ToArray(); }
         }
 
-        /// <summary>
-        /// Threshold for starting/stopping bill assignments
-        /// </summary>
-        public new Trigger_Threshold Trigger;
+        public override WorkTypeDef WorkTypeDef
+        {
+            get
+            {
+                if ( _workTypeDef == null )
+                {
+                    // fetch the worktype def in the most convoluted way possible.
+                    // first get some examples of worktables our bill is on.
+                    List< Building_WorkTable > workTables = Bill.recipe.GetCurrentRecipeUsers();
+
+                    // if none exist (yet), create a phony copy.
+                    if ( workTables.Count == 0 )
+                    {
+                        workTables.Add(
+                            ThingMaker.MakeThing( Bill.recipe.GetRecipeUsers().First() ) as Building_WorkTable );
+                    }
+
+                    // then loop through workgivers until we find one that matches.
+                    foreach ( WorkTypeDef def in DefDatabase< WorkTypeDef >.AllDefsListForReading )
+                    {
+                        foreach ( WorkGiverDef workGiver in def.workGiversByPriority )
+                        {
+                            // we're only interested in the doBill scanner?
+                            WorkGiver_DoBill scanner = workGiver.Worker as WorkGiver_DoBill;
+                            if ( scanner == null )
+                            {
+                                continue;
+                            }
+
+                            // skip workgiver if it doesn't assign work to our tables
+                            if ( !workTables.Any( workTable => scanner.PotentialWorkThingRequest.Accepts( workTable ) ) )
+                            {
+                                continue;
+                            }
+
+                            // if we got here that should hopefully mean we got a valid scanner for this table, and we now know what the worktype def is
+                            _workTypeDef = scanner.def.workType;
+                            return _workTypeDef;
+                        }
+                    }
+                }
+                return _workTypeDef;
+            }
+        }
+
+        public override SkillDef SkillDef
+        {
+            get { return Bill.recipe.workSkill; }
+        }
 
         public ManagerJob_Production()
         {
@@ -83,8 +131,9 @@ namespace FM
             base.ExposeData();
 
             Scribe_Deep.LookDeep( ref Bill, "Bill" );
+
             // bill giver tracking is going to error out in cross-map import/export, so create a new one.
-            if( Manager.LoadSaveMode == Manager.Modes.Normal )
+            if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
                 Scribe_Deep.LookDeep( ref BillGivers, "BillGivers", this );
             }
@@ -95,7 +144,7 @@ namespace FM
             Scribe_Values.LookValue( ref maxSkil, "maxSkill", false );
 
             // init main product, required by trigger.
-            if( MainProduct == null )
+            if ( MainProduct == null )
             {
                 MainProduct = new MainProductTracker( Bill.recipe );
             }
@@ -103,7 +152,7 @@ namespace FM
             Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
 
             // scribe history in normal load/save only.
-            if( Manager.LoadSaveMode == Manager.Modes.Normal )
+            if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
                 Scribe_Deep.LookDeep( ref day, "histDay", _histSize );
                 Scribe_Deep.LookDeep( ref month, "histMonth", _histSize, History.Period.Month );
@@ -125,7 +174,7 @@ namespace FM
             // flag to see if anything meaningful was done, if false at end, manager will also do next job.
             bool actionTaken = false;
 
-            if( Trigger.State )
+            if ( Trigger.State )
             {
 #if DEBUG_JOBS
                 Log.Message( "Checking workers for presence of bills" );
@@ -139,7 +188,7 @@ namespace FM
                                                 ref actionTaken );
 
                 // If Trigger met, check if there's places we need to add the bill.
-                for( int workerIndex = 0; workerIndex < workers.Count; workerIndex++ )
+                for ( int workerIndex = 0; workerIndex < workers.Count; workerIndex++ )
                 {
                     Building_WorkTable worker = workers[workerIndex];
 #if DEBUG_JOBS
@@ -148,7 +197,7 @@ namespace FM
                     bool billPresent = false;
 
                     // loop over workstations
-                    if( worker.BillStack != null &&
+                    if ( worker.BillStack != null &&
                          worker.BillStack.Count > 0 )
                     {
 #if DEBUG_JOBS
@@ -161,7 +210,7 @@ namespace FM
 #endif
 
                         // loop over billstack to see if our bill is set.
-                        foreach( Bill t in worker.BillStack )
+                        foreach ( Bill t in worker.BillStack )
                         {
                             Bill_Production thatBill = t as Bill_Production;
 #if DEBUG_JOBS
@@ -172,13 +221,13 @@ namespace FM
 #endif
 
                             // if there is a bill, and it's managed by us, check to see if it's up-to-date.
-                            if( thatBill != null &&
+                            if ( thatBill != null &&
                                  thatBill.recipe == Bill.recipe &&
                                  BillGivers.GetAssignedBillGiversAndBillsDictionary.Contains(
-                                     new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )
+                                     new KeyValuePair< Bill_Production, Building_WorkTable >( thatBill, worker ) ) )
                             {
                                 billPresent = true;
-                                if( thatBill.suspended != Bill.suspended ||
+                                if ( thatBill.suspended != Bill.suspended ||
                                      thatBill.repeatCount == 0 )
                                 {
 #if DEBUG_JOBS
@@ -199,7 +248,7 @@ namespace FM
 #endif
 
                     // if bill wasn't present, add it.
-                    if( !billPresent )
+                    if ( !billPresent )
                     {
 #if DEBUG_JOBS
                         Log.Message( "Trying to add bill" );
@@ -226,8 +275,8 @@ namespace FM
         /// <param name="workers">Allowed workstations</param>
         /// <param name="assignedBills">Assigned bills/workstations</param>
         /// <param name="actionTaken">Was anything done?</param>
-        private void CleanNoLongerAllowedBillgivers( List<Building_WorkTable> workers,
-                                                     Dictionary<Bill_Production, Building_WorkTable> assignedBills,
+        private void CleanNoLongerAllowedBillgivers( List< Building_WorkTable > workers,
+                                                     Dictionary< Bill_Production, Building_WorkTable > assignedBills,
                                                      ref bool actionTaken )
         {
 #if DEBUG_JOBS
@@ -235,8 +284,8 @@ namespace FM
 #endif
             Dictionary< Bill_Production, Building_WorkTable > toBeDeleted =
                 new Dictionary< Bill_Production, Building_WorkTable >();
-            foreach(
-                KeyValuePair<Bill_Production, Building_WorkTable> pair in
+            foreach (
+                KeyValuePair< Bill_Production, Building_WorkTable > pair in
                     assignedBills.Where( pair => !workers.Contains( pair.Value ) ) )
             {
 #if DEBUG_JOBS
@@ -246,7 +295,7 @@ namespace FM
                 toBeDeleted.Add( pair.Key, pair.Value );
                 actionTaken = true;
             }
-            foreach( KeyValuePair<Bill_Production, Building_WorkTable> pair in toBeDeleted )
+            foreach ( KeyValuePair< Bill_Production, Building_WorkTable > pair in toBeDeleted )
             {
                 assignedBills.Remove( pair.Key );
             }
@@ -259,25 +308,25 @@ namespace FM
         /// <param name="actionTaken">Any changes made?</param>
         private void Update( Bill_Production thatBill, ref bool actionTaken )
         {
-            if( thatBill.storeMode != Bill.storeMode )
+            if ( thatBill.storeMode != Bill.storeMode )
             {
                 thatBill.storeMode = Bill.storeMode;
                 actionTaken = true;
             }
 
-            if( thatBill.ingredientFilter != Bill.ingredientFilter )
+            if ( thatBill.ingredientFilter != Bill.ingredientFilter )
             {
                 thatBill.ingredientFilter = Bill.ingredientFilter;
                 actionTaken = true;
             }
 
-            if( Math.Abs( thatBill.ingredientSearchRadius - Bill.ingredientSearchRadius ) > 1 )
+            if ( Math.Abs( thatBill.ingredientSearchRadius - Bill.ingredientSearchRadius ) > 1 )
             {
                 thatBill.ingredientSearchRadius = Bill.ingredientSearchRadius;
                 actionTaken = true;
             }
 
-            if( thatBill.minSkillLevel != Bill.minSkillLevel )
+            if ( thatBill.minSkillLevel != Bill.minSkillLevel )
             {
                 thatBill.minSkillLevel = Bill.minSkillLevel;
                 actionTaken = true;
@@ -293,8 +342,8 @@ namespace FM
             Log.Message( "Cleaning up obsolete bills" );
 #endif
             List< Bill_Production > toBeDeleted = new List< Bill_Production >();
-            foreach(
-                KeyValuePair<Bill_Production, Building_WorkTable> pair in
+            foreach (
+                KeyValuePair< Bill_Production, Building_WorkTable > pair in
                     BillGivers.GetAssignedBillGiversAndBillsDictionary )
             {
                 pair.Value.BillStack.Delete( pair.Key );
@@ -303,7 +352,7 @@ namespace FM
                 Log.Message( "Checking worker " + pair.Value.LabelCap );
 #endif
             }
-            foreach( Bill_Production key in toBeDeleted )
+            foreach ( Bill_Production key in toBeDeleted )
             {
 #if DEBUG_JOBS
                 Log.Message( "Deleting bill " + key.LabelCap );
@@ -337,7 +386,7 @@ namespace FM
                                             rect.height - 2 * Utilities.Margin );
 
             string text = Label;
-            if( Targets != null )
+            if ( Targets != null )
             {
                 text += "\n<i>" + string.Join( ", ", Targets ) + "</i>";
             }
@@ -349,10 +398,10 @@ namespace FM
                 Widgets.Label( labelRect, text );
 
                 // if the bill has a manager job, give some more info.
-                if( active )
+                if ( active )
                 {
                     // draw progress bar
-                    if( Trigger != null )
+                    if ( Trigger != null )
                     {
                         Trigger.DrawProgressBar( progressRect, Suspended );
                     }
@@ -376,7 +425,7 @@ namespace FM
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            if( historyShown == null )
+            if ( historyShown == null )
             {
                 historyShown = day;
             }
@@ -384,7 +433,7 @@ namespace FM
 
             Rect switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
             Widgets.DrawHighlightIfMouseover( switchRect );
-            if( Widgets.ImageButton( switchRect, _cogTex ) )
+            if ( Widgets.ImageButton( switchRect, _cogTex ) )
             {
                 List< FloatMenuOption > options = new List< FloatMenuOption >
                 {
@@ -396,77 +445,26 @@ namespace FM
             }
         }
 
-        private WorkTypeDef _workTypeDef;
-
-        public override WorkTypeDef WorkTypeDef
-        {
-            get
-            {
-                if ( _workTypeDef == null )
-                {
-                    // fetch the worktype def in the most convoluted way possible.
-                    // first get some examples of worktables our bill is on.
-                    List< Building_WorkTable > workTables = Bill.recipe.GetCurrentRecipeUsers();
-
-                    // if none exist (yet), create a phony copy.
-                    if ( workTables.Count == 0 )
-                    {
-                        workTables.Add( ThingMaker.MakeThing( Bill.recipe.GetRecipeUsers().First() ) as Building_WorkTable );
-                    }
-                    
-                    // then loop through workgivers until we find one that matches.
-                    foreach ( WorkTypeDef def in DefDatabase< WorkTypeDef >.AllDefsListForReading )
-                    {
-                        foreach ( WorkGiverDef workGiver in def.workGiversByPriority )
-                        {
-                            // skip workgiver if it's not a scanner, or a specifically excluded job.
-                            WorkGiver_Scanner scanner = workGiver.Worker as WorkGiver_Scanner;
-                            if ( scanner == null || scanner is WorkGiver_Repair)
-                            {
-                                continue;
-                            }
-
-                            // skip workgiver if it doesn't assign work to our tables
-                            if ( !workTables.Any( workTable => scanner.PotentialWorkThingRequest.Accepts( workTable ) ) )
-                            {
-                                continue;
-                            }
-
-                            // if we got here that should hopefully mean we got a valid scanner for this table, and we now know what the worktype def is
-                            _workTypeDef = scanner.def.workType;
-                            return _workTypeDef;
-                        }
-                    }
-                }
-                return _workTypeDef;
-            }
-        }
-
-        public override SkillDef SkillDef
-        {
-            get { return Bill.recipe.workSkill; }
-        }
-
         public override void Tick()
         {
-            if( Find.TickManager.TicksGame % 250 == 0 )
+            if ( Find.TickManager.TicksGame % 250 == 0 )
             {
-                if( maxSkil )
+                if ( maxSkil )
                 {
                     Bill.minSkillLevel =
                         Find.ListerPawns.FreeColonistsSpawned.Max(
                             pawn => pawn.skills.GetSkill( Bill.recipe.workSkill ).level );
                 }
             }
-            if( Find.TickManager.TicksGame % day.Interval == 0 )
+            if ( Find.TickManager.TicksGame % day.Interval == 0 )
             {
                 day.Add( Trigger.CurCount );
             }
-            if( Find.TickManager.TicksGame % month.Interval == 0 )
+            if ( Find.TickManager.TicksGame % month.Interval == 0 )
             {
                 month.Add( Trigger.CurCount );
             }
-            if( Find.TickManager.TicksGame % year.Interval == 0 )
+            if ( Find.TickManager.TicksGame % year.Interval == 0 )
             {
                 year.Add( Trigger.CurCount );
             }
