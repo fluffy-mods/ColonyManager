@@ -142,22 +142,22 @@ namespace FM
             // bar always goes a little beyond the actual target
             int max = Math.Max( (int)( Count * 1.2f ), CurCount );
 
-            // get the bar rect
-            float barHeight = rect.height / max * CurCount;
-            float markHeight = rect.height / max * Count;
-            Rect progressBarRect = new Rect( rect.xMin + 1f, rect.yMax - barHeight, 6f, barHeight );
-
             // draw a box for the bar
             GUI.color = Color.gray;
             Widgets.DrawBox( rect.ContractedBy( 1f ) );
             GUI.color = Color.white;
 
+            // get the bar rect
+            Rect barRect = rect.ContractedBy( 2f );
+            barRect.height *= CurCount / max;
+            float markHeight = barRect.height * Count / max;
+            
             // draw the bar
             // if the job is active and pending, make the bar blueish green - otherwise white.
             Texture2D barTex = active
                 ? _barBackgroundActiveTexture
                 : _barBackgroundInactiveTexture;
-            GUI.DrawTexture( progressBarRect, barTex );
+            GUI.DrawTexture( barRect, barTex );
 
             // draw a mark at the treshold
             Widgets.DrawLineHorizontal( rect.xMin, rect.yMax - markHeight, rect.width );
