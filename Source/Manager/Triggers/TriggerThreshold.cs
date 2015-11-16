@@ -19,12 +19,14 @@ namespace FM
             HigherThan
         }
 
-        public static int DefaultCount = 500;
-        public static int DefaultMaxUpperThreshold = 3000;
+        public static int DefaultCount                         = 500;
+        public static int DefaultMaxUpperThreshold             = 3000;
         public int Count;
         public int MaxUpperThreshold;
         public Ops Op;
         public ThingFilter ThresholdFilter;
+        private static Texture2D _barBackgroundActiveTexture   = SolidColorMaterials.NewSolidColorTexture( new Color( 0.2f, 0.8f, 0.85f ) );
+        private static Texture2D _barBackgroundInactiveTexture = SolidColorMaterials.NewSolidColorTexture( new Color( 0.7f, 0.7f, 0.7f ) );
 
         public int CurCount
         {
@@ -152,8 +154,9 @@ namespace FM
 
             // draw the bar
             // if the job is active and pending, make the bar blueish green - otherwise white.
-            Color barColour = active ? new Color( 0.2f, 0.8f, 0.85f ) : new Color( 1f, 1f, 1f );
-            Texture2D barTex = SolidColorMaterials.NewSolidColorTexture( barColour );
+            Texture2D barTex = active
+                ? _barBackgroundActiveTexture
+                : _barBackgroundInactiveTexture;
             GUI.DrawTexture( progressBarRect, barTex );
 
             // draw a mark at the treshold
