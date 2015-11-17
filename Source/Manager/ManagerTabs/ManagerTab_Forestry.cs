@@ -85,13 +85,12 @@ namespace FM
             // target count (1)
             Rect targetCountTitleRect    = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             int currentCount             = _selected.Trigger.CurCount;
-            int toHaulCount              = _selected.GetWoodLyingAround();
             int designatedCount          = _selected.GetWoodInDesignations();
             int targetCount              = _selected.Trigger.Count;
             Widgets.DrawAltRect( targetCountTitleRect );
             Utilities.Label( targetCountTitleRect, 
-                             "FMF.TargetCount".Translate( currentCount, toHaulCount, designatedCount, targetCount ),
-                             "FMF.TargetCountTooltip".Translate( currentCount, toHaulCount, designatedCount, targetCount),
+                             "FMF.TargetCount".Translate( currentCount, designatedCount, targetCount ),
+                             "FMF.TargetCountTooltip".Translate( currentCount, designatedCount, targetCount),
                              TextAnchor.MiddleLeft, Margin);
             cur.y += EntryHeight;
 

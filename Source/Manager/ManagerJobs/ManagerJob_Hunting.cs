@@ -15,25 +15,24 @@ namespace FM
 {
     public class ManagerJob_Hunting : ManagerJob
     {
-        private static int _histSize = 100;
-
-        private readonly float _margin = Utilities.Margin;
-        private Texture2D _cogTex = ContentFinder< Texture2D >.Get( "UI/Buttons/Cog" );
-        public Dictionary< PawnKindDef, bool > AllowedAnimals = new Dictionary< PawnKindDef, bool >();
-
-        public History day = new History( _histSize );
-        public List< Designation > Designations = new List< Designation >();
-        public History historyShown;
-        public Area HuntingGrounds;
-        public History month = new History( _histSize, History.Period.Month );
-
-        public new Trigger_Threshold Trigger;
-        public bool UnforbidCorpses = true;
-        public History year = new History( _histSize, History.Period.Year );
+        private static int                   _histSize              = 100;
+        private Texture2D                    _cogTex                = ContentFinder<Texture2D>.Get( "UI/Buttons/Cog" );
+        private Utilities.CachedValue        _corpseCachedValue     = new Utilities.CachedValue();
+        private Utilities.CachedValue        _designatedCachedValue = new Utilities.CachedValue();
+        private readonly float               _margin                = Utilities.Margin;
+        public Dictionary<PawnKindDef, bool> AllowedAnimals         = new Dictionary<PawnKindDef, bool>();
+        public History                       day                    = new History( _histSize );
+        public List<Designation>             Designations           = new List<Designation>();
+        public History                       historyShown;
+        public Area                          HuntingGrounds;
+        public History                       month                  = new History( _histSize, History.Period.Month );
+        public new Trigger_Threshold         Trigger;
+        public bool                          UnforbidCorpses        = true;
+        public History                       year                   = new History( _histSize, History.Period.Year );
 
         public override bool Completed
         {
-            get { return Trigger.CurCount + GetMeatInCorpses() + GetMeatInDesignations() >= Trigger.Count; }
+            get { return Trigger.CurCount >= Trigger.Count; }
         }
 
         public override ManagerTab Tab
@@ -54,9 +53,9 @@ namespace FM
             }
         }
 
-        public static List< Thing > Corpses
+        public static List<Thing> Corpses
         {
-            get { return Find.ListerThings.ThingsInGroup( ThingRequestGroup.Corpse ) ?? new List< Thing >(); }
+            get { return Find.ListerThings.ThingsInGroup( ThingRequestGroup.Corpse ) ?? new List<Thing>(); }
         }
 
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Hunting;
@@ -97,14 +96,16 @@ namespace FM
             return p.RaceProps.Animal
                    && !p.health.Dead
                    && p.SpawnedInWorld
-                   // wild animals only
+
+                // wild animals only
                    && p.Faction == null
-                   // non-biome animals won't be on the list
+
+                // non-biome animals won't be on the list
                    && AllowedAnimals.ContainsKey( p.kindDef )
                    && AllowedAnimals[p.kindDef]
                    && Find.DesignationManager.DesignationOn( p ) == null
-                   && ( HuntingGrounds == null 
-                      || HuntingGrounds.ActiveCells.Contains( p.Position ) )
+                   && ( HuntingGrounds == null
+                        || HuntingGrounds.ActiveCells.Contains( p.Position ) )
                    && p.Position.CanReachColony();
         }
 
@@ -154,7 +155,7 @@ namespace FM
         public void CleanDesignations()
         {
             // get the intersection of bills in the game and bills in our list.
-            List< Designation > GameDesignations =
+            List<Designation> GameDesignations =
                 Find.DesignationManager.DesignationsOfDef( DesignationDefOf.Hunt ).ToList();
             Designations = Designations.Intersect( GameDesignations ).ToList();
         }
@@ -231,7 +232,7 @@ namespace FM
             Widgets.DrawHighlightIfMouseover( switchRect );
             if ( Widgets.ImageButton( switchRect, _cogTex ) )
             {
-                List< FloatMenuOption > options = new List< FloatMenuOption >
+                List<FloatMenuOption> options = new List<FloatMenuOption>
                 {
                     new FloatMenuOption( "Day", delegate { historyShown = day; } ),
                     new FloatMenuOption( "Month", delegate { historyShown = month; } ),
@@ -266,7 +267,7 @@ namespace FM
 
             // get a list of huntable animals sorted by distance (ignoring obstacles) and expected meat count.
             // note; attempt to balance cost and benefit, current formula: value = meat / ( distance ^ 2)
-            List< Pawn > huntableAnimals = GetHuntableAnimalsSorted();
+            List<Pawn> huntableAnimals = GetHuntableAnimalsSorted();
 
             // while totalCount < count AND we have animals that can be designated, designate animal.
             for ( int i = 0; i < huntableAnimals.Count && totalCount < Trigger.Count; i++ )
@@ -313,13 +314,13 @@ namespace FM
             AddDesignation( des );
         }
 
-        private List< Pawn > GetHuntableAnimalsSorted()
+        private List<Pawn> GetHuntableAnimalsSorted()
         {
             // we need to define a 'base' position to calculate distances.
             // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
             IntVec3 position = IntVec3.Zero;
             Building managerStation =
-                Find.ListerBuildings.AllBuildingsColonistOfClass< Building_ManagerStation >().FirstOrDefault();
+                Find.ListerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
             if ( managerStation != null )
             {
                 position = managerStation.Position;
@@ -328,7 +329,7 @@ namespace FM
             // otherwise, use the average of the home area. Not ideal, but it'll do.
             else
             {
-                List< IntVec3 > homeCells = Find.AreaManager.Get< Area_Home >().ActiveCells.ToList();
+                List<IntVec3> homeCells = Find.AreaManager.Get<Area_Home>().ActiveCells.ToList();
                 for ( int i = 0; i < homeCells.Count(); i++ )
                 {
                     position += homeCells[i];
@@ -339,13 +340,13 @@ namespace FM
             }
 
             // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
-            List< Pawn > list = Find.ListerPawns.AllPawns.Where( p => IsValidHuntingTarget( p ) )
+            List<Pawn> list = Find.ListerPawns.AllPawns.Where( p => IsValidHuntingTarget( p ) )
 
                 // OrderBy defaults to ascending, switch sign on estimated meat count to get descending
-                                    .OrderBy(
-                                        p =>
-                                            - p.EstimatedMeatCount() /
-                                            ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) ).ToList();
+                                  .OrderBy(
+                                      p =>
+                                          - p.EstimatedMeatCount() /
+                                          ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) ).ToList();
 
             return list;
         }
@@ -364,7 +365,7 @@ namespace FM
                      corpse.IsForbidden( Faction.OfColony ) )
                 {
                     // only fresh corpses
-                    CompRottable comp = corpse.GetComp< CompRottable >();
+                    CompRottable comp = corpse.GetComp<CompRottable>();
                     if ( comp != null &&
                          comp.Stage == RotStage.Fresh )
                     {
@@ -381,6 +382,12 @@ namespace FM
             // get current count + corpses in storage that is not a grave + designated count
             // current count in storage
             int count = 0;
+
+            // try get cached value
+            if ( _corpseCachedValue.TryGetCount( out count ) )
+            {
+                return count;
+            }
 
             // corpses not buried / forbidden
             foreach ( Thing current in Corpses )
@@ -414,12 +421,21 @@ namespace FM
                 }
             }
 
+            // set cache
+            _corpseCachedValue.Update( count );
+
             return count;
         }
 
         public int GetMeatInDesignations()
         {
             int count = 0;
+
+            // try get cache
+            if ( _designatedCachedValue.TryGetCount( out count ) )
+            {
+                return count;
+            }
 
             // designated animals
             foreach ( Designation des in Find.DesignationManager.DesignationsOfDef( DesignationDefOf.Hunt ) )
@@ -435,6 +451,9 @@ namespace FM
                     count += target.EstimatedMeatCount();
                 }
             }
+
+            // update cache
+            _designatedCachedValue.Update( count );
 
             return count;
         }

@@ -15,21 +15,20 @@ namespace FM
 {
     public class ManagerJob_Forestry : ManagerJob
     {
-        private static int _histSize = 100;
-        private readonly float _margin = Utilities.Margin;
-        private Texture2D _cogTex = ContentFinder< Texture2D >.Get( "UI/Buttons/Cog" );
-        public Dictionary< ThingDef, bool > AllowedTrees;
-        public bool AllowSaplings;
-        public bool ClearWindCells = true;
-        public History day = new History( _histSize );
-        public List< Designation > Designations = new List< Designation >();
-
-        public History historyShown;
-
-        public Area LoggingArea;
-        public History month = new History( _histSize, History.Period.Month );
-        public new Trigger_Threshold Trigger;
-        public History year = new History( _histSize, History.Period.Year );
+        private static int                _histSize                   = 100;
+        private Texture2D                 _cogTex                     = ContentFinder<Texture2D>.Get( "UI/Buttons/Cog" );
+        private Utilities.CachedValue     _designatedWoodCachedValue  = new Utilities.CachedValue();
+        private readonly float            _margin                     = Utilities.Margin;
+        public Dictionary<ThingDef, bool> AllowedTrees;
+        public bool                       AllowSaplings;
+        public bool                       ClearWindCells              = true;
+        public History                    day                         = new History( _histSize );
+        public List<Designation>          Designations                = new List<Designation>();
+        public History                    historyShown;
+        public Area                       LoggingArea;
+        public History                    month                       = new History( _histSize, History.Period.Month );
+        public new Trigger_Threshold      Trigger;
+        public History                    year                        = new History( _histSize, History.Period.Year );
 
         public override string Label
         {
@@ -38,7 +37,7 @@ namespace FM
 
         public override bool Completed
         {
-            get { return Trigger.CurCount + GetWoodLyingAround() + GetWoodInDesignations() >= Trigger.Count; }
+            get { return Trigger.CurCount >= Trigger.Count; }
         }
 
         public override ManagerTab Tab
@@ -119,7 +118,7 @@ namespace FM
         public void CleanDesignations()
         {
             // get the intersection of bills in the game and bills in our list.
-            List< Designation > gameDesignations =
+            List<Designation> gameDesignations =
                 Find.DesignationManager.DesignationsOfDef( DesignationDefOf.HarvestPlant ).ToList();
             Designations = Designations.Intersect( gameDesignations ).ToList();
         }
@@ -143,8 +142,8 @@ namespace FM
         {
             // get list of game designations not managed by this job that could be assigned by this job.
             foreach ( Designation des in Find.DesignationManager.DesignationsOfDef( DesignationDefOf.CutPlant )
-                                   .Except( Designations )
-                                   .Where( des => IsValidForestryTarget( des.target ) ) )
+                                             .Except( Designations )
+                                             .Where( des => IsValidForestryTarget( des.target ) ) )
             {
                 AddDesignation( des );
             }
@@ -159,22 +158,22 @@ namespace FM
         private bool IsValidForestryTarget( Thing t )
         {
             return t is Plant
-                   && IsValidForestryTarget( (Plant) t );
+                   && IsValidForestryTarget( (Plant)t );
         }
 
         private bool IsValidForestryTarget( Plant p )
         {
             return p.def.plant != null
 
-                    // non-biome trees won't be on the list
+                // non-biome trees won't be on the list
                    && AllowedTrees.ContainsKey( p.def )
 
-                    // also filters out non-tree plants
+                // also filters out non-tree plants
                    && AllowedTrees[p.def]
                    && p.SpawnedInWorld
                    && Find.DesignationManager.DesignationOn( p ) == null
 
-                    // cut only mature trees, or saplings that yield wood.
+                // cut only mature trees, or saplings that yield wood.
                    && ( ( AllowSaplings && p.YieldNow() > 1 )
                         || p.LifeStage == PlantLifeStage.Mature )
                    && ( LoggingArea == null
@@ -255,7 +254,7 @@ namespace FM
             Widgets.DrawHighlightIfMouseover( switchRect );
             if ( Widgets.ImageButton( switchRect, _cogTex ) )
             {
-                List< FloatMenuOption > options = new List< FloatMenuOption >
+                List<FloatMenuOption> options = new List<FloatMenuOption>
                 {
                     new FloatMenuOption( "Day", delegate { historyShown = day; } ),
                     new FloatMenuOption( "Month", delegate { historyShown = month; } ),
@@ -289,10 +288,10 @@ namespace FM
             }
 
             // get current lumber count
-            int count = Trigger.CurCount + GetWoodInDesignations() + GetWoodLyingAround();
+            int count = Trigger.CurCount + GetWoodInDesignations();
 
             // get sorted list of loggable trees
-            List< Plant > trees = GetLoggableTreesSorted();
+            List<Plant> trees = GetLoggableTreesSorted();
 
             // designate untill we're either out of trees or we have enough designated.
             for ( int i = 0; i < trees.Count && count < Trigger.Count; i++ )
@@ -338,10 +337,10 @@ namespace FM
             }
         }
 
-        private List< IntVec3 > GetWindCells()
+        private List<IntVec3> GetWindCells()
         {
             return Find.ListerBuildings
-                       .AllBuildingsColonistOfClass< Building_WindTurbine >()
+                       .AllBuildingsColonistOfClass<Building_WindTurbine>()
                        .SelectMany( turbine => Building_WindTurbine.CalculateWindCells( turbine.Position,
                                                                                         turbine.Rotation,
                                                                                         turbine.RotatedSize ) )
@@ -365,13 +364,13 @@ namespace FM
             }
         }
 
-        private List< Plant > GetLoggableTreesSorted()
+        private List<Plant> GetLoggableTreesSorted()
         {
             // we need to define a 'base' position to calculate distances.
             // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
             IntVec3 position = IntVec3.Zero;
             Building managerStation =
-                Find.ListerBuildings.AllBuildingsColonistOfClass< Building_ManagerStation >().FirstOrDefault();
+                Find.ListerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
             if ( managerStation != null )
             {
                 position = managerStation.Position;
@@ -380,7 +379,7 @@ namespace FM
             // otherwise, use the average of the home area. Not ideal, but it'll do.
             else
             {
-                List< IntVec3 > homeCells = Find.AreaManager.Get< Area_Home >().ActiveCells.ToList();
+                List<IntVec3> homeCells = Find.AreaManager.Get<Area_Home>().ActiveCells.ToList();
                 for ( int i = 0; i < homeCells.Count; i++ )
                 {
                     position += homeCells[i];
@@ -391,15 +390,15 @@ namespace FM
             }
 
             // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
-            List< Plant > list = Find.ListerThings.AllThings.Where( p => IsValidForestryTarget(p) )
+            List<Plant> list = Find.ListerThings.AllThings.Where( p => IsValidForestryTarget( p ) )
 
                 // OrderBy defaults to ascending, switch sign on current yield to get descending
-                                     .Select( p => p as Plant )
-                                     .OrderBy(
-                                         p =>
-                                             - p.YieldNow() /
-                                             ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) )
-                                     .ToList();
+                                   .Select( p => p as Plant )
+                                   .OrderBy(
+                                       p =>
+                                           - p.YieldNow() /
+                                           ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) )
+                                   .ToList();
 
             return list;
         }
@@ -413,6 +412,12 @@ namespace FM
         {
             int count = 0;
 
+            // try get cache
+            if ( _designatedWoodCachedValue.TryGetCount( out count ) )
+            {
+                return count;
+            }
+
             foreach ( Designation des in Designations )
             {
                 if ( des.target.HasThing &&
@@ -423,16 +428,10 @@ namespace FM
                 }
             }
 
-            return count;
-        }
+            // update cache
+            _designatedWoodCachedValue.Update( count );
 
-        public int GetWoodLyingAround()
-        {
-            return Find.ListerThings.ThingsOfDef( Utilities_Forestry.Wood )
-                       .Where( thing => !thing.IsInAnyStorage()
-                                        && !thing.IsForbidden( Faction.OfColony )
-                                        && !thing.Position.CanReachColony() )
-                       .Sum( thing => thing.stackCount );
+            return count;
         }
     }
 }

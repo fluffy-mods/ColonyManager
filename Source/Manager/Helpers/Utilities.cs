@@ -19,8 +19,8 @@ namespace FM
         public const float ListEntryHeight                        = 50f;
         public static Texture2D SlightlyDarkBackground            = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .4f );
         public static Texture2D DeleteX                           = ContentFinder< Texture2D >.Get( "UI/Buttons/Delete", true );
-        public static Dictionary< ThingFilter, Cache > CountCache = new Dictionary< ThingFilter, Cache >();
-        public static WorkTypeDef WorkTypeDefOf_Managing          = DefDatabase<WorkTypeDef>.GetNamed("Managing");
+        public static Dictionary< ThingFilter, FilterCountCache > CountCache = new Dictionary< ThingFilter, FilterCountCache >();
+        public static WorkTypeDef WorkTypeDefOf_Managing          = DefDatabase< WorkTypeDef >.GetNamed("Managing");
         public const float SliderHeight                           = 20f;
 
         public static void Label( Rect rect, string label, string tooltip = null, TextAnchor anchor = TextAnchor.UpperLeft, float lrMargin = 0f, float tbMargin = 0f, GameFont font = GameFont.Small )
@@ -46,10 +46,10 @@ namespace FM
         {
             if ( CountCache.ContainsKey( filter ) )
             {
-                Cache cache = CountCache[filter];
-                if ( Find.TickManager.TicksGame - cache.lastCache < 250 )
+                FilterCountCache filterCountCache = CountCache[filter];
+                if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 )
                 {
-                    count = cache.cachedCount;
+                    count = filterCountCache.Cache;
                     return true;
                 }
             }
@@ -65,7 +65,7 @@ namespace FM
             int days = ticks / GenDate.TicksPerDay,
                 hours = ticks % GenDate.TicksPerDay / GenDate.TicksPerHour;
 
-            string s = string.Empty;
+            string s = String.Empty;
 
             if ( days > 0 )
             {
@@ -132,21 +132,52 @@ namespace FM
                 // update cache if exists.
                 if ( CountCache.ContainsKey( filter ) )
                 {
-                    CountCache[filter].cachedCount = count;
-                    CountCache[filter].lastCache = Find.TickManager.TicksGame;
+                    CountCache[filter].Cache = count;
+                    CountCache[filter].TimeSet = Find.TickManager.TicksGame;
                 }
                 else
                 {
-                    CountCache.Add( filter, new Cache( count ) );
+                    CountCache.Add( filter, new FilterCountCache( count ) );
                 }
             }
             return count;
         }
 
+        public class CachedValue
+        {
+            public int timeSet;
+            public int updateInterval;
+            private int _cached;
+
+            public bool TryGetCount( out int count )
+            {
+                if( Find.TickManager.TicksGame - timeSet <= updateInterval )
+                {
+                    count = _cached;
+                    return true;
+                }
+                count = 0;
+                return false;
+            }
+
+            public void Update( int count )
+            {
+                _cached = count;
+                timeSet = Find.TickManager.TicksGame;
+            }
+
+            public CachedValue( int count = 0, int updateInterval = 250 )
+            {
+                this.updateInterval = updateInterval;
+                _cached = count;
+                timeSet = Find.TickManager.TicksGame;
+            }
+        }
+
         public static bool IsInt( this string text )
         {
             int num;
-            return int.TryParse( text, out num );
+            return Int32.TryParse( text, out num );
         }
 
         public static void DrawToggle( Rect rect, string label, ref bool checkOn, float size = 24f,
@@ -213,7 +244,7 @@ namespace FM
                 }
                 else
                 {
-                    on();
+                    @on();
                 }
             }
         }
@@ -225,15 +256,15 @@ namespace FM
         }
 
         // count cache for multiple products
-        public class Cache
+        public class FilterCountCache
         {
-            public int cachedCount;
-            public int lastCache;
+            public int Cache;
+            public int TimeSet;
 
-            public Cache( int count )
+            public FilterCountCache( int count )
             {
-                cachedCount = count;
-                lastCache = Find.TickManager.TicksGame;
+                Cache = count;
+                TimeSet = Find.TickManager.TicksGame;
             }
         }
     }

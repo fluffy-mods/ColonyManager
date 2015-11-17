@@ -242,7 +242,16 @@ namespace FM
                 {
                     Widgets.DrawAltRect( row );
                 }
-                DrawPawnOverviewRow( Workers[i], row );
+                try
+                {
+                    DrawPawnOverviewRow( Workers[i], row );
+                }
+                catch // pawn death, etc.
+                {
+                    // rehresh the list and skip drawing untill the next GUI tick.
+                    RefreshWorkers();
+                    return;
+                }
                 cur.y += RowHeightPawnOverview;
             }
 
