@@ -9,6 +9,7 @@ using System.Linq;
 using RimWorld;
 using UnityEngine;
 using Verse;
+using Resources = FM.Resources;
 
 namespace FM
 {
@@ -19,31 +20,23 @@ namespace FM
                            RowHeight = Utilities.ListEntryHeight,
                            RowHeightPawnOverview = 30f,
                            IconSize = 30f;
-
-        public static readonly Texture2D ArrowTop       = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowTop" ),
-                                         ArrowUp        = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowUp" ),
-                                         ArrowDown      = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowDown" ),
-                                         ArrowBottom    = ContentFinder< Texture2D >.Get( "UI/Buttons/ArrowBottom" ),
-                                         StampCompleted = ContentFinder< Texture2D >.Get( "UI/Stamps/Completed" ),
-                                         StampSuspended = ContentFinder< Texture2D >.Get( "UI/Stamps/Suspended" );
-
-        private Texture2D   _icon                   = ContentFinder< Texture2D >.Get( "UI/Icons/Overview" );
-        private Vector2     _overviewScrollPosition = Vector2.zero;
-        private Vector2     _workersScrollPosition  = Vector2.zero;
-        private ManagerJob  _selectedJob;
-        private SkillDef    _skillDef;
+        
+        private Vector2 _overviewScrollPosition = Vector2.zero;
+        private ManagerJob _selectedJob;
+        private SkillDef _skillDef;
+        private Vector2 _workersScrollPosition = Vector2.zero;
         private WorkTypeDef _workType;
-        public float        OverviewHeight          = 9999f;
-        private List< Pawn > Workers                = new List< Pawn >();
+        public float OverviewHeight = 9999f;
+        private List<Pawn> Workers = new List<Pawn>();
 
-        public static List< ManagerJob > Jobs
+        public static List<ManagerJob> Jobs
         {
             get { return Manager.Get.JobStack.FullStack(); }
         }
 
         public override Texture2D Icon
         {
-            get { return _icon; }
+            get { return Resources.IconOverview; }
         }
 
         public override IconAreas IconArea
@@ -56,7 +49,6 @@ namespace FM
         public override ManagerJob Selected
         {
             get { return _selectedJob; }
-
             set
             {
                 _selectedJob = value;
@@ -96,7 +88,7 @@ namespace FM
         /// <param name="rect"></param>
         /// <param name="job"></param>
         /// <returns></returns>
-        public static bool DrawOrderButtons< T >( Rect rect, T job ) where T : ManagerJob
+        public static bool DrawOrderButtons<T>( Rect rect, T job ) where T : ManagerJob
         {
             bool ret = false;
 
@@ -108,7 +100,7 @@ namespace FM
                  topRect = new Rect( rect.xMin + width, rect.yMin, width, height ).ContractedBy( 1f ),
                  bottomRect = new Rect( rect.xMin + width, rect.yMin + height, width, height ).ContractedBy( 1f );
 
-            List< T > jobsOfType = Jobs.OfType< T >().OrderBy( j => j.Priority ).ToList();
+            List<T> jobsOfType = Jobs.OfType<T>().OrderBy( j => j.Priority ).ToList();
 
             bool top = jobsOfType.IndexOf( job ) == 0,
                  bottom = jobsOfType.IndexOf( job ) == jobsOfType.Count - 1;
@@ -116,13 +108,13 @@ namespace FM
             if ( !top )
             {
                 DrawOrderTooltips( upRect, topRect );
-                if ( Widgets.ImageButton( topRect, ArrowTop ) )
+                if ( Widgets.ImageButton( topRect, Resources.ArrowTop ) )
                 {
                     Manager.Get.JobStack.TopPriority( job );
                     ret = true;
                 }
 
-                if ( Widgets.ImageButton( upRect, ArrowUp ) )
+                if ( Widgets.ImageButton( upRect, Resources.ArrowUp ) )
                 {
                     Manager.Get.JobStack.IncreasePriority( job );
                     ret = true;
@@ -132,13 +124,13 @@ namespace FM
             if ( !bottom )
             {
                 DrawOrderTooltips( downRect, bottomRect, false );
-                if ( Widgets.ImageButton( downRect, ArrowDown ) )
+                if ( Widgets.ImageButton( downRect, Resources.ArrowDown ) )
                 {
                     Manager.Get.JobStack.DecreasePriority( job );
                     ret = true;
                 }
 
-                if ( Widgets.ImageButton( bottomRect, ArrowBottom ) )
+                if ( Widgets.ImageButton( bottomRect, Resources.ArrowBottom ) )
                 {
                     Manager.Get.JobStack.BottomPriority( job );
                     ret = true;
@@ -188,7 +180,8 @@ namespace FM
 
         private void RefreshWorkers()
         {
-            var temp = Find.ListerPawns.FreeColonistsSpawned.Where( pawn => !pawn.story.WorkTypeIsDisabled( WorkTypeDef ) );
+            IEnumerable<Pawn> temp =
+                Find.ListerPawns.FreeColonistsSpawned.Where( pawn => !pawn.story.WorkTypeIsDisabled( WorkTypeDef ) );
 
             // sort by either specific skill def or average over job - depending on which is known.
             temp = SkillDef != null
@@ -269,7 +262,7 @@ namespace FM
             float colWidth = rect.width / 4 - Margin;
 
             // cell rects
-            Rect nameRect     = new Rect( colWidth * 0, rect.yMin, colWidth, RowHeightPawnOverview );
+            Rect nameRect = new Rect( colWidth * 0, rect.yMin, colWidth, RowHeightPawnOverview );
             Rect activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2.5f, RowHeightPawnOverview );
             Rect priorityRect = new Rect( colWidth * 3.5f, rect.yMin, colWidth * .5f, RowHeightPawnOverview );
 
@@ -293,13 +286,13 @@ namespace FM
             // current activity (if curDriver != null)
             string activityString = pawn.jobs.curDriver?.GetReport() ?? "FM.NoCurJob".Translate();
             Utilities.Label( activityRect, activityString, pawn.jobs.curDriver?.GetReport(), TextAnchor.MiddleCenter,
-                             Margin, font: GameFont.Tiny);
-            
+                             Margin, font: GameFont.Tiny );
+
             // priority button
             Rect priorityPosition = new Rect( 0f, 0f, 24f, 24f ).CenteredOnXIn( priorityRect )
-                                                              .CenteredOnYIn( priorityRect );
+                                                                .CenteredOnYIn( priorityRect );
             Text.Font = GameFont.Medium;
-            WidgetsWork.DrawWorkBoxFor(new Vector2(priorityPosition.xMin, priorityPosition.yMin), pawn, WorkTypeDef );
+            WidgetsWork.DrawWorkBoxFor( new Vector2( priorityPosition.xMin, priorityPosition.yMin ), pawn, WorkTypeDef );
             Text.Font = GameFont.Small;
         }
 
@@ -361,20 +354,6 @@ namespace FM
                     {
                         Selected = Jobs[i];
                     }
-
-                    // draw stamps
-                    Rect stampRect = new Rect( 0f, 0f, 150f, 45f ).CenteredOnXIn( row ).CenteredOnYIn( row );
-                    if ( Jobs[i].Completed )
-                    {
-                        GUI.DrawTexture( row, Utilities.SlightlyDarkBackground );
-                        GUI.DrawTexture( stampRect, StampCompleted );
-                    }
-                    else if (Jobs[i].Suspended)
-                    {
-                        GUI.DrawTexture( row, Utilities.SlightlyDarkBackground );
-                        GUI.DrawTexture( stampRect, StampSuspended );
-                    }
-
 
                     cur.y += 50f;
                 }

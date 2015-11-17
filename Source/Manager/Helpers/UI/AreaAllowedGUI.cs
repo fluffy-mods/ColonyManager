@@ -18,7 +18,7 @@ namespace FM
         public static void DoAllowedAreaSelectors( Rect rect, ref Area area,
                                                    AllowedAreaMode mode = AllowedAreaMode.Humanlike )
         {
-            List< Area > allAreas = Find.AreaManager.AllAreas;
+            List<Area> allAreas = Find.AreaManager.AllAreas;
             int areaCount = 1;
             for ( int i = 0; i < allAreas.Count; i++ )
             {

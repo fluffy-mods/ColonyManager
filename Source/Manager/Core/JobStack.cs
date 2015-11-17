@@ -12,12 +12,12 @@ namespace FM
 {
     public class JobStack : IExposable
     {
-        private List< ManagerJob > _stack;
+        private List<ManagerJob> _stack;
 
         /// <summary>
         ///     Jobstack of jobs that are available now
         /// </summary>
-        public List< ManagerJob > CurStack
+        public List<ManagerJob> CurStack
         {
             get { return _stack.Where( mj => mj.ShouldDoNow ).OrderBy( mj => mj.Priority ).ToList(); }
         }
@@ -32,7 +32,7 @@ namespace FM
         /// </summary>
         public JobStack()
         {
-            _stack = new List< ManagerJob >();
+            _stack = new List<ManagerJob>();
         }
 
         public void ExposeData()
@@ -43,15 +43,15 @@ namespace FM
         /// <summary>
         ///     Jobs of type T in jobstack, in order of priority
         /// </summary>
-        public List< T > FullStack< T >() where T : ManagerJob
+        public List<T> FullStack<T>() where T : ManagerJob
         {
-            return _stack.OrderBy( job => job.Priority ).OfType< T >().ToList();
+            return _stack.OrderBy( job => job.Priority ).OfType<T>().ToList();
         }
 
         /// <summary>
         ///     Jobs of type T in jobstack, in order of priority
         /// </summary>
-        public List< ManagerJob > FullStack()
+        public List<ManagerJob> FullStack()
         {
             return _stack.OrderBy( job => job.Priority ).ToList();
         }
@@ -106,7 +106,7 @@ namespace FM
         /// </summary>
         private void CleanPriorities()
         {
-            List< ManagerJob > orderedStack = _stack.OrderBy( mj => mj.Priority ).ToList();
+            List<ManagerJob> orderedStack = _stack.OrderBy( mj => mj.Priority ).ToList();
             for ( int i = 1; i <= _stack.Count; i++ )
             {
                 orderedStack[i - 1].Priority = i;
@@ -144,11 +144,11 @@ namespace FM
             CleanPriorities();
         }
 
-        public void TopPriority< T >( T job ) where T : ManagerJob
+        public void TopPriority<T>( T job ) where T : ManagerJob
         {
             // get list of priorities for this type.
-            List< T > jobsOfType = _stack.OfType< T >().OrderBy( j => j.Priority ).ToList();
-            List< int > priorities = jobsOfType.Select( j => j.Priority ).ToList();
+            List<T> jobsOfType = _stack.OfType<T>().OrderBy( j => j.Priority ).ToList();
+            List<int> priorities = jobsOfType.Select( j => j.Priority ).ToList();
 
             // make sure our job is on top.
             job.Priority = - 1;
@@ -163,11 +163,11 @@ namespace FM
             }
         }
 
-        public void BottomPriority< T >( T job ) where T : ManagerJob
+        public void BottomPriority<T>( T job ) where T : ManagerJob
         {
             // get list of priorities for this type.
-            List< T > jobsOfType = _stack.OfType< T >().OrderBy( j => j.Priority ).ToList();
-            List< int > priorities = jobsOfType.Select( j => j.Priority ).ToList();
+            List<T> jobsOfType = _stack.OfType<T>().OrderBy( j => j.Priority ).ToList();
+            List<int> priorities = jobsOfType.Select( j => j.Priority ).ToList();
 
             // make sure our job is on the bottom.
             job.Priority = _stack.Count + 10;
@@ -182,18 +182,18 @@ namespace FM
             }
         }
 
-        public void DecreasePriority< T >( T job ) where T : ManagerJob
+        public void DecreasePriority<T>( T job ) where T : ManagerJob
         {
-            ManagerJob jobB = _stack.OfType< T >()
+            ManagerJob jobB = _stack.OfType<T>()
                                     .OrderBy( mj => mj.Priority )
                                     .First( mj => mj.Priority > job.Priority );
             SwitchPriorities( job, jobB );
         }
 
-        public void IncreasePriority< T >( T job ) where T : ManagerJob
+        public void IncreasePriority<T>( T job ) where T : ManagerJob
         {
             ManagerJob jobB =
-                _stack.OfType< T >().OrderByDescending( mj => mj.Priority ).First( mj => mj.Priority < job.Priority );
+                _stack.OfType<T>().OrderByDescending( mj => mj.Priority ).First( mj => mj.Priority < job.Priority );
             SwitchPriorities( job, jobB );
         }
     }

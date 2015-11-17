@@ -11,9 +11,8 @@ namespace FM
 {
     public static class Utilities_Hunting
     {
-        public static ThingCategoryDef RawMeat = DefDatabase< ThingCategoryDef >.GetNamed( "MeatRaw" );
-
-        public static ThingDef HumanMeat = ThingDef.Named( "Human" ).race.meatDef;
+        public static ThingDef         HumanMeat = ThingDef.Named( "Human" ).race.meatDef;
+        public static ThingCategoryDef RawMeat   = DefDatabase<ThingCategoryDef>.GetNamed( "MeatRaw" );
 
         public static int EstimatedMeatCount( this Pawn p )
         {

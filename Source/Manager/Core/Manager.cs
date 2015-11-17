@@ -19,16 +19,14 @@ namespace FM
             ImportExport,
             Normal
         }
+                
+        public static Modes      LoadSaveMode           = Modes.Normal;
+        private List<ManagerTab> _managerTabsLeft;
+        private List<ManagerTab> _managerTabsMiddle;
+        private List<ManagerTab> _managerTabsRight;
+        private JobStack         _stack;
 
-        public static Modes LoadSaveMode = Modes.Normal;
-
-        private List< ManagerTab > _managerTabsLeft;
-        private List< ManagerTab > _managerTabsMiddle;
-        private List< ManagerTab > _managerTabsRight;
-
-        private JobStack _stack;
-
-        public List< ManagerTab > ManagerTabs = new List< ManagerTab >
+        public List<ManagerTab> ManagerTabs = new List<ManagerTab>
         {
             new ManagerTab_Overview(),
             new ManagerTab_Production(),
@@ -39,7 +37,7 @@ namespace FM
             // TODO: new ManagerTabLifestock(),
         };
 
-        public List< ManagerTab > ManagerTabsLeft
+        public List<ManagerTab> ManagerTabsLeft
         {
             get
             {
@@ -51,7 +49,7 @@ namespace FM
             }
         }
 
-        public List< ManagerTab > ManagerTabsMiddle
+        public List<ManagerTab> ManagerTabsMiddle
         {
             get
             {
@@ -64,7 +62,7 @@ namespace FM
             }
         }
 
-        public List< ManagerTab > ManagerTabsRight
+        public List<ManagerTab> ManagerTabsRight
         {
             get
             {
@@ -84,7 +82,7 @@ namespace FM
             get
             {
                 Manager getComponent =
-                    Find.Map.components.OfType< Manager >().FirstOrDefault();
+                    Find.Map.components.OfType<Manager>().FirstOrDefault();
                 if ( getComponent == null )
                 {
                     getComponent = new Manager();

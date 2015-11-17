@@ -17,24 +17,25 @@ namespace FM
         private static float viewHeight;
 
         public void DoThingFilterConfigWindow( Rect canvas, ref Vector2 scrollPosition, ThingFilter filter,
-                                               ThingFilter parentFilter = null, int openMask = 1, bool buttonsAtBottom = false )
+                                               ThingFilter parentFilter = null, int openMask = 1,
+                                               bool buttonsAtBottom = false )
         {
             // respect your bounds!
-            GUI.BeginGroup(canvas);
+            GUI.BeginGroup( canvas );
             canvas = canvas.AtZero();
 
             // set up buttons
-            Text.Font            = GameFont.Tiny;
-            float width          = canvas.width - 2f;
+            Text.Font = GameFont.Tiny;
+            float width = canvas.width - 2f;
             Rect clearButtonRect = new Rect( canvas.x + 1f, canvas.y + 1f, width / 2f, 24f );
-            Rect allButtonRect   = new Rect( clearButtonRect.xMax + 1f, clearButtonRect.y, width / 2f, 24f );
+            Rect allButtonRect = new Rect( clearButtonRect.xMax + 1f, clearButtonRect.y, width / 2f, 24f );
 
             // offset canvas position for buttons.
             if ( buttonsAtBottom )
             {
                 clearButtonRect.y = canvas.height - clearButtonRect.height;
-                allButtonRect.y   = canvas.height - clearButtonRect.height;
-                canvas.yMax       -= clearButtonRect.height;
+                allButtonRect.y = canvas.height - clearButtonRect.height;
+                canvas.yMax -= clearButtonRect.height;
             }
             else
             {
@@ -42,7 +43,7 @@ namespace FM
             }
 
             // draw buttons + logic
-            if( Widgets.TextButton( clearButtonRect, "ClearAll".Translate() ) )
+            if ( Widgets.TextButton( clearButtonRect, "ClearAll".Translate() ) )
             {
                 filter.SetDisallowAll();
             }
@@ -53,8 +54,8 @@ namespace FM
             Text.Font = GameFont.Small;
 
             // do list
-            float curY                                           = 2f;
-            Rect viewRect                                        = new Rect( 0f, 0f, canvas.width - 16f, viewHeight );
+            float curY = 2f;
+            Rect viewRect = new Rect( 0f, 0f, canvas.width - 16f, viewHeight );
 
             // scrollview
             Widgets.BeginScrollView( canvas, ref scrollPosition, viewRect );
@@ -64,11 +65,12 @@ namespace FM
             DrawQualityFilterConfig( ref curY, viewRect.width, filter );
 
             // main listing
-            Rect listingRect                                     = new Rect( 0f, curY, 9999f, 9999f );
+            Rect listingRect = new Rect( 0f, curY, 9999f, 9999f );
             float labelWidth = width - Widgets.CheckboxSize - Utilities.Margin;
-            Listing_TreeThingFilter listingTreeThingFilter       = new Listing_TreeThingFilter( listingRect, filter, parentFilter,
-                                                                      labelWidth, true );
-            TreeNode_ThingCategory node                          = ThingCategoryNodeDatabase.RootNode;
+            Listing_TreeThingFilter listingTreeThingFilter = new Listing_TreeThingFilter( listingRect, filter,
+                                                                                          parentFilter,
+                                                                                          labelWidth, true );
+            TreeNode_ThingCategory node = ThingCategoryNodeDatabase.RootNode;
             if ( parentFilter != null )
             {
                 if ( parentFilter.DisplayRootCategory == null )

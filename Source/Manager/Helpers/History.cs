@@ -26,11 +26,11 @@ namespace FM
         private const int Breaks = 5;
         private const int DashLength = 3;
         private const float Margin = Utilities.Margin;
-        private List< int > _hist = new List< int > { 0 };
+        private List<int> _hist = new List<int> { 0 };
 
         // Period stuff
         private readonly Period _period;
-        private readonly Texture2D _plotBG = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .2f );
+        private readonly Texture2D _plotBG = Resources.SlightlyDarkBackground;
 
         // start with a single entry to avoid issues with .Max()
         private int _ticksPerPeriod;
@@ -86,6 +86,15 @@ namespace FM
             Size = size;
             _period = period;
         }
+
+        #region Implementation of IExposable
+
+        public void ExposeData()
+        {
+            Scribe_Collections.LookList( ref _hist, "History", LookMode.Value );
+        }
+
+        #endregion
 
         public void Add( int x )
         {
@@ -149,14 +158,5 @@ namespace FM
             GUI.color = Color.white;
             GUI.EndGroup();
         }
-
-        #region Implementation of IExposable
-
-        public void ExposeData()
-        {
-            Scribe_Collections.LookList(ref _hist, "History", LookMode.Value);
-        }
-
-        #endregion
     }
 }

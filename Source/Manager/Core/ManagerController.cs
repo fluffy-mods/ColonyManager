@@ -20,7 +20,7 @@ namespace FM
                 return;
             }
             GameObject = new GameObject( "Manager_Controller" );
-            GameObject.AddComponent< ManagerController >();
+            GameObject.AddComponent<ManagerController>();
             Object.DontDestroyOnLoad( GameObject );
         }
 
@@ -30,7 +30,6 @@ namespace FM
     internal class ManagerController : MonoBehaviour
     {
         public readonly string GameObjectName = "Fluffy Manager";
-
         public void OnLevelWasLoaded() {}
 
         public void Start()

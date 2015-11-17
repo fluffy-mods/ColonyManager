@@ -21,12 +21,11 @@ namespace FM
             Unknown
         }
 
+        private ThingCategoryDef   _categoryDef;
+        private string             _label;
         private readonly RecipeDef _recipe;
-
-        private ThingCategoryDef _categoryDef;
-        private string _label;
-        private ThingDef _thingDef;
-        public Types Type = Types.Unknown;
+        private ThingDef           _thingDef;
+        public Types               Type = Types.Unknown;
 
         public ThingCategoryDef CategoryDef
         {
@@ -172,7 +171,7 @@ namespace FM
                              allowedThingDef.butcherProducts.Count > 0 )
                         {
                             // butcherproducts are defined, no problem.
-                            List< ThingCount > butcherProducts = allowedThingDef.butcherProducts;
+                            List<ThingCount> butcherProducts = allowedThingDef.butcherProducts;
                             if ( butcherProducts.Count == 0 )
                             {
                                 throw new Exception( "No butcherproducts defined: " + allowedThingDef.defName );
@@ -219,7 +218,7 @@ namespace FM
                             return;
                         }
 
-                        List< ThingCount > smeltingProducts = allowedThingDef.smeltProducts;
+                        List<ThingCount> smeltingProducts = allowedThingDef.smeltProducts;
                         if ( smeltingProducts.Count == 0 )
                         {
                             Clear();

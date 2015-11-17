@@ -13,7 +13,6 @@ namespace FM
     internal class MainTabWindow_Manager : MainTabWindow
     {
         public static ManagerTab CurrentTab;
-
         private static float _iconSize = 30f;
         private static float _margin = Utilities.Margin;
         public ManagerTab DefaultTab = Manager.Get.ManagerTabs[0];
@@ -50,11 +49,11 @@ namespace FM
 
             // three areas of icons for tabs, left middle and right.
             Rect leftIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsLeft.Count * ( _iconSize + _margin ),
-                                      _iconSize );
-            Rect middleIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsMiddle.Count * ( _iconSize + _margin ),
-                                        _iconSize );
-            Rect rightIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsRight.Count * ( _iconSize + _margin ),
                                        _iconSize );
+            Rect middleIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsMiddle.Count * ( _iconSize + _margin ),
+                                         _iconSize );
+            Rect rightIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsRight.Count * ( _iconSize + _margin ),
+                                        _iconSize );
 
             // finetune rects
             middleIcons = middleIcons.CenteredOnXIn( canvas );
@@ -105,7 +104,7 @@ namespace FM
             if ( tab == CurrentTab )
             {
                 GUI.color = GenUI.MouseoverColor;
-                if( Widgets.ImageButton( rect, tab.Icon, GenUI.MouseoverColor) )
+                if ( Widgets.ImageButton( rect, tab.Icon, GenUI.MouseoverColor ) )
                 {
                     tab.Selected = null;
                 }

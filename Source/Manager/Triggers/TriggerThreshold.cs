@@ -19,14 +19,13 @@ namespace FM
             HigherThan
         }
 
-        public static int DefaultCount                         = 500;
-        public static int DefaultMaxUpperThreshold             = 3000;
+        public static int DefaultCount = 500;
+        public static int DefaultMaxUpperThreshold = 3000;
+        
         public int Count;
         public int MaxUpperThreshold;
         public Ops Op;
         public ThingFilter ThresholdFilter;
-        private static Texture2D _barBackgroundActiveTexture   = SolidColorMaterials.NewSolidColorTexture( new Color( 0.2f, 0.8f, 0.85f ) );
-        private static Texture2D _barBackgroundInactiveTexture = SolidColorMaterials.NewSolidColorTexture( new Color( 0.7f, 0.7f, 0.7f ) );
 
         public int CurCount
         {
@@ -141,7 +140,7 @@ namespace FM
         {
             // bar always goes a little beyond the actual target
             int max = Math.Max( (int)( Count * 1.2f ), CurCount );
-            
+
             // draw a box for the bar
             GUI.color = Color.gray;
             Widgets.DrawBox( rect.ContractedBy( 1f ) );
@@ -151,13 +150,13 @@ namespace FM
             Rect barRect = rect.ContractedBy( 2f );
             float unit = barRect.height / max;
             float markHeight = barRect.yMin + ( max - Count ) * unit;
-            barRect.yMin += (max - CurCount) * unit;
-            
+            barRect.yMin += ( max - CurCount ) * unit;
+
             // draw the bar
             // if the job is active and pending, make the bar blueish green - otherwise white.
             Texture2D barTex = active
-                ? _barBackgroundActiveTexture
-                : _barBackgroundInactiveTexture;
+                ? Resources.BarBackgroundActiveTexture
+                : Resources.BarBackgroundInactiveTexture;
             GUI.DrawTexture( barRect, barTex );
 
             // draw a mark at the treshold
@@ -170,21 +169,37 @@ namespace FM
         {
             // target threshold
             Rect thresholdLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
-            if (alt) Widgets.DrawAltRect(thresholdLabelRect);
-            Widgets.DrawHighlightIfMouseover(thresholdLabelRect);
-            Utilities.Label( thresholdLabelRect, 
+            if ( alt )
+            {
+                Widgets.DrawAltRect( thresholdLabelRect );
+            }
+            Widgets.DrawHighlightIfMouseover( thresholdLabelRect );
+            Utilities.Label( thresholdLabelRect,
                              "FMP.ThresholdCount".Translate( CurCount, Count ) + ":",
-                             "FMP.ThresholdCountTooltip".Translate( CurCount, Count),
+                             "FMP.ThresholdCountTooltip".Translate( CurCount, Count ),
                              TextAnchor.MiddleLeft,
                              Utilities.Margin );
+
+            // add a little icon to mark interactivity
+            Rect searchIconRect = new Rect( thresholdLabelRect.xMax - entryHeight, cur.y, entryHeight, entryHeight );
+            if ( searchIconRect.height > Resources.Search.height )
+            {
+                // center it.
+                searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - Resources.Search.height ) / 2 );
+            }
+            GUI.DrawTexture( searchIconRect, Resources.Search );
+
             cur.y += entryHeight;
             if ( Widgets.InvisibleButton( thresholdLabelRect ) )
             {
                 Find.WindowStack.Add( DetailsWindow );
             }
 
-            Rect thresholdRect = new Rect( cur.x, cur.y, width, Utilities.SliderHeight);
-            if( alt ) Widgets.DrawAltRect( thresholdRect );
+            Rect thresholdRect = new Rect( cur.x, cur.y, width, Utilities.SliderHeight );
+            if ( alt )
+            {
+                Widgets.DrawAltRect( thresholdRect );
+            }
             Count = (int)GUI.HorizontalSlider( thresholdRect, Count, 0, MaxUpperThreshold );
             cur.y += Utilities.SliderHeight;
         }

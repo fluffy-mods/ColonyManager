@@ -62,10 +62,10 @@ namespace FM
         /// </summary>
         /// <param name="rd"></param>
         /// <returns></returns>
-        public static List< Building_WorkTable > GetCurrentRecipeUsers( this RecipeDef rd )
+        public static List<Building_WorkTable> GetCurrentRecipeUsers( this RecipeDef rd )
         {
-            List< ThingDef > recipeUsers = rd.GetRecipeUsers();
-            List< Building_WorkTable > currentRecipeUsers = new List< Building_WorkTable >();
+            List<ThingDef> recipeUsers = rd.GetRecipeUsers();
+            List<Building_WorkTable> currentRecipeUsers = new List<Building_WorkTable>();
 
             foreach ( ThingDef td in recipeUsers )
             {
@@ -82,9 +82,9 @@ namespace FM
         /// <param name="rd"></param>
         /// <param name="includeNonBuilding"></param>
         /// <returns></returns>
-        public static List< ThingDef > GetRecipeUsers( this RecipeDef rd, bool includeNonBuilding = false )
+        public static List<ThingDef> GetRecipeUsers( this RecipeDef rd, bool includeNonBuilding = false )
         {
-            List< ThingDef > recipeUsers = new List< ThingDef >();
+            List<ThingDef> recipeUsers = new List<ThingDef>();
 
             // probably redundant starting point, get recipeusers as defined in the recipe.
             if ( rd.recipeUsers != null )
@@ -94,8 +94,8 @@ namespace FM
 
             // fetch thingdefs which have recipes, and the recipes include ours.
             recipeUsers.AddRange(
-                DefDatabase< ThingDef >.AllDefsListForReading.Where( t => t.recipes != null && t.recipes.Contains( rd ) )
-                                       .ToList() );
+                DefDatabase<ThingDef>.AllDefsListForReading.Where( t => t.recipes != null && t.recipes.Contains( rd ) )
+                                     .ToList() );
             if ( !includeNonBuilding )
             {
                 recipeUsers = recipeUsers.Where( t => t.category == ThingCategory.Building ).ToList();
@@ -111,7 +111,7 @@ namespace FM
         /// <returns></returns>
         public static bool HasBuildingRecipeUser( this RecipeDef rd, bool built = false )
         {
-            List< ThingDef > recipeUsers = GetRecipeUsers( rd );
+            List<ThingDef> recipeUsers = GetRecipeUsers( rd );
             return
                 recipeUsers.Any(
                     t =>

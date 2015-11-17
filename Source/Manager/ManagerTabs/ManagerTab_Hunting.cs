@@ -9,25 +9,25 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using Resources = FM.Resources;
 
 namespace FM
 {
     internal class ManagerTab_Hunting : ManagerTab
     {
-        private static float     _entryHeight                  = 30f;
-        private static Texture2D _icon                         = ContentFinder< Texture2D >.Get( "UI/Icons/Hunting" );
-        private static ManagerJob_Hunting _selected            = new ManagerJob_Hunting();
-        private Vector2          _animalsScrollPosition        = Vector2.zero;
-        private Vector2          _button                       = new Vector2( 200f, 40f );
-        private float            _leftRowHeight                = 9999f;
-        private float            _margin                       = Utilities.Margin;
-        private Vector2          _scrollPosition               = Vector2.zero;
-        private float            _topAreaHeight                = 30f;
-        public List< ManagerJob_Hunting > Jobs;
+        private static float _entryHeight = 30f;
+        private static ManagerJob_Hunting _selected = new ManagerJob_Hunting();
+        private Vector2 _animalsScrollPosition = Vector2.zero;
+        private Vector2 _button = new Vector2( 200f, 40f );
+        private float _leftRowHeight = 9999f;
+        private float _margin = Utilities.Margin;
+        private Vector2 _scrollPosition = Vector2.zero;
+        private float _topAreaHeight = 30f;
+        public List<ManagerJob_Hunting> Jobs;
 
         public override Texture2D Icon
         {
-            get { return _icon; }
+            get { return Resources.IconHunting; }
         }
 
         public override IconAreas IconArea
@@ -43,7 +43,6 @@ namespace FM
         public override ManagerJob Selected
         {
             get { return _selected; }
-
             set { _selected = (ManagerJob_Hunting)value; }
         }
 
@@ -54,13 +53,14 @@ namespace FM
             Widgets.DrawMenuSection( rect );
 
             // some variables
-            float width                = rect.width;
-            float height               = rect.height - _topAreaHeight - _button.y - _margin;
-            int cols                   = 2;
-            float colWidth             = width / cols - _margin;
-            List< Rect > colRects      = new List< Rect >();
-            List< Rect > colTitleRects = new List< Rect >();
-            Rect buttonRect             = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - _margin, _button.y - _margin );
+            float width = rect.width;
+            float height = rect.height - _topAreaHeight - _button.y - _margin;
+            int cols = 2;
+            float colWidth = width / cols - _margin;
+            List<Rect> colRects = new List<Rect>();
+            List<Rect> colTitleRects = new List<Rect>();
+            Rect buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - _margin,
+                                        _button.y - _margin );
 
             // set up rects
             for ( int j = 0; j < cols; j++ )
@@ -76,23 +76,24 @@ namespace FM
             GUI.BeginGroup( rect );
 
             // settings.
-            Utilities.Label( colTitleRects[0], "FMH.Options".Translate(), lrMargin: _margin * 2, anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
+            Utilities.Label( colTitleRects[0], "FMH.Options".Translate(), lrMargin: _margin * 2,
+                             anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
 
-            GUI.DrawTexture( colRects[0], Utilities.SlightlyDarkBackground );
+            GUI.DrawTexture( colRects[0], Resources.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[0] );
             cur = Vector2.zero;
 
             // target count (1)
             Rect targetCountTitleRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
-            int currentCount          = _selected.Trigger.CurCount;
-            int corpseCount           = _selected.GetMeatInCorpses();
-            int designatedCount       = _selected.GetMeatInDesignations();
-            int targetCount           = _selected.Trigger.Count;
+            int currentCount = _selected.Trigger.CurCount;
+            int corpseCount = _selected.GetMeatInCorpses();
+            int designatedCount = _selected.GetMeatInDesignations();
+            int targetCount = _selected.Trigger.Count;
             Utilities.Label( targetCountTitleRect,
-                           "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ),
-                           "FMH.TargetCountTooltip".Translate( currentCount, corpseCount, designatedCount, targetCount ),
-                           TextAnchor.MiddleLeft,
-                           _margin);
+                             "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ),
+                             "FMH.TargetCountTooltip".Translate( currentCount, corpseCount, designatedCount, targetCount ),
+                             TextAnchor.MiddleLeft,
+                             _margin );
             Widgets.DrawAltRect( targetCountTitleRect );
             cur.y += _entryHeight;
 
@@ -105,11 +106,11 @@ namespace FM
             Rect humanMeatRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Utilities.DrawToggle( humanMeatRect, "FMH.AllowHumanMeat".Translate(),
                                   _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.HumanMeat ),
-                                  on: delegate
+                                  delegate
                                   {
                                       _selected.Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, true );
                                   },
-                                  off: delegate
+                                  delegate
                                   {
                                       _selected.Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, false );
                                   } );
@@ -123,7 +124,8 @@ namespace FM
 
             // hunting grounds (4)
             Rect huntingGroundsTitleRect = new Rect( cur.x, cur.y, colWidth - 2 * _margin, _entryHeight );
-            Utilities.Label( huntingGroundsTitleRect, "FMH.HuntingGrounds".Translate(), anchor: TextAnchor.MiddleLeft, lrMargin: _margin );
+            Utilities.Label( huntingGroundsTitleRect, "FMH.HuntingGrounds".Translate(), anchor: TextAnchor.MiddleLeft,
+                             lrMargin: _margin );
             cur.y += _entryHeight;
 
             Rect huntingGroundsRect = new Rect( cur.x + _margin, cur.y, colWidth - 2 * _margin, _entryHeight );
@@ -134,9 +136,10 @@ namespace FM
             GUI.EndGroup();
 
             // animals.
-            Utilities.Label( colTitleRects[1], "FMH.Animals".Translate(), lrMargin: _margin * 2, anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
+            Utilities.Label( colTitleRects[1], "FMH.Animals".Translate(), lrMargin: _margin * 2,
+                             anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
 
-            GUI.DrawTexture( colRects[1], Utilities.SlightlyDarkBackground );
+            GUI.DrawTexture( colRects[1], Resources.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[1] );
             cur = Vector2.zero;
 
@@ -151,12 +154,12 @@ namespace FM
             Widgets.BeginScrollView( outRect, ref _animalsScrollPosition, viewRect );
 
             // list of keys in allowed animals list (all animals in biome, static)
-            List< PawnKindDef > PawnKinds = new List< PawnKindDef >( _selected.AllowedAnimals.Keys );
+            List<PawnKindDef> PawnKinds = new List<PawnKindDef>( _selected.AllowedAnimals.Keys );
 
             // toggle all
             Rect toggleAllRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Widgets.DrawAltRect( toggleAllRect );
-            Dictionary< PawnKindDef, bool >.ValueCollection test = _selected.AllowedAnimals.Values;
+            Dictionary<PawnKindDef, bool>.ValueCollection test = _selected.AllowedAnimals.Values;
             Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
                                   _selected.AllowedAnimals.Values.All( v => v ), delegate
                                   {
@@ -315,7 +318,7 @@ namespace FM
             // set up rects
             Rect leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
             Rect contentCanvas = new Rect( leftRow.xMax + _margin, 0f, canvas.width - leftRow.width - _margin,
-                                          canvas.height );
+                                           canvas.height );
 
             // draw overview row
             DoLeftRow( leftRow );
@@ -334,7 +337,7 @@ namespace FM
 
         public void Refresh()
         {
-            Jobs = Manager.Get.JobStack.FullStack< ManagerJob_Hunting >();
+            Jobs = Manager.Get.JobStack.FullStack<ManagerJob_Hunting>();
         }
     }
 }

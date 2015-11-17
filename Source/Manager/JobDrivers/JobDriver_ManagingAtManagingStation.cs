@@ -14,7 +14,7 @@ namespace FM
 {
     internal class JobDriver_ManagingAtManagingStation : JobDriver
     {
-        protected override IEnumerable< Toil > MakeNewToils()
+        protected override IEnumerable<Toil> MakeNewToils()
         {
             yield return Toils_Reserve.Reserve( TargetIndex.A ).FailOnDespawnedOrForbiddenPlacedTargets();
             yield return Toils_Goto.GotoThing( TargetIndex.A, PathEndMode.InteractionCell )
@@ -31,7 +31,7 @@ namespace FM
                 Log.Error( "Target of manager job was not a manager station. This should never happen." );
                 return null;
             }
-            Comp_ManagerStation comp = station.GetComp< Comp_ManagerStation >();
+            Comp_ManagerStation comp = station.GetComp<Comp_ManagerStation>();
             if ( comp == null )
             {
                 Log.Error( "Target of manager job does not have manager station comp. This should never happen." );
@@ -45,11 +45,8 @@ namespace FM
 #endif
             toil.defaultCompleteMode = ToilCompleteMode.Delay;
             toil.tickAction =
-                delegate
-                {
-                    toil.actor.skills.GetSkill( DefDatabase< SkillDef >.GetNamed( "Managing" ) ).Learn( 0.11f );
-                };
-            List< Action > finishers = new List< Action >();
+                delegate { toil.actor.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Managing" ) ).Learn( 0.11f ); };
+            List<Action> finishers = new List<Action>();
             finishers.Add( delegate { Manager.Get.DoWork(); } );
             toil.finishActions = finishers;
             return toil;

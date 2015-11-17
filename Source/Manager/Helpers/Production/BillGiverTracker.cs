@@ -22,45 +22,23 @@ namespace FM
 
     public class BillGiverTracker : IExposable
     {
-        private readonly ManagerJob_Production _job;
-        private bool _assignedBillGiversInitialized = true;
+        private bool                                            _assignedBillGiversInitialized = true;
+        private Dictionary<Bill_Production, Building_WorkTable> _assignedBills;
+        private List<string>                                    _assignedBillsScribeID;
+        private List<string>                                    _assignedWorkersScribeID;
+        private readonly ManagerJob_Production                  _job;
+        public Area                                             AreaRestriction;
+        public AssignedBillGiverOptions                         BillGiverSelection             = AssignedBillGiverOptions.All;
+        public List<Building_WorkTable>                         SpecificBillGivers;
+        public int                                              UserBillGiverCount;
 
-        /// <summary>
-        ///     Current list of assigned bill/worksations
-        /// </summary>
-        private Dictionary< Bill_Production, Building_WorkTable > _assignedBills;
-
-        private List< string > _assignedBillsScribeID;
-
-        private List< string > _assignedWorkersScribeID;
-
-        /// <summary>
-        ///     Area restriction
-        /// </summary>
-        public Area AreaRestriction;
-
-        /// <summary>
-        ///     Assignment LoadSaveMode for billgivers
-        /// </summary>
-        public AssignedBillGiverOptions BillGiverSelection = AssignedBillGiverOptions.All;
-
-        /// <summary>
-        ///     Specific billgivers set by user
-        /// </summary>
-        public List< Building_WorkTable > SpecificBillGivers;
-
-        /// <summary>
-        ///     User requested billgiver count, when using count assignment LoadSaveMode.
-        /// </summary>
-        public int UserBillGiverCount;
-
-        public List< string > AssignedBillsScribe
+        public List<string> AssignedBillsScribe
         {
             get { return _assignedBills.Keys.Select( b => b.GetUniqueLoadID() ).ToList(); }
             set { _assignedBillsScribeID = value; }
         }
 
-        public List< string > AssignedWorkersScribe
+        public List<string> AssignedWorkersScribe
         {
             get { return _assignedBills.Values.Select( b => b.GetUniqueLoadID() ).ToList(); }
             set { _assignedWorkersScribeID = value; }
@@ -81,22 +59,22 @@ namespace FM
         /// <summary>
         ///     All billgiver defs (by recipe).
         /// </summary>
-        public List< ThingDef > GetBillGiverDefs => Recipe.GetRecipeUsers();
+        public List<ThingDef> GetBillGiverDefs => Recipe.GetRecipeUsers();
 
         /// <summary>
         ///     Get workstations that can perform the current bill/recipe (nothwithstanding area/count restrictions etc).
         /// </summary>
-        public List< Building_WorkTable > GetPotentialBillGivers => Recipe.GetCurrentRecipeUsers();
+        public List<Building_WorkTable> GetPotentialBillGivers => Recipe.GetCurrentRecipeUsers();
 
         /// <summary>
         ///     Get workstations that can perform the current bill/recipe, and meet selection criteria set by player.
         /// </summary>
         /// <returns></returns>
-        public List< Building_WorkTable > GetSelectedBillGivers
+        public List<Building_WorkTable> GetSelectedBillGivers
         {
             get
             {
-                List< Building_WorkTable > list = Recipe.GetCurrentRecipeUsers();
+                List<Building_WorkTable> list = Recipe.GetCurrentRecipeUsers();
 
                 switch ( BillGiverSelection )
                 {
@@ -121,14 +99,14 @@ namespace FM
             }
         }
 
-        public Dictionary< Bill_Production, Building_WorkTable > GetAssignedBillGiversAndBillsDictionary
+        public Dictionary<Bill_Production, Building_WorkTable> GetAssignedBillGiversAndBillsDictionary
         {
             get
             {
                 if ( !_assignedBillGiversInitialized )
                 {
                     bool error = false;
-                    _assignedBills = new Dictionary< Bill_Production, Building_WorkTable >();
+                    _assignedBills = new Dictionary<Bill_Production, Building_WorkTable>();
                     for ( int i = 0; i < _assignedBillsScribeID.Count; i++ )
                     {
 #if DEBUG_SCRIBE
@@ -154,7 +132,8 @@ namespace FM
                             {
                                 throw new Exception( "Billstack not initialized" );
                             }
-                            foreach ( Bill current in worker.billStack ) {
+                            foreach ( Bill current in worker.billStack )
+                            {
                                 if ( current.GetUniqueLoadID() == _assignedBillsScribeID[i] )
                                 {
                                     bill = (Bill_Production)current;
@@ -166,7 +145,8 @@ namespace FM
                             }
                             _assignedBills.Add( bill, worker );
                         }
-                        // ReSharper disable once UnusedVariable
+
+                            // ReSharper disable once UnusedVariable
                         catch ( Exception e )
                         {
                             error = true;
@@ -189,7 +169,7 @@ namespace FM
         /// <summary>
         ///     Get workstations to which a bill was actually assigned
         /// </summary>
-        public List< Building_WorkTable > GetAssignedBillGivers
+        public List<Building_WorkTable> GetAssignedBillGivers
         {
             get { return GetAssignedBillGiversAndBillsDictionary.Values.ToList(); }
         }
@@ -212,8 +192,8 @@ namespace FM
         {
             Recipe = job.Bill.recipe;
             _job = job;
-            _assignedBills = new Dictionary< Bill_Production, Building_WorkTable >();
-            SpecificBillGivers = new List< Building_WorkTable >();
+            _assignedBills = new Dictionary<Bill_Production, Building_WorkTable>();
+            SpecificBillGivers = new List<Building_WorkTable>();
         }
 
         public void ExposeData()
@@ -224,12 +204,12 @@ namespace FM
                 _assignedBillsScribeID = _assignedBills.Keys.Select( b => b.GetUniqueLoadID() ).ToList();
             }
 
-            Scribe_Values.LookValue( ref BillGiverSelection, "BillGiverSelection" );
-            Scribe_Values.LookValue( ref UserBillGiverCount, "UserBillGiverCount" );
-            Scribe_References.LookReference( ref AreaRestriction, "AreaRestriction" );
-            Scribe_Collections.LookList( ref _assignedBillsScribeID, "AssignedBills", LookMode.Value );
-            Scribe_Collections.LookList( ref _assignedWorkersScribeID, "AssignedWorkers", LookMode.Value );
-            Scribe_Collections.LookList( ref SpecificBillGivers, "SpecificBillGivers", LookMode.MapReference );
+            Scribe_Values.LookValue(         ref BillGiverSelection,       "BillGiverSelection" );
+            Scribe_Values.LookValue(         ref UserBillGiverCount,       "UserBillGiverCount" );
+            Scribe_References.LookReference( ref AreaRestriction,          "AreaRestriction" );
+            Scribe_Collections.LookList(     ref _assignedBillsScribeID,   "AssignedBills",      LookMode.Value );
+            Scribe_Collections.LookList(     ref _assignedWorkersScribeID, "AssignedWorkers",    LookMode.Value );
+            Scribe_Collections.LookList(     ref SpecificBillGivers,       "SpecificBillGivers", LookMode.MapReference );
 
             // rather complicated post-load workaround to find buildings by unique ID, since the scribe won't do things the simple way.
             // i.e. scribing dictionary with reference keys and values does not appear to work.
@@ -246,16 +226,20 @@ namespace FM
         public void DrawBillGiverConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false )
         {
             // target threshold
-            string potentialString  = string.Join( "\n", GetPotentialBillGivers.Select( b => b.LabelCap ).ToArray() );
-            string selectedString   = string.Join( "\n", GetSelectedBillGivers.Select( b => b.LabelCap ).ToArray() );
-            string assignedString   = string.Join( "\n", GetAssignedBillGivers.Select( b => b.LabelCap ).ToArray() );
+            string potentialString = string.Join( "\n", GetPotentialBillGivers.Select( b => b.LabelCap ).ToArray() );
+            string selectedString = string.Join( "\n", GetSelectedBillGivers.Select( b => b.LabelCap ).ToArray() );
+            string assignedString = string.Join( "\n", GetAssignedBillGivers.Select( b => b.LabelCap ).ToArray() );
             string billgiverTooltip = "FMP.BillGiversTooltip".Translate( potentialString, selectedString, assignedString );
 
             Rect billgiverLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
-            if (alt) Widgets.DrawAltRect(billgiverLabelRect);
-            Widgets.DrawHighlightIfMouseover(billgiverLabelRect);
+            if ( alt )
+            {
+                Widgets.DrawAltRect( billgiverLabelRect );
+            }
+            Widgets.DrawHighlightIfMouseover( billgiverLabelRect );
             Utilities.Label( billgiverLabelRect,
-                             "FMP.BillGiversCount".Translate( GetPotentialBillGivers.Count, GetSelectedBillGivers.Count, GetAssignedBillGivers.Count ),
+                             "FMP.BillGiversCount".Translate( GetPotentialBillGivers.Count, GetSelectedBillGivers.Count,
+                                                              GetAssignedBillGivers.Count ),
                              billgiverTooltip,
                              TextAnchor.MiddleLeft,
                              Utilities.Margin );
@@ -263,6 +247,16 @@ namespace FM
             {
                 Find.WindowStack.Add( DetailsWindow );
             }
+
+            // add a little icon to mark interactivity
+            Rect searchIconRect = new Rect( billgiverLabelRect.xMax - entryHeight, cur.y, entryHeight, entryHeight );
+            if( searchIconRect.height > Resources.Search.height )
+            {
+                // center it.
+                searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - Resources.Search.height ) / 2 );
+            }
+            GUI.DrawTexture( searchIconRect, Resources.Search );
+
             cur.y += entryHeight;
         }
     }

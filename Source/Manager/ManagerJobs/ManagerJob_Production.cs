@@ -15,20 +15,19 @@ namespace FM
 {
     public class ManagerJob_Production : ManagerJob
     {
-        private static int             _histSize    = 100;
-        private readonly float         _margin      = Utilities.Margin;
-        private Texture2D              _cogTex      = ContentFinder< Texture2D >.Get( "UI/Buttons/Cog" );
-
-        private WorkTypeDef       _workTypeDef;
-        public Bill_Production    Bill;
-        public BillGiverTracker   BillGivers;
-        public History            day               = new History( _histSize );
-        public History            month             = new History( _histSize, History.Period.Month );
-        public History            year              = new History( _histSize, History.Period.Year );
-        public History            historyShown;
+        private static int _histSize = 100;
+        private readonly float _margin = Utilities.Margin;
+        private WorkTypeDef _workTypeDef;
+        public Bill_Production Bill;
+        public BillGiverTracker BillGivers;
+        public History day = new History( _histSize );
+        public History historyShown;
         public MainProductTracker MainProduct;
-        public bool               maxSkil;
+        public bool maxSkil;
+        public bool prioritizeOverManual;
+        public History month = new History( _histSize, History.Period.Month );
         public new Trigger_Threshold Trigger;
+        public History year = new History( _histSize, History.Period.Year );
 
         public override bool Completed
         {
@@ -76,7 +75,7 @@ namespace FM
                 {
                     // fetch the worktype def in the most convoluted way possible.
                     // first get some examples of worktables our bill is on.
-                    List< Building_WorkTable > workTables = Bill.recipe.GetCurrentRecipeUsers();
+                    List<Building_WorkTable> workTables = Bill.recipe.GetCurrentRecipeUsers();
 
                     // if none exist (yet), create a phony copy.
                     if ( workTables.Count == 0 )
@@ -86,7 +85,7 @@ namespace FM
                     }
 
                     // then loop through workgivers until we find one that matches.
-                    foreach ( WorkTypeDef def in DefDatabase< WorkTypeDef >.AllDefsListForReading )
+                    foreach ( WorkTypeDef def in DefDatabase<WorkTypeDef>.AllDefsListForReading )
                     {
                         foreach ( WorkGiverDef workGiver in def.workGiversByPriority )
                         {
@@ -102,11 +101,16 @@ namespace FM
 
                             // skip workgiver if it applies only to pawns (cooks are not repairers!)
                             if ( workGiver.billGiversAllAnimals
-                                 || workGiver.billGiversAllAnimalsCorpses
-                                 || workGiver.billGiversAllHumanlikes
-                                 || workGiver.billGiversAllHumanlikesCorpses
-                                 || workGiver.billGiversAllMechanoids
-                                 || workGiver.billGiversAllMechanoidsCorpses )
+                                 ||
+                                 workGiver.billGiversAllAnimalsCorpses
+                                 ||
+                                 workGiver.billGiversAllHumanlikes
+                                 ||
+                                 workGiver.billGiversAllHumanlikesCorpses
+                                 ||
+                                 workGiver.billGiversAllMechanoids
+                                 ||
+                                 workGiver.billGiversAllMechanoidsCorpses )
                             {
                                 continue;
                             }
@@ -200,7 +204,7 @@ namespace FM
 #endif
 
                 // BillGivers that we should work with.
-                List< Building_WorkTable > workers = BillGivers.GetSelectedBillGivers;
+                List<Building_WorkTable> workers = BillGivers.GetSelectedBillGivers;
 
                 // clean up bills on workstations that do not meet selection criteria (area, count, etc) (anymore).
                 CleanNoLongerAllowedBillgivers( workers, BillGivers.GetAssignedBillGiversAndBillsDictionary,
@@ -243,7 +247,7 @@ namespace FM
                             if ( thatBill != null &&
                                  thatBill.recipe == Bill.recipe &&
                                  BillGivers.GetAssignedBillGiversAndBillsDictionary.Contains(
-                                     new KeyValuePair< Bill_Production, Building_WorkTable >( thatBill, worker ) ) )
+                                     new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )
                             {
                                 billPresent = true;
                                 if ( thatBill.suspended != Bill.suspended ||
@@ -294,17 +298,17 @@ namespace FM
         /// <param name="workers">Allowed workstations</param>
         /// <param name="assignedBills">Assigned bills/workstations</param>
         /// <param name="actionTaken">Was anything done?</param>
-        private void CleanNoLongerAllowedBillgivers( List< Building_WorkTable > workers,
-                                                     Dictionary< Bill_Production, Building_WorkTable > assignedBills,
+        private void CleanNoLongerAllowedBillgivers( List<Building_WorkTable> workers,
+                                                     Dictionary<Bill_Production, Building_WorkTable> assignedBills,
                                                      ref bool actionTaken )
         {
 #if DEBUG_JOBS
             Log.Message( "Cleaning no longer allowed billgivers" );
 #endif
-            Dictionary< Bill_Production, Building_WorkTable > toBeDeleted =
-                new Dictionary< Bill_Production, Building_WorkTable >();
+            Dictionary<Bill_Production, Building_WorkTable> toBeDeleted =
+                new Dictionary<Bill_Production, Building_WorkTable>();
             foreach (
-                KeyValuePair< Bill_Production, Building_WorkTable > pair in
+                KeyValuePair<Bill_Production, Building_WorkTable> pair in
                     assignedBills.Where( pair => !workers.Contains( pair.Value ) ) )
             {
 #if DEBUG_JOBS
@@ -314,7 +318,7 @@ namespace FM
                 toBeDeleted.Add( pair.Key, pair.Value );
                 actionTaken = true;
             }
-            foreach ( KeyValuePair< Bill_Production, Building_WorkTable > pair in toBeDeleted )
+            foreach ( KeyValuePair<Bill_Production, Building_WorkTable> pair in toBeDeleted )
             {
                 assignedBills.Remove( pair.Key );
             }
@@ -360,9 +364,9 @@ namespace FM
 #if DEBUG_JOBS
             Log.Message( "Cleaning up obsolete bills" );
 #endif
-            List< Bill_Production > toBeDeleted = new List< Bill_Production >();
+            List<Bill_Production> toBeDeleted = new List<Bill_Production>();
             foreach (
-                KeyValuePair< Bill_Production, Building_WorkTable > pair in
+                KeyValuePair<Bill_Production, Building_WorkTable> pair in
                     BillGivers.GetAssignedBillGiversAndBillsDictionary )
             {
                 pair.Value.BillStack.Delete( pair.Key );
@@ -389,57 +393,33 @@ namespace FM
 
         public override void DrawListEntry( Rect rect, bool overview = true, bool active = true )
         {
-            // (detailButton) | name | bar | last update
+            // (detailButton) | name | (bar | last update)/(stamp) -> handled in Utilities.DrawStatusForListEntry
+            int shownTargets = overview ? 4 : 3; // there's more space on the overview
 
-            Rect labelRect = new Rect( Utilities.Margin, Utilities.Margin,
-                                       rect.width -
-                                       ( active
-                                           ? LastUpdateRectWidth + ProgressRectWidth + 4 * Utilities.Margin
-                                           : 2 * Utilities.Margin ),
-                                       rect.height - 2 * Utilities.Margin ),
-                 progressRect = new Rect( labelRect.xMax + Utilities.Margin, Utilities.Margin,
-                                          ProgressRectWidth,
-                                          rect.height - 2 * Utilities.Margin ),
-                 lastUpdateRect = new Rect( progressRect.xMax + Utilities.Margin, Utilities.Margin,
-                                            LastUpdateRectWidth,
-                                            rect.height - 2 * Utilities.Margin );
+            // set up rects
+            Rect labelRect = new Rect( _margin, _margin, rect.width -
+                                                         ( active ? StatusRectWidth + 4 * _margin : 2 * _margin ),
+                                       rect.height - 2 * _margin ),
+                 statusRect = new Rect( labelRect.xMax + _margin, _margin, StatusRectWidth, rect.height - 2 * _margin );
 
-            string text = Label;
-            if ( Targets != null )
-            {
-                text += "\n<i>" + string.Join( ", ", Targets ) + "</i>";
-            }
+            // create label string
+            string text = Label + "\n<i>" +
+                          ( Targets.Length < shownTargets ? string.Join( ", ", Targets ) : "<multiple>" )
+                          + "</i>";
+            string tooltip = string.Join( ", ", Targets );
 
+            // do the drawing
             GUI.BeginGroup( rect );
-            try
-            {
-                Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label( labelRect, text );
 
-                // if the bill has a manager job, give some more info.
-                if ( active )
-                {
-                    // draw progress bar
-                    if ( Trigger != null )
-                    {
-                        Trigger.DrawProgressBar( progressRect, !Suspended && !Completed );
-                    }
+            // draw label
+            Utilities.Label( labelRect, text, tooltip, TextAnchor.MiddleLeft, _margin );
 
-                    // draw time since last action
-                    Text.Anchor = TextAnchor.MiddleCenter;
-                    Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - LastAction ).TimeString() );
-                    TooltipHandler.TipRegion( lastUpdateRect,
-                                              "FM.LastUpdateTooltip".Translate(
-                                                  ( Find.TickManager.TicksGame - LastAction ).TimeString() ) );
-                }
-            }
-            finally
+            // if the bill has a manager job, give some more info.
+            if ( active )
             {
-                // make sure everything is always properly closed / reset to defaults.
-                GUI.color = Color.white;
-                Text.Anchor = TextAnchor.UpperLeft;
-                GUI.EndGroup();
+                this.DrawStatusForListEntry( statusRect, Trigger );
             }
+            GUI.EndGroup();
         }
 
         public override void DrawOverviewDetails( Rect rect )
@@ -452,9 +432,9 @@ namespace FM
 
             Rect switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
             Widgets.DrawHighlightIfMouseover( switchRect );
-            if ( Widgets.ImageButton( switchRect, _cogTex ) )
+            if ( Widgets.ImageButton( switchRect, Resources.Cog ) )
             {
-                List< FloatMenuOption > options = new List< FloatMenuOption >
+                List<FloatMenuOption> options = new List<FloatMenuOption>
                 {
                     new FloatMenuOption( "Day", delegate { historyShown = day; } ),
                     new FloatMenuOption( "Month", delegate { historyShown = month; } ),

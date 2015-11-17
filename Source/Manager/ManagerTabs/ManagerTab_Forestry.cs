@@ -8,22 +8,22 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using Resources = FM.Resources;
 
 namespace FM
 {
     internal class ManagerTab_Forestry : ManagerTab
     {
-        private const float                 EntryHeight                    = 30f;
-        private const float                 Margin                         = Utilities.Margin;
-        private static ManagerJob_Forestry  _selected                      = new ManagerJob_Forestry();
-        private readonly float              _topAreaHeight                 = 30f;
-        private Vector2                     _animalsScrollPosition         = Vector2.zero;
-        private Vector2                     _button                        = new Vector2( 200f, 40f );
-        private List< ManagerJob_Forestry > _jobs;
-        private float                       _leftRowHeight                 = 9999f;
-        private Vector2                     _scrollPosition                = Vector2.zero;
-
-        public override Texture2D Icon { get; } = ContentFinder< Texture2D >.Get( "UI/Icons/Tree" );
+        private const float EntryHeight = 30f;
+        private const float Margin = Utilities.Margin;
+        private static ManagerJob_Forestry _selected = new ManagerJob_Forestry();
+        private Vector2 _animalsScrollPosition = Vector2.zero;
+        private Vector2 _button = new Vector2( 200f, 40f );
+        private List<ManagerJob_Forestry> _jobs;
+        private float _leftRowHeight = 9999f;
+        private Vector2 _scrollPosition = Vector2.zero;
+        private readonly float _topAreaHeight = 30f;
+        public override Texture2D Icon { get; } = Resources.IconForestry;
 
         public override IconAreas IconArea
         {
@@ -38,7 +38,6 @@ namespace FM
         public override ManagerJob Selected
         {
             get { return _selected; }
-
             set { _selected = (ManagerJob_Forestry)value; }
         }
 
@@ -49,14 +48,14 @@ namespace FM
             Widgets.DrawMenuSection( rect );
 
             // some variables
-            float width                = rect.width;
-            float height               = rect.height - _topAreaHeight - _button.y - Margin;
-            int cols                   = 2;
-            float colWidth             = width / cols - Margin;
-            List< Rect > colRects      = new List< Rect >();
-            List< Rect > colTitleRects = new List< Rect >();
-            Rect buttonRect             = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - Margin,
-                                       _button.y - Margin );
+            float width = rect.width;
+            float height = rect.height - _topAreaHeight - _button.y - Margin;
+            int cols = 2;
+            float colWidth = width / cols - Margin;
+            List<Rect> colRects = new List<Rect>();
+            List<Rect> colTitleRects = new List<Rect>();
+            Rect buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - Margin,
+                                        _button.y - Margin );
 
             // set up rects
             for ( int j = 0; j < cols; j++ )
@@ -78,24 +77,24 @@ namespace FM
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.UpperLeft;
 
-            GUI.DrawTexture( colRects[0], Utilities.SlightlyDarkBackground );
+            GUI.DrawTexture( colRects[0], Resources.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[0] );
             cur = Vector2.zero;
 
             // target count (1)
-            Rect targetCountTitleRect    = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-            int currentCount             = _selected.Trigger.CurCount;
-            int designatedCount          = _selected.GetWoodInDesignations();
-            int targetCount              = _selected.Trigger.Count;
+            Rect targetCountTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            int currentCount = _selected.Trigger.CurCount;
+            int designatedCount = _selected.GetWoodInDesignations();
+            int targetCount = _selected.Trigger.Count;
             Widgets.DrawAltRect( targetCountTitleRect );
-            Utilities.Label( targetCountTitleRect, 
+            Utilities.Label( targetCountTitleRect,
                              "FMF.TargetCount".Translate( currentCount, designatedCount, targetCount ),
-                             "FMF.TargetCountTooltip".Translate( currentCount, designatedCount, targetCount),
-                             TextAnchor.MiddleLeft, Margin);
+                             "FMF.TargetCountTooltip".Translate( currentCount, designatedCount, targetCount ),
+                             TextAnchor.MiddleLeft, Margin );
             cur.y += EntryHeight;
 
             Rect targetCountRect = new Rect( cur.x, cur.y, colWidth, Utilities.SliderHeight );
-            Widgets.DrawAltRect(targetCountRect);
+            Widgets.DrawAltRect( targetCountRect );
             _selected.Trigger.Count = (int)GUI.HorizontalSlider( targetCountRect, _selected.Trigger.Count, 0, 2000 );
             cur.y += Utilities.SliderHeight;
 
@@ -106,13 +105,14 @@ namespace FM
 
             // Allow saplings (3)
             Rect allowSaplingsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-            Widgets.DrawAltRect(allowSaplingsRect);
+            Widgets.DrawAltRect( allowSaplingsRect );
             Utilities.DrawToggle( allowSaplingsRect, "FMF.AllowSaplings".Translate(), ref _selected.AllowSaplings );
             cur.y += EntryHeight;
 
             // Logging area (4)
             Rect loggingAreaTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-            Utilities.Label( loggingAreaTitleRect, "FMF.LoggingArea".Translate(), anchor: TextAnchor.MiddleLeft, lrMargin: Margin );
+            Utilities.Label( loggingAreaTitleRect, "FMF.LoggingArea".Translate(), anchor: TextAnchor.MiddleLeft,
+                             lrMargin: Margin );
             cur.y += EntryHeight;
 
             Rect loggingAreaRect = new Rect( cur.x + Margin, cur.y, colWidth - 2 * Margin, EntryHeight );
@@ -128,7 +128,7 @@ namespace FM
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.UpperLeft;
 
-            GUI.DrawTexture( colRects[1], Utilities.SlightlyDarkBackground );
+            GUI.DrawTexture( colRects[1], Resources.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[1] );
             cur = Vector2.zero;
 
@@ -143,7 +143,7 @@ namespace FM
             Widgets.BeginScrollView( outRect, ref _animalsScrollPosition, viewRect );
 
             // list of keys in allowed trees list (all plans that yield wood in biome, static)
-            List< ThingDef > treeDefs = new List< ThingDef >( _selected.AllowedTrees.Keys );
+            List<ThingDef> treeDefs = new List<ThingDef>( _selected.AllowedTrees.Keys );
 
             // toggle all
             Rect toggleAllRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
@@ -306,7 +306,7 @@ namespace FM
             // set up rects
             Rect leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
             Rect contentCanvas = new Rect( leftRow.xMax + Margin, 0f, canvas.width - leftRow.width - Margin,
-                                          canvas.height );
+                                           canvas.height );
 
             // draw overview row
             DoLeftRow( leftRow );
@@ -325,7 +325,7 @@ namespace FM
 
         public void Refresh()
         {
-            _jobs = Manager.Get.JobStack.FullStack< ManagerJob_Forestry >();
+            _jobs = Manager.Get.JobStack.FullStack<ManagerJob_Forestry>();
         }
     }
 }

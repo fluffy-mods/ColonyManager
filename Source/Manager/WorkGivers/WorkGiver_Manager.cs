@@ -36,12 +36,12 @@ namespace FM
             Log.Message("Power" + (powera == null || powera.PowerOn));
             Log.Message("Job" + (Manager.Get.JobStack.NextJob != null));
 #endif
-            if ( !(t is Building_ManagerStation) )
+            if ( !( t is Building_ManagerStation ) )
             {
                 return false;
             }
 
-            if ( t.TryGetComp< Comp_ManagerStation >() == null )
+            if ( t.TryGetComp<Comp_ManagerStation>() == null )
             {
                 return false;
             }
@@ -59,7 +59,7 @@ namespace FM
                 return false;
             }
 
-            CompPowerTrader power = t.TryGetComp< CompPowerTrader >();
+            CompPowerTrader power = t.TryGetComp<CompPowerTrader>();
             if ( power != null &&
                  !power.PowerOn )
             {
@@ -76,12 +76,12 @@ namespace FM
 
         public override Job JobOnThing( Pawn pawn, Thing t )
         {
-            return new Job( DefDatabase< JobDef >.GetNamed( "ManagingAtManagingStation" ), t as Building_ManagerStation );
+            return new Job( DefDatabase<JobDef>.GetNamed( "ManagingAtManagingStation" ), t as Building_ManagerStation );
         }
 
-        public override IEnumerable< Thing > PotentialWorkThingsGlobal( Pawn pawn )
+        public override IEnumerable<Thing> PotentialWorkThingsGlobal( Pawn pawn )
         {
-            return Find.ListerBuildings.AllBuildingsColonistOfClass< Building_ManagerStation >()
+            return Find.ListerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>()
                        .Select( b => b as Thing );
         }
     }

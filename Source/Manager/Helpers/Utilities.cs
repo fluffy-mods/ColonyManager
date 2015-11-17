@@ -14,20 +14,25 @@ namespace FM
 {
     public static class Utilities
     {
-        // globals
-        public const float Margin                                 = 6f;
-        public const float ListEntryHeight                        = 50f;
-        public static Texture2D SlightlyDarkBackground            = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .4f );
-        public static Texture2D DeleteX                           = ContentFinder< Texture2D >.Get( "UI/Buttons/Delete", true );
-        public static Dictionary< ThingFilter, FilterCountCache > CountCache = new Dictionary< ThingFilter, FilterCountCache >();
-        public static WorkTypeDef WorkTypeDefOf_Managing          = DefDatabase< WorkTypeDef >.GetNamed("Managing");
-        public const float SliderHeight                           = 20f;
+        public const float ListEntryHeight = 50f;
 
-        public static void Label( Rect rect, string label, string tooltip = null, TextAnchor anchor = TextAnchor.UpperLeft, float lrMargin = 0f, float tbMargin = 0f, GameFont font = GameFont.Small )
+        // globals
+        public const float Margin = 6f;
+        public const float SliderHeight = 20f;
+
+        public static Dictionary<ThingFilter, FilterCountCache> CountCache =
+            new Dictionary<ThingFilter, FilterCountCache>();
+
+        public static WorkTypeDef WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
+
+        public static void Label( Rect rect, string label, string tooltip = null,
+                                  TextAnchor anchor = TextAnchor.UpperLeft, float lrMargin = 0f, float tbMargin = 0f,
+                                  GameFont font = GameFont.Small )
         {
             // apply margins
-            Rect labelRect = new Rect(rect.xMin + lrMargin, rect.yMin + tbMargin, rect.width - 2 * lrMargin, rect.height - 2 * tbMargin);
-            
+            Rect labelRect = new Rect( rect.xMin + lrMargin, rect.yMin + tbMargin, rect.width - 2 * lrMargin,
+                                       rect.height - 2 * tbMargin );
+
             // draw label with anchor - reset anchor
             Text.Anchor = anchor;
             Text.Font = font;
@@ -38,7 +43,7 @@ namespace FM
             // if set, draw tooltip
             if ( tooltip != null )
             {
-                TooltipHandler.TipRegion(rect, tooltip);
+                TooltipHandler.TipRegion( rect, tooltip );
             }
         }
 
@@ -65,7 +70,7 @@ namespace FM
             int days = ticks / GenDate.TicksPerDay,
                 hours = ticks % GenDate.TicksPerDay / GenDate.TicksPerHour;
 
-            string s = String.Empty;
+            string s = string.Empty;
 
             if ( days > 0 )
             {
@@ -143,41 +148,71 @@ namespace FM
             return count;
         }
 
-        public class CachedValue
-        {
-            public int timeSet;
-            public int updateInterval;
-            private int _cached;
-
-            public bool TryGetCount( out int count )
-            {
-                if( Find.TickManager.TicksGame - timeSet <= updateInterval )
-                {
-                    count = _cached;
-                    return true;
-                }
-                count = 0;
-                return false;
-            }
-
-            public void Update( int count )
-            {
-                _cached = count;
-                timeSet = Find.TickManager.TicksGame;
-            }
-
-            public CachedValue( int count = 0, int updateInterval = 250 )
-            {
-                this.updateInterval = updateInterval;
-                _cached = count;
-                timeSet = Find.TickManager.TicksGame;
-            }
-        }
-
         public static bool IsInt( this string text )
         {
             int num;
-            return Int32.TryParse( text, out num );
+            return int.TryParse( text, out num );
+        }
+
+        public static void DrawStatusForListEntry<T>( this T job, Rect rect, Trigger trigger ) where T : ManagerJob
+        {
+            if ( job.Completed ||
+                 job.Suspended )
+            {
+                // put a stamp on it
+                // get size for the stamp, respecting proportions
+                float proportion = rect.width / Resources.StampCompleted.width;
+                Rect stampRect = rect;
+
+                // don't scale up
+                if ( proportion < 1f )
+                {
+                    stampRect.width *= proportion;
+                    stampRect.height *= proportion;
+                }
+
+                // center stamp in available space
+                stampRect = stampRect.CenteredOnXIn( rect ).CenteredOnYIn( rect );
+
+                // draw it.
+                if ( job.Completed )
+                {
+                    GUI.DrawTexture( stampRect, Resources.StampCompleted );
+                    return;
+                }
+                if ( job.Suspended )
+                {
+                    GUI.DrawTexture( stampRect, Resources.StampSuspended );
+                    return;
+                }
+            }
+            if ( trigger == null )
+            {
+                Log.Message( "Trigger NULL" );
+                return;
+            }
+
+            // set up rects
+            Rect progressRect = new Rect( Margin, 0f, ManagerJob.ProgressRectWidth, rect.height ),
+                 lastUpdateRect = new Rect( progressRect.xMax + Margin, 0f, ManagerJob.LastUpdateRectWidth, rect.height );
+
+            // set drawing canvas
+            GUI.BeginGroup( rect );
+
+            // draw progress bar
+            trigger.DrawProgressBar( progressRect, true );
+
+            // draw time since last action
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - job.LastAction ).TimeString() );
+
+            // set tooltips
+            TooltipHandler.TipRegion( progressRect, trigger.StatusTooltip );
+            TooltipHandler.TipRegion( lastUpdateRect,
+                                      "FM.LastUpdateTooltip".Translate(
+                                          ( Find.TickManager.TicksGame - job.LastAction ).TimeString() ) );
+
+            GUI.EndGroup();
         }
 
         public static void DrawToggle( Rect rect, string label, ref bool checkOn, float size = 24f,
@@ -191,7 +226,7 @@ namespace FM
             checkRect = checkRect.CenteredOnYIn( labelRect );
 
             // draw label
-            Label(rect, label, null, TextAnchor.MiddleLeft, margin);
+            Label( rect, label, null, TextAnchor.MiddleLeft, margin );
 
             // draw check
             if ( checkOn )
@@ -253,6 +288,37 @@ namespace FM
                                        float margin = Margin )
         {
             DrawToggle( rect, label, checkOn, toggle, toggle, size );
+        }
+
+        public class CachedValue
+        {
+            private int _cached;
+            public int timeSet;
+            public int updateInterval;
+
+            public CachedValue( int count = 0, int updateInterval = 250 )
+            {
+                this.updateInterval = updateInterval;
+                _cached = count;
+                timeSet = Find.TickManager.TicksGame;
+            }
+
+            public bool TryGetCount( out int count )
+            {
+                if ( Find.TickManager.TicksGame - timeSet <= updateInterval )
+                {
+                    count = _cached;
+                    return true;
+                }
+                count = 0;
+                return false;
+            }
+
+            public void Update( int count )
+            {
+                _cached = count;
+                timeSet = Find.TickManager.TicksGame;
+            }
         }
 
         // count cache for multiple products

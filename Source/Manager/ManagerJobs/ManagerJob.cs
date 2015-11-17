@@ -13,22 +13,26 @@ namespace FM
 {
     public abstract class ManagerJob : IManagerJob, IExposable
     {
-        public int                     ActionInterval      = 3600; // should be 1 minute.
-        public int                     LastAction;
-        public float                   LastUpdateRectWidth = 50f,
-                                       ProgressRectWidth   = 10f;
-        public int                     Priority;
-        public Trigger                 Trigger;
+        public static float LastUpdateRectWidth = 50f,
+                            ProgressRectWidth = 10f,
+                            StatusRectWidth = LastUpdateRectWidth + ProgressRectWidth;
 
-        public virtual  bool        Assigned { get; set; }
-        public virtual  bool        IsValid => true;
-        public abstract string      Label { get; }
-        public virtual  bool        ShouldDoNow => Assigned && !Suspended && !Completed && LastAction + ActionInterval < Find.TickManager.TicksGame;
-        public virtual  bool        Suspended { get; set; } = false;
-        public abstract bool        Completed { get; }
-        public abstract ManagerTab  Tab { get; }
-        public abstract string[]    Targets { get; }
-        public virtual  SkillDef    SkillDef { get; } = null;
+        public int ActionInterval = 3600; // should be 1 minute.
+        public int LastAction;
+        public int Priority;
+        public Trigger Trigger;
+        public virtual bool Assigned { get; set; }
+        public virtual bool IsValid => true;
+        public abstract string Label { get; }
+
+        public virtual bool ShouldDoNow
+            => Assigned && !Suspended && !Completed && LastAction + ActionInterval < Find.TickManager.TicksGame;
+
+        public virtual bool Suspended { get; set; } = false;
+        public abstract bool Completed { get; }
+        public abstract ManagerTab Tab { get; }
+        public abstract string[] Targets { get; }
+        public virtual SkillDef SkillDef { get; } = null;
         public abstract WorkTypeDef WorkTypeDef { get; }
 
         public virtual void ExposeData()
@@ -70,7 +74,7 @@ namespace FM
             LastAction = Find.TickManager.TicksGame;
         }
     }
-    
+
     internal interface IManagerJob
     {
         bool TryDoJob();

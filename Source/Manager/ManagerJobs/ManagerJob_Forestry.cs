@@ -15,20 +15,19 @@ namespace FM
 {
     public class ManagerJob_Forestry : ManagerJob
     {
-        private static int                _histSize                   = 100;
-        private Texture2D                 _cogTex                     = ContentFinder<Texture2D>.Get( "UI/Buttons/Cog" );
-        private Utilities.CachedValue     _designatedWoodCachedValue  = new Utilities.CachedValue();
-        private readonly float            _margin                     = Utilities.Margin;
+        private static int _histSize = 100;
+        private Utilities.CachedValue _designatedWoodCachedValue = new Utilities.CachedValue();
+        private readonly float _margin = Utilities.Margin;
         public Dictionary<ThingDef, bool> AllowedTrees;
-        public bool                       AllowSaplings;
-        public bool                       ClearWindCells              = true;
-        public History                    day                         = new History( _histSize );
-        public List<Designation>          Designations                = new List<Designation>();
-        public History                    historyShown;
-        public Area                       LoggingArea;
-        public History                    month                       = new History( _histSize, History.Period.Month );
-        public new Trigger_Threshold      Trigger;
-        public History                    year                        = new History( _histSize, History.Period.Year );
+        public bool AllowSaplings;
+        public bool ClearWindCells = true;
+        public History day = new History( _histSize );
+        public List<Designation> Designations = new List<Designation>();
+        public History historyShown;
+        public Area LoggingArea;
+        public History month = new History( _histSize, History.Period.Month );
+        public new Trigger_Threshold Trigger;
+        public History year = new History( _histSize, History.Period.Year );
 
         public override string Label
         {
@@ -181,65 +180,35 @@ namespace FM
                    && p.Position.CanReachColony();
         }
 
-        // TODO: Refactor into utilities - hardly any changes between Forestry / Hunting / Production.
         public override void DrawListEntry( Rect rect, bool overview = true, bool active = true )
         {
-            // (detailButton) | name | bar | last update
+            // (detailButton) | name | (bar | last update)/(stamp) -> handled in Utilities.DrawStatusForListEntry
+            int shownTargets = overview ? 4 : 3; // there's more space on the overview
 
-            Rect labelRect = new Rect( _margin, _margin,
-                                       rect.width -
-                                       ( active ? LastUpdateRectWidth + ProgressRectWidth + 4 * _margin : 2 * _margin ),
+            // set up rects
+            Rect labelRect = new Rect( _margin, _margin, rect.width -
+                                                         ( active ? StatusRectWidth + 4 * _margin : 2 * _margin ),
                                        rect.height - 2 * _margin ),
-                 progressRect = new Rect( labelRect.xMax + _margin, _margin,
-                                          ProgressRectWidth,
-                                          rect.height - 2 * _margin ),
-                 lastUpdateRect = new Rect( progressRect.xMax + _margin, _margin,
-                                            LastUpdateRectWidth,
-                                            rect.height - 2 * _margin );
+                 statusRect = new Rect( labelRect.xMax + _margin, _margin, StatusRectWidth, rect.height - 2 * _margin );
 
+            // create label string
             string text = Label + "\n<i>" +
-                          ( Targets.Length < 4 ? string.Join( ", ", Targets ) : "<multiple>" )
+                          ( Targets.Length < shownTargets ? string.Join( ", ", Targets ) : "<multiple>" )
                           + "</i>";
+            string tooltip = string.Join( ", ", Targets );
 
-#if DEBUG
-            text += Priority;
-#endif
-
+            // do the drawing
             GUI.BeginGroup( rect );
-            try
+
+            // draw label
+            Utilities.Label( labelRect, text, tooltip, TextAnchor.MiddleLeft, _margin );
+
+            // if the bill has a manager job, give some more info.
+            if ( active )
             {
-                Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label( labelRect, text );
-
-                // if the bill has a manager job, give some more info.
-                if ( active )
-                {
-                    // draw progress bar
-                    Trigger.DrawProgressBar( progressRect, !Suspended && !Completed );
-
-                    // draw time since last action
-                    Text.Anchor = TextAnchor.MiddleCenter;
-                    Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - LastAction ).TimeString() );
-
-                    // set tooltips
-                    TooltipHandler.TipRegion( progressRect,
-                                              "FMF.ThresholdCount".Translate( Trigger.CurCount, Trigger.Count ) );
-                    TooltipHandler.TipRegion( lastUpdateRect,
-                                              "FM.LastUpdateTooltip".Translate(
-                                                  ( Find.TickManager.TicksGame - LastAction ).TimeString() ) );
-                    if ( !( Targets.Length < 4 ) )
-                    {
-                        TooltipHandler.TipRegion( labelRect, string.Join( ", ", Targets ) );
-                    }
-                }
+                this.DrawStatusForListEntry( statusRect, Trigger );
             }
-            finally
-            {
-                // make sure everything is always properly closed / reset to defaults.
-                GUI.color = Color.white;
-                Text.Anchor = TextAnchor.UpperLeft;
-                GUI.EndGroup();
-            }
+            GUI.EndGroup();
         }
 
         public override void DrawOverviewDetails( Rect rect )
@@ -252,7 +221,7 @@ namespace FM
 
             Rect switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
             Widgets.DrawHighlightIfMouseover( switchRect );
-            if ( Widgets.ImageButton( switchRect, _cogTex ) )
+            if ( Widgets.ImageButton( switchRect, Resources.Cog ) )
             {
                 List<FloatMenuOption> options = new List<FloatMenuOption>
                 {

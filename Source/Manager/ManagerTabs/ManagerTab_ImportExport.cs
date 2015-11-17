@@ -13,27 +13,27 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 using Verse;
+using Resources = FM.Resources;
 
 namespace FM
 {
     internal class ManagerTab_ImportExport : ManagerTab
     {
         private string _folder = "";
-        private Texture2D _icon = ContentFinder< Texture2D >.Get( "UI/Icons/ImportExport" );
         private float _iconSize = 24f;
-        private List< Pair< string, int > > _jobCounts;
+        private List<Pair<string, int>> _jobCounts;
         private JobStack _jobStackIO = new JobStack();
         private float _loadAreaRatio = .6f;
         private float _margin = Utilities.Margin;
         private float _rowHeight = 30f;
         private string _saveExtension = ".rwm";
-        private List< SaveFileInfo > _saveFiles;
+        private List<SaveFileInfo> _saveFiles;
         private string _saveName = "";
         private string _saveNameBase = "ManagerSave_";
 
         public override Texture2D Icon
         {
-            get { return _icon; }
+            get { return Resources.IconImportExport; }
         }
 
         public override IconAreas IconArea
@@ -50,14 +50,14 @@ namespace FM
         {
             // not used.
             get { throw new NotImplementedException(); }
-
             set { throw new NotImplementedException(); }
         }
 
         public override void DoWindowContents( Rect canvas )
         {
             Rect loadRect = new Rect( 0f, 0f, ( canvas.width - _margin ) * _loadAreaRatio, canvas.height );
-            Rect saveRect = new Rect( loadRect.xMax + _margin, 0f, canvas.width - _margin - loadRect.width, canvas.height );
+            Rect saveRect = new Rect( loadRect.xMax + _margin, 0f, canvas.width - _margin - loadRect.width,
+                                      canvas.height );
             Widgets.DrawMenuSection( loadRect );
             Widgets.DrawMenuSection( saveRect );
 
@@ -80,7 +80,7 @@ namespace FM
             _jobCounts = ( from job in Manager.Get.JobStack.FullStack()
                            group job by job.Tab.Label
                            into jobs
-                           select new Pair< string, int >( jobs.Key, jobs.Count() ) ).ToList();
+                           select new Pair<string, int>( jobs.Key, jobs.Count() ) ).ToList();
 
             // fetch the list of saved jobs
             _saveFiles = GetSavedFilesList();
@@ -215,7 +215,7 @@ namespace FM
             }
 
             // delete button
-            if ( Widgets.ImageButton( deleteRect, Utilities.DeleteX ) )
+            if ( Widgets.ImageButton( deleteRect, Resources.DeleteX ) )
             {
                 Find.WindowStack.Add( new Dialog_Confirm( "ConfirmDelete".Translate( file.FileInfo.Name ), delegate
                 {
@@ -274,7 +274,7 @@ namespace FM
 
             StringBuilder info = new StringBuilder();
             info.AppendLine( "FM.CurrentJobs".Translate() );
-            foreach ( Pair< string, int > jobCount in _jobCounts )
+            foreach ( Pair<string, int> jobCount in _jobCounts )
             {
                 info.AppendLine( jobCount.First + ": " + jobCount.Second );
             }
@@ -309,18 +309,18 @@ namespace FM
             return _folder + "/" + name + _saveExtension;
         }
 
-        private List< SaveFileInfo > GetSavedFilesList()
+        private List<SaveFileInfo> GetSavedFilesList()
         {
             DirectoryInfo directoryInfo = new DirectoryInfo( _folder );
 
             // raw files
-            IOrderedEnumerable< FileInfo > files = from f in directoryInfo.GetFiles()
-                                                   where f.Extension == _saveExtension
-                                                   orderby f.LastWriteTime descending
-                                                   select f;
+            IOrderedEnumerable<FileInfo> files = from f in directoryInfo.GetFiles()
+                                                 where f.Extension == _saveExtension
+                                                 orderby f.LastWriteTime descending
+                                                 select f;
 
             // convert to RW save files - mostly for the headers
-            List< SaveFileInfo > saves = new List< SaveFileInfo >();
+            List<SaveFileInfo> saves = new List<SaveFileInfo>();
             foreach ( FileInfo current in files )
             {
                 try

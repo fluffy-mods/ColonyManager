@@ -6,6 +6,7 @@
 
 using UnityEngine;
 using Verse;
+using Resources = FM.Resources;
 
 namespace FM
 {
@@ -18,12 +19,11 @@ namespace FM
             Right = 2
         }
 
-        public static Texture2D DefaultIcon = ContentFinder< Texture2D >.Get( "UI/Icons/Hammer" );
         public float DefaultLeftRowSize = 300f;
 
         public virtual Texture2D Icon
         {
-            get { return DefaultIcon; }
+            get { return Resources.IconHammer; }
         }
 
         public virtual IconAreas IconArea
@@ -37,15 +37,10 @@ namespace FM
         }
 
         public abstract ManagerJob Selected { get; set; }
-
         public abstract void DoWindowContents( Rect canvas );
-
         public virtual void PostClose() {}
-
         public virtual void PostOpen() {}
-
         public virtual void PreClose() {}
-
         public virtual void PreOpen() {}
     }
 }
