@@ -21,12 +21,12 @@ namespace FM
         public int LastAction;
         public int Priority;
         public Trigger Trigger;
-        public virtual bool Assigned { get; set; }
+        public virtual bool Managed { get; set; }
         public virtual bool IsValid => true;
         public abstract string Label { get; }
 
         public virtual bool ShouldDoNow
-            => Assigned && !Suspended && !Completed && LastAction + ActionInterval < Find.TickManager.TicksGame;
+            => Managed && !Suspended && !Completed && LastAction + ActionInterval < Find.TickManager.TicksGame;
 
         public virtual bool Suspended { get; set; } = false;
         public abstract bool Completed { get; }
@@ -34,12 +34,18 @@ namespace FM
         public abstract string[] Targets { get; }
         public virtual SkillDef SkillDef { get; } = null;
         public abstract WorkTypeDef WorkTypeDef { get; }
-
+        
         public virtual void ExposeData()
         {
             Scribe_Values.LookValue( ref ActionInterval, "ActionInterval" );
             Scribe_Values.LookValue( ref LastAction, "LastAction" );
             Scribe_Values.LookValue( ref Priority, "Priority" );
+
+            if ( Scribe.mode == LoadSaveMode.PostLoadInit || Manager.LoadSaveMode == Manager.Modes.ImportExport )
+            {
+                // must be true if it was saved.
+                Managed = true;
+            }
         }
 
         public abstract bool TryDoJob();

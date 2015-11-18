@@ -179,13 +179,13 @@ namespace FM
                              "FMP.ThresholdCountTooltip".Translate( CurCount, Count ),
                              TextAnchor.MiddleLeft,
                              Utilities.Margin );
-
+            
             // add a little icon to mark interactivity
-            Rect searchIconRect = new Rect( thresholdLabelRect.xMax - entryHeight, cur.y, entryHeight, entryHeight );
-            if ( searchIconRect.height > Resources.Search.height )
+            Rect searchIconRect = new Rect( thresholdLabelRect.xMax - Utilities.Margin - entryHeight, cur.y, entryHeight, entryHeight );
+            if( searchIconRect.height > Utilities.SmallIconSize )
             {
                 // center it.
-                searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - Resources.Search.height ) / 2 );
+                searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - Utilities.SmallIconSize ) / 2 );
             }
             GUI.DrawTexture( searchIconRect, Resources.Search );
 

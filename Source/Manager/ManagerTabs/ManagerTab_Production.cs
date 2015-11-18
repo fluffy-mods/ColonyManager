@@ -104,11 +104,14 @@ namespace FM
                     {
                         if ( Widgets.TextButton( buttonRect, "FM.Manage".Translate() ) )
                         {
-                            _selected.Assigned = true;
+                            _selected.Managed = true;
                             Manager.Get.JobStack.Add( _selected );
 
                             // refresh source list so that the next added job is not an exact copy.
                             Refresh();
+
+                            // TODO: recursive ingredient jobs.
+                            Find.WindowStack.Add( new Dialog_CreateJobsForIngredients( _selected.Bill.recipe, _selected.Trigger.Count ) );
 
                             Source = SourceOptions.Current;
                             Refresh();
@@ -192,7 +195,7 @@ namespace FM
 
                 // prioritize over manually set jobs (4)
                 Rect prioritizeRect = new Rect( cur.x, cur.y, width, _entryHeight );
-                Utilities.DrawToggle(prioritizeRect, "FMP.PrioritizeOverManual".Translate(), ref _selected.prioritizeOverManual);
+                Utilities.DrawToggle(prioritizeRect, "FMP.PrioritizeManual".Translate(), ref ManagerJob_Production.prioritizeManual);
                 cur.y += _entryHeight;
                 
                 // min skill (5)
@@ -363,7 +366,7 @@ namespace FM
             TabDrawer.DrawTabs( canvas, list );
 
             // content
-            Rect scrollCanvas = canvas; //.ContractedBy( 10f );
+            Rect scrollCanvas = canvas;
             scrollCanvas.yMin = scrollCanvas.yMin + _entryHeight + _margin;
             float height = SourceListHeight;
             Rect scrollView = new Rect( 0f, 0f, scrollCanvas.width, height );

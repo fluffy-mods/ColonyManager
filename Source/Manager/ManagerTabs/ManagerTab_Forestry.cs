@@ -193,12 +193,12 @@ namespace FM
             GUI.EndGroup();
 
             // do the button
-            if ( !_selected.Assigned )
+            if ( !_selected.Managed )
             {
                 if ( Widgets.TextButton( buttonRect, "FM.Manage".Translate() ) )
                 {
                     // activate job, add it to the stack
-                    _selected.Assigned = true;
+                    _selected.Managed = true;
                     Manager.Get.JobStack.Add( _selected );
 
                     // refresh source list

@@ -76,8 +76,8 @@ namespace FM
             GUI.BeginGroup( rect );
 
             // settings.
-            Utilities.Label( colTitleRects[0], "FMH.Options".Translate(), lrMargin: _margin * 2,
-                             anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
+            Utilities.Label( colTitleRects[0], "FMH.Options".Translate(),
+                             anchor: TextAnchor.LowerLeft, lrMargin: _margin * 2, font: GameFont.Tiny );
 
             GUI.DrawTexture( colRects[0], Resources.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[0] );
@@ -119,7 +119,7 @@ namespace FM
             // unforbid corpses (3)
             Rect ufCorpseRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Widgets.DrawAltRect( ufCorpseRect );
-            Utilities.DrawToggle( ufCorpseRect, "FMH.UnforbidCorpses".Translate(), ref _selected.UnforbidCorpses );
+            Utilities.DrawToggle( ufCorpseRect, "FMH.UnforbidCorpses".Translate(), ref ManagerJob_Hunting.UnforbidCorpses );
             cur.y += _entryHeight;
 
             // hunting grounds (4)
@@ -136,8 +136,8 @@ namespace FM
             GUI.EndGroup();
 
             // animals.
-            Utilities.Label( colTitleRects[1], "FMH.Animals".Translate(), lrMargin: _margin * 2,
-                             anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
+            Utilities.Label( colTitleRects[1], "FMH.Animals".Translate(),
+                             anchor: TextAnchor.LowerLeft, lrMargin: _margin * 2, font: GameFont.Tiny );
 
             GUI.DrawTexture( colRects[1], Resources.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[1] );
@@ -205,12 +205,12 @@ namespace FM
             GUI.EndGroup();
 
             // do the button
-            if ( !_selected.Assigned )
+            if ( !_selected.Managed )
             {
                 if ( Widgets.TextButton( buttonRect, "FM.Manage".Translate() ) )
                 {
                     // activate job, add it to the stack
-                    _selected.Assigned = true;
+                    _selected.Managed = true;
                     Manager.Get.JobStack.Add( _selected );
 
                     // refresh source list

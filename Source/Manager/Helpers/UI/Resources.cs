@@ -22,6 +22,7 @@ namespace FM
             // stamps
             StampCompleted               = ContentFinder<Texture2D>.Get( "UI/Stamps/Completed" ),
             StampSuspended               = ContentFinder<Texture2D>.Get( "UI/Stamps/Suspended" ),
+            StampStart                   = ContentFinder<Texture2D>.Get( "UI/Stamps/Start" ),
 
             // tab icons
             IconOverview                 = ContentFinder<Texture2D>.Get( "UI/Icons/Overview" ),

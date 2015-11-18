@@ -15,19 +15,19 @@ namespace FM
 {
     public class ManagerJob_Hunting : ManagerJob
     {
-        private static int _histSize = 100;
-        private Utilities.CachedValue _corpseCachedValue = new Utilities.CachedValue();
-        private Utilities.CachedValue _designatedCachedValue = new Utilities.CachedValue();
-        private readonly float _margin = Utilities.Margin;
-        public Dictionary<PawnKindDef, bool> AllowedAnimals = new Dictionary<PawnKindDef, bool>();
-        public History day = new History( _histSize );
-        public List<Designation> Designations = new List<Designation>();
-        public History historyShown;
-        public Area HuntingGrounds;
-        public History month = new History( _histSize, History.Period.Month );
-        public new Trigger_Threshold Trigger;
-        public bool UnforbidCorpses = true;
-        public History year = new History( _histSize, History.Period.Year );
+        private static int                   _histSize              = 100;
+        private Utilities.CachedValue        _corpseCachedValue     = new Utilities.CachedValue();
+        private Utilities.CachedValue        _designatedCachedValue = new Utilities.CachedValue();
+        private readonly float               _margin                = Utilities.Margin;
+        public Dictionary<PawnKindDef, bool> AllowedAnimals         = new Dictionary<PawnKindDef, bool>();
+        public History                       day                    = new History( _histSize );
+        public List<Designation>             Designations           = new List<Designation>();
+        public History                       historyShown;
+        public Area                          HuntingGrounds;
+        public History                       month                  = new History( _histSize, History.Period.Month );
+        public new Trigger_Threshold         Trigger;
+        public static bool                   UnforbidCorpses        = true;
+        public History                       year                   = new History( _histSize, History.Period.Year );
 
         public override bool Completed
         {
@@ -225,13 +225,7 @@ namespace FM
 
             // add designations that could have been handed out by us
             AddRelevantGameDesignations();
-
-            // unforbid if required
-            if ( UnforbidCorpses )
-            {
-                DoUnforbidCorpses();
-            }
-
+            
             // get the total count of meat in storage, expected meat in corpses and expected meat in designations.
             int totalCount = Trigger.CurCount + GetMeatInCorpses() + GetMeatInDesignations();
 
@@ -248,6 +242,15 @@ namespace FM
             }
 
             return workDone;
+        }
+
+        public static void GlobalWork()
+        {
+            // unforbid if required
+            if( UnforbidCorpses )
+            {
+                DoUnforbidCorpses();
+            }
         }
 
         private void CleanAreaDesignations()

@@ -9,21 +9,22 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
+using System.Reflection;
 
 namespace FM
 {
     public static class Utilities
     {
-        public const float ListEntryHeight = 50f;
-
-        // globals
-        public const float Margin = 6f;
-        public const float SliderHeight = 20f;
-
-        public static Dictionary<ThingFilter, FilterCountCache> CountCache =
-            new Dictionary<ThingFilter, FilterCountCache>();
-
-        public static WorkTypeDef WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
+        public const float                                      ListEntryHeight        = 50f;
+        public const float                                      Margin                 = 6f;
+        public const float                                      SliderHeight           = 20f;
+        public static Dictionary<ThingFilter, FilterCountCache> CountCache             = new Dictionary<ThingFilter, FilterCountCache>();
+        public static float                                     SmallIconSize          = 16f;
+        public static float                                     MediumIconSize         = 24f;
+        public static float                                     LargeIconSize          = 32f;
+        public static WorkTypeDef                               WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
+        public static float                                     TitleHeight            = 50f;
+        public static float                                     BottomButtonHeight     = 50f;
 
         public static void Label( Rect rect, string label, string tooltip = null,
                                   TextAnchor anchor = TextAnchor.UpperLeft, float lrMargin = 0f, float tbMargin = 0f,
@@ -160,16 +161,7 @@ namespace FM
                  job.Suspended )
             {
                 // put a stamp on it
-                // get size for the stamp, respecting proportions
-                float proportion = rect.width / Resources.StampCompleted.width;
-                Rect stampRect = rect;
-
-                // don't scale up
-                if ( proportion < 1f )
-                {
-                    stampRect.width *= proportion;
-                    stampRect.height *= proportion;
-                }
+                Rect stampRect = new Rect(0f, 0f, MediumIconSize, MediumIconSize);
 
                 // center stamp in available space
                 stampRect = stampRect.CenteredOnXIn( rect ).CenteredOnYIn( rect );
@@ -178,11 +170,24 @@ namespace FM
                 if ( job.Completed )
                 {
                     GUI.DrawTexture( stampRect, Resources.StampCompleted );
+                    TooltipHandler.TipRegion(stampRect, "FM.JobCompletedToolip".Translate());
                     return;
                 }
                 if ( job.Suspended )
                 {
-                    GUI.DrawTexture( stampRect, Resources.StampSuspended );
+                    // allow activating the job from here.
+                    if ( !Mouse.IsOver( stampRect ) )
+                    {
+                        GUI.DrawTexture( stampRect, Resources.StampSuspended );
+                    }
+                    else
+                    {
+                        if ( Widgets.ImageButton( stampRect, Resources.StampStart ) )
+                        {
+                            job.Suspended = false;
+                        }
+                        TooltipHandler.TipRegion( stampRect, "FM.JobSuspendedToolTip".Translate() );
+                    }
                     return;
                 }
             }
@@ -288,6 +293,30 @@ namespace FM
                                        float margin = Margin )
         {
             DrawToggle( rect, label, checkOn, toggle, toggle, size );
+        }
+
+        public static bool TryGetPrivateField( Type type, object instance, string fieldName, out object value, BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance )
+        {
+            FieldInfo field = type.GetField(fieldName, flags);
+            value = field?.GetValue( instance );
+            return value != null;
+        }
+
+        public static bool TrySetPrivateField( Type type, object instance, string fieldName, object value, BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance )
+        {
+            // get field info
+            FieldInfo field = type.GetField(fieldName, flags);
+
+            // failed?
+            if ( field == null ) return false;
+
+            // try setting it.
+            field.SetValue( instance, value );
+
+            // test by fetching the field again. (this is highly, stupidly inefficient, but ok).
+            object test;
+            if ( !TryGetPrivateField( type, instance, fieldName, out test, flags ) ) return false;
+            return test == value;
         }
 
         public class CachedValue

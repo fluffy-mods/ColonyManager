@@ -309,7 +309,8 @@ namespace FM
             else
             {
                 Rect viewRect = rect;
-                Rect contentRect = rect.AtZero();
+                Rect contentRect = viewRect.AtZero();
+                contentRect.height = OverviewHeight;
                 if ( OverviewHeight > viewRect.height )
                 {
                     contentRect.width -= 16f;

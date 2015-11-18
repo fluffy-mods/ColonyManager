@@ -25,7 +25,7 @@ namespace FM
         /// <summary>
         ///     Highest priority available job
         /// </summary>
-        public ManagerJob NextJob => CurStack.DefaultIfEmpty( null ).FirstOrDefault();
+        public ManagerJob NextJob => CurStack.FirstOrDefault();
 
         /// <summary>
         ///     Full jobstack, in order of assignment

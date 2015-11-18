@@ -125,6 +125,27 @@ namespace FM
             {
                 job.Tick();
             }
+#if DEBUG
+            if ( Find.TickManager.TicksGame % 2000 == 0 )
+#else
+            if ( Find.TickManager.TicksGame % 10000 == 0 )
+#endif
+            {
+                DoGlobalWork();
+            }
+        }
+
+        private void DoGlobalWork()
+        {
+            // priority settings on worktables.
+            DeepProfiler.Start( "Global work for production manager" );
+            ManagerJob_Production.GlobalWork();
+            DeepProfiler.End();
+
+            // unforbid corpses.
+            DeepProfiler.Start( "Global work for hunting manager" );
+            ManagerJob_Hunting.GlobalWork();
+            DeepProfiler.End();
         }
 
         internal void NewJobStack( JobStack jobstack )

@@ -10,24 +10,25 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using System.Reflection;
 
 namespace FM
 {
     public class ManagerJob_Production : ManagerJob
     {
-        private static int _histSize = 100;
-        private readonly float _margin = Utilities.Margin;
-        private WorkTypeDef _workTypeDef;
-        public Bill_Production Bill;
-        public BillGiverTracker BillGivers;
-        public History day = new History( _histSize );
-        public History historyShown;
-        public MainProductTracker MainProduct;
-        public bool maxSkil;
-        public bool prioritizeOverManual;
-        public History month = new History( _histSize, History.Period.Month );
+        private static int           _histSize        = 100;
+        private readonly float       _margin          = Utilities.Margin;
+        private WorkTypeDef          _workTypeDef;
+        public Bill_Production       Bill;
+        public BillGiverTracker      BillGivers;
+        public History               day              = new History( _histSize );
+        public History               historyShown;
+        public MainProductTracker    MainProduct;
+        public bool                  maxSkil;
+        public static bool           prioritizeManual = true;
+        public History               month            = new History( _histSize, History.Period.Month );
         public new Trigger_Threshold Trigger;
-        public History year = new History( _histSize, History.Period.Year );
+        public History               year             = new History( _histSize, History.Period.Year );
 
         public override bool Completed
         {
@@ -37,6 +38,84 @@ namespace FM
         public override ManagerTab Tab
         {
             get { return Manager.Get.ManagerTabs.Find( tab => tab is ManagerTab_Production ); }
+        }
+
+        /// <summary>
+        /// Sorting of bills
+        /// </summary>
+        public static void GlobalWork()
+        {
+            // get a list of all assigned bills, their worktables, and the priority of the job they belong to.
+            List<BillTablePriority> all = new List<BillTablePriority>();
+            foreach ( ManagerJob_Production job in Manager.Get.JobStack.FullStack<ManagerJob_Production>() )
+            {
+                all.AddRange(
+                    job.BillGivers.GetAssignedBillGiversAndBillsDictionary.Select(
+                        pair => new BillTablePriority( pair.Key, pair.Value, job.Priority ) ) );
+            }
+
+            // no assigned bills, nothing to do.
+            if ( all.Count == 0 ) return;
+            
+            // loop through distinct worktables that have more than one bill
+            foreach ( Building_WorkTable table in all.Select( v => v.table ).Distinct().Where( table => table.BillStack.Count > 1 ) )
+            {
+                // get all bills (assigned by us) for this table, pre-ordered.
+                List<Bill> managerBills = all.Where( v => v.table == table ).OrderBy( v => v.priority ).Select( v => v.bill as Bill ).ToList();
+
+                // get all actual bills on the table (private field)
+                object rawBillsOnTable;
+                if ( !Utilities.TryGetPrivateField( table.billStack.GetType(), table.billStack, "bills", out rawBillsOnTable ) )
+                {
+                    Log.Warning( "Failed to get real billstack for " + table.ToString() );
+                    continue;
+                }
+
+                // give it it's type back.
+                List<Bill> billsOnTable = rawBillsOnTable as List<Bill>;
+                if ( billsOnTable == null )
+                {
+                    Log.Warning( "Failed to convert real billstack for " + table.ToString() );
+                    continue;
+                }
+
+                // get the set difference of the two lists - these are external/manual bills
+                List<Bill> manualBills = billsOnTable.Except( managerBills ).ToList();
+
+                // create a new list of bills, by pasting the two lists together in the right order
+                List<Bill> result = new List<Bill>();
+                if ( prioritizeManual )
+                {
+                    result.AddRange( manualBills );
+                    result.AddRange( managerBills );
+                }
+                else
+                {
+                    result.AddRange( managerBills );
+                    result.AddRange( manualBills );
+                }
+
+                // feed it back to the table.
+                if ( !Utilities.TrySetPrivateField( table.billStack.GetType(), table.billStack, "bills", result ) )
+                {
+                    Log.Warning( "Failed to set billstack for " + table.ToString() );
+                    continue;
+                }
+            }
+        }
+
+        public struct BillTablePriority
+        {
+            public Bill_Production bill;
+            public Building_WorkTable table;
+            public int priority;
+
+            public BillTablePriority(Bill_Production bill, Building_WorkTable table, int priority)
+            {
+                this.bill = bill;
+                this.table = table;
+                this.priority = priority;
+            }
         }
 
         public override bool IsValid
@@ -62,9 +141,14 @@ namespace FM
             get { return Bill.recipe.LabelCap; }
         }
 
+        private string[] _targets;
         public override string[] Targets
         {
-            get { return Bill.recipe.GetRecipeUsers().Select( td => td.LabelCap ).ToArray(); }
+            get
+            {
+                if (_targets == null) _targets = Bill.recipe.GetRecipeUsers().Select( td => td.LabelCap ).ToArray();
+                return _targets;
+            }
         }
 
         public override WorkTypeDef WorkTypeDef
@@ -296,7 +380,7 @@ namespace FM
         ///     Delete outstanding managed jobs on billgivers that no longer meet criteria
         /// </summary>
         /// <param name="workers">Allowed workstations</param>
-        /// <param name="assignedBills">Assigned bills/workstations</param>
+        /// <param name="assignedBills">Managed bills/workstations</param>
         /// <param name="actionTaken">Was anything done?</param>
         private void CleanNoLongerAllowedBillgivers( List<Building_WorkTable> workers,
                                                      Dictionary<Bill_Production, Building_WorkTable> assignedBills,
