@@ -135,7 +135,7 @@ namespace FM
                 // THINGDEF SELECTOR
                 // draw the label
                 string label = recipeSelector?.target.LabelCap ?? "FMP.SelectIngredient".Translate();
-                Utilities.Label( thingRect, label, "FMP.SelectIngredientTooltip".Translate(), TextAnchor.MiddleLeft,
+                Utilities.Label( thingRect, label, "FMP.SelectIngredientTooltip".Translate( targetRecipe.LabelCap ), TextAnchor.MiddleLeft,
                                  Utilities.Margin );
 
                 // if there are choices do a dropdown on click

@@ -56,7 +56,7 @@
   <FMF.ClearWindCells>Clear wind turbine cells</FMF.ClearWindCells>
   <FMF.AllowSaplings>Allow cutting non-mature trees</FMF.AllowSaplings>
   <FMF.LoggingArea>Alllow logging in:</FMF.LoggingArea>
-  <FMF.TargetCount>Target count: {0}+{1}+/{2}</FMF.TargetCount>
+  <FMF.TargetCount>Target count: {0}+{1}/{2}</FMF.TargetCount>
   <FMF.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMF.TargetCountTooltip>
 
   <!-- Production Tab -->
@@ -98,5 +98,19 @@
   <!-- Tab headers -->
   <FMP.Current>Current</FMP.Current>
   <FMP.Available>Available</FMP.Available>
+
+  <!-- Recursive job creator -->
+  <FMP.IngredientDialogTitle>Select ingredients to produce for {0}</FMP.IngredientDialogTitle>
+  <FMP.SelectRecipe>Select...</FMP.SelectRecipe>
+  <FMP.SelectRecipeTooltip>Select recipe for {0}</FMP.SelectRecipeTooltip>
+  <FMP.DoNotUseRecipe>(none)</FMP.DoNotUseRecipe>
+  <FMP.SelectIngredient>Select...</FMP.SelectIngredient>
+  <FMP.SelectIngredientTooltip>Select ingredient for {0}</FMP.SelectIngredientTooltip>
+  <FMP.RawResource>(raw resource)</FMP.RawResource>
+  <FMP.RawResourceTooltip>{0} is a raw resource (no recipe with a fixed output for {0} found)</FMP.RawResourceTooltip>
+  <FMP.AddIngredientBills>Create Jobs</FMP.AddIngredientBills>
+  <FMP.IncreasedThreshold>Increased threshold for {0} to {1}.</FMP.IncreasedThreshold>
+  <FMP.AddedJob>Created job {0}.</FMP.AddedJob>
+  <FMP.CouldNotAddJob>Failed to create job {0}.</FMP.CouldNotAddJob>
 
 </LanguageData>
