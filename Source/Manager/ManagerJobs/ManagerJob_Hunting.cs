@@ -387,7 +387,10 @@ namespace FM
                         }
                     }
 
-                    if ( !buried )
+                    // get the rottable comp and check how far gone it is.
+                    CompRottable rottable = corpse.TryGetComp<CompRottable>();
+
+                    if ( !buried && rottable?.Stage == RotStage.Fresh )
                     {
                         count += corpse.GetMeatCount();
                     }
