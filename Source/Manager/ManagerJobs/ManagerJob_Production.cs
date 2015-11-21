@@ -30,6 +30,9 @@ namespace FM
         public new Trigger_Threshold Trigger;
         public History               year             = new History( _histSize, History.Period.Year );
 
+        internal bool _hasMeaningfulIngredientChoices ;
+        internal bool _createIngredientBills;
+
         public override bool Completed
         {
             get { return Trigger.CurCount >= Trigger.Count; }
@@ -228,6 +231,7 @@ namespace FM
         public ManagerJob_Production( RecipeDef recipe )
         {
             Bill = recipe.UsesUnfinishedThing ? new Bill_ProductionWithUft( recipe ) : new Bill_Production( recipe );
+            _hasMeaningfulIngredientChoices = Dialog_CreateJobsForIngredients.HasRecipeChoices( recipe );
             MainProduct = new MainProductTracker( Bill.recipe );
             Trigger = new Trigger_Threshold( this );
             BillGivers = new BillGiverTracker( this );
@@ -238,6 +242,8 @@ namespace FM
             base.ExposeData();
 
             Scribe_Deep.LookDeep( ref Bill, "Bill" );
+            Scribe_Values.LookValue( ref _hasMeaningfulIngredientChoices, "hasMeaningFulIngredientChoices", false);
+            Scribe_Values.LookValue(ref _createIngredientBills, "createIngredientBills", true);
 
             // bill giver tracking is going to error out in cross-map import/export, so create a new one.
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )

@@ -85,6 +85,8 @@ namespace FM
                 // bottom buttons
                 Rect buttonRect = new Rect( canvas.xMax - _button.x, canvas.yMax - _button.y, _button.x - _margin,
                                             _button.y - _margin );
+                Rect ingredientCheck = new Rect( buttonRect.xMin - 300f - _margin, buttonRect.yMin, 300f,
+                                                 buttonRect.height );
 
                 // add / remove to the stack
                 if ( Source == SourceOptions.Current )
@@ -102,6 +104,8 @@ namespace FM
                 {
                     if ( _selected.Trigger.IsValid )
                     {
+                        Widgets.LabelCheckbox(ingredientCheck, "FMP.CreateBillsForIngredients".Translate(), ref _selected._createIngredientBills, !_selected._hasMeaningfulIngredientChoices);
+
                         if ( Widgets.TextButton( buttonRect, "FM.Manage".Translate() ) )
                         {
                             _selected.Managed = true;
@@ -110,8 +114,11 @@ namespace FM
                             // refresh source list so that the next added job is not an exact copy.
                             Refresh();
 
-                            // TODO: recursive ingredient jobs.
-                            Find.WindowStack.Add( new Dialog_CreateJobsForIngredients( _selected.Bill.recipe, _selected.Trigger.Count ) );
+                            if ( _selected._hasMeaningfulIngredientChoices &&
+                                 _selected._createIngredientBills )
+                            {
+                                Find.WindowStack.Add( new Dialog_CreateJobsForIngredients( _selected.Bill.recipe, _selected.Trigger.Count ) );
+                            }
 
                             Source = SourceOptions.Current;
                             Refresh();

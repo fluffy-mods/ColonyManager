@@ -17,34 +17,34 @@ namespace FM
     {
         // TODO: use properties to cache all the DefDatabase<> calls.
         public static List<IngredientSelector> ingredients;
-        private static float _entryHeight = 30f;
-        private static float _finalListHeight = 9999f;
-        private static float _nestingOffset = 15f;
-        private static Vector2 _scrollPosition = Vector2.zero;
-        public int targetCount;
-        public RecipeDef targetRecipe;
+        private static float                   _entryHeight     = 30f;
+        private static float                   _finalListHeight = 9999f;
+        private static float                   _nestingOffset   = 15f;
+        private static Vector2                 _scrollPosition  = Vector2.zero;
+        public int                             targetCount;
+        public RecipeDef                       targetRecipe;
 
         public Dialog_CreateJobsForIngredients( RecipeDef recipe, int count )
         {
-            targetCount = count;
+            targetCount  = count;
             targetRecipe = recipe;
-            ingredients =
+            ingredients  =
                 recipe.ingredients.Select(
-                    ic => new IngredientSelector( ic, targetCount, recipe ) ).ToList();
+                    ic   => new IngredientSelector( ic, targetCount, recipe ) ).ToList();
         }
 
-        public static bool HasMeaningFulChoices( RecipeDef recipe )
+        public static bool HasRecipeChoices( RecipeDef recipe )
         {
             return
                 recipe.ingredients.Select( ing => new IngredientSelector( ing, 1, recipe ) )
-                      .Any( IngredientSelector.HasMeaningfulIngredientChoices );
+                      .Any( IngredientSelector.HasRecipeChoices );
         }
 
         public override void DoWindowContents( Rect inRect )
         {
             // set up rects
-            Rect titleRect = new Rect(inRect.xMin, inRect.yMin, inRect.width, Utilities.TitleHeight);
-            Rect listRect = new Rect(inRect.xMin, titleRect.yMax, inRect.width, inRect.height - Utilities.TitleHeight - Utilities.BottomButtonHeight);
+            Rect titleRect  = new Rect(inRect.xMin, inRect.yMin, inRect.width, Utilities.TitleHeight);
+            Rect listRect   = new Rect(inRect.xMin, titleRect.yMax, inRect.width, inRect.height - Utilities.TitleHeight - Utilities.BottomButtonHeight);
             Rect buttonRect = new Rect(inRect.xMax - 200f, listRect.yMax + Utilities.Margin, 200f, Utilities.BottomButtonHeight - Utilities.Margin );
 
             // title
@@ -98,10 +98,10 @@ namespace FM
             public IngredientSelector( IngredientCount ingredient, int count, RecipeDef targetRecipe )
             {
                 // set up vars
-                this.ingredient = ingredient;
+                this.ingredient   = ingredient;
                 this.targetRecipe = targetRecipe;
-                targetCount = count * (int)Math.Sqrt( ingredient.GetBaseCount() );
-                allowedThingDefs = ingredient.filter.AllowedThingDefs.ToList();
+                targetCount       = count * (int)Math.Sqrt( ingredient.GetBaseCount() );
+                allowedThingDefs  = ingredient.filter.AllowedThingDefs.ToList();
 
                 // if there's only one allowed we don't need to manually choose.
                 if ( allowedThingDefs.Count == 1 )
@@ -118,9 +118,9 @@ namespace FM
                 cur.x = nesting * _nestingOffset;
                 float colWidth = ( width - _countField.x ) / 2;
 
-                Rect thingRect = new Rect( cur.x, cur.y, colWidth - cur.x, _entryHeight );
+                Rect thingRect  = new Rect( cur.x, cur.y, colWidth - cur.x, _entryHeight );
                 Rect recipeRect = new Rect( thingRect.xMax, cur.y, colWidth, _entryHeight );
-                Rect countRect = new Rect( width - _countField.x, cur.y, _countField.x, _countField.y );
+                Rect countRect  = new Rect( width - _countField.x, cur.y, _countField.x, _countField.y );
                 cur.y += _entryHeight;
 
                 // Draw line from parent to here.
@@ -174,7 +174,7 @@ namespace FM
                      recipeSelector.selectedRecipe != null &&
                      recipeSelector.children != null )
                 {
-                    // ok I have no idea why this is mucking about.
+                    // For some reason just plain copying cur (or even the elements of cur) doesn't work (I'm quite possibly misunderstanding how this works) 
                     float x = cur.x;
                     float y = cur.y;
                     Vector2 pos = new Vector2( x, y );
@@ -185,9 +185,9 @@ namespace FM
                 }
             }
 
-            public static bool HasMeaningfulIngredientChoices( IngredientSelector ingredient )
+            public static bool HasRecipeChoices( IngredientSelector ingredient )
             {
-                return ingredient.allowedThingDefs.Any( RecipeSelector.HasMeaningfulRecipeChoices );
+                return ingredient.allowedThingDefs.Any( RecipeSelector.HasRecipe );
             }
 
             public void AddBills()
@@ -260,7 +260,7 @@ namespace FM
                     rd => rd.products.Any( tc => tc.thingDef == td ) ).ToList();
             }
 
-            public static bool HasMeaningfulRecipeChoices( ThingDef thingDef )
+            public static bool HasRecipe( ThingDef thingDef )
             {
                 return GetRecipesFor( thingDef ).Count > 0;
             }
