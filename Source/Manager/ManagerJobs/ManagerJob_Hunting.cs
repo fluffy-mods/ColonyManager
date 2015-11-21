@@ -415,7 +415,7 @@ namespace FM
 
         public override void Tick()
         {
-            History.Update(new [] { Trigger.Count });
+            History.Update( Trigger.CurCount );
         }
     }
 }

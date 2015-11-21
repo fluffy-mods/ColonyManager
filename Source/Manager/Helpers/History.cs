@@ -110,6 +110,16 @@ namespace FM
             }
         }
 
+        public void Update( int count )
+        {
+            if ( _chapters.Count != 1 )
+            {
+                Log.Warning( "History updated with incorrect number of chapters" );
+            }
+
+            _chapters[0].Add( count );
+        }
+
         public void DrawPlot( Rect rect, int target = 0, string label = "" )
         {
             // stuff we need

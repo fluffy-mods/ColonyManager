@@ -525,7 +525,7 @@ namespace FM
                             pawn => pawn.skills.GetSkill( Bill.recipe.workSkill ).level );
                 }
             }
-            History.Update( new [] { Trigger.Count } );
+            History.Update( Trigger.CurCount );
         }
     }
 }
