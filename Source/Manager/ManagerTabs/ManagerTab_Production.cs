@@ -52,7 +52,15 @@ namespace FM
         public override ManagerJob Selected
         {
             get { return _selected; }
-            set { _selected = (ManagerJob_Production)value; }
+            set
+            {
+                _selected = (ManagerJob_Production)value;
+                if ( _selected.Managed && Source != SourceOptions.Current )
+                {
+                    Source = SourceOptions.Current;
+                    Refresh();
+                }
+            }
         }
 
         public static void Refresh()
