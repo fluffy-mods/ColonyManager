@@ -23,86 +23,90 @@ namespace FM
             Year
         }
 
-        private const int Breaks = 5;
-        private const int DashLength = 3;
-        private const float Margin = Utilities.Margin;
-        private List<int> _hist = new List<int> { 0 };
+        public static Color DefaultLineColor   = Color.white;
+        private const int   Breaks             = 5;
+        private const int   DashLength         = 3;
+        private const float Margin             = Utilities.Margin;
+        private const int   Size               = 100;
 
-        // Period stuff
-        private readonly Period _period;
-        private readonly Texture2D _plotBG = Resources.SlightlyDarkBackground;
+        // interval per period
+        private static Dictionary<Period, int> _intervals   = new Dictionary<Period, int>();
+        private static readonly Texture2D      _plotBG      = Resources.SlightlyDarkBackground;
+        private static readonly float          _yAxisMargin = 25f;
+        private static Period[]                periods      = (Period[])Enum.GetValues( typeof (Period) );
 
-        // start with a single entry to avoid issues with .Max()
-        private int _ticksPerPeriod;
-        private readonly float _yAxisMargin = 25f;
+        // each chapter holds the history for all periods.
+        private List<Chapter> _chapters = new List<Chapter>();
+        private List<Chapter> _chaptersShown = new List<Chapter>();
+        private Period        _periodShown = Period.Day;
 
-        // plotting stuff
-        public Color LineCol = Color.white;
-
-        public int[] Get
+        public History()
         {
-            get { return _hist.ToArray(); }
+            // for scribe?
         }
 
-        public int Interval
+        public History( string[] labels, Color[] colors = null )
         {
-            get
+            // get range of colors if not set
+            if ( colors == null )
             {
-                if ( _ticksPerPeriod == 0 )
+                // default to white for single line
+                if ( labels.Length == 1 )
                 {
-                    int ticks;
-                    switch ( _period )
-                    {
-                        case Period.Day:
-                            ticks = GenDate.TicksPerDay;
-                            break;
-
-                        case Period.Month:
-                            ticks = GenDate.TicksPerMonth;
-                            break;
-
-                        case Period.Year:
-                        default:
-                            ticks = GenDate.TicksPerYear;
-                            break;
-                    }
-                    _ticksPerPeriod = ticks / Size;
+                    colors = new[] { Color.white };
                 }
-                return _ticksPerPeriod;
+
+                // rainbow!
+                else
+                {
+                    colors = HSV_Helper.Range( labels.Length );
+                }
+            }
+
+            // create a chapter for each label
+            for ( int i = 0; i < labels.Length; i++ )
+            {
+                _chapters.Add( new Chapter( labels[i], Size, colors[i % colors.Length] ) );
             }
         }
 
-        // main cache
-        public int Size { get; set; }
-
-        public History( int size )
-        {
-            Size = size;
-            _period = Period.Day;
-        }
-
-        public History( int size, Period period )
-        {
-            Size = size;
-            _period = period;
-        }
-
-        #region Implementation of IExposable
-
         public void ExposeData()
         {
-            Scribe_Collections.LookList( ref _hist, "History", LookMode.Value );
+            Scribe_Collections.LookList( ref _chapters, "Chapter", LookMode.Deep );
         }
 
-        #endregion
-
-        public void Add( int x )
+        public static int Interval( Period period )
         {
-            _hist.Add( x );
-
-            while ( _hist.Count > Size )
+            if ( !_intervals.ContainsKey( period ) )
             {
-                _hist.RemoveAt( 0 );
+                int ticks;
+                switch ( period )
+                {
+                    case Period.Month:
+                        ticks = GenDate.TicksPerMonth;
+                        break;
+                    case Period.Year:
+                        ticks = GenDate.TicksPerYear;
+                        break;
+                    default:
+                        ticks = GenDate.TicksPerDay;
+                        break;
+                }
+                _intervals[period] = ticks / Size;
+            }
+            return _intervals[period];
+        }
+
+        public void Update( int[] counts )
+        {
+            if ( counts.Length != _chapters.Count )
+            {
+                Log.Warning( "History updated with incorrect number of chapters" );
+            }
+
+            for ( int i = 0; i < counts.Length; i++ )
+            {
+                _chapters[i].Add( counts[i] );
             }
         }
 
@@ -111,24 +115,32 @@ namespace FM
             // stuff we need
             Rect plot = rect.ContractedBy( Utilities.Margin );
             plot.xMin += _yAxisMargin;
-            int max = Math.Max( _hist.Max(), (int)( target * 1.2 ) );
-            float w = plot.width;
-            float h = plot.height;
+
+            // maximum of all chapters.
+            int max = Math.Max( _chapters.Select( c => c.Max( _periodShown ) ).Max(), (int)( target * 1.2 ) );
+
+            // size, and pixels per node.
+            float w  = plot.width;
+            float h  = plot.height;
             float wu = w / Size; // width per section
             float hu = h / max; // height per count
-            int bi = max / ( Breaks + 1 ); // count per break
+            int   bi = max / ( Breaks + 1 ); // count per break
             float bu = hu * bi; // height per break
 
-            // plot the line
+            // plot the line(s)
             GUI.DrawTexture( plot, _plotBG );
             GUI.BeginGroup( plot );
-            if ( _hist.Count > 1 )
+            foreach ( Chapter chapter in _chapters )
             {
-                for ( int i = 0; i < _hist.Count - 1; i++ ) // line segments, so up till n-1
+                if ( chapter._hist[_periodShown].Count > 1 )
                 {
-                    Vector2 start = new Vector2( wu * i, h - hu * _hist[i] );
-                    Vector2 end = new Vector2( wu * ( i + 1 ), h - hu * _hist[i + 1] );
-                    Widgets.DrawLine( start, end, LineCol, 1f );
+                    List<int> hist = chapter._hist[_periodShown];
+                    for ( int i = 0; i < hist.Count - 1; i++ ) // line segments, so up till n-1
+                    {
+                        Vector2 start = new Vector2( wu * i, h - hu * hist[i] );
+                        Vector2 end = new Vector2( wu * ( i + 1 ), h - hu * hist[i + 1] );
+                        Widgets.DrawLine( start, end, chapter.lineColor, 1f );
+                    }
                 }
             }
 
@@ -156,7 +168,69 @@ namespace FM
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.UpperLeft;
             GUI.color = Color.white;
+
+            // period / variables picker
+            Rect switchRect = new Rect( rect.xMax - Utilities.SmallIconSize - Utilities.Margin,
+                                        rect.yMin + Utilities.Margin, Utilities.SmallIconSize, Utilities.SmallIconSize );
+            Widgets.DrawHighlightIfMouseover( switchRect );
+            if ( Widgets.ImageButton( switchRect, Resources.Cog ) )
+            {
+                List<FloatMenuOption> options =
+                    periods.Select( p => new FloatMenuOption( p.ToString(), delegate { _periodShown = p; } ) ).ToList();
+                Find.WindowStack.Add( new FloatMenu( options ) );
+            }
+
             GUI.EndGroup();
+        }
+
+        public class Chapter : IExposable
+        {
+            public Dictionary<Period, List<int>> _hist;
+            public string                        label;
+            public Color                         lineColor;
+            public int                           size;
+
+            public Chapter( string label, int size, Color color )
+            {
+                this.label = label;
+                this.size  = size;
+                lineColor  = color;
+
+                // create a dictionary of histories, one for each period.
+                _hist = periods.ToDictionary( k => k, v => new List<int>() );
+            }
+
+            public void ExposeData()
+            {
+                Scribe_Values.LookValue( ref label, "label" );
+                Scribe_Values.LookValue( ref size, "size", 100 );
+
+                // TODO: custom class for scribing an array really necessary?
+                // Scribe_Collections.LookDictionary( ref _hist, "pages", LookMode.Value, LookMode.Value);
+            }
+
+            public void Add( int count )
+            {
+                int curTick = Find.TickManager.TicksGame;
+                foreach ( Period period in periods )
+                {
+                    if ( curTick % Interval( period ) == 0 )
+                    {
+                        _hist[period].Add( count );
+
+                        // cull the list back down to size.
+                        while ( _hist[period].Count > Size )
+                        {
+                            _hist[period].RemoveAt( 0 );
+                        }
+                    }
+                }
+            }
+
+            public int Max( Period period )
+            {
+                return _hist[period].Max();
+            }
         }
     }
 }

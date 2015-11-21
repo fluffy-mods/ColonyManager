@@ -15,19 +15,15 @@ namespace FM
 {
     public class ManagerJob_Hunting : ManagerJob
     {
-        private static int                   _histSize              = 100;
         private Utilities.CachedValue        _corpseCachedValue     = new Utilities.CachedValue();
         private Utilities.CachedValue        _designatedCachedValue = new Utilities.CachedValue();
         private readonly float               _margin                = Utilities.Margin;
         public Dictionary<PawnKindDef, bool> AllowedAnimals         = new Dictionary<PawnKindDef, bool>();
-        public History                       day                    = new History( _histSize );
         public List<Designation>             Designations           = new List<Designation>();
-        public History                       historyShown;
         public Area                          HuntingGrounds;
-        public History                       month                  = new History( _histSize, History.Period.Month );
         public new Trigger_Threshold         Trigger;
         public static bool                   UnforbidCorpses        = true;
-        public History                       year                   = new History( _histSize, History.Period.Year );
+        public History                       History                = new History( new [] { "Meat" } );
 
         public override bool Completed
         {
@@ -69,6 +65,8 @@ namespace FM
 
             // populate the list of animals from the animals in the biome - allow all by default.
             AllowedAnimals = Find.Map.Biome.AllWildAnimals.ToDictionary( pk => pk, v => true );
+
+            History = new History(new [] { "Meat" });
         }
 
         private void AddRelevantGameDesignations()
@@ -127,9 +125,7 @@ namespace FM
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
                 // scribe history
-                Scribe_Deep.LookDeep( ref day, "histDay", _histSize );
-                Scribe_Deep.LookDeep( ref month, "histMonth", _histSize, History.Period.Month );
-                Scribe_Deep.LookDeep( ref year, "histYear", _histSize, History.Period.Year );
+                Scribe_Deep.LookDeep( ref History, "History", new object[] { new string[] { "meat" }} );
             }
         }
 
@@ -192,24 +188,7 @@ namespace FM
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            if ( historyShown == null )
-            {
-                historyShown = day;
-            }
-            historyShown.DrawPlot( rect, Trigger.Count );
-
-            Rect switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
-            Widgets.DrawHighlightIfMouseover( switchRect );
-            if ( Widgets.ImageButton( switchRect, Resources.Cog ) )
-            {
-                List<FloatMenuOption> options = new List<FloatMenuOption>
-                {
-                    new FloatMenuOption( "Day", delegate { historyShown = day; } ),
-                    new FloatMenuOption( "Month", delegate { historyShown = month; } ),
-                    new FloatMenuOption( "Year", delegate { historyShown = year; } )
-                };
-                Find.WindowStack.Add( new FloatMenu( options ) );
-            }
+            History.DrawPlot( rect, Trigger.Count );
         }
 
         public override bool TryDoJob()
@@ -436,18 +415,7 @@ namespace FM
 
         public override void Tick()
         {
-            if ( Find.TickManager.TicksGame % day.Interval == 0 )
-            {
-                day.Add( Trigger.CurCount );
-            }
-            if ( Find.TickManager.TicksGame % month.Interval == 0 )
-            {
-                month.Add( Trigger.CurCount );
-            }
-            if ( Find.TickManager.TicksGame % year.Interval == 0 )
-            {
-                year.Add( Trigger.CurCount );
-            }
+            History.Update(new [] { Trigger.Count });
         }
     }
 }

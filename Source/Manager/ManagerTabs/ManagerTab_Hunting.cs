@@ -15,15 +15,15 @@ namespace FM
 {
     internal class ManagerTab_Hunting : ManagerTab
     {
-        private static float _entryHeight = 30f;
-        private static ManagerJob_Hunting _selected = new ManagerJob_Hunting();
-        private Vector2 _animalsScrollPosition = Vector2.zero;
-        private Vector2 _button = new Vector2( 200f, 40f );
-        private float _leftRowHeight = 9999f;
-        private float _margin = Utilities.Margin;
-        private Vector2 _scrollPosition = Vector2.zero;
-        private float _topAreaHeight = 30f;
-        public List<ManagerJob_Hunting> Jobs;
+        private static float              _entryHeight           = 30f;
+        private static ManagerJob_Hunting _selected              = new ManagerJob_Hunting();
+        private Vector2                   _animalsScrollPosition = Vector2.zero;
+        private Vector2                   _button                = new Vector2( 200f, 40f );
+        private float                     _leftRowHeight         = 9999f;
+        private float                     _margin                = Utilities.Margin;
+        private Vector2                   _scrollPosition        = Vector2.zero;
+        private float                     _topAreaHeight         = 30f;
+        public List<ManagerJob_Hunting>   Jobs;
 
         public override Texture2D Icon
         {

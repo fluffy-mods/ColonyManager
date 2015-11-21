@@ -15,19 +15,15 @@ namespace FM
 {
     public class ManagerJob_Forestry : ManagerJob
     {
-        private static int _histSize = 100;
-        private Utilities.CachedValue _designatedWoodCachedValue = new Utilities.CachedValue();
-        private readonly float _margin = Utilities.Margin;
+        private Utilities.CachedValue     _designatedWoodCachedValue = new Utilities.CachedValue();
+        private readonly float            _margin                    = Utilities.Margin;
         public Dictionary<ThingDef, bool> AllowedTrees;
-        public bool AllowSaplings;
-        public static bool ClearWindCells = true;
-        public History day = new History( _histSize );
-        public List<Designation> Designations = new List<Designation>();
-        public History historyShown;
-        public Area LoggingArea;
-        public History month = new History( _histSize, History.Period.Month );
-        public new Trigger_Threshold Trigger;
-        public History year = new History( _histSize, History.Period.Year );
+        public bool                       AllowSaplings;
+        public static bool                ClearWindCells             = true;
+        public List<Designation>          Designations               = new List<Designation>();
+        public History                    History;
+        public Area                       LoggingArea;
+        public new Trigger_Threshold      Trigger;
 
         public override string Label
         {
@@ -66,6 +62,8 @@ namespace FM
             AllowedTrees =
                 Find.Map.Biome.AllWildPlants.Where( pd => pd.plant.harvestedThingDef == Utilities_Forestry.Wood )
                     .ToDictionary( pk => pk, v => true );
+
+            History = new History(new [] { "Wood" });
         }
 
         #region Overrides of ManagerJob
@@ -87,9 +85,7 @@ namespace FM
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
                 // scribe history
-                Scribe_Deep.LookDeep( ref day, "histDay", _histSize );
-                Scribe_Deep.LookDeep( ref month, "histMonth", _histSize, History.Period.Month );
-                Scribe_Deep.LookDeep( ref year, "histYear", _histSize, History.Period.Year );
+                Scribe_Deep.LookDeep( ref History, "History", "wood" );
             }
         }
 
@@ -97,18 +93,7 @@ namespace FM
 
         public override void Tick()
         {
-            if ( Find.TickManager.TicksGame % day.Interval == 0 )
-            {
-                day.Add( Trigger.CurCount );
-            }
-            if ( Find.TickManager.TicksGame % month.Interval == 0 )
-            {
-                month.Add( Trigger.CurCount );
-            }
-            if ( Find.TickManager.TicksGame % year.Interval == 0 )
-            {
-                year.Add( Trigger.CurCount );
-            }
+            History.Update( new [] {Trigger.Count } );
         }
 
         /// <summary>
@@ -213,24 +198,7 @@ namespace FM
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            if ( historyShown == null )
-            {
-                historyShown = day;
-            }
-            historyShown.DrawPlot( rect, Trigger.Count );
-
-            Rect switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
-            Widgets.DrawHighlightIfMouseover( switchRect );
-            if ( Widgets.ImageButton( switchRect, Resources.Cog ) )
-            {
-                List<FloatMenuOption> options = new List<FloatMenuOption>
-                {
-                    new FloatMenuOption( "Day", delegate { historyShown = day; } ),
-                    new FloatMenuOption( "Month", delegate { historyShown = month; } ),
-                    new FloatMenuOption( "Year", delegate { historyShown = year; } )
-                };
-                Find.WindowStack.Add( new FloatMenu( options ) );
-            }
+            History.DrawPlot( rect, Trigger.Count );
         }
 
         public override bool TryDoJob()

@@ -16,19 +16,15 @@ namespace FM
 {
     public class ManagerJob_Production : ManagerJob
     {
-        private static int           _histSize        = 100;
         private readonly float       _margin          = Utilities.Margin;
         private WorkTypeDef          _workTypeDef;
         public Bill_Production       Bill;
         public BillGiverTracker      BillGivers;
-        public History               day              = new History( _histSize );
-        public History               historyShown;
         public MainProductTracker    MainProduct;
         public bool                  maxSkil;
         public static bool           prioritizeManual = true;
-        public History               month            = new History( _histSize, History.Period.Month );
         public new Trigger_Threshold Trigger;
-        public History               year             = new History( _histSize, History.Period.Year );
+        public History               History;
 
         internal bool _hasMeaningfulIngredientChoices ;
         internal bool _createIngredientBills;
@@ -235,6 +231,8 @@ namespace FM
             MainProduct = new MainProductTracker( Bill.recipe );
             Trigger = new Trigger_Threshold( this );
             BillGivers = new BillGiverTracker( this );
+
+            History = new History(new [] { Trigger.ThresholdFilter.Summary });
         }
 
         public override void ExposeData()
@@ -267,9 +265,8 @@ namespace FM
             // scribe history in normal load/save only.
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
-                Scribe_Deep.LookDeep( ref day, "histDay", _histSize );
-                Scribe_Deep.LookDeep( ref month, "histMonth", _histSize, History.Period.Month );
-                Scribe_Deep.LookDeep( ref year, "histYear", _histSize, History.Period.Year );
+                Scribe_Deep.LookDeep( ref History, "History",
+                                      new object[] { new string[] { Trigger.ThresholdFilter.Summary } } );
             }
         }
 
@@ -514,24 +511,7 @@ namespace FM
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            if ( historyShown == null )
-            {
-                historyShown = day;
-            }
-            historyShown.DrawPlot( rect, Trigger.Count );
-
-            Rect switchRect = new Rect( rect.xMax - 16f - _margin, rect.yMin + _margin, 16f, 16f );
-            Widgets.DrawHighlightIfMouseover( switchRect );
-            if ( Widgets.ImageButton( switchRect, Resources.Cog ) )
-            {
-                List<FloatMenuOption> options = new List<FloatMenuOption>
-                {
-                    new FloatMenuOption( "Day", delegate { historyShown = day; } ),
-                    new FloatMenuOption( "Month", delegate { historyShown = month; } ),
-                    new FloatMenuOption( "Year", delegate { historyShown = year; } )
-                };
-                Find.WindowStack.Add( new FloatMenu( options ) );
-            }
+            History.DrawPlot( rect, Trigger.Count );
         }
 
         public override void Tick()
@@ -545,18 +525,7 @@ namespace FM
                             pawn => pawn.skills.GetSkill( Bill.recipe.workSkill ).level );
                 }
             }
-            if ( Find.TickManager.TicksGame % day.Interval == 0 )
-            {
-                day.Add( Trigger.CurCount );
-            }
-            if ( Find.TickManager.TicksGame % month.Interval == 0 )
-            {
-                month.Add( Trigger.CurCount );
-            }
-            if ( Find.TickManager.TicksGame % year.Interval == 0 )
-            {
-                year.Add( Trigger.CurCount );
-            }
+            History.Update( new [] { Trigger.Count } );
         }
     }
 }
