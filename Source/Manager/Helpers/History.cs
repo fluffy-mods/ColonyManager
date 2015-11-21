@@ -206,8 +206,8 @@ namespace FM
                 this.size  = size;
                 lineColor  = color;
 
-                // create a dictionary of histories, one for each period.
-                _hist = periods.ToDictionary( k => k, v => new List<int>() );
+                // create a dictionary of histories, one for each period, initialize with a zero to avoid errors.
+                _hist = periods.ToDictionary( k => k, v => new List<int>( new [] { 0 }) );
             }
 
             public void ExposeData()
