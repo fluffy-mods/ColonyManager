@@ -20,7 +20,7 @@ namespace FM
         private readonly float _margin = Utilities.Margin;
         public Dictionary<ThingDef, bool> AllowedTrees;
         public bool AllowSaplings;
-        public bool ClearWindCells = true;
+        public static bool ClearWindCells = true;
         public History day = new History( _histSize );
         public List<Designation> Designations = new List<Designation>();
         public History historyShown;
@@ -249,13 +249,7 @@ namespace FM
 
             // add external designations
             AddRelevantGameDesignations();
-
-            // designate wind cells
-            if ( ClearWindCells )
-            {
-                DesignateWindCells();
-            }
-
+            
             // get current lumber count
             int count = Trigger.CurCount + GetWoodInDesignations();
 
@@ -282,6 +276,15 @@ namespace FM
             Designations.Add( des );
         }
 
+        public static void GlobalWork()
+        {
+            // designate wind cells
+            if( ClearWindCells )
+            {
+                DesignateWindCells();
+            }
+        }
+
         private void AddDesignation( Plant p, DesignationDef def = null )
         {
             // create designation
@@ -291,7 +294,7 @@ namespace FM
             AddDesignation( des );
         }
 
-        public void DesignateWindCells()
+        public static void DesignateWindCells()
         {
             foreach ( IntVec3 cell in GetWindCells() )
             {
@@ -301,12 +304,12 @@ namespace FM
                      plant.def.plant.IsTree &&
                      Find.DesignationManager.DesignationOn( plant, DesignationDefOf.CutPlant ) == null )
                 {
-                    AddDesignation( plant, DesignationDefOf.CutPlant );
+                    Find.DesignationManager.AddDesignation( new Designation( plant, DesignationDefOf.CutPlant ) );
                 }
             }
         }
 
-        private List<IntVec3> GetWindCells()
+        private static List<IntVec3> GetWindCells()
         {
             return Find.ListerBuildings
                        .AllBuildingsColonistOfClass<Building_WindTurbine>()

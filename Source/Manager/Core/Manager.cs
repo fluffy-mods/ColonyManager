@@ -146,6 +146,11 @@ namespace FM
             DeepProfiler.Start( "Global work for hunting manager" );
             ManagerJob_Hunting.GlobalWork();
             DeepProfiler.End();
+
+            // clear turbine cells.
+            DeepProfiler.Start( "Global work for forestry manager" );
+            ManagerJob_Forestry.GlobalWork();
+            DeepProfiler.End();
         }
 
         internal void NewJobStack( JobStack jobstack )

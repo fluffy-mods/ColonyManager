@@ -100,7 +100,7 @@ namespace FM
 
             // Clear wind cells (2)
             Rect clearWindCellsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-            Utilities.DrawToggle( clearWindCellsRect, "FMF.ClearWindCells".Translate(), ref _selected.ClearWindCells );
+            Utilities.DrawToggle( clearWindCellsRect, "FMF.ClearWindCells".Translate(), ref ManagerJob_Forestry.ClearWindCells );
             cur.y += EntryHeight;
 
             // Allow saplings (3)
