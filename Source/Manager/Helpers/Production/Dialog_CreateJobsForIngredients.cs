@@ -135,7 +135,7 @@ namespace FM
                 // THINGDEF SELECTOR
                 // draw the label
                 string label = recipeSelector?.target.LabelCap ?? "FMP.SelectIngredient".Translate();
-                Utilities.Label( thingRect, label, "FMP.SelectIngredientTooltip".Translate( targetRecipe.LabelCap ), TextAnchor.MiddleLeft,
+                Utilities.Label( thingRect, label, "FMP.SelectIngredientTooltip".Translate( targetRecipe.LabelCap, ingredient.GetBaseCount() ), TextAnchor.MiddleLeft,
                                  Utilities.Margin );
 
                 // if there are choices do a dropdown on click
@@ -145,7 +145,8 @@ namespace FM
                     if ( Widgets.InvisibleButton( thingRect ) )
                     {
                         List<FloatMenuOption> options = allowedThingDefs
-                        .Select(
+                            .Where( RecipeSelector.HasRecipe )
+                            .Select(
                             td =>
                                 new FloatMenuOption( td.LabelCap,
                                                      delegate
@@ -154,8 +155,15 @@ namespace FM
                                                                                                 ingredient
                                                                                                     .CountRequiredOfFor(
                                                                                                         td, targetRecipe ) *
-                                                                                                targetCount );
+                                                                                                (int)Math.Sqrt(targetCount)) ;
                                                      } ) ).ToList();
+                        if ( allowedThingDefs.Any( td => !RecipeSelector.HasRecipe( td ) ) )
+                        {
+                            options.Add( new FloatMenuOption( "FMP.RawResource".Translate(), delegate
+                            {
+                                recipeSelector = null;
+                            })  );
+                        }
                         Find.WindowStack.Add( new FloatMenu( options ) );
                     }
                 }
@@ -238,18 +246,18 @@ namespace FM
         public class RecipeSelector
         {
             public List<IngredientSelector> children;
-            public string newCount;
-            public int outCount;
-            public List<RecipeDef> recipes;
-            public RecipeDef selectedRecipe;
-            public ThingDef target;
-            public int targetCount;
+            public string                   newCount;
+            public int                      outCount;
+            public List<RecipeDef>          recipes;
+            public RecipeDef                selectedRecipe;
+            public ThingDef                 target;
+            public int                      targetCount;
 
             public RecipeSelector( ThingDef thingDef, int count )
             {
-                target = thingDef;
+                target      = thingDef;
                 targetCount = count;
-                newCount = count.ToString();
+                newCount    = count.ToString();
 
                 recipes = GetRecipesFor( thingDef );
             }
@@ -287,6 +295,15 @@ namespace FM
                 {
                     label = selectedRecipe?.LabelCap ?? "FMP.SelectRecipe".Translate();
                     tooltip = "FMP.SelectRecipeTooltip".Translate( target.LabelCap );
+                    if ( selectedRecipe != null )
+                    {
+                        tooltip += "FMP.SelectRecipeTooltipSelected".Translate();
+                        foreach ( IngredientCount ingredient in selectedRecipe.ingredients )
+                        {
+                            tooltip += "FMP.IngredientCount".Translate( ingredient.filter.Summary,
+                                                                        ingredient.GetBaseCount() );
+                        }
+                    }
                 }
 
                 Utilities.Label( rect, label, tooltip, TextAnchor.MiddleLeft,

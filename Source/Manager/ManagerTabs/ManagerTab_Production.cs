@@ -112,7 +112,7 @@ namespace FM
                 {
                     if ( _selected.Trigger.IsValid )
                     {
-                        Widgets.LabelCheckbox(ingredientCheck, "FMP.CreateBillsForIngredients".Translate(), ref _selected._createIngredientBills, !_selected._hasMeaningfulIngredientChoices);
+                        Widgets.LabelCheckbox(ingredientCheck, "FMP.IngredientDialogTitle".Translate(), ref _selected._createIngredientBills, !_selected._hasMeaningfulIngredientChoices);
 
                         if ( Widgets.TextButton( buttonRect, "FM.Manage".Translate() ) )
                         {
