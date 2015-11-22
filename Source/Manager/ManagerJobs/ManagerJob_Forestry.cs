@@ -63,7 +63,7 @@ namespace FM
                 Find.Map.Biome.AllWildPlants.Where( pd => pd.plant.harvestedThingDef == Utilities_Forestry.Wood )
                     .ToDictionary( pk => pk, v => true );
 
-            History = new History(new [] { "Wood" });
+            History = new History( new[] { "stock", "designated" }, new[] { Color.white, Color.grey } );
         }
 
         #region Overrides of ManagerJob
@@ -85,7 +85,7 @@ namespace FM
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
                 // scribe history
-                Scribe_Deep.LookDeep( ref History, "History", "wood" );
+                Scribe_Deep.LookDeep( ref History, "History", new object[] { new string[] { "stock", "designated" } } );
             }
         }
 
@@ -93,7 +93,7 @@ namespace FM
 
         public override void Tick()
         {
-            History.Update( Trigger.CurCount );
+            History.Update( Trigger.CurCount, GetWoodInDesignations() );
         }
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace FM
             int count = 0;
 
             // try get cache
-            if ( _designatedWoodCachedValue.TryGetCount( out count ) )
+            if ( _designatedWoodCachedValue.TryGetValue( out count ) )
             {
                 return count;
             }

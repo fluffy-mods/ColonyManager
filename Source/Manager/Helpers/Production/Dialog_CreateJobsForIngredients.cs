@@ -16,13 +16,18 @@ namespace FM
     public class Dialog_CreateJobsForIngredients : Window
     {
         // TODO: use properties to cache all the DefDatabase<> calls.
+        // ingredients are set by the recipe, and are given by a thingfilter and a count.
+        // we create an ingredientSelector for each ingredient, which allows selecting an ingredient from the filter. (or sets it, if there's only one thingdef allowed).
         public static List<IngredientSelector> ingredients;
+        public int                             targetCount;
+        public RecipeDef                       targetRecipe;
+
+        // UI settings.
         private static float                   _entryHeight     = 30f;
         private static float                   _finalListHeight = 9999f;
         private static float                   _nestingOffset   = 15f;
         private static Vector2                 _scrollPosition  = Vector2.zero;
-        public int                             targetCount;
-        public RecipeDef                       targetRecipe;
+        private static Vector2                 _countField      = new Vector2( 100f, 30f );
 
         public Dialog_CreateJobsForIngredients( RecipeDef recipe, int count )
         {
@@ -33,7 +38,12 @@ namespace FM
                     ic   => new IngredientSelector( ic, targetCount, recipe ) ).ToList();
         }
 
-        public static bool HasRecipeChoices( RecipeDef recipe )
+        /// <summary>
+        /// Returns true if the recipe has prerequisite ingredients, and those ingredients can currently be crafted.
+        /// </summary>
+        /// <param name="recipe"></param>
+        /// <returns></returns>
+        public static bool HasPrerequisiteChoices( RecipeDef recipe )
         {
             return
                 recipe.ingredients.Select( ing => new IngredientSelector( ing, 1, recipe ) )
@@ -88,19 +98,20 @@ namespace FM
 
         public class IngredientSelector
         {
-            private Vector2        _countField = new Vector2( 100f, 30f );
-            public List<ThingDef>  allowedThingDefs;
-            public IngredientCount ingredient;
-            public RecipeSelector  recipeSelector;
-            public int             targetCount;
-            public RecipeDef       targetRecipe;
+            // the ingredient selector itself is an intermediate step, it links the target recipe with (one of multiple possible) prerequisite recipes.
+            public RecipeSelector  recipeSelector;  
+            public IngredientCount ingredient;        // the vanilla ingredientcount of the parent recipe (filter + count)
+            public List<ThingDef>  allowedThingDefs;  // the list of thingdefs allowed by the ingredient
+            public int             targetCount;       // the number of ingredients required * sqrt(number of parent recipe crafts)
+            public RecipeDef       targetRecipe;      // the parent recipe itself.
+
 
             public IngredientSelector( IngredientCount ingredient, int count, RecipeDef targetRecipe )
             {
                 // set up vars
                 this.ingredient   = ingredient;
                 this.targetRecipe = targetRecipe;
-                targetCount       = count * (int)Math.Sqrt( ingredient.GetBaseCount() );
+                targetCount       = (int)Math.Sqrt( count ) * (int)ingredient.GetBaseCount();
                 allowedThingDefs  = ingredient.filter.AllowedThingDefs.ToList();
 
                 // if there's only one allowed we don't need to manually choose.
@@ -262,10 +273,11 @@ namespace FM
                 recipes = GetRecipesFor( thingDef );
             }
 
-            public static List<RecipeDef> GetRecipesFor( ThingDef td )
+            public static List<RecipeDef> GetRecipesFor( ThingDef td, bool currentlyAvailable = true )
             {
-                return DefDatabase<RecipeDef>.AllDefsListForReading.Where(
-                    rd => rd.products.Any( tc => tc.thingDef == td ) ).ToList();
+                return DefDatabase<RecipeDef>.AllDefsListForReading
+                    .Where( rd => rd.products.Any( tc => tc.thingDef == td )  && rd.GetCurrentRecipeUsers().Count > 0 )
+                    .ToList();
             }
 
             public static bool HasRecipe( ThingDef thingDef )

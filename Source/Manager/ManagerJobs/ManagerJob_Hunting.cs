@@ -23,7 +23,7 @@ namespace FM
         public Area                          HuntingGrounds;
         public new Trigger_Threshold         Trigger;
         public static bool                   UnforbidCorpses        = true;
-        public History                       History                = new History( new [] { "Meat" } );
+        public History                       History;
 
         public override bool Completed
         {
@@ -66,7 +66,8 @@ namespace FM
             // populate the list of animals from the animals in the biome - allow all by default.
             AllowedAnimals = Find.Map.Biome.AllWildAnimals.ToDictionary( pk => pk, v => true );
 
-            History = new History(new [] { "Meat" });
+            History = new History( new[] { "stock", "corpses", "designated" },
+                                   new Color[] { Color.white, new Color( .7f, .7f, .7f ), new Color( .4f, .4f, .4f ) } );
         }
 
         private void AddRelevantGameDesignations()
@@ -125,7 +126,7 @@ namespace FM
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
                 // scribe history
-                Scribe_Deep.LookDeep( ref History, "History", new object[] { new string[] { "meat" }} );
+                Scribe_Deep.LookDeep( ref History, "History", new object[] { new string[] { "stock", "corpses", "designated" }} );
             }
         }
 
@@ -336,7 +337,7 @@ namespace FM
             int count = 0;
 
             // try get cached value
-            if ( _corpseCachedValue.TryGetCount( out count ) )
+            if ( _corpseCachedValue.TryGetValue( out count ) )
             {
                 return count;
             }
@@ -387,7 +388,7 @@ namespace FM
             int count = 0;
 
             // try get cache
-            if ( _designatedCachedValue.TryGetCount( out count ) )
+            if ( _designatedCachedValue.TryGetValue( out count ) )
             {
                 return count;
             }
@@ -415,7 +416,7 @@ namespace FM
 
         public override void Tick()
         {
-            History.Update( Trigger.CurCount );
+            History.Update( Trigger.CurCount, GetMeatInCorpses(), GetMeatInDesignations() );
         }
     }
 }

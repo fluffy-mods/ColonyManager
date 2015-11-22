@@ -23,27 +23,25 @@ namespace FM
             Year
         }
 
-        public static Color DefaultLineColor   = Color.white;
-        private const int   Breaks             = 5;
-        private const int   DashLength         = 3;
-        private const float Margin             = Utilities.Margin;
-        private const int   Size               = 100;
+        public static Color DefaultLineColor = Color.white;
+        private const int Breaks = 5;
+        private const int DashLength = 3;
+        private const float Margin = Utilities.Margin;
+        private const int Size = 100;
 
         // interval per period
-        private static Dictionary<Period, int> _intervals   = new Dictionary<Period, int>();
-        private static readonly Texture2D      _plotBG      = Resources.SlightlyDarkBackground;
-        private static readonly float          _yAxisMargin = 25f;
-        private static Period[]                periods      = (Period[])Enum.GetValues( typeof (Period) );
+        private static Dictionary<Period, int> _intervals = new Dictionary<Period, int>();
+        private static readonly Texture2D _plotBG = Resources.SlightlyDarkBackground;
+        private static readonly float _yAxisMargin = 25f;
+        private static Period[] periods = (Period[])Enum.GetValues( typeof (Period) );
 
         // each chapter holds the history for all periods.
         private List<Chapter> _chapters = new List<Chapter>();
         private List<Chapter> _chaptersShown = new List<Chapter>();
-        private Period        _periodShown = Period.Day;
+        private Period _periodShown = Period.Day;
 
-        public History()
-        {
-            // for scribe?
-        }
+        // for scribe.
+        public History( string[] labels ) : this( labels, null ) {}
 
         public History( string[] labels, Color[] colors = null )
         {
@@ -72,7 +70,7 @@ namespace FM
 
         public void ExposeData()
         {
-            Scribe_Collections.LookList( ref _chapters, "Chapter", LookMode.Deep );
+            Scribe_Collections.LookList( ref _chapters, "Chapters", LookMode.Deep );
         }
 
         public static int Interval( Period period )
@@ -97,7 +95,7 @@ namespace FM
             return _intervals[period];
         }
 
-        public void Update( int[] counts )
+        public void Update( params int[] counts )
         {
             if ( counts.Length != _chapters.Count )
             {
@@ -110,16 +108,6 @@ namespace FM
             }
         }
 
-        public void Update( int count )
-        {
-            if ( _chapters.Count != 1 )
-            {
-                Log.Warning( "History updated with incorrect number of chapters" );
-            }
-
-            _chapters[0].Add( count );
-        }
-
         public void DrawPlot( Rect rect, int target = 0, string label = "" )
         {
             // stuff we need
@@ -130,11 +118,11 @@ namespace FM
             int max = Math.Max( _chapters.Select( c => c.Max( _periodShown ) ).Max(), (int)( target * 1.2 ) );
 
             // size, and pixels per node.
-            float w  = plot.width;
-            float h  = plot.height;
+            float w = plot.width;
+            float h = plot.height;
             float wu = w / Size; // width per section
             float hu = h / max; // height per count
-            int   bi = max / ( Breaks + 1 ); // count per break
+            int bi = max / ( Breaks + 1 ); // count per break
             float bu = hu * bi; // height per break
 
             // plot the line(s)
@@ -179,9 +167,12 @@ namespace FM
             Text.Anchor = TextAnchor.UpperLeft;
             GUI.color = Color.white;
 
+            rect = rect.AtZero(); // ugh, I'm tired, just work.
+
             // period / variables picker
             Rect switchRect = new Rect( rect.xMax - Utilities.SmallIconSize - Utilities.Margin,
                                         rect.yMin + Utilities.Margin, Utilities.SmallIconSize, Utilities.SmallIconSize );
+
             Widgets.DrawHighlightIfMouseover( switchRect );
             if ( Widgets.ImageButton( switchRect, Resources.Cog ) )
             {
@@ -193,12 +184,64 @@ namespace FM
             GUI.EndGroup();
         }
 
+        public class ExposableList<T> : List<T>, IExposable
+        {
+            private List<T> _list = new List<T>();
+
+            // get / set the items in here.
+            private List<T> InnerList
+            {
+                get
+                {
+                    List<T> temp = new List<T>();
+                    foreach ( T item in this )
+                    {
+                        temp.Add( item );
+                    }
+                    return temp;
+                }
+                set
+                {
+                    Clear();
+                    foreach ( T item in value )
+                    {
+                        Add( item );
+                    }
+                }
+            }
+
+            // only provide an init constructor and a blank one.
+            public ExposableList() {}
+            public ExposableList( T init ) : base( new[] { init } ) {}
+
+            public void ExposeData()
+            {
+                // get ready for saving
+                if ( Scribe.mode == LoadSaveMode.Saving )
+                {
+                    _list = InnerList;
+                }
+                
+                // the actual work 
+                Scribe_Collections.LookList( ref _list, "List", LookMode.Value );
+                
+                // after loading raw data
+                if ( Scribe.mode == LoadSaveMode.PostLoadInit )
+                {
+                    InnerList = _list;
+                }
+            }
+        }
+
         public class Chapter : IExposable
         {
-            public Dictionary<Period, List<int>> _hist;
-            public string                        label;
-            public Color                         lineColor;
-            public int                           size;
+            public Dictionary<Period, ExposableList<int>> _hist     = new Dictionary<Period, ExposableList<int>>();
+            public string                                 label     = String.Empty;
+            public Color                                  lineColor = DefaultLineColor;
+            public int                                    size      = Size;
+
+            // scribe
+            public Chapter() {}
 
             public Chapter( string label, int size, Color color )
             {
@@ -207,16 +250,15 @@ namespace FM
                 lineColor  = color;
 
                 // create a dictionary of histories, one for each period, initialize with a zero to avoid errors.
-                _hist = periods.ToDictionary( k => k, v => new List<int>( new [] { 0 }) );
+                _hist = periods.ToDictionary( k => k, v => new ExposableList<int>( 0 ) );
             }
 
             public void ExposeData()
             {
                 Scribe_Values.LookValue( ref label, "label" );
                 Scribe_Values.LookValue( ref size, "size", 100 );
-
-                // TODO: custom class for scribing an array really necessary?
-                // Scribe_Collections.LookDictionary( ref _hist, "pages", LookMode.Value, LookMode.Value);
+                Scribe_Values.LookValue( ref lineColor, "color", Color.white );
+                Scribe_Collections.LookDictionary( ref _hist, "pages", LookMode.Value, LookMode.Deep );
             }
 
             public void Add( int count )

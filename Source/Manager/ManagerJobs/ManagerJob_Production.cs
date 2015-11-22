@@ -227,7 +227,7 @@ namespace FM
         public ManagerJob_Production( RecipeDef recipe )
         {
             Bill = recipe.UsesUnfinishedThing ? new Bill_ProductionWithUft( recipe ) : new Bill_Production( recipe );
-            _hasMeaningfulIngredientChoices = Dialog_CreateJobsForIngredients.HasRecipeChoices( recipe );
+            _hasMeaningfulIngredientChoices = Dialog_CreateJobsForIngredients.HasPrerequisiteChoices( recipe );
             MainProduct = new MainProductTracker( Bill.recipe );
             Trigger = new Trigger_Threshold( this );
             BillGivers = new BillGiverTracker( this );

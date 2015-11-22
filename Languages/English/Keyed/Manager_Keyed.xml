@@ -100,12 +100,14 @@
   <FMP.Available>Available</FMP.Available>
 
   <!-- Recursive job creator -->
-  <FMP.IngredientDialogTitle>Select ingredients to produce for {0}</FMP.IngredientDialogTitle>
+  <FMP.IngredientDialogTitle>Create jobs for ingredients</FMP.IngredientDialogTitle>
   <FMP.SelectRecipe>Select...</FMP.SelectRecipe>
-  <FMP.SelectRecipeTooltip>Select recipe for {0}</FMP.SelectRecipeTooltip>
+  <FMP.SelectRecipeTooltip>Click to select recipe for {0}</FMP.SelectRecipeTooltip>
+  <FMP.SelectRecipeTooltipSelected>\n\nCurrent recipe requires:</FMP.SelectRecipeTooltipSelected>
   <FMP.DoNotUseRecipe>(none)</FMP.DoNotUseRecipe>
   <FMP.SelectIngredient>Select...</FMP.SelectIngredient>
-  <FMP.SelectIngredientTooltip>Select ingredient for {0}</FMP.SelectIngredientTooltip>
+  <FMP.SelectIngredientTooltip>Click to select ingredient for {0} (requires {1})</FMP.SelectIngredientTooltip>
+  <FMP.IngredientCount>\n{0} ({1})</FMP.IngredientCount>
   <FMP.RawResource>(raw resource)</FMP.RawResource>
   <FMP.RawResourceTooltip>{0} is a raw resource (no recipe with a fixed output for {0} found)</FMP.RawResourceTooltip>
   <FMP.AddIngredientBills>Create Jobs</FMP.AddIngredientBills>

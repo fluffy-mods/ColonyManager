@@ -325,27 +325,27 @@ namespace FM
             public int timeSet;
             public int updateInterval;
 
-            public CachedValue( int count = 0, int updateInterval = 250 )
+            public CachedValue( int value = 0, int updateInterval = 250 )
             {
                 this.updateInterval = updateInterval;
-                _cached = count;
+                _cached = value;
                 timeSet = Find.TickManager.TicksGame;
             }
 
-            public bool TryGetCount( out int count )
+            public bool TryGetValue( out int value )
             {
                 if ( Find.TickManager.TicksGame - timeSet <= updateInterval )
                 {
-                    count = _cached;
+                    value = _cached;
                     return true;
                 }
-                count = 0;
+                value = 0;
                 return false;
             }
 
-            public void Update( int count )
+            public void Update( int value )
             {
-                _cached = count;
+                _cached = value;
                 timeSet = Find.TickManager.TicksGame;
             }
         }
