@@ -12,17 +12,17 @@ namespace FM
 {
     public class WindowTriggerThresholdDetails : Window
     {
-        public Vector2 FilterScrollPosition = new Vector2( 0f, 0f );
+        public Vector2 FilterScrollPosition = Vector2.zero;
         public string Input;
         public Trigger_Threshold Trigger;
         public override Vector2 InitialWindowSize => new Vector2( 300f, 500 );
+        ThingFilterUI filterUI = new ThingFilterUI();
 
         public override void DoWindowContents( Rect inRect )
         {
             Rect filterRect = new Rect( inRect.ContractedBy( 6f ) );
             filterRect.height -= 30f;
-            ThingFilterUI filterUI = new ThingFilterUI();
-            filterUI.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter, null, 4 );
+            filterUI.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter );
             Rect buttonRect = new Rect( filterRect.xMin, filterRect.yMax + 3, ( filterRect.width - 6 ) / 2, 25f );
             if ( Widgets.TextButton( buttonRect, Trigger.OpString ) )
             {

@@ -36,6 +36,7 @@ namespace FM
         private Vector2                           _infoScrollPosition       = Vector2.zero;
         private float                             _margin                   = Utilities.Margin;
         private bool                              _postOpenFocus;
+        ThingFilterUI                             filterUI                  = new ThingFilterUI();
 
         public override Texture2D Icon
         {
@@ -287,7 +288,6 @@ namespace FM
 
                 // ingredients picker, fill available space
                 Rect ingredientsRect = new Rect( cur.x, cur.y, width, billColumnRect.height - cur.y );
-                ThingFilterUI filterUI = new ThingFilterUI();
                 filterUI.DoThingFilterConfigWindow( ingredientsRect, ref IngredientsScrollPosition,
                                                     _selected.Bill.ingredientFilter,
                                                     _selected.Bill.recipe.fixedIngredientFilter, 4 );

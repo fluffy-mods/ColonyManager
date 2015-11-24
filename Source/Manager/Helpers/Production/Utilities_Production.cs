@@ -67,7 +67,7 @@ namespace FM
                     var ingredients = job.Bill.recipe.ingredients;
 
                     // get the total input count of any ingredients that allow our thingdef (probably 0 or 1, but who knows - could be a stuff + specific listing).
-                    float? recipeInput = ingredients?.Where( ing => ing.filter.AllowedThingDefs.Contains( filterThingDef ) ).Select( ing => ing.GetBaseCount() ).Sum();
+                    float? recipeInput = ingredients?.Where( ing => ing.filter.AllowedThingDefs.Contains( filterThingDef ) ).Select( ing => ing.CountRequiredOfFor(filterThingDef, job.Bill.recipe) ).Sum();
 
                     // if this wasn't null or close to zero, set the reduction count per bill to this number.
                     if ( recipeInput != null && Math.Abs( recipeInput.Value ) > 1 )

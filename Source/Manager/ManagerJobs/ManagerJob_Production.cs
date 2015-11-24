@@ -16,105 +16,27 @@ namespace FM
 {
     public class ManagerJob_Production : ManagerJob
     {
-        private readonly float       _margin          = Utilities.Margin;
-        private WorkTypeDef          _workTypeDef;
-        public Bill_Production       Bill;
-        public BillGiverTracker      BillGivers;
-        public MainProductTracker    MainProduct;
-        public bool                  maxSkil;
-        public static bool           prioritizeManual = true;
-        public new Trigger_Threshold Trigger;
-        public History               History;
-
-        internal bool _hasMeaningfulIngredientChoices ;
+        public static bool prioritizeManual = true;
         internal bool _createIngredientBills;
+        internal bool _hasMeaningfulIngredientChoices;
+        private readonly float _margin = Utilities.Margin;
+        private string[] _targets;
+        private WorkTypeDef _workTypeDef;
+        public Bill_Production Bill;
+        public BillGiverTracker BillGivers;
+        public History History;
+        public MainProductTracker MainProduct;
+        public bool maxSkil;
+        public new Trigger_Threshold Trigger;
 
         public override bool Completed
         {
-            get { return Trigger.State; }
+            get { return !Trigger.State; }
         }
 
         public override ManagerTab Tab
         {
             get { return Manager.Get.ManagerTabs.Find( tab => tab is ManagerTab_Production ); }
-        }
-
-        /// <summary>
-        /// Sorting of bills
-        /// </summary>
-        public static void GlobalWork()
-        {
-            // get a list of all assigned bills, their worktables, and the priority of the job they belong to.
-            List<BillTablePriority> all = new List<BillTablePriority>();
-            foreach ( ManagerJob_Production job in Manager.Get.JobStack.FullStack<ManagerJob_Production>() )
-            {
-                all.AddRange(
-                    job.BillGivers.GetAssignedBillGiversAndBillsDictionary.Select(
-                        pair => new BillTablePriority( pair.Key, pair.Value, job.Priority ) ) );
-            }
-
-            // no assigned bills, nothing to do.
-            if ( all.Count == 0 ) return;
-            
-            // loop through distinct worktables that have more than one bill
-            foreach ( Building_WorkTable table in all.Select( v => v.table ).Distinct().Where( table => table.BillStack.Count > 1 ) )
-            {
-                // get all bills (assigned by us) for this table, pre-ordered.
-                List<Bill> managerBills = all.Where( v => v.table == table ).OrderBy( v => v.priority ).Select( v => v.bill as Bill ).ToList();
-
-                // get all actual bills on the table (private field)
-                object rawBillsOnTable;
-                if ( !Utilities.TryGetPrivateField( table.billStack.GetType(), table.billStack, "bills", out rawBillsOnTable ) )
-                {
-                    Log.Warning( "Failed to get real billstack for " + table.ToString() );
-                    continue;
-                }
-
-                // give it it's type back.
-                List<Bill> billsOnTable = rawBillsOnTable as List<Bill>;
-                if ( billsOnTable == null )
-                {
-                    Log.Warning( "Failed to convert real billstack for " + table.ToString() );
-                    continue;
-                }
-
-                // get the set difference of the two lists - these are external/manual bills
-                List<Bill> manualBills = billsOnTable.Except( managerBills ).ToList();
-
-                // create a new list of bills, by pasting the two lists together in the right order
-                List<Bill> result = new List<Bill>();
-                if ( prioritizeManual )
-                {
-                    result.AddRange( manualBills );
-                    result.AddRange( managerBills );
-                }
-                else
-                {
-                    result.AddRange( managerBills );
-                    result.AddRange( manualBills );
-                }
-
-                // feed it back to the table.
-                if ( !Utilities.TrySetPrivateField( table.billStack.GetType(), table.billStack, "bills", result ) )
-                {
-                    Log.Warning( "Failed to set billstack for " + table.ToString() );
-                    continue;
-                }
-            }
-        }
-
-        public struct BillTablePriority
-        {
-            public Bill_Production bill;
-            public Building_WorkTable table;
-            public int priority;
-
-            public BillTablePriority(Bill_Production bill, Building_WorkTable table, int priority)
-            {
-                this.bill = bill;
-                this.table = table;
-                this.priority = priority;
-            }
         }
 
         public override bool IsValid
@@ -140,12 +62,14 @@ namespace FM
             get { return Bill.recipe.LabelCap; }
         }
 
-        private string[] _targets;
         public override string[] Targets
         {
             get
             {
-                if (_targets == null) _targets = Bill.recipe.GetRecipeUsers().Select( td => td.LabelCap ).ToArray();
+                if ( _targets == null )
+                {
+                    _targets = Bill.recipe.GetRecipeUsers().Select( td => td.LabelCap ).ToArray();
+                }
                 return _targets;
             }
         }
@@ -232,7 +156,78 @@ namespace FM
             Trigger = new Trigger_Threshold( this );
             BillGivers = new BillGiverTracker( this );
 
-            History = new History(new [] { Trigger.ThresholdFilter.Summary });
+            History = new History( new[] { Trigger.ThresholdFilter.Summary } );
+        }
+
+        /// <summary>
+        /// Sorting of bills
+        /// </summary>
+        public static void GlobalWork()
+        {
+            // get a list of all assigned bills, their worktables, and the priority of the job they belong to.
+            List<BillTablePriority> all = new List<BillTablePriority>();
+            foreach ( ManagerJob_Production job in Manager.Get.JobStack.FullStack<ManagerJob_Production>() )
+            {
+                all.AddRange(
+                    job.BillGivers.GetAssignedBillGiversAndBillsDictionary.Select(
+                        pair => new BillTablePriority( pair.Key, pair.Value, job.Priority ) ) );
+            }
+
+            // no assigned bills, nothing to do.
+            if ( all.Count == 0 )
+            {
+                return;
+            }
+
+            // loop through distinct worktables that have more than one bill
+            foreach (
+                Building_WorkTable table in
+                    all.Select( v => v.table ).Distinct().Where( table => table.BillStack.Count > 1 ) )
+            {
+                // get all bills (assigned by us) for this table, pre-ordered.
+                List<Bill> managerBills =
+                    all.Where( v => v.table == table ).OrderBy( v => v.priority ).Select( v => v.bill as Bill ).ToList();
+
+                // get all actual bills on the table (private field)
+                object rawBillsOnTable;
+                if (
+                    !Utilities.TryGetPrivateField( table.billStack.GetType(), table.billStack, "bills",
+                                                   out rawBillsOnTable ) )
+                {
+                    Log.Warning( "Failed to get real billstack for " + table );
+                    continue;
+                }
+
+                // give it it's type back.
+                List<Bill> billsOnTable = rawBillsOnTable as List<Bill>;
+                if ( billsOnTable == null )
+                {
+                    Log.Warning( "Failed to convert real billstack for " + table );
+                    continue;
+                }
+
+                // get the set difference of the two lists - these are external/manual bills
+                List<Bill> manualBills = billsOnTable.Except( managerBills ).ToList();
+
+                // create a new list of bills, by pasting the two lists together in the right order
+                List<Bill> result = new List<Bill>();
+                if ( prioritizeManual )
+                {
+                    result.AddRange( manualBills );
+                    result.AddRange( managerBills );
+                }
+                else
+                {
+                    result.AddRange( managerBills );
+                    result.AddRange( manualBills );
+                }
+
+                // feed it back to the table.
+                if ( !Utilities.TrySetPrivateField( table.billStack.GetType(), table.billStack, "bills", result ) )
+                {
+                    Log.Warning( "Failed to set billstack for " + table );
+                }
+            }
         }
 
         public override void ExposeData()
@@ -240,8 +235,8 @@ namespace FM
             base.ExposeData();
 
             Scribe_Deep.LookDeep( ref Bill, "Bill" );
-            Scribe_Values.LookValue( ref _hasMeaningfulIngredientChoices, "hasMeaningFulIngredientChoices", false);
-            Scribe_Values.LookValue(ref _createIngredientBills, "createIngredientBills", true);
+            Scribe_Values.LookValue( ref _hasMeaningfulIngredientChoices, "hasMeaningFulIngredientChoices", false );
+            Scribe_Values.LookValue( ref _createIngredientBills, "createIngredientBills", true );
 
             // bill giver tracking is going to error out in cross-map import/export, so create a new one.
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
@@ -266,7 +261,7 @@ namespace FM
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
                 Scribe_Deep.LookDeep( ref History, "History",
-                                      new object[] { new string[] { Trigger.ThresholdFilter.Summary } } );
+                                      new object[] { new[] { Trigger.ThresholdFilter.Summary } } );
             }
         }
 
@@ -526,6 +521,20 @@ namespace FM
                 }
             }
             History.Update( Trigger.CurCount );
+        }
+
+        public struct BillTablePriority
+        {
+            public Bill_Production bill;
+            public Building_WorkTable table;
+            public int priority;
+
+            public BillTablePriority( Bill_Production bill, Building_WorkTable table, int priority )
+            {
+                this.bill = bill;
+                this.table = table;
+                this.priority = priority;
+            }
         }
     }
 }

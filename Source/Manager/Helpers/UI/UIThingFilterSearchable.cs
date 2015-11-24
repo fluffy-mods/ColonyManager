@@ -14,7 +14,7 @@ namespace FM
 {
     public class ThingFilterUI
     {
-        private static float viewHeight;
+        private float viewHeight;
 
         public void DoThingFilterConfigWindow( Rect canvas, ref Vector2 scrollPosition, ThingFilter filter,
                                                ThingFilter parentFilter = null, int openMask = 1,

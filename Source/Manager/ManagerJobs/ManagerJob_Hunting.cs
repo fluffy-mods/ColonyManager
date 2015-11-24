@@ -27,7 +27,7 @@ namespace FM
 
         public override bool Completed
         {
-            get { return Trigger.State; }
+            get { return !Trigger.State; }
         }
 
         public override ManagerTab Tab

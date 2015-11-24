@@ -103,7 +103,8 @@ namespace FM
         {
             Op = Ops.LowerThan;
             MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
-            Count = MaxUpperThreshold / 5;
+            // TODO: Better way of setting sensible defaults.
+            Count = MaxUpperThreshold / 20;
             ThresholdFilter = new ThingFilter();
             ThresholdFilter.SetDisallowAll();
             if ( job.MainProduct.ThingDef != null )
@@ -176,9 +177,7 @@ namespace FM
             Widgets.DrawHighlightIfMouseover( thresholdLabelRect );
             Utilities.Label( thresholdLabelRect,
                              "FMP.ThresholdCount".Translate( CurCount, Count ) + ":",
-                             "FMP.ThresholdCountTooltip".Translate( CurCount, Count ),
-                             TextAnchor.MiddleLeft,
-                             Utilities.Margin );
+                             "FMP.ThresholdCountTooltip".Translate( CurCount, Count ));
             
             // add a little icon to mark interactivity
             Rect searchIconRect = new Rect( thresholdLabelRect.xMax - Utilities.Margin - entryHeight, cur.y, entryHeight, entryHeight );
