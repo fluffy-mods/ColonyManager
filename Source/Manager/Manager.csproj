@@ -53,9 +53,11 @@
     <Compile Include="Helpers\UI\Resources.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Forestry.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Hunting.cs" />
+    <Compile Include="ManagerJobs\ManagerJob_Ranching.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Forestry.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Hunting.cs" />
     <Compile Include="ManagerTabs\ManagerTab_ImportExport.cs" />
+    <Compile Include="ManagerTabs\ManagerTab_Ranching.cs" />
     <Compile Include="Things\Building_ManagerStation.cs" />
     <Compile Include="Comps\CompProperties_ManagerStation.cs" />
     <Compile Include="Comps\Comp_ManagerStation.cs" />

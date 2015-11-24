@@ -32,9 +32,8 @@ namespace FM
             new ManagerTab_Production(),
             new ManagerTab_ImportExport(),
             new ManagerTab_Hunting(),
-            new ManagerTab_Forestry()
-
-            // TODO: new ManagerTabLifestock(),
+            new ManagerTab_Forestry(),
+            //new ManagerTab_Ranching()
         };
 
         public List<ManagerTab> ManagerTabsLeft

@@ -32,7 +32,7 @@ namespace FM
 
         public override bool Completed
         {
-            get { return Trigger.CurCount >= Trigger.Count; }
+            get { return Trigger.State; }
         }
 
         public override ManagerTab Tab

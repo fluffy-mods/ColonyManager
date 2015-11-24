@@ -158,7 +158,7 @@ namespace FM
                                                     0f,
                                                     optionsColumnRect.width,
                                                     _topAreaHeight );
-                Rect ingredientsColumnTitle = new Rect( billColumnRect.xMin,
+                Rect billColumnTitle = new Rect( billColumnRect.xMin,
                                                         0f,
                                                         billColumnRect.width,
                                                         _topAreaHeight );
@@ -170,7 +170,7 @@ namespace FM
                 // titles
                 Utilities.Label( optionsColumnTitle, "FMP.Options".Translate(), lrMargin: _margin * 2,
                                  anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
-                Utilities.Label( ingredientsColumnTitle, "FMP.Bill".Translate(), lrMargin: _margin * 2,
+                Utilities.Label( billColumnTitle, "FMP.Bill".Translate(), lrMargin: _margin * 2,
                                  anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
 
                 // options

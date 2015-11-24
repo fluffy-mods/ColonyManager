@@ -47,8 +47,43 @@ namespace FM
         public static int CountPerWorker( this ManagerJob_Production job, int i )
         {
             int n = job.BillGivers.CurBillGiverCount;
-            int diff = Mathf.CeilToInt( job.Trigger.Count - Utilities.CountProducts( job.Trigger.ThresholdFilter ) );
-            int bills = Mathf.CeilToInt( diff / job.MainProduct.Count );
+            int diff = Mathf.CeilToInt( job.Trigger.Count - job.Trigger.CurCount );
+
+            int bills;
+            // if diff is negative this is a destructive job.
+            if ( diff < 0 )
+            {
+                // default input count set to 1
+                float count = 1;
+                var filterThingDefs = job.Trigger.ThresholdFilter.AllowedThingDefs;
+
+                // if the filter is a single thingdef, try to figure out what the input count of it is for the managed recipe.
+                if ( filterThingDefs?.Count() == 1 )
+                {
+                    // only one thingdef in the filter, so get the first.
+                    var filterThingDef = filterThingDefs.First();
+
+                    // the ingredient list of the managed recipe.
+                    var ingredients = job.Bill.recipe.ingredients;
+
+                    // get the total input count of any ingredients that allow our thingdef (probably 0 or 1, but who knows - could be a stuff + specific listing).
+                    float? recipeInput = ingredients?.Where( ing => ing.filter.AllowedThingDefs.Contains( filterThingDef ) ).Select( ing => ing.GetBaseCount() ).Sum();
+
+                    // if this wasn't null or close to zero, set the reduction count per bill to this number.
+                    if ( recipeInput != null && Math.Abs( recipeInput.Value ) > 1 )
+                    {
+                        count = recipeInput.Value;
+                    }
+                }
+
+                // divide by negative reduction amount per bill to get a positive number of bills.
+                bills = Mathf.CeilToInt( diff / - count );
+            } else
+            {
+                // this one is a bit simpler - mainly because we already did the complicated stuff in the MainProduct class.
+                bills = Mathf.CeilToInt( diff / job.MainProduct.Count );
+            }
+            
             float naive = bills / (float)n;
             if ( bills % n > i )
             {

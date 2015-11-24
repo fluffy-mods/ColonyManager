@@ -15,19 +15,30 @@ namespace FM
 {
     public static class Utilities
     {
-        public const float                                      ListEntryHeight        = 50f;
-        public const float                                      Margin                 = 6f;
-        public const float                                      SliderHeight           = 20f;
-        public static Dictionary<ThingFilter, FilterCountCache> CountCache             = new Dictionary<ThingFilter, FilterCountCache>();
-        public static float                                     SmallIconSize          = 16f;
-        public static float                                     MediumIconSize         = 24f;
-        public static float                                     LargeIconSize          = 32f;
-        public static WorkTypeDef                               WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
-        public static float                                     TitleHeight            = 50f;
-        public static float                                     BottomButtonHeight     = 50f;
+        public const float                                      ListEntryHeight              = 50f;
+        public const float                                      Margin                       = 6f;
+        public const float                                      SliderHeight                 = 20f;
+        public static Dictionary<ThingFilter, FilterCountCache> CountCache                   = new Dictionary<ThingFilter, FilterCountCache>();
+        public static float                                     SmallIconSize                = 16f;
+        public static float                                     MediumIconSize               = 24f;
+        public static float                                     LargeIconSize                = 32f;
+        public static WorkTypeDef                               WorkTypeDefOf_Managing       = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
+        public static float                                     TitleHeight                  = 50f;
+        public static float                                     BottomButtonHeight           = 50f;
+        public static float                                     TopAreaHeight                = 30f;
+        public static Vector2                                   ButtonSize                   = new Vector2( 200f, 40f );
+
+        public static void Label( ref Vector2 cur, float width, float height, string label, string tooltip = null,
+                                  TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin, float tbMargin = 0f,
+                                  GameFont font = GameFont.Small )
+        {
+            Rect rect = new Rect(cur.x, cur.y, width, height);
+            Label(rect, label, tooltip, anchor, lrMargin, tbMargin, font);
+            cur.y += height;
+        }
 
         public static void Label( Rect rect, string label, string tooltip = null,
-                                  TextAnchor anchor = TextAnchor.UpperLeft, float lrMargin = 0f, float tbMargin = 0f,
+                                  TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin, float tbMargin = 0f,
                                   GameFont font = GameFont.Small )
         {
             // apply margins
@@ -221,7 +232,7 @@ namespace FM
         }
 
         public static void DrawToggle( Rect rect, string label, ref bool checkOn, float size = 24f,
-                                       float margin = Margin )
+                                       float margin = Margin, GameFont font = GameFont.Small )
         {
             // set up rects
             Rect labelRect = rect;
@@ -231,7 +242,7 @@ namespace FM
             checkRect = checkRect.CenteredOnYIn( labelRect );
 
             // draw label
-            Label( rect, label, null, TextAnchor.MiddleLeft, margin );
+            Label( rect, label, null, TextAnchor.MiddleLeft, margin, font: font);
 
             // draw check
             if ( checkOn )
