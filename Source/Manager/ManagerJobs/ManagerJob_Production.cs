@@ -97,7 +97,7 @@ namespace FM
             else
             {
                 _otherRecipeAvailable = false;
-                _timeSinceLastOtherRecipeCheck = Find.TickManager.TicksGame;
+                _timeSinceLastOtherRecipeCheck = 0;
                 OtherRecipeDefs.Clear();
             }
             return _otherRecipeAvailable;
@@ -115,8 +115,8 @@ namespace FM
             // mainproduct and trigger do not change.
             BillGivers = new BillGiverTracker( this );
 
-            // set the last cache time to something silly so it gets updated.
-            _timeSinceLastOtherRecipeCheck = - 500;
+            // set the last cache time so it gets updated.
+            _timeSinceLastOtherRecipeCheck = _recacheThreshold;
         }
 
         public override string Label
