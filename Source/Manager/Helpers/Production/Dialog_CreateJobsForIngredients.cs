@@ -276,7 +276,7 @@ namespace FM
             public static List<RecipeDef> GetRecipesFor( ThingDef td, bool currentlyAvailable = true )
             {
                 return DefDatabase<RecipeDef>.AllDefsListForReading
-                    .Where( rd => rd.products.Any( tc => tc.thingDef == td )  && rd.GetCurrentRecipeUsers().Count > 0 )
+                    .Where( rd => rd.products.Any( tc => tc.thingDef == td )  && rd.CurrentRecipeUsers().Count > 0 )
                     .ToList();
             }
 

@@ -56,6 +56,7 @@ namespace FM
             set
             {
                 _selected = (ManagerJob_Production)value;
+                _selected.ForceRecache();
                 if ( _selected.Managed && Source != SourceOptions.Current )
                 {
                     Source = SourceOptions.Current;
@@ -150,7 +151,7 @@ namespace FM
                                                    _topAreaHeight,
                                                    canvas.width / 2 - _margin,
                                                    canvas.height - _topAreaHeight - _margin - _button.y );
-                Rect billColumnRect = new Rect( optionsColumnRect.xMax + _margin,
+                Rect recipeColumnRect = new Rect( optionsColumnRect.xMax + _margin,
                                                 _topAreaHeight,
                                                 canvas.width / 2 - _margin,
                                                 canvas.height - _topAreaHeight - _margin - _button.y );
@@ -159,19 +160,19 @@ namespace FM
                                                     0f,
                                                     optionsColumnRect.width,
                                                     _topAreaHeight );
-                Rect billColumnTitle = new Rect( billColumnRect.xMin,
+                Rect recipeColumnTitle = new Rect( recipeColumnRect.xMin,
                                                         0f,
-                                                        billColumnRect.width,
+                                                        recipeColumnRect.width,
                                                         _topAreaHeight );
 
                 // backgrounds
                 GUI.DrawTexture( optionsColumnRect, Resources.SlightlyDarkBackground );
-                GUI.DrawTexture( billColumnRect, Resources.SlightlyDarkBackground );
+                GUI.DrawTexture( recipeColumnRect, Resources.SlightlyDarkBackground );
 
                 // titles
                 Utilities.Label( optionsColumnTitle, "FMP.Options".Translate(), lrMargin: _margin * 2,
                                  anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
-                Utilities.Label( billColumnTitle, "FMP.Bill".Translate(), lrMargin: _margin * 2,
+                Utilities.Label( recipeColumnTitle, "FMP.Recipe".Translate(), lrMargin: _margin * 2,
                                  anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
 
                 // options
@@ -179,15 +180,19 @@ namespace FM
                 Vector2 cur = Vector2.zero;
                 float width = optionsColumnRect.width;
 
-                // suspended (1)
+                // keep track of optionIndex for shading purposes (lazy way to avoid having to redo this all the damn time).
+                int optionindex = 0;
+
+                // suspended
                 Rect suspendedRect = new Rect( cur.x, cur.y, width, _entryHeight );
-                Widgets.DrawAltRect( suspendedRect );
+                if (optionindex++ % 2 == 0) Widgets.DrawAltRect( suspendedRect );
                 Utilities.DrawToggle( suspendedRect, "Suspended".Translate(), _selected.Suspended,
                                       delegate { _selected.Suspended = !_selected.Suspended; } );
                 cur.y += _entryHeight;
 
-                // store mode (2)
+                // store mode 
                 Rect takeToStockRect = new Rect( cur.x, cur.y, width, _entryHeight );
+                if( optionindex++ % 2 == 0 ) Widgets.DrawAltRect( takeToStockRect );
                 Utilities.DrawToggle( takeToStockRect, "BillStoreMode_BestStockpile".Translate(),
                                       _selected.Bill.storeMode == BillStoreMode.BestStockpile,
                                       delegate { _selected.Bill.storeMode = BillStoreMode.BestStockpile; },
@@ -196,7 +201,7 @@ namespace FM
 
                 // ingredient search radius (3)
                 Rect searchRadiusLabelRect = new Rect( cur.x, cur.y, width, _entryHeight );
-                Widgets.DrawAltRect( searchRadiusLabelRect );
+                if( optionindex % 2 == 0 ) Widgets.DrawAltRect( searchRadiusLabelRect );
                 Utilities.Label( searchRadiusLabelRect,
                                  "IngredientSearchRadius".Translate() + ": " +
                                  _selected.Bill.ingredientSearchRadius.ToString( " #####0" ),
@@ -204,13 +209,14 @@ namespace FM
                 cur.y += _entryHeight;
 
                 Rect searchRadiusRect = new Rect( cur.x, cur.y, width, Utilities.SliderHeight );
-                Widgets.DrawAltRect( searchRadiusRect );
+                if( optionindex++ % 2 == 0 ) Widgets.DrawAltRect( searchRadiusRect );
                 _selected.Bill.ingredientSearchRadius =
                     (int)GUI.HorizontalSlider( searchRadiusRect, _selected.Bill.ingredientSearchRadius, 0f, 250f );
                 cur.y += Utilities.SliderHeight;
 
                 // prioritize over manually set jobs (4)
                 Rect prioritizeRect = new Rect( cur.x, cur.y, width, _entryHeight );
+                if( optionindex++ % 2 == 0 ) Widgets.DrawAltRect( prioritizeRect );
                 Utilities.DrawToggle(prioritizeRect, "FMP.PrioritizeManual".Translate(), ref ManagerJob_Production.prioritizeManual);
                 cur.y += _entryHeight;
                 
@@ -218,6 +224,7 @@ namespace FM
                 if ( _selected.Bill.recipe.workSkill != null )
                 {
                     Rect skillLabelRect = new Rect( cur.x, cur.y, width, _entryHeight );
+                    if( optionindex % 2 == 0 ) Widgets.DrawAltRect( skillLabelRect );
                     Utilities.Label( skillLabelRect,
                                      "MinimumSkillLevel".Translate( _selected.Bill.recipe.workSkill.label.ToLower() )
                                      + ": " + _selected.Bill.minSkillLevel.ToString( "#####0" ),
@@ -225,32 +232,74 @@ namespace FM
                     cur.y += _entryHeight;
 
                     Rect skillRect = new Rect( cur.x, cur.y, width, Utilities.SliderHeight );
+                    if( optionindex % 2 == 0 ) Widgets.DrawAltRect( skillRect );
                     _selected.Bill.minSkillLevel =
                         (int)GUI.HorizontalSlider( skillRect, _selected.Bill.minSkillLevel, 0f, 20f );
                     cur.y += Utilities.SliderHeight;
 
                     Rect snapToHighestRect = new Rect( cur.x, cur.y, width, _entryHeight );
+                    if( optionindex++ % 2 == 0 ) Widgets.DrawAltRect( snapToHighestRect );
                     Utilities.DrawToggle( snapToHighestRect, "FMP.SnapToHighestSkill".Translate(), ref _selected.maxSkil );
                     cur.y += _entryHeight;
-
-                    Widgets.DrawAltRect(skillLabelRect);
-                    Widgets.DrawAltRect(skillRect);
-                    Widgets.DrawAltRect(snapToHighestRect);
+                    
                 }
 
                 // draw threshold and billgiver config (6, 7)
-                _selected.Trigger.DrawThresholdConfig( ref cur, optionsColumnRect.width, _entryHeight );
-                _selected.BillGivers.DrawBillGiverConfig( ref cur, optionsColumnRect.width, _entryHeight, true );
+                _selected.Trigger.DrawThresholdConfig( ref cur, optionsColumnRect.width, _entryHeight, optionindex++ % 2 == 0 );
+                _selected.BillGivers.DrawBillGiverConfig( ref cur, optionsColumnRect.width, _entryHeight, optionindex++ % 2 == 0 );
+
+                // add a better recipe available notification with corresponding float menu if other recipe options are available.
+                if( _selected.Managed && _selected.OtherRecipeAvailable() )
+                {
+                    Rect otherRecipeAvailableRect = new Rect(cur.x, cur.y, width, _entryHeight);
+                    Utilities.Label( otherRecipeAvailableRect, "FMP.OtherRecipeAvailable".Translate(), "FMP.OtherRecipeAvailableTooltip".Translate() );
+                    Widgets.DrawHighlightIfMouseover( otherRecipeAvailableRect );
+                    if ( optionindex++ % 2 == 0 ) Widgets.DrawAltRect(otherRecipeAvailableRect);
+
+                    // add a little icon to mark interactivity
+                    Rect searchIconRect = new Rect( otherRecipeAvailableRect.xMax - Utilities.Margin - _entryHeight, cur.y, _entryHeight, _entryHeight );
+                    if( searchIconRect.height > Utilities.SmallIconSize )
+                    {
+                        // center it.
+                        searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - Utilities.SmallIconSize ) / 2 );
+                    }
+                    GUI.DrawTexture( searchIconRect, Resources.Search );
+
+                    // draw a floatmenu on click
+                    if( Widgets.InvisibleButton( otherRecipeAvailableRect ) )
+                    {
+                        List<FloatMenuOption> options = new List<FloatMenuOption>();
+                        string curLabel = "Current: " + _selected.Label +
+                                           " (<i>" + string.Join( ", ", _selected.Targets ) + "</i>)";
+                        options.Add(new FloatMenuOption( curLabel, null));
+
+                        foreach( RecipeDef recipe in _selected.OtherRecipeDefs )
+                        {
+                            string label = recipe.LabelCap +
+                                           " (<i>" + string.Join( ", ", recipe.GetRecipeUsers().Select( td => td.LabelCap ).ToArray()) + "</i>)";
+                            Action action = delegate
+                            {
+                                _selected.SetNewRecipe( recipe );
+                                _selected.ForceRecache();
+                            };
+                            options.Add( new FloatMenuOption( label, action ) );
+                        }
+
+                        Find.WindowStack.Add( new FloatMenu( options ) );
+                    }
+
+                    cur.y += _entryHeight;
+                }
 
                 GUI.EndGroup(); // options
 
                 // bill
-                GUI.BeginGroup( billColumnRect );
+                GUI.BeginGroup( recipeColumnRect );
                 cur = Vector2.zero;
-                width = billColumnRect.width;
+                width = recipeColumnRect.width;
 
                 // bill information
-                Rect infoRect = new Rect( cur.x, cur.y, width, ( billColumnRect.height - cur.y ) / 2 );
+                Rect infoRect = new Rect( cur.x, cur.y, width, ( recipeColumnRect.height - cur.y ) / 2 );
                 string text = GetInfoText();
                 float actualHeight = Text.CalcHeight( text, infoRect.width );
 
@@ -269,7 +318,7 @@ namespace FM
                 }
 
                 Widgets.BeginScrollView( infoRect, ref _infoScrollPosition, infoViewRect );
-                Utilities.Label( infoRect, text, lrMargin: _margin );
+                Utilities.Label( infoRect, text, anchor: TextAnchor.UpperLeft, lrMargin: _margin );
                 Widgets.EndScrollView();
 
                 // if there is one or more products known to us (so not smelting, ugh!) display an infocard button
@@ -287,7 +336,7 @@ namespace FM
                 cur.y += _entryHeight;
 
                 // ingredients picker, fill available space
-                Rect ingredientsRect = new Rect( cur.x, cur.y, width, billColumnRect.height - cur.y );
+                Rect ingredientsRect = new Rect( cur.x, cur.y, width, recipeColumnRect.height - cur.y );
                 filterUI.DoThingFilterConfigWindow( ingredientsRect, ref IngredientsScrollPosition,
                                                     _selected.Bill.ingredientFilter,
                                                     _selected.Bill.recipe.fixedIngredientFilter, 4 );
@@ -463,6 +512,7 @@ namespace FM
         {
             base.PreOpen();
             Refresh();
+            if (_selected != null && _selected.Managed) _selected.ForceRecache();
         }
     }
 }

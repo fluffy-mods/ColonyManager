@@ -112,11 +112,11 @@ namespace FM
 
             if ( Job.BillGivers.BillGiverSelection == AssignedBillGiverOptions.Specific )
             {
-                specific.height += 24f * Job.BillGivers.GetPotentialBillGivers.Count;
+                specific.height += 24f * Job.BillGivers.PotentialBillGivers.Count;
 
                 Widgets.DrawMenuSection( specific, true );
 
-                foreach ( Building_WorkTable billgiver in Job.BillGivers.GetPotentialBillGivers )
+                foreach ( Building_WorkTable billgiver in Job.BillGivers.PotentialBillGivers )
                 {
                     Rect row = new Rect( x, y, contentRect.width, 24f );
                     DrawRow( billgiver, row );

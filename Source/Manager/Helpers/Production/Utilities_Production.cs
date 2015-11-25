@@ -97,7 +97,7 @@ namespace FM
         /// </summary>
         /// <param name="rd"></param>
         /// <returns></returns>
-        public static List<Building_WorkTable> GetCurrentRecipeUsers( this RecipeDef rd )
+        public static List<Building_WorkTable> CurrentRecipeUsers( this RecipeDef rd )
         {
             List<ThingDef> recipeUsers = rd.GetRecipeUsers();
             List<Building_WorkTable> currentRecipeUsers = new List<Building_WorkTable>();

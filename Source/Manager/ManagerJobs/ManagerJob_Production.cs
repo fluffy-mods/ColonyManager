@@ -57,6 +57,68 @@ namespace FM
             }
         }
 
+        private bool _otherRecipeAvailable;
+        public List<RecipeDef> OtherRecipeDefs = new List<RecipeDef>();
+        private int _timeSinceLastOtherRecipeCheck;
+        private int _recacheThreshold = 1000;
+
+        public void ForceRecache()
+        {
+            _timeSinceLastOtherRecipeCheck = _recacheThreshold;
+        }
+        
+        public bool OtherRecipeAvailable()
+        {
+            // do we have a recently cached value?
+            if ( _timeSinceLastOtherRecipeCheck < _recacheThreshold )
+            {
+                // if so, return that
+                _timeSinceLastOtherRecipeCheck++;
+                return _otherRecipeAvailable;
+            }    
+            
+            // otherwise, get a list of recipes with our output that can be done on any of our workstations.
+            List<RecipeDef> recipes = DefDatabase<RecipeDef>
+                .AllDefsListForReading
+                .Where( rd => rd != Bill.recipe &&
+                              rd.products.Any( tc => tc.thingDef == MainProduct.ThingDef ) &&
+                              rd.HasBuildingRecipeUser(true) )
+                .ToList();
+
+            Log.Message( "Recipe count: " + recipes.Count );
+
+            // if there's anything in here, set the vars
+            if ( recipes.Count > 0 )
+            {
+                _otherRecipeAvailable = true;
+                _timeSinceLastOtherRecipeCheck = 0;
+                OtherRecipeDefs = recipes;
+            }
+            else
+            {
+                _otherRecipeAvailable = false;
+                _timeSinceLastOtherRecipeCheck = Find.TickManager.TicksGame;
+                OtherRecipeDefs.Clear();
+            }
+            return _otherRecipeAvailable;
+        }
+
+        public void SetNewRecipe( RecipeDef newRecipe )
+        {
+            // clear currently assigned bills.
+            CleanUp();
+
+            // set the bill on this job
+            Bill = newRecipe.UsesUnfinishedThing ? new Bill_ProductionWithUft( newRecipe ) : new Bill_Production( newRecipe );
+            _hasMeaningfulIngredientChoices = Dialog_CreateJobsForIngredients.HasPrerequisiteChoices( newRecipe );
+
+            // mainproduct and trigger do not change.
+            BillGivers = new BillGiverTracker( this );
+
+            // set the last cache time to something silly so it gets updated.
+            _timeSinceLastOtherRecipeCheck = - 500;
+        }
+
         public override string Label
         {
             get { return Bill.recipe.LabelCap; }
@@ -82,7 +144,7 @@ namespace FM
                 {
                     // fetch the worktype def in the most convoluted way possible.
                     // first get some examples of worktables our bill is on.
-                    List<Building_WorkTable> workTables = Bill.recipe.GetCurrentRecipeUsers();
+                    List<Building_WorkTable> workTables = Bill.recipe.CurrentRecipeUsers();
 
                     // if none exist (yet), create a phony copy.
                     if ( workTables.Count == 0 )
@@ -169,7 +231,7 @@ namespace FM
             foreach ( ManagerJob_Production job in Manager.Get.JobStack.FullStack<ManagerJob_Production>() )
             {
                 all.AddRange(
-                    job.BillGivers.GetAssignedBillGiversAndBillsDictionary.Select(
+                    job.BillGivers.AssignedBillGiversAndBillsDictionary.Select(
                         pair => new BillTablePriority( pair.Key, pair.Value, job.Priority ) ) );
             }
 
@@ -286,13 +348,13 @@ namespace FM
 #endif
 
                 // BillGivers that we should work with.
-                List<Building_WorkTable> workers = BillGivers.GetSelectedBillGivers;
+                List<Building_WorkTable> workers = BillGivers.SelectedBillGivers;
 
                 // clean up bills on workstations that do not meet selection criteria (area, count, etc) (anymore).
-                CleanNoLongerAllowedBillgivers( workers, BillGivers.GetAssignedBillGiversAndBillsDictionary,
+                CleanNoLongerAllowedBillgivers( workers, BillGivers.AssignedBillGiversAndBillsDictionary,
                                                 ref actionTaken );
 
-                // If Trigger met, check if there's places we need to add the bill.
+                // check if there's places we need to add the bill.
                 for ( int workerIndex = 0; workerIndex < workers.Count; workerIndex++ )
                 {
                     Building_WorkTable worker = workers[workerIndex];
@@ -308,7 +370,7 @@ namespace FM
 #if DEBUG_JOBS
                         foreach (
                             KeyValuePair< Bill_Production, Building_WorkTable > pair in
-                                BillGivers.GetAssignedBillGiversAndBillsDictionary )
+                                BillGivers.AssignedBillGiversAndBillsDictionary )
                         {
                             Log.Message( "saved" + pair.Key.GetUniqueLoadID() + " | " + pair.Value.GetUniqueLoadID() );
                         }
@@ -328,7 +390,7 @@ namespace FM
                             // if there is a bill, and it's managed by us, check to see if it's up-to-date.
                             if ( thatBill != null &&
                                  thatBill.recipe == Bill.recipe &&
-                                 BillGivers.GetAssignedBillGiversAndBillsDictionary.Contains(
+                                 BillGivers.AssignedBillGiversAndBillsDictionary.Contains(
                                      new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )
                             {
                                 billPresent = true;
@@ -362,7 +424,7 @@ namespace FM
                         copy.repeatMode = BillRepeatMode.RepeatCount;
                         copy.repeatCount = this.CountPerWorker( workerIndex );
                         worker.BillStack?.AddBill( copy );
-                        BillGivers.GetAssignedBillGiversAndBillsDictionary.Add( copy, worker );
+                        BillGivers.AssignedBillGiversAndBillsDictionary.Add( copy, worker );
                         actionTaken = true;
                     }
                 }
@@ -445,25 +507,21 @@ namespace FM
         {
 #if DEBUG_JOBS
             Log.Message( "Cleaning up obsolete bills" );
-#endif
+#endif      
+            // remove managed bills from worktables.
             List<Bill_Production> toBeDeleted = new List<Bill_Production>();
             foreach (
                 KeyValuePair<Bill_Production, Building_WorkTable> pair in
-                    BillGivers.GetAssignedBillGiversAndBillsDictionary )
+                    BillGivers.AssignedBillGiversAndBillsDictionary )
             {
                 pair.Value.BillStack.Delete( pair.Key );
-                toBeDeleted.Add( pair.Key );
 #if DEBUG_JOBS
                 Log.Message( "Checking worker " + pair.Value.LabelCap );
 #endif
             }
-            foreach ( Bill_Production key in toBeDeleted )
-            {
-#if DEBUG_JOBS
-                Log.Message( "Deleting bill " + key.LabelCap );
-#endif
-                BillGivers.GetAssignedBillGiversAndBillsDictionary.Remove( key );
-            }
+
+            BillGivers.AssignedBillGiversAndBillsDictionary.Clear();
+
         }
 
         public override string ToString()

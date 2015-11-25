@@ -72,8 +72,11 @@
   <FMP.SnapToHighestSkill>Restrict to highest skilled colonist(s)</FMP.SnapToHighestSkill>
   <FMP.Options>Options</FMP.Options>
   <FMP.Bill>Bill</FMP.Bill>
+  <FMP.Recipe>Recipe</FMP.Recipe>
   <FMP.AllowedIngredients>Allowed ingredients:</FMP.AllowedIngredients>
   <FMP.PrioritizeManual>Prioritize manual bills</FMP.PrioritizeManual>
+  <FMP.OtherRecipeAvailable>Other recipes available</FMP.OtherRecipeAvailable>
+  <FMP.OtherRecipeAvailableTooltip>Other recipes producing the same product are available.\nClick to change this bill to another recipe.</FMP.OtherRecipeAvailableTooltip>
 
   <!-- Thresholds -->
   <FMP.ThresholdCount>Threshold: {0}/{1}</FMP.ThresholdCount>
