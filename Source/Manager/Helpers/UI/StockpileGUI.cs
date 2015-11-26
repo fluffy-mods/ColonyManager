@@ -97,6 +97,7 @@ namespace FM
                 }
             }
             TooltipHandler.TipRegion( rect, label );
+            Text.Anchor = TextAnchor.UpperLeft;
         }
     }
 }
