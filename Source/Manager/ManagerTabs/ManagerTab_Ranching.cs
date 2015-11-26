@@ -17,7 +17,7 @@ namespace FM
         private List<PawnKindDef> _available;
         private List<ManagerJob_Ranching> _current;
         private float _entryHeight = 30f;
-        private float _listEntryHeight = Utilities.ListEntryHeight;
+        private float _listEntryHeight = Utilities.LargeListEntryHeight;
 
         // init with 5's if new job.
         private Dictionary<ManagerJob_Ranching.ageAndSex, string> _newCounts =

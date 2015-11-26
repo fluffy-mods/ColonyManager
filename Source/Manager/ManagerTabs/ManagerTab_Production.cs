@@ -28,7 +28,7 @@ namespace FM
         public static string                      SourceFilter              = "";
         public static List<ManagerJob_Production> SourceList;
         public static float                       SourceListHeight;
-        private static float                      _leftRowEntryHeight       = Utilities.ListEntryHeight;
+        private static float                      _leftRowEntryHeight       = Utilities.LargeListEntryHeight;
         private static ManagerJob_Production      _selected;
         private static float                      _topAreaHeight            = 30f;
         private Vector2                           _button                   = new Vector2( 200f, 40f );
@@ -454,7 +454,7 @@ namespace FM
                                                               .Contains( SourceFilter.ToUpper() )
                                                        select job )
             {
-                Rect row = new Rect( 0f, y, scrollContent.width, Utilities.ListEntryHeight );
+                Rect row = new Rect( 0f, y, scrollContent.width, Utilities.LargeListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
                 if ( _selected == current )
                 {
@@ -485,7 +485,7 @@ namespace FM
                     _selected = current;
                 }
 
-                y += Utilities.ListEntryHeight;
+                y += Utilities.LargeListEntryHeight;
             }
             SourceListHeight = y;
             GUI.EndGroup();

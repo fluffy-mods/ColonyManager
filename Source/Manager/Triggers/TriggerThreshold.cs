@@ -5,6 +5,7 @@
 // Created 2015-11-04 19:25
 
 using System;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -26,10 +27,11 @@ namespace FM
         public int MaxUpperThreshold;
         public Ops Op;
         public ThingFilter ThresholdFilter;
+        public Zone_Stockpile stockpile;
 
         public int CurCount
         {
-            get { return Utilities.CountProducts( ThresholdFilter ); }
+            get { return Utilities.CountProducts( ThresholdFilter, stockpile ); }
         }
 
         public WindowTriggerThresholdDetails DetailsWindow

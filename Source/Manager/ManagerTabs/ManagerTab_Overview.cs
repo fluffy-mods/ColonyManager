@@ -17,7 +17,7 @@ namespace FM
     {
         public const float Margin = Utilities.Margin,
                            OverviewWidthRatio = .6f,
-                           RowHeight = Utilities.ListEntryHeight,
+                           RowHeight = Utilities.LargeListEntryHeight,
                            RowHeightPawnOverview = 30f,
                            IconSize = 30f;
         

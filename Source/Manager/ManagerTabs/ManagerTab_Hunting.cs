@@ -257,7 +257,7 @@ namespace FM
 
             foreach ( ManagerJob_Hunting job in Jobs )
             {
-                Rect row = new Rect( 0f, cur.y, scrollContent.width, Utilities.ListEntryHeight );
+                Rect row = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
                 if ( _selected == job )
                 {
@@ -283,11 +283,11 @@ namespace FM
                     _selected = job;
                 }
 
-                cur.y += Utilities.ListEntryHeight;
+                cur.y += Utilities.LargeListEntryHeight;
             }
 
             // row for new job.
-            Rect newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.ListEntryHeight );
+            Rect newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
             Widgets.DrawHighlightIfMouseover( newRect );
 
             if ( i++ % 2 == 1 )
@@ -306,7 +306,7 @@ namespace FM
 
             TooltipHandler.TipRegion( newRect, "FMH.NewHuntingJobTooltip".Translate() );
 
-            cur.y += Utilities.ListEntryHeight;
+            cur.y += Utilities.LargeListEntryHeight;
 
             _leftRowHeight = cur.y;
             GUI.EndGroup();

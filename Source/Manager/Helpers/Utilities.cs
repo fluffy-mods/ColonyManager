@@ -7,6 +7,7 @@
 using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 using System.Reflection;
@@ -15,30 +16,36 @@ namespace FM
 {
     public static class Utilities
     {
-        public const float                                      ListEntryHeight              = 50f;
-        public const float                                      Margin                       = 6f;
-        public const float                                      SliderHeight                 = 20f;
-        public static Dictionary<ThingFilter, FilterCountCache> CountCache                   = new Dictionary<ThingFilter, FilterCountCache>();
-        public static float                                     SmallIconSize                = 16f;
-        public static float                                     MediumIconSize               = 24f;
-        public static float                                     LargeIconSize                = 32f;
-        public static WorkTypeDef                               WorkTypeDefOf_Managing       = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
-        public static float                                     TitleHeight                  = 50f;
-        public static float                                     BottomButtonHeight           = 50f;
-        public static float                                     TopAreaHeight                = 30f;
-        public static Vector2                                   ButtonSize                   = new Vector2( 200f, 40f );
+        public const float LargeListEntryHeight = 50f;
+        public const float Margin = 6f;
+        public const float SliderHeight = 20f;
+        public static float BottomButtonHeight = 50f;
+        public static Vector2 ButtonSize = new Vector2( 200f, 40f );
+
+        public static Dictionary<StockpileFilter, FilterCountCache> CountCache =
+            new Dictionary<StockpileFilter, FilterCountCache>();
+
+        public static float LargeIconSize = 32f;
+        public static float ListEntryHeight = 30f;
+        public static float MediumIconSize = 24f;
+        public static float SmallIconSize = 16f;
+        public static float TitleHeight = 50f;
+        public static float TopAreaHeight = 30f;
+        public static WorkTypeDef WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
 
         public static void Label( ref Vector2 cur, float width, float height, string label, string tooltip = null,
-                                  TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin, float tbMargin = 0f,
+                                  TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin,
+                                  float tbMargin = 0f,
                                   GameFont font = GameFont.Small )
         {
-            Rect rect = new Rect(cur.x, cur.y, width, height);
-            Label(rect, label, tooltip, anchor, lrMargin, tbMargin, font);
+            Rect rect = new Rect( cur.x, cur.y, width, height );
+            Label( rect, label, tooltip, anchor, lrMargin, tbMargin, font );
             cur.y += height;
         }
 
         public static void Label( Rect rect, string label, string tooltip = null,
-                                  TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin, float tbMargin = 0f,
+                                  TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin,
+                                  float tbMargin = 0f,
                                   GameFont font = GameFont.Small )
         {
             // apply margins
@@ -59,11 +66,11 @@ namespace FM
             }
         }
 
-        private static bool TryGetCached( ThingFilter filter, out int count )
+        private static bool TryGetCached( StockpileFilter stockpileFilter, out int count )
         {
-            if ( CountCache.ContainsKey( filter ) )
+            if ( CountCache.ContainsKey( stockpileFilter ) )
             {
-                FilterCountCache filterCountCache = CountCache[filter];
+                FilterCountCache filterCountCache = CountCache[stockpileFilter];
                 if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 )
                 {
                     count = filterCountCache.Cache;
@@ -93,11 +100,17 @@ namespace FM
             return s;
         }
 
-        public static int CountProducts( ThingFilter filter )
+        public static int CountProducts( ThingFilter filter, Zone_Stockpile stockpile = null )
         {
             int count = 0;
-            if ( filter != null &&
-                 TryGetCached( filter, out count ) )
+
+            // copout if filter is null
+            if ( filter == null )
+            {
+                return count;
+            }
+            StockpileFilter cacheKey = new StockpileFilter( filter, stockpile );
+            if ( TryGetCached( cacheKey, out count ) )
             {
                 return count;
             }
@@ -106,55 +119,61 @@ namespace FM
             Log.Message("Obtaining new count");
 #endif
 
-            if ( filter != null )
+            foreach ( ThingDef td in filter.AllowedThingDefs )
             {
-                foreach ( ThingDef td in filter.AllowedThingDefs )
+                // if it counts as a resource and we're not limited to a single stockpile, use the ingame counter (e.g. only steel in stockpiles.)
+                if ( td.CountAsResource &&
+                     stockpile == null )
                 {
-                    // if it counts as a resource, use the ingame counter (e.g. only steel in stockpiles.)
-                    if ( td.CountAsResource )
-                    {
 #if DEBUG_COUNTS
                         Log.Message(td.LabelCap + ", " + Find.ResourceCounter.GetCount(td));
 #endif
-                        count += Find.ResourceCounter.GetCount( td );
-                    }
-                    else
+                    // we don't need to bother with quality / hitpoints as these are non-existant/irrelevant for resources.
+                    count += Find.ResourceCounter.GetCount( td );
+                }
+                else
+                {
+                    // otherwise, go look for stuff that matches our filters.
+                    List<Thing> thingList = Find.ListerThings.ThingsOfDef( td );
+
+                    // if filtered by stockpile, filter the thinglist accordingly.
+                    if ( stockpile != null )
                     {
-                        foreach ( Thing t in Find.ListerThings.ThingsOfDef( td ) )
+                        SlotGroup areaSlotGroup = stockpile.slotGroup;
+                        thingList = thingList.Where( t => t.Position.GetSlotGroup() == areaSlotGroup ).ToList();
+                    }
+                    foreach ( Thing t in thingList )
+                    {
+                        QualityCategory quality;
+                        if ( t.TryGetQuality( out quality ) )
                         {
-                            // otherwise, go look for stuff that matches our filters.
-                            // TODO: does this catch minified things?
-                            QualityCategory quality;
-                            if ( t.TryGetQuality( out quality ) )
-                            {
-                                if ( !filter.AllowedQualityLevels.Includes( quality ) )
-                                {
-                                    continue;
-                                }
-                            }
-                            if ( filter.AllowedHitPointsPercents.IncludesEpsilon( t.HitPoints ) )
+                            if ( !filter.AllowedQualityLevels.Includes( quality ) )
                             {
                                 continue;
                             }
+                        }
+                        if ( filter.AllowedHitPointsPercents.IncludesEpsilon( t.HitPoints ) )
+                        {
+                            continue;
+                        }
 
 #if DEBUG_COUNTS
                             Log.Message(t.LabelCap + ": " + CountProducts(t));
 #endif
 
-                            count += t.stackCount;
-                        }
+                        count += t.stackCount;
                     }
                 }
 
                 // update cache if exists.
-                if ( CountCache.ContainsKey( filter ) )
+                if ( CountCache.ContainsKey( cacheKey ) )
                 {
-                    CountCache[filter].Cache = count;
-                    CountCache[filter].TimeSet = Find.TickManager.TicksGame;
+                    CountCache[cacheKey].Cache = count;
+                    CountCache[cacheKey].TimeSet = Find.TickManager.TicksGame;
                 }
                 else
                 {
-                    CountCache.Add( filter, new FilterCountCache( count ) );
+                    CountCache.Add( cacheKey, new FilterCountCache( count ) );
                 }
             }
             return count;
@@ -172,7 +191,7 @@ namespace FM
                  job.Suspended )
             {
                 // put a stamp on it
-                Rect stampRect = new Rect(0f, 0f, MediumIconSize, MediumIconSize);
+                Rect stampRect = new Rect( 0f, 0f, MediumIconSize, MediumIconSize );
 
                 // center stamp in available space
                 stampRect = stampRect.CenteredOnXIn( rect ).CenteredOnYIn( rect );
@@ -181,7 +200,7 @@ namespace FM
                 if ( job.Completed )
                 {
                     GUI.DrawTexture( stampRect, Resources.StampCompleted );
-                    TooltipHandler.TipRegion(stampRect, "FM.JobCompletedToolip".Translate());
+                    TooltipHandler.TipRegion( stampRect, "FM.JobCompletedToolip".Translate() );
                     return;
                 }
                 if ( job.Suspended )
@@ -242,7 +261,7 @@ namespace FM
             checkRect = checkRect.CenteredOnYIn( labelRect );
 
             // draw label
-            Label( rect, label, null, TextAnchor.MiddleLeft, margin, font: font);
+            Label( rect, label, null, TextAnchor.MiddleLeft, margin, font: font );
 
             // draw check
             if ( checkOn )
@@ -306,28 +325,48 @@ namespace FM
             DrawToggle( rect, label, checkOn, toggle, toggle, size );
         }
 
-        public static bool TryGetPrivateField( Type type, object instance, string fieldName, out object value, BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance )
+        public static bool TryGetPrivateField( Type type, object instance, string fieldName, out object value,
+                                               BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance )
         {
-            FieldInfo field = type.GetField(fieldName, flags);
+            FieldInfo field = type.GetField( fieldName, flags );
             value = field?.GetValue( instance );
             return value != null;
         }
 
-        public static bool TrySetPrivateField( Type type, object instance, string fieldName, object value, BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance )
+        public static bool TrySetPrivateField( Type type, object instance, string fieldName, object value,
+                                               BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance )
         {
             // get field info
-            FieldInfo field = type.GetField(fieldName, flags);
+            FieldInfo field = type.GetField( fieldName, flags );
 
             // failed?
-            if ( field == null ) return false;
+            if ( field == null )
+            {
+                return false;
+            }
 
             // try setting it.
             field.SetValue( instance, value );
 
             // test by fetching the field again. (this is highly, stupidly inefficient, but ok).
             object test;
-            if ( !TryGetPrivateField( type, instance, fieldName, out test, flags ) ) return false;
+            if ( !TryGetPrivateField( type, instance, fieldName, out test, flags ) )
+            {
+                return false;
+            }
             return test == value;
+        }
+
+        public struct StockpileFilter
+        {
+            private ThingFilter filter;
+            private Zone_Stockpile stockpile;
+
+            public StockpileFilter( ThingFilter filter, Zone_Stockpile stockpile )
+            {
+                this.filter = filter;
+                this.stockpile = stockpile;
+            }
         }
 
         public class CachedValue

@@ -20,10 +20,19 @@ namespace FM
 
         public override void DoWindowContents( Rect inRect )
         {
+            // set up rects
             Rect filterRect = new Rect( inRect.ContractedBy( 6f ) );
-            filterRect.height -= 30f;
+            filterRect.height -= 2 * (Utilities.ListEntryHeight + Utilities.Margin);
+            Rect zoneRect = new Rect(filterRect.xMin, filterRect.yMax + Utilities.Margin, filterRect.width, Utilities.ListEntryHeight);
+            Rect buttonRect = new Rect( filterRect.xMin, zoneRect.yMax + Utilities.Margin, ( filterRect.width - Utilities.Margin ) / 2f, Utilities.ListEntryHeight );
+
+            // draw thingfilter
             filterUI.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter );
-            Rect buttonRect = new Rect( filterRect.xMin, filterRect.yMax + 3, ( filterRect.width - 6 ) / 2, 25f );
+
+            // draw zone selector
+            StockpileGUI.DoStockpileSelectors(zoneRect, ref Trigger.stockpile);
+
+            // draw operator button
             if ( Widgets.TextButton( buttonRect, Trigger.OpString ) )
             {
                 List<FloatMenuOption> list = new List<FloatMenuOption>
@@ -34,7 +43,12 @@ namespace FM
                 };
                 Find.WindowStack.Add( new FloatMenu( list ) );
             }
-            buttonRect.x = buttonRect.xMax + 3f;
+            
+
+            // move operator button canvas for count input
+            buttonRect.x = buttonRect.xMax + Utilities.Margin;
+
+            // if current input is invalid color the element red
             Color oldColor = GUI.color;
             if ( !Input.IsInt() )
             {
@@ -48,8 +62,12 @@ namespace FM
                     Trigger.MaxUpperThreshold = Trigger.Count;
                 }
             }
+
+            // draw the input field
             Input = Widgets.TextField( buttonRect, Input );
             GUI.color = oldColor;
+
+            // close on enter
             if ( Event.current.type == EventType.KeyDown &&
                  Event.current.keyCode == KeyCode.Return )
             {
