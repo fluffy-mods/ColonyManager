@@ -49,8 +49,8 @@ namespace FM
         public override ManagerJob Selected
         {
             // not used.
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return null; }
+            set {  }
         }
 
         public override void DoWindowContents( Rect canvas )
