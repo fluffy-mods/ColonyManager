@@ -33,7 +33,7 @@ namespace FM
             new ManagerTab_ImportExport(),
             new ManagerTab_Hunting(),
             new ManagerTab_Forestry(),
-            //new ManagerTab_Ranching()
+            new ManagerTab_Lifestock()
         };
 
         public List<ManagerTab> ManagerTabsLeft

@@ -168,7 +168,7 @@ namespace FM
             TooltipHandler.TipRegion( rect, StatusTooltip );
         }
 
-        public override void DrawThresholdConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false )
+        public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false )
         {
             // target threshold
             Rect thresholdLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
@@ -179,6 +179,7 @@ namespace FM
             Widgets.DrawHighlightIfMouseover( thresholdLabelRect );
             Utilities.Label( thresholdLabelRect,
                              "FMP.ThresholdCount".Translate( CurCount, Count ) + ":",
+                             ThresholdFilter?.Summary() + 
                              "FMP.ThresholdCountTooltip".Translate( CurCount, Count ));
             
             // add a little icon to mark interactivity

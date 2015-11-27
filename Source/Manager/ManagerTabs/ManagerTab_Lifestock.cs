@@ -1,4 +1,4 @@
-﻿// Manager/ManagerTab_Ranching.cs
+﻿// Manager/ManagerTab_Lifestock.cs
 // 
 // Copyright Karel Kroeze, 2015.
 // 
@@ -12,26 +12,26 @@ using Verse;
 
 namespace FM
 {
-    public class ManagerTab_Ranching : ManagerTab
+    public class ManagerTab_Lifestock : ManagerTab
     {
         private List<PawnKindDef> _available;
-        private List<ManagerJob_Ranching> _current;
+        private List<ManagerJob_Lifestock> _current;
         private float _entryHeight = 30f;
         private float _listEntryHeight = Utilities.LargeListEntryHeight;
 
         // init with 5's if new job.
-        private Dictionary<ManagerJob_Ranching.ageAndSex, string> _newCounts =
-            ManagerJob_Ranching.AgeSexArray.ToDictionary( k => k, v => "5" );
+        private Dictionary<ManagerJob_Lifestock.ageAndSex, string> _newCounts =
+            ManagerJob_Lifestock.AgeSexArray.ToDictionary( k => k, v => "5" );
 
         private bool _onCurrentTab;
         private Vector2 _scrollPosition = Vector2.zero;
         private PawnKindDef _selectedAvailable;
-        private ManagerJob_Ranching _selectedCurrent;
+        private ManagerJob_Lifestock _selectedCurrent;
         private float _topAreaHeight = 30f;
 
         // public override Texture2D Icon { get; }
         public override IconAreas IconArea => IconAreas.Middle;
-        public override string Label => "FMR.Ranching".Translate();
+        public override string Label => "FML.Lifestock".Translate();
 
         public override ManagerJob Selected
         {
@@ -42,7 +42,7 @@ namespace FM
                 // in either case, available selection can be cleared.
                 _onCurrentTab = value != null;
                 _selectedAvailable = null;
-                _selectedCurrent = (ManagerJob_Ranching)value;
+                _selectedCurrent = (ManagerJob_Lifestock)value;
                 _newCounts = _selectedCurrent?.CountTargets.ToDictionary( k => k.Key, v => v.Value.ToString() );
             }
         }
@@ -60,14 +60,10 @@ namespace FM
                 Find.ListerPawns.PawnsInFaction( Faction.OfColony )
                     .Where( p => p.RaceProps.Animal )
                     .Select( p => p.kindDef ) );
-            foreach ( PawnKindDef def in _available )
-            {
-                Log.Message( def.LabelCap );
-            }
             _available = _available.Distinct().OrderBy( def => def.LabelCap ).ToList();
 
             // currently managed
-            _current = Manager.Get.JobStack.FullStack<ManagerJob_Ranching>();
+            _current = Manager.Get.JobStack.FullStack<ManagerJob_Lifestock>();
         }
 
         public override void DoWindowContents( Rect canvas )
@@ -82,14 +78,14 @@ namespace FM
 
         private void DoContent( Rect rect )
         {
-            // background
-            Widgets.DrawMenuSection( rect );
-
             // cop out if nothing is selected.
             if ( _selectedCurrent == null )
             {
                 return;
             }
+
+            // background
+            Widgets.DrawMenuSection( rect );
 
             // begin window
             GUI.BeginGroup( rect );
@@ -119,17 +115,18 @@ namespace FM
             GUI.DrawTexture( animalsRect, Resources.SlightlyDarkBackground );
 
             // titles
-            Utilities.Label( optionsColumnTitle, "FMP.Options".Translate(), lrMargin: Utilities.Margin * 2,
-                             anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
-            Utilities.Label( animalsColumnTitle, "FMR.Animals".Translate(), lrMargin: Utilities.Margin * 2,
-                             anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
+            Utilities.Label( optionsColumnTitle, "FMP.Options".Translate(),
+                             anchor: TextAnchor.LowerLeft, lrMargin: Utilities.Margin * 2, font: GameFont.Tiny );
+            Utilities.Label( animalsColumnTitle, "FML.Animals".Translate(),
+                             anchor: TextAnchor.LowerLeft, lrMargin: Utilities.Margin * 2, font: GameFont.Tiny );
 
             // options
             GUI.BeginGroup( optionsColumnRect );
             Vector2 cur = Vector2.zero;
+            int optionIndex = 1;
 
             // counts header
-            Utilities.Label( ref cur, optionsColumnRect.width, _entryHeight, "FMR.TargetCounts".Translate() );
+            Utilities.Label( ref cur, optionsColumnRect.width, _entryHeight, "FML.TargetCounts".Translate(), alt: optionIndex % 2 == 0 );
 
             // counts table
             int cols = 3;
@@ -145,64 +142,75 @@ namespace FM
                 {
                     // kindof overkill for a 3x3 table, but ok.
                     countRects[x, y] = new Rect( widths.Take( x ).Sum(), cur.y + heights.Take( y ).Sum(), widths[x], heights[y] );
+                    if (optionIndex % 2 == 0) Widgets.DrawAltRect(countRects[x,y]);
                 }
             }
+            optionIndex++;
 
             // headers
             Utilities.Label( countRects[1, 0], Gender.Female.ToString(), null, TextAnchor.LowerCenter, font: GameFont.Tiny );
             Utilities.Label( countRects[2, 0], Gender.Male.ToString(), null, TextAnchor.LowerCenter, font: GameFont.Tiny );
-            Utilities.Label( countRects[0, 1], "FMP.Adult".Translate(), null, TextAnchor.MiddleRight, font: GameFont.Tiny );
-            Utilities.Label( countRects[0, 2], "FMP.Juvenile".Translate(), null, TextAnchor.MiddleRight, font: GameFont.Tiny );
+            Utilities.Label( countRects[0, 1], "FML.Adult".Translate(), null, TextAnchor.MiddleRight, font: GameFont.Tiny );
+            Utilities.Label( countRects[0, 2], "FML.Juvenile".Translate(), null, TextAnchor.MiddleRight, font: GameFont.Tiny );
 
             // fields
-            DoCountField( countRects[1, 1], ManagerJob_Ranching.ageAndSex.AdultFemale );
-            DoCountField( countRects[2, 1], ManagerJob_Ranching.ageAndSex.AdultMale );
-            DoCountField( countRects[1, 2], ManagerJob_Ranching.ageAndSex.JuvenileFemale );
-            DoCountField( countRects[2, 2], ManagerJob_Ranching.ageAndSex.JuvenileMale );
+            DoCountField( countRects[1, 1], ManagerJob_Lifestock.ageAndSex.AdultFemale );
+            DoCountField( countRects[2, 1], ManagerJob_Lifestock.ageAndSex.AdultMale );
+            DoCountField( countRects[1, 2], ManagerJob_Lifestock.ageAndSex.JuvenileFemale );
+            DoCountField( countRects[2, 2], ManagerJob_Lifestock.ageAndSex.JuvenileMale );
             cur.y += 3 * _entryHeight;
 
             // restrict to area
-            Utilities.Label(ref cur, optionsColumnRect.width, _entryHeight, "FMR.RestrictToArea".Translate());
-            Rect restrictAreaRect = new Rect(cur.x + Utilities.Margin, cur.y, optionsColumnRect.width - 2 * Utilities.Margin, _entryHeight);
+            Utilities.Label( ref cur, optionsColumnRect.width, _entryHeight, "FML.RestrictToArea".Translate(), alt: optionIndex % 2 == 0 );
+            Rect restrictAreaRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
+            if ( optionIndex++ % 2 == 0 ) Widgets.DrawAltRect( restrictAreaRect );
             cur.y += _entryHeight;
-            AreaAllowedGUI.DoAllowedAreaSelectors(restrictAreaRect, ref _selectedCurrent.RestrictArea, AllowedAreaMode.Animal);
+            // TODO: separate areas per ageSex
+            AreaAllowedGUI.DoAllowedAreaSelectors(restrictAreaRect, ref _selectedCurrent.RestrictArea, AllowedAreaMode.Animal, Utilities.Margin);
 
             // train
-            Utilities.Label(ref cur, optionsColumnRect.width, _entryHeight, "FMR.Training".Translate());
-            Rect trainingRect = new Rect( cur.x + Utilities.Margin, cur.y, optionsColumnRect.width - 2 * Utilities.Margin, _entryHeight );
-            _selectedCurrent.DrawTrainingSelector( trainingRect );
+            Utilities.Label(ref cur, optionsColumnRect.width, _entryHeight, "FML.Training".Translate(), alt: optionIndex % 2 == 0 );
+            Rect trainingRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+            if( optionIndex++ % 2 == 0 ) Widgets.DrawAltRect( trainingRect );
+            _selectedCurrent.DrawTrainingSelector( trainingRect, Utilities.Margin );
             cur.y += _entryHeight;
             
             // butchery stuff
             Rect butcherExcessRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+            if( optionIndex++ % 2 == 0 ) Widgets.DrawAltRect( butcherExcessRect );
             cur.y += _entryHeight;
             Rect butcherTrainedRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+            if( optionIndex++ % 2 == 0 ) Widgets.DrawAltRect( butcherTrainedRect );
             cur.y += _entryHeight;
 
-            Utilities.DrawToggle( butcherExcessRect, "FMR.ButcherExcess".Translate(), ref _selectedCurrent.ButcherExcess );
-            Utilities.DrawToggle( butcherTrainedRect, "FMR.ButcherTrained".Translate(),
+            Utilities.DrawToggle( butcherExcessRect, "FML.ButcherExcess".Translate(), ref _selectedCurrent.ButcherExcess );
+            Utilities.DrawToggle( butcherTrainedRect, "FML.ButcherTrained".Translate(),
                                   ref _selectedCurrent.ButcherTrained );
 
             // try tame more?
             Rect tameMoreRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
             cur.y += _entryHeight;
 
-            Utilities.DrawToggle( tameMoreRect, "FMR.TameMore".Translate(), ref _selectedCurrent.TryTameMore );
+            Utilities.DrawToggle( tameMoreRect, "FML.TameMore".Translate(), ref _selectedCurrent.TryTameMore );
+            if( optionIndex % 2 == 0 ) Widgets.DrawAltRect( tameMoreRect );
 
             // area to train from (if taming more);
             if ( _selectedCurrent.TryTameMore )
             {
                 Rect tameAreaRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+                if( optionIndex % 2 == 0 ) Widgets.DrawAltRect( tameAreaRect );
                 cur.y += _entryHeight;
-                Rect tameAreaSelectorRect = new Rect(cur.x + Utilities.Margin, cur.y, optionsColumnRect.width - 2 * Utilities.Margin, _entryHeight);
+                Rect tameAreaSelectorRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
+                if( optionIndex % 2 == 0 ) Widgets.DrawAltRect( tameAreaSelectorRect );
                 cur.y += _entryHeight;
 
-                Utilities.Label( tameAreaRect, "FMR.TameArea".Translate() );
-                AreaAllowedGUI.DoAllowedAreaSelectors( tameAreaSelectorRect, ref _selectedCurrent.TameArea, AllowedAreaMode.Any );
+                Utilities.Label( tameAreaRect, "FML.TameArea".Translate() );
+                AreaAllowedGUI.DoAllowedAreaSelectors( tameAreaSelectorRect, ref _selectedCurrent.TameArea, AllowedAreaMode.Any, Utilities.Margin );
 
                 // why am I getting an error for not being at upperleft? Oh well, force it.
                 Text.Anchor = TextAnchor.UpperLeft;
             }
+            optionIndex++;
 
             GUI.EndGroup(); // options
 
@@ -215,7 +223,7 @@ namespace FM
             GUI.EndGroup(); // window
         }
 
-        private void DoCountField( Rect rect, ManagerJob_Ranching.ageAndSex ageSex )
+        private void DoCountField( Rect rect, ManagerJob_Lifestock.ageAndSex ageSex )
         {
             if ( _newCounts == null ||
                  _newCounts[ageSex] == null )
@@ -306,7 +314,7 @@ namespace FM
                 if ( Widgets.InvisibleButton( row ) )
                 {
                     _selectedAvailable = _available[i]; // for highlighting to work
-                    _selectedCurrent = new ManagerJob_Ranching( _available[i] ); // for details
+                    _selectedCurrent = new ManagerJob_Lifestock( _available[i] ); // for details
                 }
             }
 

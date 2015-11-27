@@ -16,8 +16,15 @@ namespace FM
     {
         // RimWorld.AreaAllowedGUI
         public static void DoAllowedAreaSelectors( Rect rect, ref Area area,
-                                                   AllowedAreaMode mode = AllowedAreaMode.Humanlike )
+                                                   AllowedAreaMode mode = AllowedAreaMode.Humanlike, float lrMargin = 0 )
         {
+            if ( lrMargin > 0 )
+            {
+                rect.xMin += lrMargin;
+                rect.width -= lrMargin * 2;
+            }
+
+
             List<Area> allAreas = Find.AreaManager.AllAreas;
             int areaCount = 1;
             for ( int i = 0; i < allAreas.Count; i++ )

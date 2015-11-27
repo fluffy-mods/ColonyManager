@@ -15,6 +15,6 @@ namespace FM
         public abstract string StatusTooltip { get; }
         public abstract void ExposeData();
         public virtual void DrawProgressBar( Rect progressRect, bool active ) {}
-        public abstract void DrawThresholdConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false );
+        public abstract void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false );
     }
 }

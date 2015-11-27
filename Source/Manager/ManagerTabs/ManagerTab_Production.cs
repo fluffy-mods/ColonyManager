@@ -170,10 +170,10 @@ namespace FM
                 GUI.DrawTexture( recipeColumnRect, Resources.SlightlyDarkBackground );
 
                 // titles
-                Utilities.Label( optionsColumnTitle, "FMP.Options".Translate(), lrMargin: _margin * 2,
-                                 anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
-                Utilities.Label( recipeColumnTitle, "FMP.Recipe".Translate(), lrMargin: _margin * 2,
-                                 anchor: TextAnchor.LowerLeft, font: GameFont.Tiny );
+                Utilities.Label( optionsColumnTitle, "FMP.Options".Translate(),
+                                 anchor: TextAnchor.LowerLeft, lrMargin: _margin * 2, font: GameFont.Tiny );
+                Utilities.Label( recipeColumnTitle, "FMP.Recipe".Translate(),
+                                 anchor: TextAnchor.LowerLeft, lrMargin: _margin * 2, font: GameFont.Tiny );
 
                 // options
                 GUI.BeginGroup( optionsColumnRect );
@@ -245,7 +245,7 @@ namespace FM
                 }
 
                 // draw threshold and billgiver config (6, 7)
-                _selected.Trigger.DrawThresholdConfig( ref cur, optionsColumnRect.width, _entryHeight, optionindex++ % 2 == 0 );
+                _selected.Trigger.DrawTriggerConfig( ref cur, optionsColumnRect.width, _entryHeight, optionindex++ % 2 == 0 );
                 _selected.BillGivers.DrawBillGiverConfig( ref cur, optionsColumnRect.width, _entryHeight, optionindex++ % 2 == 0 );
 
                 // add a better recipe available notification with corresponding float menu if other recipe options are available.
