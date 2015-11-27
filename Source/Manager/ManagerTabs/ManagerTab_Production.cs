@@ -56,8 +56,8 @@ namespace FM
             set
             {
                 _selected = (ManagerJob_Production)value;
-                _selected.ForceRecache();
-                if ( _selected.Managed && Source != SourceOptions.Current )
+                _selected?.ForceRecache();
+                if ( _selected != null && _selected.Managed && Source != SourceOptions.Current )
                 {
                     Source = SourceOptions.Current;
                     Refresh();
