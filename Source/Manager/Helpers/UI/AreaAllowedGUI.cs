@@ -14,6 +14,15 @@ namespace FM
 {
     internal class AreaAllowedGUI
     {
+
+        public static Area DoAllowedAreaSelectors( Rect rect, Area areaIn,
+                                                   AllowedAreaMode mode = AllowedAreaMode.Humanlike, float lrMargin = 0 )
+        {
+            Area areaIO = areaIn;
+            DoAllowedAreaSelectors( rect, ref areaIO, mode, lrMargin );
+            return areaIO;
+        }
+
         // RimWorld.AreaAllowedGUI
         public static void DoAllowedAreaSelectors( Rect rect, ref Area area,
                                                    AllowedAreaMode mode = AllowedAreaMode.Humanlike, float lrMargin = 0 )
@@ -53,6 +62,8 @@ namespace FM
             Text.WordWrap = true;
             Text.Font = GameFont.Small;
         }
+
+
 
         // RimWorld.AreaAllowedGUI
         private static void DoAreaSelector( Rect rect, ref Area areaAllowed, Area area )

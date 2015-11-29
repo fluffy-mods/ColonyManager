@@ -29,6 +29,8 @@ namespace FM
         private const float Margin = Utilities.Margin;
         private const int Size = 100;
 
+        private bool ShowLegend = true;
+
         // interval per period
         private static Dictionary<Period, int> _intervals = new Dictionary<Period, int>();
         private static readonly Texture2D _plotBG = Resources.SlightlyDarkBackground;
@@ -148,6 +150,27 @@ namespace FM
             {
                 Widgets.DrawLineHorizontal( i * DashLength, plot.height - target * hu, DashLength );
             }
+
+            // draw legend
+            int lineCount = _chapters.Count;
+            if ( lineCount > 1 && ShowLegend )
+            {
+                float rowHeight = 20f;
+                float lineLength = 30f;
+                float labelWidth = 100f;
+
+                Vector2 cur = Vector2.zero;
+                foreach ( Chapter chapter in _chapters )
+                {
+                    GUI.color = chapter.lineColor;
+                    Widgets.DrawLineHorizontal(cur.x, cur.y + rowHeight / 2f, lineLength);
+                    cur.x += lineLength;
+                    Utilities.Label( ref cur, labelWidth, rowHeight, chapter.label, font: GameFont.Tiny );
+                    cur.x = 0f;
+                }
+                GUI.color = Color.white;
+            }
+
             GUI.EndGroup();
 
             // plot axis
@@ -177,7 +200,11 @@ namespace FM
             if ( Widgets.ImageButton( switchRect, Resources.Cog ) )
             {
                 List<FloatMenuOption> options =
-                    periods.Select( p => new FloatMenuOption( p.ToString(), delegate { _periodShown = p; } ) ).ToList();
+                    periods.Select( p => new FloatMenuOption( "FM.HistoryPeriod".Translate() + ": " + p.ToString(), delegate { _periodShown = p; } ) ).ToList();
+                if ( _chapters.Count > 1 ) // add option to show/hide legend if appropriate.
+                {
+                    options.Add( new FloatMenuOption( "FM.HistoryShowHideLegend".Translate(), delegate { ShowLegend = !ShowLegend; } ) );
+                }
                 Find.WindowStack.Add( new FloatMenu( options ) );
             }
 

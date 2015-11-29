@@ -25,7 +25,7 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\Assemblies\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEBUG_LIFESTOCK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -54,11 +54,12 @@
     <Compile Include="Helpers\UI\StockpileGUI.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Forestry.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Hunting.cs" />
-    <Compile Include="ManagerJobs\ManagerJob_Lifestock.cs" />
+    <Compile Include="ManagerJobs\ManagerJob_Livestock.cs" />
+    <Compile Include="Triggers\Trigger_PawnKind.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Forestry.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Hunting.cs" />
     <Compile Include="ManagerTabs\ManagerTab_ImportExport.cs" />
-    <Compile Include="ManagerTabs\ManagerTab_Lifestock.cs" />
+    <Compile Include="ManagerTabs\ManagerTab_Livestock.cs" />
     <Compile Include="Things\Building_ManagerStation.cs" />
     <Compile Include="Comps\CompProperties_ManagerStation.cs" />
     <Compile Include="Comps\Comp_ManagerStation.cs" />
@@ -68,7 +69,7 @@
     <Compile Include="Helpers\Forestry\Utilities_Forestry.cs" />
     <Compile Include="WorkGivers\WorkGiver_Manager.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Overview.cs" />
-    <Compile Include="Triggers\TriggerThreshold.cs" />
+    <Compile Include="Triggers\Trigger_Threshold.cs" />
     <Compile Include="Core\Manager.cs" />
     <Compile Include="Core\ManagerController.cs" />
     <Compile Include="ManagerJobs\ManagerJob.cs" />

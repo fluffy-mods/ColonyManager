@@ -6,13 +6,14 @@
 
 using UnityEngine;
 using Verse;
+using static System.String;
 
 namespace FM
 {
     public abstract class Trigger : IExposable
     {
         public abstract bool State { get; }
-        public abstract string StatusTooltip { get; }
+        public virtual string StatusTooltip { get; } = Empty;
         public abstract void ExposeData();
         public virtual void DrawProgressBar( Rect progressRect, bool active ) {}
         public abstract void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false );

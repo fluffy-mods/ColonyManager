@@ -244,6 +244,34 @@ namespace FM
             return int.TryParse( text, out num );
         }
 
+        public static IntVec3 GetBasePosition()
+        {
+            // we need to define a 'base' position to calculate distances.
+            // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
+            IntVec3 position = IntVec3.Zero;
+            Building managerStation =
+                Find.ListerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
+            if( managerStation != null )
+            {
+                position = managerStation.Position;
+            }
+
+            // otherwise, use the average of the home area. Not ideal, but it'll do.
+            else
+            {
+                List<IntVec3> homeCells = Find.AreaManager.Get<Area_Home>().ActiveCells.ToList();
+                for( int i = 0; i < homeCells.Count(); i++ )
+                {
+                    position += homeCells[i];
+                }
+                position.x /= homeCells.Count;
+                position.y /= homeCells.Count;
+                position.z /= homeCells.Count;
+            }
+
+            return position;
+        }
+
         public static void DrawStatusForListEntry<T>( this T job, Rect rect, Trigger trigger ) where T : ManagerJob
         {
             if ( job.Completed ||
@@ -259,7 +287,7 @@ namespace FM
                 if ( job.Completed )
                 {
                     GUI.DrawTexture( stampRect, Resources.StampCompleted );
-                    TooltipHandler.TipRegion( stampRect, "FM.JobCompletedToolip".Translate() );
+                    TooltipHandler.TipRegion( stampRect, "FM.JobCompletedTooltip".Translate() );
                     return;
                 }
                 if ( job.Suspended )
@@ -275,7 +303,7 @@ namespace FM
                         {
                             job.Suspended = false;
                         }
-                        TooltipHandler.TipRegion( stampRect, "FM.JobSuspendedToolTip".Translate() );
+                        TooltipHandler.TipRegion( stampRect, "FM.JobSuspendedTooltip".Translate() );
                     }
                     return;
                 }
@@ -428,31 +456,31 @@ namespace FM
             }
         }
 
-        public class CachedValue
+        public class CachedValue<T>
         {
-            private int _cached;
+            private T _cached;
             public int timeSet;
             public int updateInterval;
 
-            public CachedValue( int value = 0, int updateInterval = 250 )
+            public CachedValue( T value = default(T), int updateInterval = 250 )
             {
                 this.updateInterval = updateInterval;
                 _cached = value;
                 timeSet = Find.TickManager.TicksGame;
             }
 
-            public bool TryGetValue( out int value )
+            public bool TryGetValue( out T value )
             {
                 if ( Find.TickManager.TicksGame - timeSet <= updateInterval )
                 {
                     value = _cached;
                     return true;
                 }
-                value = 0;
+                value = default(T);
                 return false;
             }
 
-            public void Update( int value )
+            public void Update( T value )
             {
                 _cached = value;
                 timeSet = Find.TickManager.TicksGame;

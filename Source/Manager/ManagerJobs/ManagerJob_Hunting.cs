@@ -15,8 +15,8 @@ namespace FM
 {
     public class ManagerJob_Hunting : ManagerJob
     {
-        private Utilities.CachedValue        _corpseCachedValue     = new Utilities.CachedValue();
-        private Utilities.CachedValue        _designatedCachedValue = new Utilities.CachedValue();
+        private Utilities.CachedValue<int>        _corpseCachedValue     = new Utilities.CachedValue<int>();
+        private Utilities.CachedValue<int>        _designatedCachedValue = new Utilities.CachedValue<int>();
         private readonly float               _margin                = Utilities.Margin;
         public Dictionary<PawnKindDef, bool> AllowedAnimals         = new Dictionary<PawnKindDef, bool>();
         public List<Designation>             Designations           = new List<Designation>();
@@ -269,28 +269,8 @@ namespace FM
 
         private List<Pawn> GetHuntableAnimalsSorted()
         {
-            // we need to define a 'base' position to calculate distances.
-            // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
-            IntVec3 position = IntVec3.Zero;
-            Building managerStation =
-                Find.ListerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
-            if ( managerStation != null )
-            {
-                position = managerStation.Position;
-            }
-
-            // otherwise, use the average of the home area. Not ideal, but it'll do.
-            else
-            {
-                List<IntVec3> homeCells = Find.AreaManager.Get<Area_Home>().ActiveCells.ToList();
-                for ( int i = 0; i < homeCells.Count(); i++ )
-                {
-                    position += homeCells[i];
-                }
-                position.x /= homeCells.Count;
-                position.y /= homeCells.Count;
-                position.z /= homeCells.Count;
-            }
+            // get the 'home' position
+            IntVec3 position = Utilities.GetBasePosition();
 
             // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
             List<Pawn> list = Find.ListerPawns.AllPawns.Where( p => IsValidHuntingTarget( p ) )

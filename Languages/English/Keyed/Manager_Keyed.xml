@@ -13,6 +13,10 @@
   <FM.OrderDown>Decrease job priority</FM.OrderDown>
   <FM.OrderTop>Maximum priority</FM.OrderTop>
   <FM.OrderBottom>Minimum priority</FM.OrderBottom>
+
+  <!-- History graphs -->
+  <FM.HistoryPeriod>Period</FM.HistoryPeriod>
+  <FM.HistoryShowHideLegend>Show/Hide legend</FM.HistoryShowHideLegend>
   
   <!-- Overview Tab -->
   <FM.Overview>Overview</FM.Overview>
@@ -124,11 +128,12 @@
   <FML.Adult>Adult</FML.Adult>
   <FML.Juvenile>Juvenile</FML.Juvenile>
   <FML.Training>Training</FML.Training>
-  <FML.RestrictToArea>Restrict animals to:</FML.RestrictToArea>
+  <FML.RestrictToArea>Restrict animals to area?</FML.RestrictToArea>
   <FML.ButcherExcess>Butcher excess livestock</FML.ButcherExcess>
   <FML.ButcherTrained>Butcher trained excess livestock</FML.ButcherTrained>
   <FML.TameMore>Auto-designate animals to be tamed</FML.TameMore>
   <FML.TameArea>Allow taming in:</FML.TameArea>
   <FML.Animals>Animals</FML.Animals>
+  <FML.ListEntryTooltip>{0}s:\n{1}/{5} adult females\n{2}/{6} adult males\n{3}/{7} juvenile females\n{4}/{8} juvenile males</FML.ListEntryTooltip>
 
 </LanguageData>

@@ -1,4 +1,4 @@
-﻿// Manager/ManagerTab_Lifestock.cs
+﻿// Manager/ManagerTab_Livestock.cs
 // 
 // Copyright Karel Kroeze, 2015.
 // 
@@ -12,26 +12,27 @@ using Verse;
 
 namespace FM
 {
-    public class ManagerTab_Lifestock : ManagerTab
+    public class ManagerTab_Livestock : ManagerTab
     {
         private List<PawnKindDef> _available;
-        private List<ManagerJob_Lifestock> _current;
+        private List<ManagerJob_Livestock> _current;
         private float _entryHeight = 30f;
         private float _listEntryHeight = Utilities.LargeListEntryHeight;
 
         // init with 5's if new job.
-        private Dictionary<ManagerJob_Lifestock.ageAndSex, string> _newCounts =
-            ManagerJob_Lifestock.AgeSexArray.ToDictionary( k => k, v => "5" );
+        private Dictionary<ManagerJob_Livestock.AgeAndSex, string> _newCounts =
+            ManagerJob_Livestock.AgeSexArray.ToDictionary( k => k, v => "5" );
 
         private bool _onCurrentTab;
         private Vector2 _scrollPosition = Vector2.zero;
         private PawnKindDef _selectedAvailable;
-        private ManagerJob_Lifestock _selectedCurrent;
+        private ManagerJob_Livestock _selectedCurrent;
         private float _topAreaHeight = 30f;
 
         // public override Texture2D Icon { get; }
         public override IconAreas IconArea => IconAreas.Middle;
         public override string Label => "FML.Lifestock".Translate();
+        public override Texture2D Icon => Resources.IconLivestock;
 
         public override ManagerJob Selected
         {
@@ -42,8 +43,8 @@ namespace FM
                 // in either case, available selection can be cleared.
                 _onCurrentTab = value != null;
                 _selectedAvailable = null;
-                _selectedCurrent = (ManagerJob_Lifestock)value;
-                _newCounts = _selectedCurrent?.CountTargets.ToDictionary( k => k.Key, v => v.Value.ToString() );
+                _selectedCurrent = (ManagerJob_Livestock)value;
+                _newCounts = _selectedCurrent?.Trigger?.CountTargets.ToDictionary( k => k.Key, v => v.Value.ToString() );
             }
         }
 
@@ -63,7 +64,7 @@ namespace FM
             _available = _available.Distinct().OrderBy( def => def.LabelCap ).ToList();
 
             // currently managed
-            _current = Manager.Get.JobStack.FullStack<ManagerJob_Lifestock>();
+            _current = Manager.Get.JobStack.FullStack<ManagerJob_Livestock>();
         }
 
         public override void DoWindowContents( Rect canvas )
@@ -154,19 +155,48 @@ namespace FM
             Utilities.Label( countRects[0, 2], "FML.Juvenile".Translate(), null, TextAnchor.MiddleRight, font: GameFont.Tiny );
 
             // fields
-            DoCountField( countRects[1, 1], ManagerJob_Lifestock.ageAndSex.AdultFemale );
-            DoCountField( countRects[2, 1], ManagerJob_Lifestock.ageAndSex.AdultMale );
-            DoCountField( countRects[1, 2], ManagerJob_Lifestock.ageAndSex.JuvenileFemale );
-            DoCountField( countRects[2, 2], ManagerJob_Lifestock.ageAndSex.JuvenileMale );
+            DoCountField( countRects[1, 1], ManagerJob_Livestock.AgeAndSex.AdultFemale );
+            DoCountField( countRects[2, 1], ManagerJob_Livestock.AgeAndSex.AdultMale );
+            DoCountField( countRects[1, 2], ManagerJob_Livestock.AgeAndSex.JuvenileFemale );
+            DoCountField( countRects[2, 2], ManagerJob_Livestock.AgeAndSex.JuvenileMale );
             cur.y += 3 * _entryHeight;
 
             // restrict to area
-            Utilities.Label( ref cur, optionsColumnRect.width, _entryHeight, "FML.RestrictToArea".Translate(), alt: optionIndex % 2 == 0 );
             Rect restrictAreaRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
-            if ( optionIndex++ % 2 == 0 ) Widgets.DrawAltRect( restrictAreaRect );
+            if ( optionIndex % 2 == 0 ) Widgets.DrawAltRect( restrictAreaRect );
+            Utilities.DrawToggle(restrictAreaRect, "FML.RestrictToArea".Translate(), ref _selectedCurrent.RestrictToArea);
             cur.y += _entryHeight;
-            // TODO: separate areas per ageSex
-            AreaAllowedGUI.DoAllowedAreaSelectors(restrictAreaRect, ref _selectedCurrent.RestrictArea, AllowedAreaMode.Animal, Utilities.Margin);
+            if ( _selectedCurrent.RestrictToArea )
+            {            
+                // area selectors table
+                // set up a 3x3 table of rects
+                Rect[,] areaRects = new Rect[cols, cols];
+                for( int x = 0; x < cols; x++ )
+                {
+                    for( int y = 0; y < cols; y++ )
+                    {
+                        // kindof overkill for a 3x3 table, but ok.
+                        areaRects[x, y] = new Rect( widths.Take( x ).Sum(), cur.y + heights.Take( y ).Sum(), widths[x], heights[y] );
+                        if( optionIndex % 2 == 0 ) Widgets.DrawAltRect( areaRects[x, y] );
+                    }
+                }
+
+                // headers
+                Utilities.Label( areaRects[1, 0], Gender.Female.ToString(), null, TextAnchor.LowerCenter, font: GameFont.Tiny );
+                Utilities.Label( areaRects[2, 0], Gender.Male.ToString(), null, TextAnchor.LowerCenter, font: GameFont.Tiny );
+                Utilities.Label( areaRects[0, 1], "FML.Adult".Translate(), null, TextAnchor.MiddleRight, font: GameFont.Tiny );
+                Utilities.Label( areaRects[0, 2], "FML.Juvenile".Translate(), null, TextAnchor.MiddleRight, font: GameFont.Tiny );
+
+                // do the selectors
+                _selectedCurrent.RestrictArea[0] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 1], _selectedCurrent.RestrictArea[0], AllowedAreaMode.Animal, Utilities.Margin );
+                _selectedCurrent.RestrictArea[1] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 1], _selectedCurrent.RestrictArea[1], AllowedAreaMode.Animal, Utilities.Margin );
+                _selectedCurrent.RestrictArea[2] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 2], _selectedCurrent.RestrictArea[2], AllowedAreaMode.Animal, Utilities.Margin );
+                _selectedCurrent.RestrictArea[3] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 2], _selectedCurrent.RestrictArea[3], AllowedAreaMode.Animal, Utilities.Margin );
+
+                cur.y += 3 * _entryHeight;
+
+            }
+            optionIndex++;
 
             // train
             Utilities.Label(ref cur, optionsColumnRect.width, _entryHeight, "FML.Training".Translate(), alt: optionIndex % 2 == 0 );
@@ -220,15 +250,44 @@ namespace FM
 
             GUI.EndGroup(); // animals
 
+            // bottom button
+            Rect buttonRect = new Rect( rect.xMax - Utilities.ButtonSize.x, rect.yMax - Utilities.ButtonSize.y, Utilities.ButtonSize.x - Utilities.Margin,
+                                            Utilities.ButtonSize.y - Utilities.Margin );
+
+            // add / remove to the stack
+            if( _selectedCurrent.Managed )
+            {
+                if( Widgets.TextButton( buttonRect, "FM.Delete".Translate() ) )
+                {
+                    _selectedCurrent.Delete();
+                    _selectedCurrent = null;
+                    _onCurrentTab = false;
+                    Refresh();
+                    return; // just skip to the next tick to avoid null reference errors.
+                }
+                TooltipHandler.TipRegion( buttonRect, "FMP.DeleteBillTooltip".Translate() );
+            }
+            else
+            {
+                    if( Widgets.TextButton( buttonRect, "FM.Manage".Translate() ) )
+                    {
+                        _selectedCurrent.Managed = true;
+                        _onCurrentTab = true;
+                        Manager.Get.JobStack.Add( _selectedCurrent );
+                        Refresh();
+                    }
+                    TooltipHandler.TipRegion( buttonRect, "FMP.ManageBillTooltip".Translate() );
+            }
+
             GUI.EndGroup(); // window
         }
 
-        private void DoCountField( Rect rect, ManagerJob_Lifestock.ageAndSex ageSex )
+        private void DoCountField( Rect rect, ManagerJob_Livestock.AgeAndSex ageSex )
         {
             if ( _newCounts == null ||
                  _newCounts[ageSex] == null )
             {
-                _newCounts = _selectedCurrent?.CountTargets.ToDictionary( k => k.Key, v => v.Value.ToString() );
+                _newCounts = _selectedCurrent?.Trigger?.CountTargets.ToDictionary( k => k.Key, v => v.Value.ToString() );
             }
 
             if ( !_newCounts[ageSex].IsInt() )
@@ -237,7 +296,7 @@ namespace FM
             }
             else
             {
-                _selectedCurrent.CountTargets[ageSex] = int.Parse( _newCounts[ageSex] );
+                _selectedCurrent.Trigger.CountTargets[ageSex] = int.Parse( _newCounts[ageSex] );
             }
             _newCounts[ageSex] = Widgets.TextField( rect.ContractedBy( 1f ), _newCounts[ageSex] );
             GUI.color = Color.white;
@@ -314,7 +373,7 @@ namespace FM
                 if ( Widgets.InvisibleButton( row ) )
                 {
                     _selectedAvailable = _available[i]; // for highlighting to work
-                    _selectedCurrent = new ManagerJob_Lifestock( _available[i] ); // for details
+                    Selected = new ManagerJob_Livestock( _available[i] ); // for details
                 }
             }
 
@@ -356,7 +415,7 @@ namespace FM
                 // button
                 if ( Widgets.InvisibleButton( row ) )
                 {
-                    _selectedCurrent = _current[i];
+                    Selected = _current[i];
                 }
             }
 

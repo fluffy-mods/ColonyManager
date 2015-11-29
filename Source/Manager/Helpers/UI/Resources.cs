@@ -30,6 +30,7 @@ namespace FM
             IconHunting                  = ContentFinder<Texture2D>.Get( "UI/Icons/Hunting" ),
             IconImportExport             = ContentFinder<Texture2D>.Get( "UI/Icons/ImportExport" ),
             IconForestry                 = ContentFinder<Texture2D>.Get( "UI/Icons/Tree" ),
+            IconLivestock                = ContentFinder<Texture2D>.Get( "UI/Icons/Livestock" ),
 
             // misc
             SlightlyDarkBackground       = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .4f ),
@@ -38,5 +39,6 @@ namespace FM
             BarBackgroundActiveTexture   = SolidColorMaterials.NewSolidColorTexture( new Color( 0.2f, 0.8f, 0.85f ) ),
             BarBackgroundInactiveTexture = SolidColorMaterials.NewSolidColorTexture( new Color( 0.7f, 0.7f, 0.7f ) ),
             Search                       = ContentFinder<Texture2D>.Get( "UI/Buttons/Search" );
+        
     }
 }

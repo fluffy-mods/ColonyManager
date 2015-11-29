@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Verse;
 
-// todo: implement reservations for managerjobs.
-
 namespace FM
 {
     public class Manager : MapComponent
@@ -33,7 +31,7 @@ namespace FM
             new ManagerTab_ImportExport(),
             new ManagerTab_Hunting(),
             new ManagerTab_Forestry(),
-            new ManagerTab_Lifestock()
+            new ManagerTab_Livestock()
         };
 
         public List<ManagerTab> ManagerTabsLeft

@@ -15,7 +15,7 @@ namespace FM
 {
     public class ManagerJob_Forestry : ManagerJob
     {
-        private Utilities.CachedValue     _designatedWoodCachedValue = new Utilities.CachedValue();
+        private Utilities.CachedValue<int> _designatedWoodCachedValue = new Utilities.CachedValue<int>();
         private readonly float            _margin                    = Utilities.Margin;
         public Dictionary<ThingDef, bool> AllowedTrees;
         public bool                       AllowSaplings;
