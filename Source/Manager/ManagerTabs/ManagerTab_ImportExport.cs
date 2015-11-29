@@ -91,7 +91,7 @@ namespace FM
 
         private string DefaultSaveName()
         {
-            // TODO: actually check saves and find a new one rather than rely on random gen.
+            // keep adding 1 until we have a new name.
             int i = 1;
             string name = _saveNameBase + i;
             while ( SaveExists( name ) )

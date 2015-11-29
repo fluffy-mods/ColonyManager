@@ -16,17 +16,21 @@ namespace FM
 {
     public class ManagerJob_Production : ManagerJob
     {
-        public static bool prioritizeManual = true;
-        internal bool _createIngredientBills;
-        internal bool _hasMeaningfulIngredientChoices;
-        private readonly float _margin = Utilities.Margin;
-        private string[] _targets;
-        private WorkTypeDef _workTypeDef;
-        public Bill_Production Bill;
-        public BillGiverTracker BillGivers;
-        public History History;
-        public MainProductTracker MainProduct;
-        public bool maxSkil;
+        public static bool           prioritizeManual                       = true;
+        internal bool                _createIngredientBills;
+        internal bool                _hasMeaningfulIngredientChoices;
+        private readonly float       _margin                                = Utilities.Margin;
+        private bool                 _otherRecipeAvailable;
+        private int                  _recacheThreshold                      = 1000;
+        private string[]             _targets;
+        private int                  _timeSinceLastOtherRecipeCheck;
+        private WorkTypeDef          _workTypeDef;
+        public Bill_Production       Bill;
+        public BillGiverTracker      BillGivers;
+        public History               History;
+        public MainProductTracker    MainProduct;
+        public bool                  maxSkil;
+        public List<RecipeDef>       OtherRecipeDefs                        = new List<RecipeDef>();
         public new Trigger_Threshold Trigger;
 
         public override bool Completed
@@ -55,68 +59,6 @@ namespace FM
                 Log.Message( Bill.recipe.ToString() );
                 return true;
             }
-        }
-
-        private bool _otherRecipeAvailable;
-        public List<RecipeDef> OtherRecipeDefs = new List<RecipeDef>();
-        private int _timeSinceLastOtherRecipeCheck;
-        private int _recacheThreshold = 1000;
-
-        public void ForceRecache()
-        {
-            _timeSinceLastOtherRecipeCheck = _recacheThreshold;
-        }
-        
-        public bool OtherRecipeAvailable()
-        {
-            // do we have a recently cached value?
-            if ( _timeSinceLastOtherRecipeCheck < _recacheThreshold )
-            {
-                // if so, return that
-                _timeSinceLastOtherRecipeCheck++;
-                return _otherRecipeAvailable;
-            }    
-            
-            // otherwise, get a list of recipes with our output that can be done on any of our workstations.
-            List<RecipeDef> recipes = DefDatabase<RecipeDef>
-                .AllDefsListForReading
-                .Where( rd => rd != Bill.recipe &&
-                              rd.products.Any( tc => tc.thingDef == MainProduct.ThingDef ) &&
-                              rd.HasBuildingRecipeUser(true) )
-                .ToList();
-
-            Log.Message( "Recipe count: " + recipes.Count );
-
-            // if there's anything in here, set the vars
-            if ( recipes.Count > 0 )
-            {
-                _otherRecipeAvailable = true;
-                _timeSinceLastOtherRecipeCheck = 0;
-                OtherRecipeDefs = recipes;
-            }
-            else
-            {
-                _otherRecipeAvailable = false;
-                _timeSinceLastOtherRecipeCheck = 0;
-                OtherRecipeDefs.Clear();
-            }
-            return _otherRecipeAvailable;
-        }
-
-        public void SetNewRecipe( RecipeDef newRecipe )
-        {
-            // clear currently assigned bills.
-            CleanUp();
-
-            // set the bill on this job
-            Bill = newRecipe.UsesUnfinishedThing ? new Bill_ProductionWithUft( newRecipe ) : new Bill_Production( newRecipe );
-            _hasMeaningfulIngredientChoices = Dialog_CreateJobsForIngredients.HasPrerequisiteChoices( newRecipe );
-
-            // mainproduct and trigger do not change.
-            BillGivers = new BillGiverTracker( this );
-
-            // set the last cache time so it gets updated.
-            _timeSinceLastOtherRecipeCheck = _recacheThreshold;
         }
 
         public override string Label
@@ -219,6 +161,68 @@ namespace FM
             BillGivers = new BillGiverTracker( this );
 
             History = new History( new[] { Trigger.ThresholdFilter.Summary } );
+        }
+
+        public void ForceRecache()
+        {
+            _timeSinceLastOtherRecipeCheck = _recacheThreshold;
+        }
+
+        public bool OtherRecipeAvailable()
+        {
+            // do we have a recently cached value?
+            if ( _timeSinceLastOtherRecipeCheck < _recacheThreshold )
+            {
+                // if so, return that
+                _timeSinceLastOtherRecipeCheck++;
+                return _otherRecipeAvailable;
+            }
+
+            // otherwise, get a list of recipes with our output that can be done on any of our workstations.
+            List<RecipeDef> recipes = DefDatabase<RecipeDef>
+                .AllDefsListForReading
+                .Where( rd => rd != Bill.recipe &&
+                              rd.products.Any( tc => tc.thingDef == MainProduct.ThingDef ) &&
+                              rd.HasBuildingRecipeUser( true ) )
+                .ToList();
+
+            Log.Message( "Recipe count: " + recipes.Count );
+
+            // if there's anything in here, set the vars
+            if ( recipes.Count > 0 )
+            {
+                _otherRecipeAvailable = true;
+                _timeSinceLastOtherRecipeCheck = 0;
+                OtherRecipeDefs = recipes;
+            }
+            else
+            {
+                _otherRecipeAvailable = false;
+                _timeSinceLastOtherRecipeCheck = 0;
+                OtherRecipeDefs.Clear();
+            }
+            return _otherRecipeAvailable;
+        }
+
+        public void SetNewRecipe( RecipeDef newRecipe )
+        {
+            // clear currently assigned bills.
+            CleanUp();
+
+            // set the bill on this job
+            Bill = newRecipe.UsesUnfinishedThing
+                ? new Bill_ProductionWithUft( newRecipe )
+                : new Bill_Production( newRecipe );
+            _hasMeaningfulIngredientChoices = Dialog_CreateJobsForIngredients.HasPrerequisiteChoices( newRecipe );
+
+            // mainproduct and trigger do not change.
+            BillGivers = new BillGiverTracker( this );
+
+            // set the last cache time so it gets updated.
+            _timeSinceLastOtherRecipeCheck = _recacheThreshold;
+
+            // null targets cache so it gets updated
+            _targets = null;
         }
 
         /// <summary>
@@ -507,7 +511,8 @@ namespace FM
         {
 #if DEBUG_JOBS
             Log.Message( "Cleaning up obsolete bills" );
-#endif      
+#endif
+
             // remove managed bills from worktables.
             List<Bill_Production> toBeDeleted = new List<Bill_Production>();
             foreach (
@@ -521,7 +526,6 @@ namespace FM
             }
 
             BillGivers.AssignedBillGiversAndBillsDictionary.Clear();
-
         }
 
         public override string ToString()

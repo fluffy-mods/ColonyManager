@@ -31,7 +31,7 @@ namespace FM
 
         // public override Texture2D Icon { get; }
         public override IconAreas IconArea => IconAreas.Middle;
-        public override string Label => "FML.Lifestock".Translate();
+        public override string Label => "FML.Livestock".Translate();
         public override Texture2D Icon => Resources.IconLivestock;
 
         public override ManagerJob Selected
