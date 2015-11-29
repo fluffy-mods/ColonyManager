@@ -105,7 +105,7 @@ namespace FM
         {
             Op = Ops.LowerThan;
             MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
-            // TODO: Better way of setting sensible defaults.
+            // TODO: Better way of setting sensible defaults?
             Count = MaxUpperThreshold / 20;
             ThresholdFilter = new ThingFilter();
             ThresholdFilter.SetDisallowAll();
