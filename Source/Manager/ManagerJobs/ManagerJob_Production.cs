@@ -337,19 +337,11 @@ namespace FM
         /// <returns></returns>
         public override bool TryDoJob()
         {
-#if DEBUG_JOBS
-            Log.Message( "Starting job for Production Manager." );
-            Log.Message( "Job: " + ToString() );
-#endif
-
             // flag to see if anything meaningful was done, if false at end, manager will also do next job.
             bool actionTaken = false;
 
             if ( Trigger.State )
             {
-#if DEBUG_JOBS
-                Log.Message( "Checking workers for presence of bills" );
-#endif
 
                 // BillGivers that we should work with.
                 List<Building_WorkTable> workers = BillGivers.SelectedBillGivers;
@@ -371,28 +363,31 @@ namespace FM
                     if ( worker.BillStack != null &&
                          worker.BillStack.Count > 0 )
                     {
-#if DEBUG_JOBS
-                        foreach (
-                            KeyValuePair< Bill_Production, Building_WorkTable > pair in
-                                BillGivers.AssignedBillGiversAndBillsDictionary )
-                        {
-                            Log.Message( "saved" + pair.Key.GetUniqueLoadID() + " | " + pair.Value.GetUniqueLoadID() );
-                        }
-#endif
 
                         // loop over billstack to see if our bill is set.
                         foreach ( Bill t in worker.BillStack )
                         {
                             Bill_Production thatBill = t as Bill_Production;
+
 #if DEBUG_JOBS
-                            if ( thatBill != null )
+                            string debugMsg = "Managed bills: (checking: " + t.GetUniqueLoadID() + ")";
+                            foreach(
+                                KeyValuePair<Bill_Production, Building_WorkTable> pair in
+                                    BillGivers.AssignedBillGiversAndBillsDictionary )
                             {
-                                Log.Message( "real" + thatBill.GetUniqueLoadID() + " | " + worker.GetUniqueLoadID() );
+                                debugMsg += "\n" + pair.Key.GetUniqueLoadID();
+                                if (
+                                    BillGivers.AssignedBillGiversAndBillsDictionary.Contains(
+                                        new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )
+                                {
+                                    debugMsg += " <- match!";
+                                }
                             }
+                            Log.Message(debugMsg);
 #endif
 
                             // if there is a bill, and it's managed by us, check to see if it's up-to-date.
-                            if ( thatBill != null &&
+                            if( thatBill != null &&
                                  thatBill.recipe == Bill.recipe &&
                                  BillGivers.AssignedBillGiversAndBillsDictionary.Contains(
                                      new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )

@@ -16,15 +16,6 @@ namespace FM
 {
     public class ManagerJob_Livestock : ManagerJob
     {
-        public enum AgeAndSex
-        {
-            AdultFemale    = 0,
-            AdultMale      = 1,
-            JuvenileFemale = 2,
-            JuvenileMale   = 3
-        }
-
-        public static AgeAndSex[] AgeSexArray = (AgeAndSex[])Enum.GetValues( typeof (AgeAndSex) );
         private History _history;
         public bool ButcherExcess;
         public bool ButcherTrained;
@@ -35,7 +26,7 @@ namespace FM
         public TrainingTracker Training;
         public new Trigger_PawnKind Trigger;
         public bool TryTameMore;
-        public override string Label => "FML.Livestock".Translate();
+        public override string Label => Trigger.pawnKind.LabelCap;
 
         public override bool Completed
         {
@@ -56,9 +47,8 @@ namespace FM
         {
             get
             {
-                return
-                    AgeSexArray.Select( ageSex => ( "FMP." + ageSex.ToString() + "Count" )
-                                            .Translate( Trigger.GetTame( ageSex ).Count, Trigger.CountTargets[ageSex] ) )
+                return Utilities_Livestock.AgeSexArray.Select( ageSex => ( "FMP." + ageSex.ToString() + "Count" )
+                                            .Translate( Utilities_Livestock.GetTame( ageSex, Trigger.pawnKind ).Count, Trigger.CountTargets[ageSex] ) )
                                .ToArray();
             }
         }
@@ -71,10 +61,10 @@ namespace FM
             Designations = new List<Designation>();
 
             // start history tracker
-            _history = new History( AgeSexArray.Select( ageSex => ageSex.ToString() ).ToArray() );
+            _history = new History( Utilities_Livestock.AgeSexArray.Select( ageSex => ageSex.ToString() ).ToArray() );
 
             // set up the trigger, set all target counts to 5
-            Trigger = new Trigger_PawnKind { CountTargets = AgeSexArray.ToDictionary( k => k, v => 5 ) };
+            Trigger = new Trigger_PawnKind { CountTargets = Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => 5 ) };
 
             // set all training to false
             Training = new TrainingTracker();
@@ -82,7 +72,7 @@ namespace FM
             // set areas for restriction and taming to unrestricted
             TameArea = null;
             RestrictToArea = false;
-            RestrictArea = AgeSexArray.Select( k => (Area)null).ToList();
+            RestrictArea = Utilities_Livestock.AgeSexArray.Select( k => (Area)null).ToList();
 
             // set defaults for boolean options
             TryTameMore = false;
@@ -119,7 +109,7 @@ namespace FM
 
             // this is an array of strings as the first (and only) parameter - make sure it doesn't get cast to array of objects for multiple parameters.
             Scribe_Deep.LookDeep( ref _history, "History",
-                                  new object[] { AgeSexArray.Select( ageSex => ageSex.ToString() ).ToArray() } );
+                                  new object[] { Utilities_Livestock.AgeSexArray.Select( ageSex => ageSex.ToString() ).ToArray() } );
         }
 
         public override bool TryDoJob()
@@ -156,9 +146,9 @@ namespace FM
         {
             if ( RestrictToArea )
             {
-                for (int i = 0; i < AgeSexArray.Length; i++ )
+                for (int i = 0; i < Utilities_Livestock.AgeSexArray.Length; i++ )
                 {
-                    foreach ( Pawn p in Trigger.GetTame( AgeSexArray[i] ) )
+                    foreach ( Pawn p in Utilities_Livestock.GetTame( Utilities_Livestock.AgeSexArray[i], Trigger.pawnKind ) )
                     {
                         if ( p.playerSettings.AreaRestriction != RestrictArea[i] )
                         {
@@ -170,16 +160,16 @@ namespace FM
             }
         }
 
-        public List<Designation> DesignationsOfOn( DesignationDef def, AgeAndSex ageSex )
+        public List<Designation> DesignationsOfOn( DesignationDef def, Utilities_Livestock.AgeAndSex ageSex )
         {
             return Designations.Where( des => des.def == def
                                            && des.target.HasThing
                                            && des.target.Thing is Pawn
-                                           && Trigger.PawnIsOfAgeSex( (Pawn)des.target.Thing, ageSex ) )
+                                           && Utilities_Livestock.PawnIsOfAgeSex( (Pawn)des.target.Thing, ageSex ) )
                             .ToList();
         }
 
-        private bool TryRemoveDesignation( AgeAndSex ageSex, DesignationDef def )
+        private bool TryRemoveDesignation( Utilities_Livestock.AgeAndSex ageSex, DesignationDef def )
         {
             // get current designations
             List<Designation> currentDesignations = DesignationsOfOn( def, ageSex );
@@ -208,9 +198,9 @@ namespace FM
         {
             actionTaken = false;
 
-            foreach ( AgeAndSex ageSex in AgeSexArray )
+            foreach ( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
             {
-                foreach ( Pawn animal in Trigger.GetTame( ageSex ) )
+                foreach ( Pawn animal in Utilities_Livestock.GetTame( ageSex, Trigger.pawnKind ) )
                 {
                     foreach ( TrainableDef def in Training.Defs )
                     {
@@ -235,11 +225,11 @@ namespace FM
                 return;
             }
 
-            foreach ( AgeAndSex ageSex in AgeSexArray )
+            foreach ( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
             {
                 // not enough animals?
                 int deficit = Trigger.CountTargets[ageSex] 
-                                - Trigger.GetTame( ageSex ).Count 
+                                - Utilities_Livestock.GetTame( ageSex, Trigger.pawnKind ).Count 
                                 - DesignationsOfOn( DesignationDefOf.Tame, ageSex ).Count;
 
 
@@ -253,7 +243,7 @@ namespace FM
                     IntVec3 position = Utilities.GetBasePosition();
 
                     // get list of animals in sorted by youngest weighted to distance.
-                    List<Pawn> animals = Trigger.GetWild( ageSex )
+                    List<Pawn> animals = Utilities_Livestock.GetWild( ageSex, Trigger.pawnKind )
                                                 .Where(p => Find.DesignationManager.DesignationOn( p ) == null
                                                         && TameArea == null || TameArea.ActiveCells.Contains(p.Position))
                                                 .OrderBy( p => p.ageTracker.AgeBiologicalTicks / (p.Position.DistanceToSquared(position) * 2 ))
@@ -303,10 +293,10 @@ namespace FM
             Log.Message("Doing butchery: " + Trigger.pawnKind.LabelCap);
 #endif
 
-            foreach( AgeAndSex ageSex in AgeSexArray )
+            foreach( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
             {
                 // too many animals?
-                int surplus = Trigger.GetTame( ageSex ).Count
+                int surplus = Utilities_Livestock.GetTame( ageSex, Trigger.pawnKind ).Count
                               - DesignationsOfOn( DesignationDefOf.Slaughter, ageSex ).Count
                               - Trigger.CountTargets[ageSex];
 
@@ -318,10 +308,10 @@ namespace FM
                 if( surplus > 0 )
                 {
                     // should slaughter oldest adults, youngest juveniles.
-                    bool oldestFirst = ageSex == AgeAndSex.AdultFemale || ageSex == AgeAndSex.AdultMale;
+                    bool oldestFirst = ageSex == Utilities_Livestock.AgeAndSex.AdultFemale || ageSex == Utilities_Livestock.AgeAndSex.AdultMale;
 
                     // get list of animals in correct sort order.
-                    List<Pawn> animals = Trigger.GetTame( ageSex )
+                    List<Pawn> animals = Utilities_Livestock.GetTame( ageSex, Trigger.pawnKind )
                                          .Where( p => Find.DesignationManager.DesignationOn( p, DesignationDefOf.Slaughter ) == null
                                                  && ButcherTrained || !p.training.IsCompleted( TrainableDefOf.Obedience ) )
                                          .OrderBy( p => ( oldestFirst ? -1 : 1 ) * p.ageTracker.AgeBiologicalTicks )
@@ -383,7 +373,12 @@ namespace FM
                                         rect.height - 2 * Utilities.Margin );
 
             // create label string
-            string text = Label + "\n<i>" + Trigger.pawnKind.LabelCap + "</i>";
+            string text = Label + "\n<i>";
+            foreach ( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
+            {
+                text += Utilities_Livestock.GetTame( ageSex, Trigger.pawnKind ).Count + "/" + Trigger.CountTargets[ageSex] + ", ";
+            }
+            text += Utilities_Livestock.GetWild( Trigger.pawnKind ).Count + "</i>";
             string tooltip = Trigger.StatusTooltip;
 
             // do the drawing

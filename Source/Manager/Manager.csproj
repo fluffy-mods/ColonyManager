@@ -25,7 +25,7 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\Assemblies\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEBUG_LIFESTOCK</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEBUG_JOBS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\Livestock\Utilities_Livestock.cs" />
     <Compile Include="Helpers\Color\HSV_Helper.cs" />
     <Compile Include="Helpers\History.cs" />
     <Compile Include="Helpers\Hunting\Utilities_Hunting.cs" />

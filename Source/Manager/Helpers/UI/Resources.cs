@@ -38,7 +38,19 @@ namespace FM
             Cog                          = ContentFinder<Texture2D>.Get( "UI/Buttons/Cog" ),
             BarBackgroundActiveTexture   = SolidColorMaterials.NewSolidColorTexture( new Color( 0.2f, 0.8f, 0.85f ) ),
             BarBackgroundInactiveTexture = SolidColorMaterials.NewSolidColorTexture( new Color( 0.7f, 0.7f, 0.7f ) ),
-            Search                       = ContentFinder<Texture2D>.Get( "UI/Buttons/Search" );
-        
+            Search                       = ContentFinder<Texture2D>.Get( "UI/Buttons/Search" ),
+
+            // livestock header icons
+            WoolIcon                     = ContentFinder<Texture2D>.Get( "UI/Icons/wool" ),
+            MilkIcon                     = ContentFinder<Texture2D>.Get( "UI/Icons/milk" ),
+            StageC                       = ContentFinder<Texture2D>.Get( "UI/Icons/stage-3" ),
+            StageB                       = ContentFinder<Texture2D>.Get( "UI/Icons/stage-2" ),
+            StageA                       = ContentFinder<Texture2D>.Get( "UI/Icons/stage-1" ),
+            FemaleIcon                   = ContentFinder<Texture2D>.Get( "UI/Icons/female" ),
+            MaleIcon                     = ContentFinder<Texture2D>.Get( "UI/Icons/male" ),
+            MeatIcon                     = ContentFinder<Texture2D>.Get( "UI/Icons/meat" ),
+            UnkownIcon                   = ContentFinder<Texture2D>.Get( "UI/Icons/unknown" );
+
+        public static Texture UnknownIcon;
     }
 }

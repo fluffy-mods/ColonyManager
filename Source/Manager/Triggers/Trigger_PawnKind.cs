@@ -14,10 +14,7 @@ namespace FM
 {
     public class Trigger_PawnKind : Trigger
     {
-        private Dictionary<ManagerJob_Livestock.AgeAndSex, Utilities.CachedValue<IEnumerable<Pawn>>> _allCache =
-            ManagerJob_Livestock.AgeSexArray.ToDictionary( k => k, v => new Utilities.CachedValue<IEnumerable<Pawn>>() );
-
-        public Dictionary<ManagerJob_Livestock.AgeAndSex, int> CountTargets;
+        public Dictionary<Utilities_Livestock.AgeAndSex, int> CountTargets;
         public PawnKindDef pawnKind;
 
         private Utilities.CachedValue<bool> _state = new Utilities.CachedValue<bool>(); 
@@ -28,7 +25,7 @@ namespace FM
                 bool state;
                 if ( !_state.TryGetValue( out state ) )
                 {
-                    state = ManagerJob_Livestock.AgeSexArray.All( ageSex => CountTargets[ageSex] == GetTame( ageSex ).Count ) && AllTrainingWantedSet();
+                    state = Utilities_Livestock.AgeSexArray.All( ageSex => CountTargets[ageSex] == Utilities_Livestock.GetTame( ageSex, pawnKind ).Count ) && AllTrainingWantedSet();
                     _state.Update( state );
                 }
                 return state;
@@ -53,9 +50,9 @@ namespace FM
             {
                 if ( Job.Training[def] )
                 {
-                    foreach( ManagerJob_Livestock.AgeAndSex ageSex in ManagerJob_Livestock.AgeSexArray )
+                    foreach( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
                     {
-                        foreach ( Pawn p in GetTame( ageSex ) )
+                        foreach ( Pawn p in Utilities_Livestock.GetTame( ageSex, pawnKind ) )
                         {
                             if ( !p.training.GetWanted( def ) &&
                                  !p.training.IsCompleted( def ) )
@@ -71,7 +68,7 @@ namespace FM
 
         public int[] Counts
         {
-            get { return ManagerJob_Livestock.AgeSexArray.Select( ageSex => GetTame( ageSex ).Count ).ToArray(); }
+            get { return Utilities_Livestock.AgeSexArray.Select( ageSex => Utilities_Livestock.GetTame( ageSex, pawnKind ).Count ).ToArray(); }
         }
 
         public override string StatusTooltip
@@ -84,71 +81,6 @@ namespace FM
                 tooltipArgs.AddRange( CountTargets.Values.Select( v => v.ToString() ) );
                 return "FML.ListEntryTooltip".Translate( tooltipArgs.ToArray() );
             }
-        }
-
-        public bool PawnIsOfAgeSex( Pawn p, ManagerJob_Livestock.AgeAndSex ageSex )
-        {
-            // we're making the assumption here that anything with a lifestage index of 2 or greater is adult - so 3 lifestages.
-            // this works for vanilla and all modded animals that I know off.
-            
-            switch ( ageSex )
-            {
-                case ManagerJob_Livestock.AgeAndSex.AdultFemale:
-                    return p.gender == Gender.Female && p.ageTracker.CurLifeStageIndex >= 2;
-                case ManagerJob_Livestock.AgeAndSex.AdultMale:
-                    return p.gender == Gender.Male && p.ageTracker.CurLifeStageIndex >= 2;
-                case ManagerJob_Livestock.AgeAndSex.JuvenileFemale:
-                    return p.gender == Gender.Female && p.ageTracker.CurLifeStageIndex < 2;
-                case ManagerJob_Livestock.AgeAndSex.JuvenileMale:
-                default:
-                    return p.gender == Gender.Male && p.ageTracker.CurLifeStageIndex < 2;
-            }
-        }
-
-        public List<Pawn> GetTame( ManagerJob_Livestock.AgeAndSex ageSex )
-        {
-#if DEBUG_LIFESTOCK_COUNTS
-            List<Pawn> tame = GetAll( ageSex ).Where( p => p.Faction == Faction.OfColony ).ToList();
-            Log.Message( "Tamecount " + ageSex + ": " + tame.Count );
-            return tame;
-#else
-            return GetAll( ageSex ).Where( p => p.Faction == Faction.OfColony ).ToList();
-#endif
-        }
-
-        public IEnumerable<Pawn> GetAll( ManagerJob_Livestock.AgeAndSex ageSex )
-        {
-            // check if we have a cached version
-            IEnumerable<Pawn> cached;
-            if ( _allCache[ageSex].TryGetValue( out cached ) &&
-                 cached != null )
-            {
-                return cached;
-            }
-
-            // if not, get a new list.
-            cached = Find.ListerPawns.AllPawns
-                         .Where( p => p.RaceProps.Animal // is animal
-                                      && !p.Dead // is alive
-                                      && p.kindDef == pawnKind // is our managed pawnkind
-                                      && PawnIsOfAgeSex( p, ageSex ) ); // is of age and sex we want
-            _allCache[ageSex].Update( cached );
-#if DEBUG_LIFESTOCK_COUNTS
-            Log.Message( "Allcount " + ageSex + ": " + cached.Count() );
-#endif
-            return cached;
-        }
-
-        public List<Pawn> GetWild( ManagerJob_Livestock.AgeAndSex ageSex )
-        {
-#if DEBUG_LIFESTOCK_COUNTS
-            foreach (Pawn p in GetAll( ageSex )) Log.Message(p.Faction?.GetCallLabel() ?? "NULL" );
-            List<Pawn> wild = GetAll( ageSex ).Where( p => p.Faction == null ).ToList();
-            Log.Message( "Wildcount " + ageSex + ": " + wild.Count );
-            return wild;
-#else
-            return GetAll( ageSex ).Where( p => p.Faction == null ).ToList();
-#endif
         }
 
         public override void ExposeData()

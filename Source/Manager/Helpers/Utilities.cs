@@ -33,15 +33,12 @@ namespace FM
         public static float TopAreaHeight = 30f;
         public static WorkTypeDef WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
 
-        public static void Label( ref Vector2 cur, float width, float height, string label, string tooltip = null,
-                                  TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin,
-                                  float tbMargin = 0f, bool alt = false,
-                                  GameFont font = GameFont.Small )
+        public static Rect CenteredIn( this Rect inner, Rect outer, float x = 0f, float y = 0f )
         {
-            Rect rect = new Rect( cur.x, cur.y, width, height );
-            if ( alt ) Widgets.DrawAltRect( rect );
-            Label( rect, label, tooltip, anchor, lrMargin, tbMargin, font );
-            cur.y += height;
+            inner = inner.CenteredOnXIn( outer ).CenteredOnYIn( outer );
+            inner.x += x;
+            inner.y += y;
+            return inner;
         }
 
         public static string Summary( this ThingFilter filter )
@@ -49,8 +46,8 @@ namespace FM
             string label = filter._mainSummary();
 
             if ( filter.allowedHitPointsConfigurable &&
-                 (filter.AllowedHitPointsPercents.TrueMax != 1 ||
-                 filter.AllowedHitPointsPercents.TrueMin != 0 ))
+                 ( filter.AllowedHitPointsPercents.TrueMax != 1 ||
+                   filter.AllowedHitPointsPercents.TrueMin != 0 ) )
             {
                 label += " (" + "FM.FilterDescriptionHitPoints".Translate( filter.AllowedHitPointsPercents.TrueMin,
                                                                            filter.AllowedHitPointsPercents.TrueMax )
@@ -66,14 +63,15 @@ namespace FM
                                                                   filter.AllowedQualityLevels.max.ToString() ) +
                          ")";
             }
-            
+
             return label;
         }
 
         private static string _mainSummary( this ThingFilter filter )
         {
             // special cases: 1 category (almost) fully allowed (only works if filter is actually limited to that category?)
-            if ( filter.categories?.Count == 1 && filter.exceptedThingDefs.Count < 2 )
+            if ( filter.categories?.Count == 1 &&
+                 filter.exceptedThingDefs.Count < 2 )
             {
                 string label = filter.categories.First();
                 if ( filter.exceptedThingDefs.Count == 1 )
@@ -83,7 +81,7 @@ namespace FM
                 }
                 return label;
             }
-            
+
             // special cases: 1-3 thingdefs allowed;
             if ( filter.AllowedThingDefs?.Count() < 4 )
             {
@@ -103,7 +101,9 @@ namespace FM
             return string.Empty;
         }
 
-        public static void Label( Rect rect, string label, string tooltip = null, TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin, float tbMargin = 0f, GameFont font = GameFont.Small, Color? color = null )
+        public static void Label( Rect rect, string label, string tooltip = null,
+                                  TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin,
+                                  float tbMargin = 0f, GameFont font = GameFont.Small, Color? color = null )
         {
             // apply margins
             Rect labelRect = new Rect( rect.xMin + lrMargin, rect.yMin + tbMargin, rect.width - 2 * lrMargin,
@@ -123,6 +123,20 @@ namespace FM
             {
                 TooltipHandler.TipRegion( rect, tooltip );
             }
+        }
+
+        public static void Label( ref Vector2 cur, float width, float height, string label, string tooltip = null,
+                                  TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin,
+                                  float tbMargin = 0f, bool alt = false,
+                                  GameFont font = GameFont.Small, Color? color = null )
+        {
+            Rect rect = new Rect( cur.x, cur.y, width, height );
+            if ( alt )
+            {
+                Widgets.DrawAltRect( rect );
+            }
+            Label( rect, label, tooltip, anchor, lrMargin, tbMargin, font, color );
+            cur.y += height;
         }
 
         private static bool TryGetCached( StockpileFilter stockpileFilter, out int count )
@@ -187,6 +201,7 @@ namespace FM
 #if DEBUG_COUNTS
                         Log.Message(td.LabelCap + ", " + Find.ResourceCounter.GetCount(td));
 #endif
+
                     // we don't need to bother with quality / hitpoints as these are non-existant/irrelevant for resources.
                     count += Find.ResourceCounter.GetCount( td );
                 }
@@ -251,7 +266,7 @@ namespace FM
             IntVec3 position = IntVec3.Zero;
             Building managerStation =
                 Find.ListerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
-            if( managerStation != null )
+            if ( managerStation != null )
             {
                 position = managerStation.Position;
             }
@@ -260,7 +275,7 @@ namespace FM
             else
             {
                 List<IntVec3> homeCells = Find.AreaManager.Get<Area_Home>().ActiveCells.ToList();
-                for( int i = 0; i < homeCells.Count(); i++ )
+                for ( int i = 0; i < homeCells.Count(); i++ )
                 {
                     position += homeCells[i];
                 }
