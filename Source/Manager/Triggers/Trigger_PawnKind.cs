@@ -25,7 +25,7 @@ namespace FM
                 bool state;
                 if ( !_state.TryGetValue( out state ) )
                 {
-                    state = Utilities_Livestock.AgeSexArray.All( ageSex => CountTargets[ageSex] == Utilities_Livestock.GetTame( ageSex, pawnKind ).Count ) && AllTrainingWantedSet();
+                    state = Utilities_Livestock.AgeSexArray.All( ageSex => CountTargets[ageSex] == pawnKind.GetTame( ageSex ).Count ) && AllTrainingWantedSet();
                     _state.Update( state );
                 }
                 return state;
@@ -52,7 +52,7 @@ namespace FM
                 {
                     foreach( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
                     {
-                        foreach ( Pawn p in Utilities_Livestock.GetTame( ageSex, pawnKind ) )
+                        foreach ( Pawn p in pawnKind.GetTame( ageSex ) )
                         {
                             if ( !p.training.GetWanted( def ) &&
                                  !p.training.IsCompleted( def ) )
@@ -68,7 +68,7 @@ namespace FM
 
         public int[] Counts
         {
-            get { return Utilities_Livestock.AgeSexArray.Select( ageSex => Utilities_Livestock.GetTame( ageSex, pawnKind ).Count ).ToArray(); }
+            get { return Utilities_Livestock.AgeSexArray.Select( ageSex => pawnKind.GetTame( ageSex ).Count ).ToArray(); }
         }
 
         public override string StatusTooltip

@@ -27,7 +27,7 @@ namespace FM
         private static Dictionary<PawnKindDef, Utilities.CachedValue<IEnumerable<Pawn>>> _allCache =
             new Dictionary<PawnKindDef, Utilities.CachedValue<IEnumerable<Pawn>>>();
 
-        public static bool PawnIsOfAgeSex( Pawn p, AgeAndSex ageSex )
+        public static bool PawnIsOfAgeSex( this Pawn p, AgeAndSex ageSex )
         {
             // we're making the assumption here that anything with a lifestage index of 2 or greater is adult - so 3 lifestages.
             // this works for vanilla and all modded animals that I know off.
@@ -46,18 +46,7 @@ namespace FM
             }
         }
 
-        public static List<Pawn> GetTame( AgeAndSex ageSex, PawnKindDef pawnKind )
-        {
-#if DEBUG_LIFESTOCK_COUNTS
-            List<Pawn> tame = GetAll( ageSex ).Where( p => p.Faction == Faction.OfColony ).ToList();
-            Log.Message( "Tamecount " + ageSex + ": " + tame.Count );
-            return tame;
-#else
-            return GetAll( ageSex, pawnKind ).Where( p => p.Faction == Faction.OfColony ).ToList();
-#endif
-        }
-
-        public static IEnumerable<Pawn> GetAll( PawnKindDef pawnKind )
+        public static IEnumerable<Pawn> GetAll( this PawnKindDef pawnKind )
         {
             // check if we have a cached version
             IEnumerable<Pawn> cached;
@@ -93,12 +82,22 @@ namespace FM
             return cached;
         }
 
-        public static IEnumerable<Pawn> GetAll( AgeAndSex ageSex, PawnKindDef pawnKind )
+        public static List<Pawn> GetWild( this PawnKindDef pawnKind )
         {
-            return GetAll( pawnKind ).Where( p => PawnIsOfAgeSex( p, ageSex ) ); // is of age and sex we want
+            return pawnKind.GetAll().Where( p => p.Faction == null ).ToList();
         }
 
-        public static List<Pawn> GetWild( AgeAndSex ageSex, PawnKindDef pawnKind )
+        public static List<Pawn> GetTame( this PawnKindDef pawnKind )
+        {
+            return pawnKind.GetAll().Where( p => p.Faction == Faction.OfColony ).ToList();
+        }
+
+        public static IEnumerable<Pawn> GetAll( this PawnKindDef pawnKind, AgeAndSex ageSex )
+        {
+            return pawnKind.GetAll().Where( p => PawnIsOfAgeSex( p, ageSex ) ); // is of age and sex we want
+        }
+
+        public static List<Pawn> GetWild( this PawnKindDef pawnKind, AgeAndSex ageSex )
         {
 #if DEBUG_LIFESTOCK_COUNTS
             foreach (Pawn p in GetAll( ageSex )) Log.Message(p.Faction?.GetCallLabel() ?? "NULL" );
@@ -106,21 +105,26 @@ namespace FM
             Log.Message( "Wildcount " + ageSex + ": " + wild.Count );
             return wild;
 #else
-            return GetAll( ageSex, pawnKind ).Where( p => p.Faction == null ).ToList();
+            return pawnKind.GetAll( ageSex ).Where( p => p.Faction == null ).ToList();
 #endif
         }
 
-        public static List<Pawn> GetTame( PawnKindDef pawnKind )
+        public static List<Pawn> GetTame( this PawnKindDef pawnKind, AgeAndSex ageSex )
         {
-            return GetAll( pawnKind ).Where( p => p.Faction == Faction.OfColony ).ToList();
+#if DEBUG_LIFESTOCK_COUNTS
+            List<Pawn> tame = GetAll( ageSex ).Where( p => p.Faction == Faction.OfColony ).ToList();
+            Log.Message( "Tamecount " + ageSex + ": " + tame.Count );
+            return tame;
+#else
+            return pawnKind.GetAll( ageSex ).Where( p => p.Faction == Faction.OfColony ).ToList();
+#endif
         }
 
-        public static List<Pawn> GetWild( PawnKindDef pawnKind )
-        {
-            return GetAll( pawnKind ).Where( p => p.Faction == null ).ToList();
-        }
-        
-        private static Dictionary<PawnKindDef, Utilities.CachedValue<bool>> _milkablePawnkind = new Dictionary<PawnKindDef, Utilities.CachedValue<bool>>(); 
+        private static Dictionary<PawnKindDef, Utilities.CachedValue<bool>> _milkablePawnkind = new Dictionary<PawnKindDef, Utilities.CachedValue<bool>>();
+        private static Dictionary<Pawn, Utilities.CachedValue<bool>> _milkablePawn = new Dictionary<Pawn, Utilities.CachedValue<bool>>();
+        private static Dictionary<PawnKindDef, Utilities.CachedValue<bool>> _shearablePawnkind = new Dictionary<PawnKindDef, Utilities.CachedValue<bool>>();
+        private static Dictionary<Pawn, Utilities.CachedValue<bool>> _shearablePawn = new Dictionary<Pawn, Utilities.CachedValue<bool>>();
+
         public static bool Milkable( this PawnKindDef pawnKind )
         {
             if ( pawnKind == null ) return false;
@@ -140,7 +144,6 @@ namespace FM
             return ret;
         }
 
-        private static Dictionary<Pawn, Utilities.CachedValue<bool>> _milkablePawn = new Dictionary<Pawn, Utilities.CachedValue<bool>>(); 
         public static bool Milkable( this Pawn pawn )
         {
             bool ret = false;
@@ -161,16 +164,15 @@ namespace FM
 
         private static bool _milkable( this Pawn pawn )
         {
-            CompMilkable comp = pawn.TryGetComp<CompMilkable>();
+            CompMilkable comp = pawn?.TryGetComp<CompMilkable>();
             object active = false;
             if( comp != null )
             {
-                Utilities.TryGetPrivateField( typeof( CompMilkable ), comp, "Active", out active );
+                active = comp.GetPrivatePropertyValue( "Active" );
             }
             return (bool)active;
         }
 
-        private static Dictionary<PawnKindDef, Utilities.CachedValue<bool>> _shearablePawnkind = new Dictionary<PawnKindDef, Utilities.CachedValue<bool>>();
         public static bool Shearable( this PawnKindDef pawnKind )
         {
             if( pawnKind == null ) return false;
@@ -190,7 +192,6 @@ namespace FM
             return ret;
         }
 
-        private static Dictionary<Pawn, Utilities.CachedValue<bool>> _shearablePawn = new Dictionary<Pawn, Utilities.CachedValue<bool>>();
         public static bool Shearable( this Pawn pawn )
         {
             bool ret = false;
@@ -211,11 +212,11 @@ namespace FM
 
         private static bool _shearable( this Pawn pawn )
         {
-            CompShearable comp = pawn.TryGetComp<CompShearable>();
+            CompShearable comp = pawn?.TryGetComp<CompShearable>();
             object active = false;
             if( comp != null )
             {
-                Utilities.TryGetPrivateField( typeof( CompShearable ), comp, "Active", out active );
+                active = comp.GetPrivatePropertyValue( "Active" );
             }
             return (bool)active;
         }

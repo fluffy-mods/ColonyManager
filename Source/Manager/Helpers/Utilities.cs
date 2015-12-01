@@ -459,6 +459,11 @@ namespace FM
             return test == value;
         }
 
+        public static object GetPrivatePropertyValue( this object src, string propName, BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic )
+        {
+            return src.GetType().GetProperty( propName, flags ).GetValue( src, null );
+        }
+
         public struct StockpileFilter
         {
             private ThingFilter filter;

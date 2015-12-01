@@ -4,6 +4,7 @@
 // 
 // Created 2015-11-17 12:59
 
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -51,6 +52,6 @@ namespace FM
             MeatIcon                     = ContentFinder<Texture2D>.Get( "UI/Icons/meat" ),
             UnkownIcon                   = ContentFinder<Texture2D>.Get( "UI/Icons/unknown" );
 
-        public static Texture UnknownIcon;
+        public static Texture2D[] LifeStages = { StageA, StageB, StageC };
     }
 }

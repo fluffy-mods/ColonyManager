@@ -144,5 +144,6 @@
   <FML.MeatHeader>Expected meat amount when butchered</FML.MeatHeader>
   <FML.MilkHeader>Progress till next milking</FML.MilkHeader>
   <FML.WoolHeader>Progress till next shearing</FML.WoolHeader>
+  <FML.Yields>yields {0} x{1}</FML.Yields>
 
 </LanguageData>

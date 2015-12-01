@@ -16,23 +16,25 @@ namespace FM
     {
         private List<PawnKindDef>                                 _availablePawnKinds;
         private List<ManagerJob_Livestock>                        _currentJobs;
-        private float                                             _entryHeight     = 30f;
-        private float                                             _listEntryHeight = Utilities.LargeListEntryHeight;
+        private float                                             _entryHeight           = 30f;
+        private float                                             _listEntryHeight       = Utilities.LargeListEntryHeight;
+        private float                                             _smallIconSize         = Utilities.SmallIconSize;
 
         // init with 5's if new job.
-        private Dictionary<Utilities_Livestock.AgeAndSex, string> _newCounts       =
-            Utilities_Livestock.AgeSexArray.ToDictionary(         k                => k, v => "5" );
+        private Dictionary<Utilities_Livestock.AgeAndSex, string> _newCounts             = Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => "5" );
 
         private bool                                              _onCurrentTab;
-        private Vector2                                           _scrollPosition  = Vector2.zero;
+        private Vector2                                           _scrollPosition        = Vector2.zero;
         private PawnKindDef                                       _selectedAvailable;
         private ManagerJob_Livestock                              _selectedCurrent;
-        private float                                             _topAreaHeight   = 30f;
+        private float                                             _topAreaHeight         = 30f;
+        private float                                             _actualHeight          = 999f;
+        private Vector2                                           _animalsScrollPosition = Vector2.zero;
 
         // public override Texture2D Icon {                       get; }
-        public override IconAreas                                 IconArea         => IconAreas.Middle;
-        public override string                                    Label            => "FML.Livestock".Translate();
-        public override Texture2D                                 Icon             => Resources.IconLivestock;
+        public override IconAreas                                 IconArea               => IconAreas.Middle;
+        public override string                                    Label                  => "FML.Livestock".Translate();
+        public override Texture2D                                 Icon                   => Resources.IconLivestock;
 
         public override ManagerJob Selected
         {
@@ -310,33 +312,38 @@ namespace FM
             PawnKindDef pawnKind = _onCurrentTab ? _selectedCurrent.Trigger.pawnKind : _selectedAvailable;
             if ( pawnKind != null )
             {
-                GUI.BeginGroup( animalsRect );
+                Rect viewRect = animalsRect;
+                viewRect.height = _actualHeight;
+                if ( _actualHeight > animalsRect.height ) viewRect.width -= 16f;
+
+                Widgets.BeginScrollView(animalsRect, ref _animalsScrollPosition, viewRect);
+                GUI.BeginGroup( viewRect );
                 cur = Vector2.zero;
 
                 // tamed animals
-                DrawAnimalListheader( ref cur, new Vector2( animalsRect.width, _entryHeight / 3 * 2 ), pawnKind,
+                DrawAnimalListheader( ref cur, new Vector2( viewRect.width, _entryHeight / 3 * 2 ), pawnKind,
                                       "FML.Tame".Translate().CapitalizeFirst() );
-                List<Pawn> tame = Utilities_Livestock.GetTame( pawnKind );
+                List<Pawn> tame = pawnKind.GetTame(  );
                 if ( tame.Count == 0 )
                 {
-                    Utilities.Label( ref cur, animalsRect.width, _entryHeight,
+                    Utilities.Label( ref cur, viewRect.width, _entryHeight,
                                      "FML.NoAnimals".Translate( "FML.Tame".Translate() ),
                                      anchor: TextAnchor.MiddleCenter, color: Color.grey );
                 }
                 for ( int i = 0; i < tame.Count; i++ )
                 {
-                    DrawAnimalRow( ref cur, new Vector2( animalsRect.width, _entryHeight ), tame[i], i % 2 == 0 );
+                    DrawAnimalRow( ref cur, new Vector2( viewRect.width, _entryHeight ), tame[i], i % 2 == 0 );
                 }
 
                 cur.y += _entryHeight;
 
                 // wild animals
-                DrawAnimalListheader( ref cur, new Vector2( animalsRect.width, _entryHeight / 3 * 2 ), pawnKind,
+                DrawAnimalListheader( ref cur, new Vector2( viewRect.width, _entryHeight / 3 * 2 ), pawnKind,
                                       "FML.Wild".Translate().CapitalizeFirst() );
-                List<Pawn> wild = Utilities_Livestock.GetWild( pawnKind );
+                List<Pawn> wild = pawnKind.GetWild();
                 if ( wild.Count == 0 )
                 {
-                    Utilities.Label( ref cur, animalsRect.width, _entryHeight,
+                    Utilities.Label( ref cur, viewRect.width, _entryHeight,
                                      "FML.NoAnimals".Translate( "FML.Wild".Translate() ), null, TextAnchor.MiddleCenter,
                                      color: Color.grey );
                 }
@@ -345,7 +352,11 @@ namespace FM
                     DrawAnimalRow( ref cur, new Vector2( animalsRect.width, _entryHeight ), wild[i], i % 2 == 0 );
                 }
 
+                // update list height
+                _actualHeight = cur.y;
+
                 GUI.EndGroup(); // animals
+                Widgets.EndScrollView();
             }
 
             // bottom button
@@ -411,22 +422,15 @@ namespace FM
             int cols = 3;
 
             // extra columns?
-            bool milk = p.kindDef.Milkable();
-            bool wool = p.kindDef.Shearable();
-            if ( milk )
-            {
-                cols++;
-            }
-            if ( wool )
-            {
-                cols++;
-            }
+            if ( p.kindDef.Milkable() ) cols++;
+            if ( p.kindDef.Shearable() ) cols++;
+            
             float colwidth = size.x * 2 / 3 / cols;
 
             // gender column
             Rect genderRect = new Rect( cur.x, cur.y, colwidth, size.y );
             Rect genderIconRect =
-                new Rect( 0f, 0f, Utilities.SmallIconSize, Utilities.SmallIconSize ).CenteredIn( genderRect );
+                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( genderRect );
             switch ( p.gender )
             {
                 case Gender.Female:
@@ -436,7 +440,7 @@ namespace FM
                     GUI.DrawTexture( genderIconRect, Resources.MaleIcon );
                     break;
                 case Gender.None:
-                    GUI.DrawTexture( genderIconRect, Resources.UnknownIcon );
+                    GUI.DrawTexture( genderIconRect, Resources.UnkownIcon );
                     break;
             }
             TooltipHandler.TipRegion( genderRect, p.gender.GetLabel() );
@@ -444,36 +448,38 @@ namespace FM
 
             // lifestage column
             Rect ageRect = new Rect( cur.x, cur.y, colwidth, size.y );
-            Utilities.Label( ageRect, p.ageTracker.AgeBiologicalYears.ToString(), anchor: TextAnchor.MiddleCenter,
-                             font: GameFont.Tiny );
+            Rect ageIconRect = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect );
+            GUI.DrawTexture( ageIconRect, Resources.LifeStages[p.ageTracker.CurLifeStageIndex] );
+            TooltipHandler.TipRegion( ageRect, p.ageTracker.AgeTooltipString );
             cur.x += colwidth;
 
             // meat column
             Rect meatRect = new Rect( cur.x, cur.y, colwidth, size.y );
-
             // NOTE: When splitting tabs into separate mods; estimated meat count is defined in the Hunting helper.
-            Utilities.Label( meatRect, p.EstimatedMeatCount().ToString(), anchor: TextAnchor.MiddleCenter,
+            Utilities.Label( meatRect, p.EstimatedMeatCount().ToString(), p.EstimatedMeatCount().ToString(), TextAnchor.MiddleCenter,
                              font: GameFont.Tiny );
             cur.x += colwidth;
 
             // milk column
-            if ( milk )
+            if ( p.Milkable() )
             {
                 Rect milkRect = new Rect( cur.x, cur.y, colwidth, size.y );
-                Utilities.Label( milkRect, p.TryGetComp<CompMilkable>()?.Fullness.ToString( "0%" ) ?? string.Empty,
-                                 anchor: TextAnchor.MiddleCenter, font: GameFont.Tiny );
-                cur.x += colwidth;
+                CompMilkable comp = p.TryGetComp<CompMilkable>();
+                Utilities.Label( milkRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate( comp.props.milkDef.LabelCap, comp.props.milkAmount ),
+                                 TextAnchor.MiddleCenter, font: GameFont.Tiny );
             }
+            if ( p.kindDef.Milkable() ) cur.x += colwidth;
 
             // wool column
-            if ( wool )
+            if ( p.Shearable() )
             {
                 Rect woolRect = new Rect( cur.x, cur.y, colwidth, size.y );
-                Utilities.Label( woolRect, p.TryGetComp<CompShearable>()?.Fullness.ToString( "0%" ) ?? string.Empty,
-                                 anchor: TextAnchor.MiddleCenter, font: GameFont.Tiny );
-                cur.x += colwidth;
+                CompShearable comp = p.TryGetComp<CompShearable>();
+                Utilities.Label( woolRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate(comp.props.woolDef.LabelCap, comp.props.woolAmount ),
+                                 TextAnchor.MiddleCenter, font: GameFont.Tiny );
             }
-
+            if( p.kindDef.Milkable() ) cur.x += colwidth;
+            
             // do the carriage return on ref cur
             cur.x = 0f;
             cur.y += size.y;
@@ -505,41 +511,31 @@ namespace FM
             // gender header
             Rect genderRect = new Rect( cur.x, cur.y, colwidth, size.y );
             Rect genderMale =
-                new Rect( 0f, 0f, Utilities.SmallIconSize, Utilities.SmallIconSize ).CenteredIn( genderRect,
-                                                                                                 - Utilities
-                                                                                                     .SmallIconSize / 2 );
+                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( genderRect, - _smallIconSize / 2 );
             Rect genderFemale =
-                new Rect( 0f, 0f, Utilities.SmallIconSize, Utilities.SmallIconSize ).CenteredIn( genderRect,
-                                                                                                 Utilities.SmallIconSize /
-                                                                                                 2 );
+                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( genderRect, _smallIconSize / 2 );
             GUI.DrawTexture( genderMale, Resources.MaleIcon );
             GUI.DrawTexture( genderFemale, Resources.FemaleIcon );
-            TooltipHandler.TipRegion( genderRect, "FML.GenderHeader" );
+            TooltipHandler.TipRegion( genderRect, "FML.GenderHeader".Translate() );
             cur.x += colwidth;
 
             // lifestage header
             Rect ageRect = new Rect( cur.x, cur.y, colwidth, size.y );
-            Rect ageRectC = new Rect( 0f, 0f, Utilities.SmallIconSize, Utilities.SmallIconSize ).CenteredIn( ageRect,
-                                                                                                             Utilities
-                                                                                                                 .SmallIconSize /
-                                                                                                             2 );
-            Rect ageRectB = new Rect( 0f, 0f, Utilities.SmallIconSize, Utilities.SmallIconSize ).CenteredIn( ageRect );
-            Rect ageRectA = new Rect( 0f, 0f, Utilities.SmallIconSize, Utilities.SmallIconSize ).CenteredIn( ageRect,
-                                                                                                             - Utilities
-                                                                                                                 .SmallIconSize /
-                                                                                                             2 );
-            GUI.DrawTexture( ageRectC, Resources.StageC );
-            GUI.DrawTexture( ageRectB, Resources.StageB );
-            GUI.DrawTexture( ageRectA, Resources.StageA );
-            TooltipHandler.TipRegion( ageRect, "FML.AgeHeader" );
+            Rect ageRectC = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect, _smallIconSize / 2 );
+            Rect ageRectB = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect );
+            Rect ageRectA = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect, - _smallIconSize / 2 );
+            GUI.DrawTexture( ageRectC, Resources.LifeStages[2] );
+            GUI.DrawTexture( ageRectB, Resources.LifeStages[1] );
+            GUI.DrawTexture( ageRectA, Resources.LifeStages[0] );
+            TooltipHandler.TipRegion( ageRect, "FML.AgeHeader".Translate() );
             cur.x += colwidth;
 
             // meat header
             Rect meatRect = new Rect( cur.x, cur.y, colwidth, size.y );
             Rect meatIconRect =
-                new Rect( 0f, 0f, Utilities.SmallIconSize, Utilities.SmallIconSize ).CenteredIn( meatRect );
+                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( meatRect );
             GUI.DrawTexture( meatIconRect, Resources.MeatIcon );
-            TooltipHandler.TipRegion( meatRect, "FML.MeatHeader" );
+            TooltipHandler.TipRegion( meatRect, "FML.MeatHeader".Translate() );
             cur.x += colwidth;
 
             // milk header
@@ -547,9 +543,9 @@ namespace FM
             {
                 Rect milkRect = new Rect( cur.x, cur.y, colwidth, size.y );
                 Rect milkIconRect =
-                    new Rect( 0f, 0f, Utilities.SmallIconSize, Utilities.SmallIconSize ).CenteredIn( milkRect );
+                    new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( milkRect );
                 GUI.DrawTexture( milkIconRect, Resources.MilkIcon );
-                TooltipHandler.TipRegion( milkRect, "FML.MilkHeader" );
+                TooltipHandler.TipRegion( milkRect, "FML.MilkHeader".Translate() );
                 cur.x += colwidth;
             }
 
@@ -560,7 +556,7 @@ namespace FM
                 Rect woolIconRect =
                     new Rect( 0f, 0f, Utilities.MediumIconSize, Utilities.MediumIconSize ).CenteredIn( woolRect );
                 GUI.DrawTexture( woolIconRect, Resources.WoolIcon );
-                TooltipHandler.TipRegion( woolRect, "FML.WoolHeader" );
+                TooltipHandler.TipRegion( woolRect, "FML.WoolHeader".Translate() );
                 cur.x += colwidth;
             }
 
@@ -656,8 +652,8 @@ namespace FM
                 // draw label
                 string label = _availablePawnKinds[i].LabelCap + "\n<i>" +
                                "FML.TameWildCount".Translate(
-                                   Utilities_Livestock.GetTame( _availablePawnKinds[i] ).Count,
-                                   Utilities_Livestock.GetWild( _availablePawnKinds[i] ).Count ) + "</i>";
+                                   _availablePawnKinds[i].GetTame().Count,
+                                   _availablePawnKinds[i].GetWild().Count ) + "</i>";
                 Utilities.Label( row, label, null, TextAnchor.MiddleLeft, Utilities.Margin * 2 );
 
                 // button
