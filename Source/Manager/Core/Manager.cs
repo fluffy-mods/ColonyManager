@@ -32,7 +32,7 @@ namespace FM
             new ManagerTab_Hunting(),
             new ManagerTab_Forestry(),
             new ManagerTab_Livestock(),
-            //new ManagerTab_Power()
+            new ManagerTab_Power()
         };
 
         public List<ManagerTab> ManagerTabsLeft

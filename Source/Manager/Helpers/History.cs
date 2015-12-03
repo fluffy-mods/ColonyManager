@@ -29,7 +29,10 @@ namespace FM
         private const float Margin = Utilities.Margin;
         private const int Size = 100;
 
+        // settings
+        private bool AllowTogglingLegend = true;
         private bool ShowLegend = true;
+        private bool DrawTargetLine = true;
 
         // interval per period
         private static Dictionary<Period, int> _intervals = new Dictionary<Period, int>();
@@ -72,6 +75,12 @@ namespace FM
 
         public void ExposeData()
         {
+            // settings
+            Scribe_Values.LookValue( ref AllowTogglingLegend, "AllowToggingLegend", true );
+            Scribe_Values.LookValue( ref ShowLegend, "ShowLegend", true );
+            Scribe_Values.LookValue( ref DrawTargetLine, "DrawTargetLine", true );
+
+            // history chapters
             Scribe_Collections.LookList( ref _chapters, "Chapters", LookMode.Deep );
         }
 
@@ -110,14 +119,17 @@ namespace FM
             }
         }
 
-        public void DrawPlot( Rect rect, int target = 0, string label = "" )
+        public void DrawPlot( Rect rect, int target = 0, string label = "", List<Chapter> chapters = null, int sign = 1 )
         {
+            // if chapters is left default, plot all
+            if ( chapters == null ) chapters = _chapters;
+
             // stuff we need
             Rect plot = rect.ContractedBy( Utilities.Margin );
             plot.xMin += _yAxisMargin;
 
             // maximum of all chapters.
-            int max = Math.Max( _chapters.Select( c => c.Max( _periodShown ) ).Max(), (int)( target * 1.2 ) );
+            int max = Math.Max( chapters.Select( c => c.Max( _periodShown ) ).Max(), (int)( target * 1.2 ) );
 
             // size, and pixels per node.
             float w = plot.width;
@@ -132,28 +144,78 @@ namespace FM
             GUI.BeginGroup( plot );
             foreach ( Chapter chapter in _chapters )
             {
-                if ( chapter._hist[_periodShown].Count > 1 )
+                chapter.Plot( _periodShown, plot.AtZero(), wu, hu );
+            }
+
+            // handle mouseover events
+            if ( Mouse.IsOver( plot.AtZero() ) )
+            {
+                // very conveniently this is the position within the current group.
+                Vector2 pos = Event.current.mousePosition;
+                Vector2 upos = new Vector2(pos.x / wu, (plot.height - pos.y) / hu);
+
+                // get distances
+                float[] distances = chapters.Select( c => Math.Abs( c.ValueAt( _periodShown, (int)upos.x, sign ) - upos.y ) ).ToArray();
+                
+                // get the minimum index
+                float min = int.MaxValue;
+                int minIndex = 0;
+                for ( int i = 0; i < distances.Count(); i++ )
                 {
-                    List<int> hist = chapter._hist[_periodShown];
-                    for ( int i = 0; i < hist.Count - 1; i++ ) // line segments, so up till n-1
+                    if ( distances[i] < min )
                     {
-                        Vector2 start = new Vector2( wu * i, h - hu * hist[i] );
-                        Vector2 end = new Vector2( wu * ( i + 1 ), h - hu * hist[i + 1] );
-                        Widgets.DrawLine( start, end, chapter.lineColor, 1f );
+                        minIndex = i;
+                        min = distances[i];
                     }
                 }
+
+                // closest line
+                Chapter closest = chapters[minIndex];
+
+                // do minimum stuff.
+                Vector2 realpos = new Vector2( pos.x, plot.height - closest.ValueAt( _periodShown, (int)upos.x, sign ) * hu );
+                Rect blipRect = new Rect(realpos.x - Utilities.SmallIconSize / 2f, realpos.y - Utilities.SmallIconSize / 2f, Utilities.SmallIconSize, Utilities.SmallIconSize );
+                GUI.color = closest.lineColor;
+                GUI.DrawTexture( blipRect, Resources.StageB );
+                GUI.color = DefaultLineColor;
+
+                // get orientation of tooltip
+                Vector2 tippos = realpos + new Vector2( Utilities.Margin, Utilities.Margin );
+                string tip = chapters[minIndex].label + ": " + chapters[minIndex].ValueAt( _periodShown, (int)upos.x, sign );
+                Vector2 tipsize = Text.CalcSize( tip );
+                bool up = false, left = false;
+                if ( tippos.x + tipsize.x > plot.width )
+                {
+                    left = true;
+                    tippos.x -= tipsize.x + 2 * + Utilities.Margin;
+                }
+                if ( tippos.y + tipsize.y > plot.height )
+                {
+                    up = true;
+                    tippos.y -= tipsize.y + 2 * Utilities.Margin;
+                }
+
+                TextAnchor anchor = TextAnchor.UpperLeft;
+                if (up && left) anchor = TextAnchor.LowerRight;
+                if ( up && !left ) anchor = TextAnchor.LowerLeft;
+                if ( !up && left ) anchor = TextAnchor.UpperRight;
+                Rect tooltipRect = new Rect( tippos.x, tippos.y, tipsize.x, tipsize.y );
+                Utilities.Label( tooltipRect, tip, anchor: anchor, font: GameFont.Tiny );
             }
 
             // draw target line
-            GUI.color = Color.gray;
-            for ( int i = 0; i < plot.width / DashLength; i += 2 )
+            if ( DrawTargetLine )
             {
-                Widgets.DrawLineHorizontal( i * DashLength, plot.height - target * hu, DashLength );
+                GUI.color = Color.gray;
+                for ( int i = 0; i < plot.width / DashLength; i += 2 )
+                {
+                    Widgets.DrawLineHorizontal( i * DashLength, plot.height - target * hu, DashLength );
+                }
             }
 
             // draw legend
             int lineCount = _chapters.Count;
-            if ( lineCount > 1 && ShowLegend )
+            if ( AllowTogglingLegend && lineCount > 1 && ShowLegend )
             {
                 float rowHeight = 20f;
                 float lineLength = 30f;
@@ -280,11 +342,18 @@ namespace FM
                 _hist = periods.ToDictionary( k => k, v => new ExposableList<int>( 0 ) );
             }
 
+            public int ValueAt( Period period, int x , int sign = 1)
+            {
+                if ( x < 0 || x >= _hist[period].Count ) return -1;
+                return _hist[period][x] * sign;
+            }
+
             public void ExposeData()
             {
                 Scribe_Values.LookValue( ref label, "label" );
                 Scribe_Values.LookValue( ref size, "size", 100 );
                 Scribe_Values.LookValue( ref lineColor, "color", Color.white );
+                // TODO: NEXT MAJOR VERSION - CHANGE STORAGE TO BYTEARRAY
                 Scribe_Collections.LookDictionary( ref _hist, "pages", LookMode.Value, LookMode.Deep );
             }
 
@@ -309,6 +378,20 @@ namespace FM
             public int Max( Period period )
             {
                 return _hist[period].Max();
+            }
+
+            public void Plot( Period period, Rect canvas, float wu, float hu, int sign = 1 )
+            {
+                if( _hist[period].Count > 1 )
+                {
+                    List<int> hist = _hist[period];
+                    for( int i = 0; i < hist.Count - 1; i++ ) // line segments, so up till n-1
+                    {
+                        Vector2 start = new Vector2( wu * i, canvas.height - hu * hist[i] * sign );
+                        Vector2 end = new Vector2( wu * ( i + 1 ), canvas.height - hu * hist[i + 1] * sign );
+                        Widgets.DrawLine( start, end, lineColor, 1f );
+                    }
+                }
             }
         }
     }
