@@ -64,7 +64,7 @@ namespace FM
             _history = new History( Utilities_Livestock.AgeSexArray.Select( ageSex => ageSex.ToString() ).ToArray() );
 
             // set up the trigger, set all target counts to 5
-            Trigger = new Trigger_PawnKind { CountTargets = Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => 5 ) };
+            Trigger = new Trigger_PawnKind();
 
             // set all training to false
             Training = new TrainingTracker();

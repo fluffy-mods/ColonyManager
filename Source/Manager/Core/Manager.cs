@@ -31,7 +31,8 @@ namespace FM
             new ManagerTab_ImportExport(),
             new ManagerTab_Hunting(),
             new ManagerTab_Forestry(),
-            new ManagerTab_Livestock()
+            new ManagerTab_Livestock(),
+            //new ManagerTab_Power()
         };
 
         public List<ManagerTab> ManagerTabsLeft
@@ -118,9 +119,16 @@ namespace FM
         {
             base.MapComponentTick();
 
+            // tick jobs
             foreach ( ManagerJob job in JobStack.FullStack() )
             {
                 job.Tick();
+            }
+
+            // tick tabs
+            foreach ( ManagerTab tab in ManagerTabs )
+            {
+                tab.Tick();
             }
 #if DEBUG
             if ( Find.TickManager.TicksGame % 2000 == 0 )

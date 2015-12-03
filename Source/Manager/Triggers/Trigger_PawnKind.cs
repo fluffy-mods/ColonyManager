@@ -17,6 +17,11 @@ namespace FM
         public Dictionary<Utilities_Livestock.AgeAndSex, int> CountTargets;
         public PawnKindDef pawnKind;
 
+        public Trigger_PawnKind()
+        {
+            CountTargets = Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => 5 );
+        }
+
         private Utilities.CachedValue<bool> _state = new Utilities.CachedValue<bool>(); 
         public override bool State
         {

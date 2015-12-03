@@ -37,6 +37,7 @@ namespace FM
         }
 
         public abstract ManagerJob Selected { get; set; }
+        public virtual void Tick() {}
         public abstract void DoWindowContents( Rect canvas );
         public virtual void PostClose() {}
         public virtual void PostOpen() {}

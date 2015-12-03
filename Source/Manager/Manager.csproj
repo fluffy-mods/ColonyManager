@@ -56,6 +56,7 @@
     <Compile Include="ManagerJobs\ManagerJob_Forestry.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Hunting.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Livestock.cs" />
+    <Compile Include="ManagerTabs\ManagerTab_Power.cs" />
     <Compile Include="Triggers\Trigger_PawnKind.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Forestry.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Hunting.cs" />
