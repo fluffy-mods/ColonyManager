@@ -508,6 +508,10 @@ namespace FM
 
             private void SetWantedRecursive( TrainableDef td, bool wanted )
             {
+                // cop out if nothing changed
+                if ( TrainingTargets[td] == wanted ) return;
+
+                // make changes
                 TrainingTargets[td] = wanted;
                 if ( wanted )
                 {
