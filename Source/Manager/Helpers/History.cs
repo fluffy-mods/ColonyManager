@@ -30,9 +30,9 @@ namespace FM
         private const int Size = 100;
 
         // settings
-        private bool AllowTogglingLegend = true;
-        private bool ShowLegend = true;
-        private bool DrawTargetLine = true;
+        public bool AllowTogglingLegend = true;
+        public bool ShowLegend = true;
+        public bool DrawTargetLine = true;
 
         // interval per period
         private static Dictionary<Period, int> _intervals = new Dictionary<Period, int>();
@@ -71,6 +71,9 @@ namespace FM
             {
                 _chapters.Add( new Chapter( labels[i], Size, colors[i % colors.Length] ) );
             }
+
+            // show all by default
+            _chaptersShown = _chapters;
         }
 
         public void ExposeData()
@@ -122,7 +125,7 @@ namespace FM
         public void DrawPlot( Rect rect, int target = 0, string label = "", List<Chapter> chapters = null, int sign = 1 )
         {
             // if chapters is left default, plot all
-            if ( chapters == null ) chapters = _chapters;
+            if ( chapters == null ) chapters = _chaptersShown;
 
             // stuff we need
             Rect plot = rect.ContractedBy( Utilities.Margin );
@@ -273,6 +276,28 @@ namespace FM
             GUI.EndGroup();
         }
 
+        public void DrawDetailedLegend( Rect canvas, int max )
+        {
+            float rowHeight = 20f;
+            
+            // get list of chapters that have a nonzero entry in this history period.
+            IEnumerable<Chapter> relevantChaptersInOrder = _chapters.Where( chapter => chapter.Active( _periodShown ) )
+                                                             .OrderByDescending( chapter => chapter._hist[_periodShown].Last() );
+
+            // number of columns
+            int entries = relevantChaptersInOrder.Count();
+            int cols =  entries * rowHeight > canvas.height ? 2 : 1;
+
+            // entries per column, inclusive so first column has 1 more for uneven numbers.
+            int rowsPerCol = Mathf.CeilToInt( (float)entries / (float)cols );
+
+            for ( int i = 0; i < entries; i++ )
+            {
+                
+            }
+
+        }
+
         public class ExposableList<T> : List<T>, IExposable
         {
             private List<T> _list = new List<T>();
@@ -340,6 +365,11 @@ namespace FM
 
                 // create a dictionary of histories, one for each period, initialize with a zero to avoid errors.
                 _hist = periods.ToDictionary( k => k, v => new ExposableList<int>( 0 ) );
+            }
+
+            public bool Active( Period period )
+            {
+                return _hist[period].Any( v => v > 0 );
             }
 
             public int ValueAt( Period period, int x , int sign = 1)
