@@ -17,6 +17,8 @@
   <!-- History graphs -->
   <FM.HistoryPeriod>Period</FM.HistoryPeriod>
   <FM.HistoryShowHideLegend>Show/Hide legend</FM.HistoryShowHideLegend>
+  <FM.HistoryClickToEnable>\n\nClick to {0} {1} in plot.\nRight click to show only {1}.</FM.HistoryClickToEnable>
+  <FM.HistoryNoChapters>Nothing to show!</FM.HistoryNoChapters>
   
   <!-- Overview Tab -->
   <FM.Overview>Overview</FM.Overview>

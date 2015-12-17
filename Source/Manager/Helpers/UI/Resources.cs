@@ -40,6 +40,7 @@ namespace FM
             BarBackgroundActiveTexture   = SolidColorMaterials.NewSolidColorTexture( new Color( 0.2f, 0.8f, 0.85f ) ),
             BarBackgroundInactiveTexture = SolidColorMaterials.NewSolidColorTexture( new Color( 0.7f, 0.7f, 0.7f ) ),
             Search                       = ContentFinder<Texture2D>.Get( "UI/Buttons/Search" ),
+            BarShader                    = ContentFinder<Texture2D>.Get( "UI/Misc/BarShader" ),
 
             // livestock header icons
             WoolIcon                     = ContentFinder<Texture2D>.Get( "UI/Icons/wool" ),

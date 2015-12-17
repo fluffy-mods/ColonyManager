@@ -17,15 +17,16 @@ namespace FM
     public class ManagerTab_Power : ManagerTab
     {
         private List<ThingDef> _batteryDefs;
-        private List<ThingDef> _consumerDefs;
-        private List<ThingDef> _producerDefs;
+        private List<ThingDef> _traderDefs;
         private List<List<CompPowerBattery>> _batteries;
-        private List<List<CompPowerTrader>> _producers;
-        private List<List<CompPowerTrader>> _consumers;
-        
-        private History consumptionHistory;
-        private History productionHistory;
+        private List<List<CompPowerTrader>> _traders;
+
+        private History tradingHistory;
         private History overallHistory;
+
+        private Vector2 _overallScrollPos = Vector2.zero;
+        private Vector2 _productionScrollPos = Vector2.zero;
+        private Vector2 _consumptionScrollPos = Vector2.zero;
 
         public override string Label => "FME.Power".Translate();
         public override Texture2D Icon => Resources.UnkownIcon;
@@ -35,30 +36,31 @@ namespace FM
         {
             base.Tick();
 
-            // once in a while, update the list of comps.
+            // once in a while, update the list of comps, and history thingcounts + theoretical maxes (where known).
             if ( Find.TickManager.TicksGame % 2000 == 0 )
             {
+                // get all existing comps for all building defs that have power related comps (in essence, get all powertraders)
                 RefreshCompLists();
+
+                // update these counts in the history tracker + reset maxes if count changed.
+                tradingHistory.UpdateThingCountAndMax( _traders.Select( list => list.Count ).ToArray(), 
+                                                       _traders.Select( list => 0 ).ToArray() );
+
+                // update theoretical max for batteries, and reset observed max.
+                overallHistory.UpdateMax( 0, 0, (int)_batteries.Sum( list => list.Sum( battery => battery.props.storedEnergyMax ) ) );
             }
 
             // update the history tracker.
-            int[] production = GetCurrentProduction();
-            productionHistory.Update(production);
-            int[] consumption = GetCurrentConsumption();
-            consumptionHistory.Update(consumption);
-            overallHistory.Update( production.Sum(), consumption.Sum(), GetCurrentBatteries().Sum() );
+            int[] trade = GetCurrentTrade();
+            tradingHistory.Update( trade );
+            overallHistory.Update( trade.Where( i => i > 0 ).Sum(), trade.Where( i => i < 0 ).Sum( Math.Abs ), GetCurrentBatteries().Sum() );
         }
 
-        private int[] GetCurrentProduction()
+        private int[] GetCurrentTrade()
         {
-            return _producers.Select( list => (int)list.Sum( producer => producer.PowerOutput ) ).ToArray();
+            return _traders.Select( list => (int)list.Sum( trader => trader.PowerOutput ) ).ToArray();
         }
-
-        private int[] GetCurrentConsumption()
-        {
-            return _consumers.Select( list => (int)list.Sum( consumer => - consumer.PowerOutput ) ).ToArray();
-        }
-
+        
         private int[] GetCurrentBatteries()
         {
             return _batteries.Select( list => (int)list.Sum( battery => battery.StoredEnergy ) ).ToArray();
@@ -67,32 +69,43 @@ namespace FM
         public ManagerTab_Power()
         {
             // get list of thingdefs set to use the power comps - this should be static throughout the game (barring added mods midgame)
-            _consumerDefs = GetConsumerDefs().ToList();
-            _producerDefs = GetProducerDefs().ToList();
+            _traderDefs = GetTraderDefs().ToList();
             _batteryDefs = GetBatteryDefs().ToList();
 
             // get a dictionary of powercomps actually existing on the map for each thingdef.
             RefreshCompLists();
 
             // set up the history trackers.
-            consumptionHistory = new History( _consumerDefs.Select( def => def.LabelCap ).ToArray() ) { AllowTogglingLegend = false, ShowLegend = false};
-            productionHistory = new History( _producerDefs.Select( def => def.LabelCap ).ToArray() ) { AllowTogglingLegend = false, ShowLegend = false };
-            overallHistory = new History( new []{"Production", "Consumption", "Batteries"} ) { AllowTogglingLegend = false, ShowLegend = false };
-        }
+            tradingHistory =
+                new History(
+                    _traderDefs.Select(
+                        def => new ThingCount( def, Find.ListerBuildings.AllBuildingsColonistOfDef( def ).Count() ) )
+                               .ToArray() )
+                {
+                    DrawOptions = false,
+                    DrawInlineLegend = false,
+                    Suffix = "W",
+                    DrawInfoInBar = true,
+                    DrawMaxMarkers = true
+                };
 
-        private IEnumerable<ThingDef> GetProducerDefs()
-        {
-            return from td in DefDatabase<ThingDef>.AllDefsListForReading
-                   where td.HasComp( typeof( CompPowerTrader ) )
-                   where td.comps.Any( comp => comp.basePowerConsumption < 0 )
-                   select td;
+            overallHistory = new History( new[] { "Production", "Consumption", "Batteries" } )
+            {
+                DrawOptions = false,
+                DrawInlineLegend = false,
+                Suffix = "W",
+                DrawIcons = false,
+                DrawCounts = false,
+                DrawInfoInBar = true,
+                DrawMaxMarkers = true,
+                MaxPerChapter = true
+            };
         }
         
-        private IEnumerable<ThingDef> GetConsumerDefs()
+        private IEnumerable<ThingDef> GetTraderDefs()
         {
             return from td in DefDatabase<ThingDef>.AllDefsListForReading
                    where td.HasComp( typeof( CompPowerTrader ) )
-                   where td.comps.Any( comp => comp.basePowerConsumption >= 0 )
                    select td;
         }
 
@@ -106,15 +119,10 @@ namespace FM
         private void RefreshCompLists()
         {
             // get list of power trader comps per def for consumers and producers.
-            _producers = _producerDefs.Select( v => Find.ListerBuildings.AllBuildingsColonistOfDef( v )
+            _traders = _traderDefs.Select( def => Find.ListerBuildings.AllBuildingsColonistOfDef( def )
                                                             .Select( t => t.GetComp<CompPowerTrader>() )
                                                             .ToList() )
                                                         .ToList();
-            _consumers = _consumerDefs.Select( v => Find.ListerBuildings.AllBuildingsColonistOfDef( v )
-                                                            .Select( t => t.GetComp<CompPowerTrader>() )
-                                                            .ToList() )
-                                                        .ToList();
-
 
             // get list of lists of powertrader comps per thingdef.
             _batteries = _batteryDefs
@@ -137,9 +145,9 @@ namespace FM
                                             canvas.height - overviewRect.height - Utilities.Margin );
 
             // draw area BG's
-            GUI.DrawTexture( overviewRect, Resources.SlightlyDarkBackground );
-            GUI.DrawTexture( consumtionRect, Resources.SlightlyDarkBackground );
-            GUI.DrawTexture( productionRect, Resources.SlightlyDarkBackground );
+            Widgets.DrawMenuSection( overviewRect );
+            Widgets.DrawMenuSection( consumtionRect );
+            Widgets.DrawMenuSection( productionRect );
 
             // draw contents
             DrawOverview( overviewRect );
@@ -150,23 +158,27 @@ namespace FM
         private void DrawProduction( Rect canvas )
         {
             // setup rects 
-            Rect legendRect = new Rect(canvas.xMin, canvas.yMin, canvas.width, (canvas.height - Utilities.Margin) / 2f);
-            Rect plotRect = new Rect(canvas.xMin, legendRect.yMax + Utilities.Margin, canvas.width, (canvas.height - Utilities.Margin) / 2f);
+            Rect plotRect = new Rect(canvas.xMin, canvas.yMin, canvas.width, (canvas.height - Utilities.Margin) / 2f);
+            Rect legendRect = new Rect(canvas.xMin, plotRect.yMax + Utilities.Margin, canvas.width, (canvas.height - Utilities.Margin) / 2f);
 
             // draw the plot
-            productionHistory.DrawPlot( plotRect );
+            tradingHistory.DrawPlot( plotRect, positiveOnly: true );
 
-
+            // draw the detailed legend
+            tradingHistory.DrawDetailedLegend( legendRect, ref _productionScrollPos, null, true );
         }
 
         private void DrawConsumption( Rect canvas )
         {
             // setup rects 
-            Rect legendRect = new Rect(canvas.xMin, canvas.yMin, canvas.width, (canvas.height - Utilities.Margin) / 2f);
-            Rect plotRect = new Rect(canvas.xMin, legendRect.yMax + Utilities.Margin, canvas.width, (canvas.height - Utilities.Margin) / 2f);
+            Rect plotRect = new Rect(canvas.xMin, canvas.yMin, canvas.width, (canvas.height - Utilities.Margin) / 2f);
+            Rect legendRect = new Rect(canvas.xMin, plotRect.yMax + Utilities.Margin, canvas.width, (canvas.height - Utilities.Margin) / 2f);
 
             // draw the plot
-            consumptionHistory.DrawPlot( plotRect );
+            tradingHistory.DrawPlot( plotRect, negativeOnly: true );
+
+            // draw the detailed legend
+            tradingHistory.DrawDetailedLegend( legendRect, ref _consumptionScrollPos, null, false, true );
         }
 
         private void DrawOverview( Rect canvas )
@@ -178,9 +190,8 @@ namespace FM
             // draw the plot
             overallHistory.DrawPlot( plotRect );
 
-
+            // draw the detailed legend
+            overallHistory.DrawDetailedLegend( legendRect, ref _overallScrollPos, null );
         }
-
-
     }
 }

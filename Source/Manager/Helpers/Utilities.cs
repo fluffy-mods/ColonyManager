@@ -519,5 +519,22 @@ namespace FM
                 TimeSet = Find.TickManager.TicksGame;
             }
         }
+
+        public static void LabelOutline( Rect icon, string label, string tooltip, TextAnchor anchor, float lrMargin, float tbMargin, GameFont font, Color textColour, Color outlineColour )
+        {
+            // horribly inefficient way of getting an outline to show - draw 4 background coloured labels with a 1px offset, then draw the foreground on top.
+            int[] offsets = { - 1, 0, 1 };
+
+            foreach (int xOffset in offsets)
+                foreach ( int yOffset in offsets )
+                {
+                    Rect offsetIcon = icon;
+                    offsetIcon.x += xOffset;
+                    offsetIcon.y += yOffset;
+                    Label( offsetIcon, label, null, anchor, lrMargin, tbMargin, font, outlineColour );
+                }
+
+            Label( icon, label, tooltip, anchor, lrMargin, tbMargin, font, textColour );
+        }
     }
 }
