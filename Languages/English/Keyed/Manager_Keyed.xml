@@ -7,6 +7,14 @@
   <FM.Delete>Delete</FM.Delete>
   <FM.All>All</FM.All>
 
+  <!-- Help and alert messages for the lexically challenged. -->
+  <FM.HelpTitle>Colony Manger V2</FM.HelpTitle>
+  <FM.HelpMessage>Welcome to the Colony Manager V2!\n\nThe colony manager allows you to set targets for production, hunting, logging and animal husbandry. Each of these can be set through the various manager screens, and accessed through the buttons at the top of the window, as well as some other handy screens. \n\nWhen you set a target, a pawn with the manager job enabled will occasionally review your targets and the colony's stockpiles at a manager's desk, and update bills and designations accordingly.\n\n<b>IN ORDER FOR THE MOD TO WORK, YOU NEED TWO THINGS:</b>\n\t1: A pawn with the manager job enabled.\n\t2:A manager's desk.\n\nHappy hunting!</FM.HelpMessage>
+  <FM.AlertNoTableLabel>Need manager's desk</FM.AlertNoTableLabel>
+  <FM.AlertNoTable>Manager targets are set, but no manager's desk is available</FM.AlertNoTable>
+  <FM.AlertNoManagerLabel>Need manager</FM.AlertNoManagerLabel>
+  <FM.AlertNoManager>Manager targets are set, but no pawn has the managing job enabled</FM.AlertNoManager>
+
   <!-- Common -->
   <FM.LastUpdateTooltip>This job was last updated {0} ago.</FM.LastUpdateTooltip>
   <FM.OrderUp>Increase job priority</FM.OrderUp>

@@ -141,7 +141,7 @@ namespace FM
 
             if ( !Manager.Get.HelpShown )
             {
-                Find.WindowStack.Add( new Dialog_Message("FM.ManagerHelp".Translate(), "FM.Manager".Translate()));
+                Find.WindowStack.Add( new Dialog_Message("FM.HelpMessage".Translate(), "FM.HelpTitle".Translate()));
                 Manager.Get.HelpShown = true;
             }
 
