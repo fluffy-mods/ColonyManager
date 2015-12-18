@@ -50,12 +50,12 @@ namespace FM
         private static Dictionary<Period, int> _intervals = new Dictionary<Period, int>();
         private static readonly Texture2D _plotBG         = Resources.SlightlyDarkBackground;
         private static readonly float _yAxisMargin        = 40f;
-        private static Period[] periods                   = (Period[])Enum.GetValues( typeof (Period) );
+        public  static Period[] periods                   = (Period[])Enum.GetValues( typeof (Period) );
 
         // each chapter holds the history for all periods.
         private List<Chapter> _chapters                   = new List<Chapter>();
         private List<Chapter> _chaptersShown              = new List<Chapter>();
-        private Period _periodShown                       = Period.Day;
+        public Period periodShown                         = Period.Day;
 
         // for scribe.
         public History( string[] labels ) : this( labels, null ) {}
@@ -247,8 +247,8 @@ namespace FM
             int sign = negativeOnly ? -1 : 1;
 
             // subset chapters
-            List<Chapter> chapters = _chaptersShown.Where( chapter => !positiveOnly || chapter._hist[_periodShown].Any( i => i > 0 ) )
-                               .Where( chapter => !negativeOnly || chapter._hist[_periodShown].Any( i => i < 0 ) )
+            List<Chapter> chapters = _chaptersShown.Where( chapter => !positiveOnly || chapter._hist[periodShown].Any( i => i > 0 ) )
+                               .Where( chapter => !negativeOnly || chapter._hist[periodShown].Any( i => i < 0 ) )
                                .ToList();
 
             // get out early if no chapters.
@@ -265,7 +265,7 @@ namespace FM
             plot.xMin += _yAxisMargin;
 
             // maximum of all chapters.
-            int max = CeilToPrecision( Math.Max( chapters.Select( c => c.Max( _periodShown, !negativeOnly ) ).Max(), target ) * 1.2f );
+            int max = CeilToPrecision( Math.Max( chapters.Select( c => c.Max( periodShown, !negativeOnly ) ).Max(), target ) * 1.2f );
 
             // size, and pixels per node.
             float w = plot.width;
@@ -280,7 +280,7 @@ namespace FM
             GUI.BeginGroup( plot );
             foreach ( Chapter chapter in chapters )
             {
-                chapter.Plot( _periodShown, plot.AtZero(), wu, hu, sign );
+                chapter.Plot( periodShown, plot.AtZero(), wu, hu, sign );
             }
 
             // handle mouseover events
@@ -291,7 +291,7 @@ namespace FM
                 Vector2 upos = new Vector2(pos.x / wu, (plot.height - pos.y) / hu);
 
                 // get distances
-                float[] distances = chapters.Select( c => Math.Abs( c.ValueAt( _periodShown, (int)upos.x, sign ) - upos.y ) ).ToArray();
+                float[] distances = chapters.Select( c => Math.Abs( c.ValueAt( periodShown, (int)upos.x, sign ) - upos.y ) ).ToArray();
                 
                 // get the minimum index
                 float min = int.MaxValue;
@@ -309,7 +309,7 @@ namespace FM
                 Chapter closest = chapters[minIndex];
 
                 // do minimum stuff.
-                Vector2 realpos = new Vector2( pos.x, plot.height - closest.ValueAt( _periodShown, (int)upos.x, sign ) * hu );
+                Vector2 realpos = new Vector2( pos.x, plot.height - closest.ValueAt( periodShown, (int)upos.x, sign ) * hu );
                 Rect blipRect = new Rect(realpos.x - Utilities.SmallIconSize / 2f, realpos.y - Utilities.SmallIconSize / 2f, Utilities.SmallIconSize, Utilities.SmallIconSize );
                 GUI.color = closest.lineColor;
                 GUI.DrawTexture( blipRect, Resources.StageB );
@@ -317,7 +317,7 @@ namespace FM
 
                 // get orientation of tooltip
                 Vector2 tippos = realpos + new Vector2( Utilities.Margin, Utilities.Margin );
-                string tip = chapters[minIndex].label + ": " + FormatCount( chapters[minIndex].ValueAt( _periodShown, (int)upos.x, sign ));
+                string tip = chapters[minIndex].label + ": " + FormatCount( chapters[minIndex].ValueAt( periodShown, (int)upos.x, sign ));
                 Vector2 tipsize = Text.CalcSize( tip );
                 bool up = false, left = false;
                 if ( tippos.x + tipsize.x > plot.width )
@@ -404,7 +404,7 @@ namespace FM
                         periods.Select(
                             p =>
                                 new FloatMenuOption( "FM.HistoryPeriod".Translate() + ": " + p.ToString(),
-                                                     delegate { _periodShown = p; } ) ).ToList();
+                                                     delegate { periodShown = p; } ) ).ToList();
                     if ( AllowTogglingLegend && _chapters.Count > 1 ) // add option to show/hide legend if appropriate.
                     {
                         options.Add( new FloatMenuOption( "FM.HistoryShowHideLegend".Translate(),
@@ -423,9 +423,9 @@ namespace FM
             int sign = negativeOnly ? -1 : 1;
 
             List<Chapter> ChaptersOrdered = _chapters
-                .Where( chapter => !positiveOnly || chapter._hist[_periodShown].Any( i => i > 0 ) )
-                .Where( chapter => !negativeOnly || chapter._hist[_periodShown].Any( i => i < 0 ) )
-                .OrderByDescending( chapter => chapter.Last( _periodShown ) * sign ).ToList();
+                .Where( chapter => !positiveOnly || chapter._hist[periodShown].Any( i => i > 0 ) )
+                .Where( chapter => !negativeOnly || chapter._hist[periodShown].Any( i => i < 0 ) )
+                .OrderByDescending( chapter => chapter.Last( periodShown ) * sign ).ToList();
 
             // get out early if no chapters.
             if( ChaptersOrdered.Count == 0 )
@@ -438,7 +438,7 @@ namespace FM
             // max 
             float _max = max ?? ( DrawMaxMarkers
                                  ? ChaptersOrdered.Max( chapter => (int)chapter.TMax ) 
-                                 : ChaptersOrdered.FirstOrDefault()?.Last( _periodShown ) * sign )
+                                 : ChaptersOrdered.FirstOrDefault()?.Last( periodShown ) * sign )
                              ?? 0;
             
             // cell height
@@ -474,11 +474,11 @@ namespace FM
                 float maxWidth = barFill.width;
                 if ( MaxPerChapter )
                 {
-                    barFill.width *= ChaptersOrdered[i].Last( _periodShown ) * sign / (float)ChaptersOrdered[i].TMax;
+                    barFill.width *= ChaptersOrdered[i].Last( periodShown ) * sign / (float)ChaptersOrdered[i].TMax;
                 }
                 else
                 {
-                    barFill.width *= ChaptersOrdered[i].Last( _periodShown ) * sign / _max;
+                    barFill.width *= ChaptersOrdered[i].Last( periodShown ) * sign / _max;
                 }
                 
                 GUI.BeginGroup( viewRect );
@@ -518,7 +518,7 @@ namespace FM
                 if ( DrawInfoInBar )
                 {
                     string info = ChaptersOrdered[i].label + ": " +
-                                  FormatCount( ChaptersOrdered[i].Last( _periodShown ) * sign );
+                                  FormatCount( ChaptersOrdered[i].Last( periodShown ) * sign );
 
                     if ( DrawMaxMarkers )
                     {
@@ -540,7 +540,7 @@ namespace FM
                 bool shown = _chaptersShown.Contains( ChaptersOrdered[i] );
 
                 // tooltip on entire row
-                string tooltip = ChaptersOrdered[i].label + ": " + FormatCount( Mathf.Abs( ChaptersOrdered[i].Last( _periodShown ) ) );
+                string tooltip = ChaptersOrdered[i].label + ": " + FormatCount( Mathf.Abs( ChaptersOrdered[i].Last( periodShown ) ) );
                 tooltip += "FM.HistoryClickToEnable".Translate( shown ? "hide" : "show", ChaptersOrdered[i].label );
                 TooltipHandler.TipRegion( row, tooltip);
 

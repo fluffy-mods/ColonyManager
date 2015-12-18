@@ -184,14 +184,50 @@ namespace FM
         private void DrawOverview( Rect canvas )
         {
             // setup rects 
-            Rect legendRect = new Rect( canvas.xMin, canvas.yMin, (canvas.width - Utilities.Margin ) / 2f, canvas.height);
+            Rect legendRect = new Rect( canvas.xMin, canvas.yMin, (canvas.width - Utilities.Margin ) / 2f, canvas.height - Utilities.ButtonSize.y - Utilities.Margin );
             Rect plotRect = new Rect( legendRect.xMax + Utilities.Margin, canvas.yMin, (canvas.width - Utilities.Margin ) / 2f, canvas.height);
+            Rect buttonsRect = new Rect( canvas.xMin, legendRect.yMax + Utilities.Margin, (canvas.width - Utilities.Margin ) / 2f, Utilities.ButtonSize.y );
 
             // draw the plot
             overallHistory.DrawPlot( plotRect );
 
             // draw the detailed legend
             overallHistory.DrawDetailedLegend( legendRect, ref _overallScrollPos, null );
+
+            // draw period switcher
+            Rect periodRect = buttonsRect;
+            periodRect.width /= 2f;
+            
+            // label
+            Utilities.Label( periodRect, "FME.PeriodShown".Translate( tradingHistory.periodShown.ToString() ),
+                             "FME.PeriodShownTooltip".Translate( tradingHistory.periodShown.ToString() ) );
+            
+            // mark interactivity
+            Rect searchIconRect = periodRect;
+            searchIconRect.xMin = searchIconRect.xMax - searchIconRect.height;
+            if( searchIconRect.height > Utilities.SmallIconSize )
+            {
+                // center it.
+                searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - Utilities.SmallIconSize ) / 2 );
+            }
+            GUI.DrawTexture( searchIconRect, Resources.Search );
+            Widgets.DrawHighlightIfMouseover( periodRect );
+            if ( Widgets.InvisibleButton( periodRect ) )
+            {
+                List<FloatMenuOption> periodOptions = new List<FloatMenuOption>();
+                for( int i = 0; i < History.periods.Length; i++ )
+                {
+                    History.Period period = History.periods[i];
+                    periodOptions.Add( new FloatMenuOption( period.ToString(), delegate
+                    {
+                        tradingHistory.periodShown = period;
+                        overallHistory.periodShown = period;
+                    } ) );
+                }
+                Find.WindowStack.Add( new FloatMenu( periodOptions ) );
+            }
+            
+            
         }
     }
 }
