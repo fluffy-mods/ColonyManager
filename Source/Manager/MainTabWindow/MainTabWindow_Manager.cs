@@ -138,6 +138,13 @@ namespace FM
         public override void PreOpen()
         {
             base.PreOpen();
+
+            if ( !Manager.Get.HelpShown )
+            {
+                Find.WindowStack.Add( new Dialog_Message("FM.ManagerHelp".Translate(), "FM.Manager".Translate()));
+                Manager.Get.HelpShown = true;
+            }
+
             CurrentTab.PreOpen();
         }
     }

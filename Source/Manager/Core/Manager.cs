@@ -23,6 +23,7 @@ namespace FM
         private List<ManagerTab> _managerTabsMiddle;
         private List<ManagerTab> _managerTabsRight;
         private JobStack         _stack;
+        public bool              HelpShown;
 
         public List<ManagerTab> ManagerTabs = new List<ManagerTab>
         {
@@ -98,6 +99,7 @@ namespace FM
 
         public override void ExposeData()
         {
+            Scribe_Values.LookValue( ref HelpShown, "HelpShown", false);
             Scribe_Deep.LookDeep( ref _stack, "JobStack" );
             base.ExposeData();
 
