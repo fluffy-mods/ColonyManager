@@ -12,7 +12,7 @@ using UnityEngine;
 using Verse;
 using System.Reflection;
 
-namespace FM
+namespace FluffyManager
 {
     public class ManagerJob_Production : ManagerJob
     {
@@ -326,8 +326,7 @@ namespace FM
             // scribe history in normal load/save only.
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
-                Scribe_Deep.LookDeep( ref History, "History",
-                                      new object[] { new[] { Trigger.ThresholdFilter.Summary } } );
+                Scribe_Deep.LookDeep( ref History, "History" );
             }
         }
 

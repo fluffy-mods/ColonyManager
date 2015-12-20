@@ -10,7 +10,7 @@ using System.Linq;
 using Verse;
 using Verse.AI;
 
-namespace FM
+namespace FluffyManager
 {
     internal class WorkGiver_Manage : WorkGiver_Scanner
     {

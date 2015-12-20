@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class WindowTriggerThresholdDetails : Window
     {

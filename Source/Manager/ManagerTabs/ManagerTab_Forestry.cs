@@ -9,7 +9,7 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     internal class ManagerTab_Forestry : ManagerTab
     {

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class MainProductTracker
     {

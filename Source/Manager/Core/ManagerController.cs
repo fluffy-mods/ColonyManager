@@ -7,7 +7,7 @@
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class Bootstrap : ITab
     {

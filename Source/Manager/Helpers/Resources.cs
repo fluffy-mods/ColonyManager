@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public static class Resources
     {
@@ -32,6 +32,7 @@ namespace FM
             IconImportExport             = ContentFinder<Texture2D>.Get( "UI/Icons/ImportExport" ),
             IconForestry                 = ContentFinder<Texture2D>.Get( "UI/Icons/Tree" ),
             IconLivestock                = ContentFinder<Texture2D>.Get( "UI/Icons/Livestock" ),
+            IconPower                    = ContentFinder<Texture2D>.Get( "UI/Icons/Power" ),
 
             // misc
             SlightlyDarkBackground       = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .4f ),

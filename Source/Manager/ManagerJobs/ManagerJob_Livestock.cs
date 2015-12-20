@@ -12,7 +12,7 @@ using Verse;
 using RimWorld;
 using Verse.Sound;
 
-namespace FM
+namespace FluffyManager
 {
     public class ManagerJob_Livestock : ManagerJob
     {
@@ -108,8 +108,7 @@ namespace FM
             }
 
             // this is an array of strings as the first (and only) parameter - make sure it doesn't get cast to array of objects for multiple parameters.
-            Scribe_Deep.LookDeep( ref _history, "History",
-                                  new object[] { Utilities_Livestock.AgeSexArray.Select( ageSex => ageSex.ToString() ).ToArray() } );
+            Scribe_Deep.LookDeep( ref _history, "History" );
         }
 
         public override bool TryDoJob()

@@ -8,7 +8,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class WindowBillGiverDetails : Window
     {

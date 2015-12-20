@@ -8,7 +8,7 @@
         <label>Manager_Bootstrapper</label>
         <thingClass>Thing</thingClass>
         <inspectorTabs>
-            <li>FM.Bootstrap</li>
+            <li>FluffyManager.Bootstrap</li>
         </inspectorTabs>
     </ThingDef>
 

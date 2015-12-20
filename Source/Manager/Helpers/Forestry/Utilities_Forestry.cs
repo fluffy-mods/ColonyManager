@@ -7,7 +7,7 @@
 using RimWorld;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class Utilities_Forestry
     {

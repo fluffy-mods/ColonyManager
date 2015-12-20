@@ -11,7 +11,7 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class ManagerJob_Forestry : ManagerJob
     {
@@ -85,7 +85,7 @@ namespace FM
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
                 // scribe history
-                Scribe_Deep.LookDeep( ref History, "History", new object[] { new string[] { "stock", "designated" } } );
+                Scribe_Deep.LookDeep( ref History, "History" );
             }
         }
 

@@ -10,7 +10,7 @@ using UnityEngine;
 using Verse;
 using Verse.Sound;
 
-namespace FM
+namespace FluffyManager
 {
     internal class AreaAllowedGUI
     {

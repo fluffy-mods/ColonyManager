@@ -11,12 +11,12 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class ManagerJob_Hunting : ManagerJob
     {
-        private Utilities.CachedValue<int>        _corpseCachedValue     = new Utilities.CachedValue<int>();
-        private Utilities.CachedValue<int>        _designatedCachedValue = new Utilities.CachedValue<int>();
+        private Utilities.CachedValue<int>   _corpseCachedValue     = new Utilities.CachedValue<int>();
+        private Utilities.CachedValue<int>   _designatedCachedValue = new Utilities.CachedValue<int>();
         private readonly float               _margin                = Utilities.Margin;
         public Dictionary<PawnKindDef, bool> AllowedAnimals         = new Dictionary<PawnKindDef, bool>();
         public List<Designation>             Designations           = new List<Designation>();
@@ -126,7 +126,7 @@ namespace FM
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
                 // scribe history
-                Scribe_Deep.LookDeep( ref History, "History", new object[] { new string[] { "stock", "corpses", "designated" }} );
+                Scribe_Deep.LookDeep( ref History, "History" );
             }
         }
 

@@ -6,9 +6,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class Manager : MapComponent
     {
@@ -32,9 +33,16 @@ namespace FM
             new ManagerTab_ImportExport(),
             new ManagerTab_Hunting(),
             new ManagerTab_Forestry(),
-            new ManagerTab_Livestock(),
-            new ManagerTab_Power()
+            new ManagerTab_Livestock()
+            // Power is added by ResearchWorkers.UnlockPowerTab() after the appropriate research is done.
         };
+
+        public void RefreshTabs()
+        {
+            _managerTabsLeft = null;
+            _managerTabsMiddle = null;
+            _managerTabsRight = null;
+        }
 
         public List<ManagerTab> ManagerTabsLeft
         {
@@ -99,9 +107,18 @@ namespace FM
 
         public override void ExposeData()
         {
+            base.ExposeData();
             Scribe_Values.LookValue( ref HelpShown, "HelpShown", false);
             Scribe_Deep.LookDeep( ref _stack, "JobStack" );
-            base.ExposeData();
+
+            foreach ( ManagerTab tab in ManagerTabs )
+            {
+                IExposable exposableTab = tab as IExposable;
+                if ( exposableTab != null )
+                {
+                    Scribe_Deep.LookDeep(ref exposableTab, tab.Label);
+                }
+            }
 
             if ( _stack == null )
             {

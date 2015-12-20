@@ -11,7 +11,7 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public enum AssignedBillGiverOptions
     {
@@ -209,7 +209,7 @@ namespace FM
                     _assignedBills.Add( bill, worker );
                 }
 
-                    // ReSharper disable once UnusedVariable
+                // ReSharper disable once UnusedVariable
                 catch ( Exception e )
                 {
                     error = true;

@@ -6,9 +6,9 @@
 
 using UnityEngine;
 using Verse;
-using Resources = FM.Resources;
+using Resources = FluffyManager.Resources;
 
-namespace FM
+namespace FluffyManager
 {
     public abstract class ManagerTab
     {

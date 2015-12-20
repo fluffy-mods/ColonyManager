@@ -12,7 +12,7 @@ using UnityEngine;
 using Verse;
 using System.Reflection;
 
-namespace FM
+namespace FluffyManager
 {
     public static class Utilities
     {
@@ -535,6 +535,20 @@ namespace FM
                 }
 
             Label( icon, label, tooltip, anchor, lrMargin, tbMargin, font, textColour );
+        }
+
+        public static void Scribe_IntArray( ref List<int> values, string label )
+        {
+            string text = null;
+            if ( Scribe.mode == LoadSaveMode.Saving )
+            {
+                text = String.Join(":", values.ConvertAll(i => i.ToString()).ToArray() );
+            }
+            Scribe_Values.LookValue( ref text, label );
+            if ( Scribe.mode == LoadSaveMode.LoadingVars )
+            {
+                values = text.Split( ":".ToCharArray() ).ToList().ConvertAll( int.Parse );
+            }
         }
     }
 }

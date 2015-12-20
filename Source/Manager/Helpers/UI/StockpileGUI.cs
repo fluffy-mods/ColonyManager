@@ -11,7 +11,7 @@ using UnityEngine;
 using Verse;
 using Verse.Sound;
 
-namespace FM
+namespace FluffyManager
 {
     public class StockpileGUI
     {

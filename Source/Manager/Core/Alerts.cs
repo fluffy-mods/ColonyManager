@@ -2,7 +2,7 @@
 using RimWorld;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     class Alert_NoTable : Alert
     {
@@ -39,7 +39,8 @@ namespace FM
             return
                 Find.ListerPawns.FreeColonistsSpawned.Any(
                     pawn => !pawn.health.Dead && !pawn.Downed &&
-                            pawn.workSettings.WorkIsActive( Utilities.WorkTypeDefOf_Managing ) );
+                            pawn.workSettings.WorkIsActive( Utilities.WorkTypeDefOf_Managing ) ) ||
+                Find.ListerBuildings.ColonistsHaveBuilding( DefDatabase<ThingDef>.GetNamed( "FM_AIManager" ) );
         }
 
         public Alert_NoManager()

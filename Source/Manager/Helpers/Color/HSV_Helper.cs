@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace FM
+namespace FluffyManager
 {
     internal class HSV_Helper
     {

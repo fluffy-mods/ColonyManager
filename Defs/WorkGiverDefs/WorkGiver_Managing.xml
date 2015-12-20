@@ -3,7 +3,7 @@
 
   <WorkGiverDef>
     <defName>ManagerManage</defName>
-    <giverClass>FM.WorkGiver_Manage</giverClass>
+    <giverClass>FluffyManager.WorkGiver_Manage</giverClass>
     <workType>Managing</workType>
     <priorityInType>100</priorityInType>
     <verb>manage</verb>

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using Verse;
 using Verse.AI;
 
-namespace FM
+namespace FluffyManager
 {
     internal class JobDriver_ManagingAtManagingStation : JobDriver
     {
@@ -39,9 +39,9 @@ namespace FM
             }
             Toil toil = new Toil();
             toil.defaultDuration =
-                (int)( comp.Props.Speed * ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
+                (int)( comp.props.Speed * ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
 #if DEBUG_WORKGIVER
-            Log.Message("Pawn stat: " + pawn.GetStatValue(StatDef.Named("ManagingSpeed")) + " (+0.5) Station speed: " + comp.Props.Speed + "Total time: " + toil.defaultDuration);
+            Log.Message("Pawn stat: " + pawn.GetStatValue(StatDef.Named("ManagingSpeed")) + " (+0.5) Station speed: " + comp.props.Speed + "Total time: " + toil.defaultDuration);
 #endif
             toil.defaultCompleteMode = ToilCompleteMode.Delay;
             toil.tickAction =

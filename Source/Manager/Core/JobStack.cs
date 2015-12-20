@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class JobStack : IExposable
     {
@@ -59,15 +59,12 @@ namespace FM
         /// <summary>
         ///     Call the worker for the next available job
         /// </summary>
-        public void TryDoNextJob()
+        public bool TryDoNextJob()
         {
             ManagerJob job = NextJob;
             if ( job == null )
             {
-#if DEBUG_JOBS
-                Log.Message( "Tried to do job, but _stack is empty" );
-#endif
-                return;
+                return false;
             }
 
             // update lastAction
@@ -76,8 +73,9 @@ namespace FM
             // perform next job if no action was taken
             if ( !job.TryDoJob() )
             {
-                TryDoNextJob();
+                return TryDoNextJob();
             }
+            return true;
         }
 
         /// <summary>

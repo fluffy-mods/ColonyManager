@@ -7,9 +7,9 @@
 using System;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
-    internal class CompProperties_ManagerStation : CompProperties
+    public class CompProperties_ManagerStation : CompProperties
     {
         public int Speed;
         public CompProperties_ManagerStation() {}

@@ -52,7 +52,8 @@
     <Compile Include="Helpers\History.cs" />
     <Compile Include="Helpers\Hunting\Utilities_Hunting.cs" />
     <Compile Include="Helpers\Production\Dialog_CreateJobsForIngredients.cs" />
-    <Compile Include="Helpers\UI\Resources.cs" />
+    <Compile Include="Helpers\Research\ResearchWorkers.cs" />
+    <Compile Include="Helpers\Resources.cs" />
     <Compile Include="Helpers\UI\StockpileGUI.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Forestry.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Hunting.cs" />

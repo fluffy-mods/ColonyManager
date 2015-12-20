@@ -11,7 +11,7 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public static class Utilities_Production
     {

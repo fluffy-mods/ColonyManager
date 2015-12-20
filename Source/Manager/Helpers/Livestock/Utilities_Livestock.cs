@@ -10,7 +10,7 @@ using System.Linq;
 using RimWorld;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public static class Utilities_Livestock
     {

@@ -6,22 +6,22 @@
 
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
-    internal class Comp_ManagerStation : ThingComp
+    public class Comp_ManagerStation : ThingComp
     {
         // todo add automatic work setup.
         // todo add research and more workstations.
-        public CompProperties_ManagerStation Props;
+        public CompProperties_ManagerStation props;
 
         public override void Initialize( CompProperties vprops )
         {
             base.Initialize( vprops );
-            Props = vprops as CompProperties_ManagerStation;
-            if ( Props == null )
+            props = vprops as CompProperties_ManagerStation;
+            if ( props == null )
             {
-                Log.Warning( "Props went horribly wrong." );
-                Props = new CompProperties_ManagerStation { Speed = 250 };
+                Log.Warning( "props went horribly wrong." );
+                props = new CompProperties_ManagerStation { Speed = 250 };
             }
         }
     }

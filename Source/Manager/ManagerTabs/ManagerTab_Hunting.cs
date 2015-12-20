@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
-using Resources = FM.Resources;
+using Resources = FluffyManager.Resources;
 
-namespace FM
+namespace FluffyManager
 {
     internal class ManagerTab_Hunting : ManagerTab
     {

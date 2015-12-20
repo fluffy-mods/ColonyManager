@@ -8,7 +8,7 @@ using UnityEngine;
 using Verse;
 using static System.String;
 
-namespace FM
+namespace FluffyManager
 {
     public abstract class Trigger : IExposable
     {

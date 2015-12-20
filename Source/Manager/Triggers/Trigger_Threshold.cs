@@ -9,7 +9,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class Trigger_Threshold : Trigger
     {

@@ -10,7 +10,7 @@ using System.Globalization;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class ThingFilterUI
     {

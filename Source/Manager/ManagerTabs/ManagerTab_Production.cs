@@ -12,7 +12,7 @@ using System.Text;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class ManagerTab_Production : ManagerTab
     {

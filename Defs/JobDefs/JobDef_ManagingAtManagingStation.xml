@@ -3,7 +3,7 @@
 
   <JobDef>
 		<defName>ManagingAtManagingStation</defName>
-		<driverClass>FM.JobDriver_ManagingAtManagingStation</driverClass>
+		<driverClass>FluffyManager.JobDriver_ManagingAtManagingStation</driverClass>
 		<reportString>Doing essential conolony management at TargetA.</reportString>
     <alwaysShowWeapon>false</alwaysShowWeapon>
 	</JobDef>

@@ -14,7 +14,7 @@ using System.Security.Permissions;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class History : IExposable
     {
@@ -58,8 +58,8 @@ namespace FM
         public Period periodShown                         = Period.Day;
 
         // for scribe.
-        public History( string[] labels ) : this( labels, null ) {}
-
+        public History() {}
+        
         public History( string[] labels, Color[] colors = null )
         {
 #if DEBUG
@@ -87,13 +87,12 @@ namespace FM
                 _chapters.Add( new Chapter( labels[i], Size, colors[i % colors.Length] ) );
             }
 
-            // show all by default and after load.
+            // show all by default
             _chaptersShown.AddRange( _chapters );
         }
-
+        
         public History( ThingCount[] thingCounts, Color[] colors = null )
         {
-            Log.Message( "History created" + string.Join( ", ", thingCounts.Select( tc => tc.thingDef.LabelCap ).ToArray() ) );
             // get range of colors if not set
             if( colors == null )
             {
@@ -116,7 +115,7 @@ namespace FM
                 _chapters.Add( new Chapter( thingCounts[i], Size, colors[i % colors.Length] ) );
             }
 
-            // show all by default and after load.
+            // show all by default
             _chaptersShown.AddRange( _chapters );
         }
 
@@ -132,9 +131,18 @@ namespace FM
             Scribe_Values.LookValue( ref DrawCounts, "DrawCounts", true );
             Scribe_Values.LookValue( ref DrawInfoInBar, "DrawInfoInBar", false );
             Scribe_Values.LookValue( ref DrawMaxMarkers, "DrawMaxMarkers", true );
+            Scribe_Values.LookValue( ref MaxPerChapter, "MaxPerChapter", false );
 
             // history chapters
             Scribe_Collections.LookList( ref _chapters, "Chapters", LookMode.Deep );
+
+            // some post load tweaks
+            if ( Scribe.mode == LoadSaveMode.PostLoadInit )
+            {
+                // set chapters shown to the newly loaded chapters (instead of the default created empty chapters).
+                _chaptersShown.Clear();
+                _chaptersShown.AddRange(_chapters);
+            }
         }
 
         public static int Interval( Period period )
@@ -220,7 +228,7 @@ namespace FM
 
             for( int i = 0; i < maxes.Length; i++ )
             {
-                _chapters[i].TMax = maxes[i];
+                _chapters[i].TrueMax = maxes[i];
             }
         }
 
@@ -235,7 +243,7 @@ namespace FM
             {
                 if ( _chapters[i].ThingCount.count != counts[i] )
                 {
-                    _chapters[i].TMax = maxes[i];
+                    _chapters[i].TrueMax = maxes[i];
                     _chapters[i].ThingCount.count = counts[i];
                 }
             }
@@ -247,8 +255,8 @@ namespace FM
             int sign = negativeOnly ? -1 : 1;
 
             // subset chapters
-            List<Chapter> chapters = _chaptersShown.Where( chapter => !positiveOnly || chapter._hist[periodShown].Any( i => i > 0 ) )
-                               .Where( chapter => !negativeOnly || chapter._hist[periodShown].Any( i => i < 0 ) )
+            List<Chapter> chapters = _chaptersShown.Where( chapter => !positiveOnly || chapter.pages[periodShown].Any( i => i > 0 ) )
+                               .Where( chapter => !negativeOnly || chapter.pages[periodShown].Any( i => i < 0 ) )
                                .ToList();
 
             // get out early if no chapters.
@@ -423,8 +431,8 @@ namespace FM
             int sign = negativeOnly ? -1 : 1;
 
             List<Chapter> ChaptersOrdered = _chapters
-                .Where( chapter => !positiveOnly || chapter._hist[periodShown].Any( i => i > 0 ) )
-                .Where( chapter => !negativeOnly || chapter._hist[periodShown].Any( i => i < 0 ) )
+                .Where( chapter => !positiveOnly || chapter.pages[periodShown].Any( i => i > 0 ) )
+                .Where( chapter => !negativeOnly || chapter.pages[periodShown].Any( i => i < 0 ) )
                 .OrderByDescending( chapter => chapter.Last( periodShown ) * sign ).ToList();
 
             // get out early if no chapters.
@@ -437,7 +445,7 @@ namespace FM
 
             // max 
             float _max = max ?? ( DrawMaxMarkers
-                                 ? ChaptersOrdered.Max( chapter => (int)chapter.TMax ) 
+                                 ? ChaptersOrdered.Max( chapter => (int)chapter.TrueMax ) 
                                  : ChaptersOrdered.FirstOrDefault()?.Last( periodShown ) * sign )
                              ?? 0;
             
@@ -474,7 +482,7 @@ namespace FM
                 float maxWidth = barFill.width;
                 if ( MaxPerChapter )
                 {
-                    barFill.width *= ChaptersOrdered[i].Last( periodShown ) * sign / (float)ChaptersOrdered[i].TMax;
+                    barFill.width *= ChaptersOrdered[i].Last( periodShown ) * sign / (float)ChaptersOrdered[i].TrueMax;
                 }
                 else
                 {
@@ -503,7 +511,7 @@ namespace FM
                 if( DrawMaxMarkers )
                 {
                     Rect ghostBarFill = barFill;
-                    ghostBarFill.width = MaxPerChapter ? maxWidth : maxWidth * ( ChaptersOrdered[i].TMax / _max );
+                    ghostBarFill.width = MaxPerChapter ? maxWidth : maxWidth * ( ChaptersOrdered[i].TrueMax / _max );
                     GUI.color = new Color( 1f, 1f, 1f, .2f );
                     GUI.DrawTexture( ghostBarFill, ChaptersOrdered[i].Texture ); // coloured texture
                     GUI.color = Color.white;
@@ -522,7 +530,7 @@ namespace FM
 
                     if ( DrawMaxMarkers )
                     {
-                        info += " / " + FormatCount( ChaptersOrdered[i].TMax );
+                        info += " / " + FormatCount( ChaptersOrdered[i].TrueMax );
                     }
 
                     // offset label a bit downwards and to the right
@@ -574,89 +582,38 @@ namespace FM
             }
             Widgets.EndScrollView();
         }
-
-        public class ExposableList<T> : List<T>, IExposable
-        {
-            private List<T> _list = new List<T>();
-
-            // get / set the items in here.
-            private List<T> InnerList
-            {
-                get
-                {
-                    List<T> temp = new List<T>();
-                    foreach ( T item in this )
-                    {
-                        temp.Add( item );
-                    }
-                    return temp;
-                }
-                set
-                {
-                    Clear();
-                    foreach ( T item in value )
-                    {
-                        Add( item );
-                    }
-                }
-            }
-
-            // only provide an init constructor and a blank one.
-            public ExposableList() {}
-            public ExposableList( T init ) : base( new[] { init } ) {}
-
-            public void ExposeData()
-            {
-                // get ready for saving
-                if ( Scribe.mode == LoadSaveMode.Saving )
-                {
-                    _list = InnerList;
-                }
-                
-                // the actual work 
-                Scribe_Collections.LookList( ref _list, "List", LookMode.Value );
-                
-                // after loading raw data
-                if ( Scribe.mode == LoadSaveMode.PostLoadInit )
-                {
-                    InnerList = _list;
-                }
-            }
-        }
-
+        
         public class Chapter : IExposable
         {
-            public Dictionary<Period, ExposableList<int>> _hist            = new Dictionary<Period, ExposableList<int>>();
+            public Dictionary<Period, List<int>> pages                     = new Dictionary<Period, List<int>>();
             public string                                 label            = String.Empty;
             public Color                                  lineColor        = DefaultLineColor;
             public Texture2D                              _texture;
             public int                                    size             = Size;
-            public ThingCount                             ThingCount;
+            public ThingCount                             ThingCount       = new ThingCount();
             private int                                   _observedMax     = -1;
             private int                                   _specificMax     = -1;
 
-            // scribe
-            public Chapter() {}
+            public Chapter()
+            {
+                // empty for scribe.
+                // create a dictionary of histories, one for each period, initialize with a zero to avoid errors.
+                pages = periods.ToDictionary( k => k, v => new List<int>( new [] { 0 } ) );
+            }
 
-            public Chapter( string label, int size, Color color )
+            public Chapter( string label, int size, Color color ) : this()
             {
                 this.label = label;
                 this.size = size;
                 lineColor = color;
-
-                // create a dictionary of histories, one for each period, initialize with a zero to avoid errors.
-                _hist = periods.ToDictionary( k => k, v => new ExposableList<int>( 0 ) );
             }
 
-            public Chapter( ThingCount thingCount, int size, Color color )
+            public Chapter( ThingCount thingCount, int size, Color color ) : this()
             {
                 this.label = thingCount.thingDef.LabelCap;
                 this.ThingCount = thingCount;
                 this.size = size;
                 lineColor = color;
-
-                // create a dictionary of histories, one for each period, initialize with a zero to avoid errors.
-                _hist = periods.ToDictionary( k => k, v => new ExposableList<int>( 0 ) );
             }
 
             public Texture2D Texture
@@ -673,18 +630,18 @@ namespace FM
 
             public bool Active( Period period )
             {
-                return _hist[period].Any( v => v > 0 );
+                return pages[period].Any( v => v > 0 );
             }
 
             public int Last( Period period )
             {
-                return _hist[period].Last();
+                return pages[period].Last();
             }
 
             public int ValueAt( Period period, int x , int sign = 1)
             {
-                if ( x < 0 || x >= _hist[period].Count ) return -1;
-                return _hist[period][x] * sign;
+                if ( x < 0 || x >= pages[period].Count ) return -1;
+                return pages[period][x] * sign;
             }
 
             public void ExposeData()
@@ -692,12 +649,24 @@ namespace FM
                 Scribe_Values.LookValue( ref label, "label" );
                 Scribe_Values.LookValue( ref size, "size", 100 );
                 Scribe_Values.LookValue( ref lineColor, "color", Color.white );
-                Scribe_Deep.LookDeep( ref ThingCount, "thingCount" );
-                // TODO: RimWorld A13 - change to bytearray scribing.
-                Scribe_Collections.LookDictionary( ref _hist, "pages", LookMode.Value, LookMode.Deep );
+                Scribe_Values.LookValue( ref ThingCount.count, "thingCount_count" );
+                Scribe_Defs.LookDef( ref ThingCount.thingDef, "thingCount_def" );
+
+                List<Period> periods = new List<Period>( pages.Keys );
+                foreach ( Period period in periods )
+                {
+                    List<int> values = pages[period];
+                    Utilities.Scribe_IntArray( ref values, period.ToString() );
+
+#if DEBUG_SCRIBE
+                    Log.Message( Scribe.mode + " for " + label + ", daycount: " + pages[Period.Day].Count );
+#endif
+
+                    pages[period] = values;
+                }
             }
 
-            public int TMax
+            public int TrueMax
             {
                 get { return Mathf.Max( _observedMax, _specificMax, 1 ); }
                 set
@@ -714,13 +683,13 @@ namespace FM
                 {
                     if ( curTick % Interval( period ) == 0 )
                     {
-                        _hist[period].Add( count );
+                        pages[period].Add( count );
                         if ( Mathf.Abs( count ) > _observedMax ) _observedMax = Mathf.Abs( count );
 
                         // cull the list back down to size.
-                        while ( _hist[period].Count > Size )
+                        while ( pages[period].Count > Size )
                         {
-                            _hist[period].RemoveAt( 0 );
+                            pages[period].RemoveAt( 0 );
                         }
                     }
                 }
@@ -728,14 +697,14 @@ namespace FM
 
             public int Max( Period period, bool positive = true )
             {
-                return positive ? _hist[period].Max() : Math.Abs( _hist[period].Min() );
+                return positive ? pages[period].Max() : Math.Abs( pages[period].Min() );
             }
 
             public void Plot( Period period, Rect canvas, float wu, float hu, int sign = 1 )
             {
-                if( _hist[period].Count > 1 )
+                if( pages[period].Count > 1 )
                 {
-                    List<int> hist = _hist[period];
+                    List<int> hist = pages[period];
                     for( int i = 0; i < hist.Count - 1; i++ ) // line segments, so up till n-1
                     {
                         Vector2 start = new Vector2( wu * i, canvas.height - hu * hist[i] * sign );

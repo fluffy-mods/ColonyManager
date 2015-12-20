@@ -11,7 +11,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace FM
+namespace FluffyManager
 {
     public class Dialog_CreateJobsForIngredients : Window
     {

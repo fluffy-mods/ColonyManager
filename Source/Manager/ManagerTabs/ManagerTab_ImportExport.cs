@@ -13,9 +13,9 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 using Verse;
-using Resources = FM.Resources;
+using Resources = FluffyManager.Resources;
 
-namespace FM
+namespace FluffyManager
 {
     internal class ManagerTab_ImportExport : ManagerTab
     {
