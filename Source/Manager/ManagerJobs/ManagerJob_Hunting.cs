@@ -22,7 +22,7 @@ namespace FluffyManager
         public List<Designation>             Designations           = new List<Designation>();
         public Area                          HuntingGrounds;
         public new Trigger_Threshold         Trigger;
-        public static bool                   UnforbidCorpses        = true;
+        public bool                          UnforbidCorpses        = true;
         public History                       History;
 
         public override bool Completed
@@ -48,9 +48,13 @@ namespace FluffyManager
             }
         }
 
-        public static List<Thing> Corpses
+        public List<Corpse> Corpses
         {
-            get { return Find.ListerThings.ThingsInGroup( ThingRequestGroup.Corpse ) ?? new List<Thing>(); }
+            get
+            {
+                List<Corpse> corpses = Find.ListerThings.ThingsInGroup( ThingRequestGroup.Corpse ).ConvertAll( thing => thing as Corpse);
+                return corpses.Where( thing => AllowedAnimals.ContainsKey(thing.innerPawn.kindDef) && AllowedAnimals[thing.innerPawn.kindDef] ).ToList();
+            }
         }
 
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Hunting;
@@ -221,18 +225,15 @@ namespace FluffyManager
                 workDone = true;
             }
 
-            return workDone;
-        }
-
-        public static void GlobalWork()
-        {
             // unforbid if required
             if( UnforbidCorpses )
             {
-                DoUnforbidCorpses();
+                DoUnforbidCorpses( ref workDone );
             }
+        
+            return workDone;
         }
-
+        
         private void CleanAreaDesignations()
         {
             // huntinggrounds of null denotes unrestricted
@@ -286,12 +287,11 @@ namespace FluffyManager
 
         // copypasta from autohuntbeacon by Carry
         // https://ludeon.com/forums/index.php?topic=8930.0
-        private static void DoUnforbidCorpses()
+        private void DoUnforbidCorpses( ref bool workDone )
         {
-            foreach ( Thing current in Corpses )
+            foreach ( Corpse corpse in Corpses )
             {
-                Corpse corpse = current as Corpse;
-
+                
                 // don't unforbid corpses in storage - we're going to assume they were manually set.
                 if ( corpse != null &&
                      !corpse.IsInAnyStorage() &&
@@ -303,7 +303,7 @@ namespace FluffyManager
                          comp.Stage == RotStage.Fresh )
                     {
                         // unforbid
-                        // note: this doesn't count as work
+                        workDone = true;
                         corpse.SetForbidden( false, false );
                     }
                 }
@@ -397,6 +397,38 @@ namespace FluffyManager
         public override void Tick()
         {
             History.Update( Trigger.CurCount, GetMeatInCorpses(), GetMeatInDesignations() );
+        }
+
+        private List<ThingDef> _humanLikeMeatDefs;
+
+        public List<ThingDef> HumanLikeMeatDefs
+        {
+            get
+            {
+                if ( _humanLikeMeatDefs == null )
+                {
+                    List<ThingDef> humanLikeRaces =
+                        DefDatabase<ThingDef>.AllDefsListForReading.Where( def => def.category == ThingCategory.Pawn &&
+                                                                                  def.race.Humanlike && 
+                                                                                  def.race.isFlesh )
+                                             .ToList();
+
+                    _humanLikeMeatDefs = new List<ThingDef>();
+                    foreach ( ThingDef sourceDef in humanLikeRaces )
+                    {
+                        _humanLikeMeatDefs.Add( DefDatabase<ThingDef>.GetNamed( sourceDef.defName + "_Meat" ) );
+                    }
+                }
+                return _humanLikeMeatDefs;
+            }
+        } 
+
+        public void AllowHumanLikeMeat( bool allow )
+        {
+            foreach ( ThingDef meatDef in HumanLikeMeatDefs )
+            {
+                Trigger.ThresholdFilter.SetAllow(meatDef, allow);
+            }
         }
     }
 }

@@ -165,12 +165,7 @@ namespace FluffyManager
             DeepProfiler.Start( "Global work for production manager" );
             ManagerJob_Production.GlobalWork();
             DeepProfiler.End();
-
-            // unforbid corpses.
-            DeepProfiler.Start( "Global work for hunting manager" );
-            ManagerJob_Hunting.GlobalWork();
-            DeepProfiler.End();
-
+            
             // clear turbine cells.
             DeepProfiler.Start( "Global work for forestry manager" );
             ManagerJob_Forestry.GlobalWork();

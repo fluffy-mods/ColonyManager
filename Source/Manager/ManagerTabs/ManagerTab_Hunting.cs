@@ -108,18 +108,18 @@ namespace FluffyManager
                                   _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.HumanMeat ),
                                   delegate
                                   {
-                                      _selected.Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, true );
+                                      _selected.AllowHumanLikeMeat( true );
                                   },
                                   delegate
                                   {
-                                      _selected.Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, false );
+                                      _selected.AllowHumanLikeMeat( false );
                                   } );
             cur.y += _entryHeight;
 
             // unforbid corpses (3)
             Rect ufCorpseRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Widgets.DrawAltRect( ufCorpseRect );
-            Utilities.DrawToggle( ufCorpseRect, "FMH.UnforbidCorpses".Translate(), ref ManagerJob_Hunting.UnforbidCorpses );
+            Utilities.DrawToggle( ufCorpseRect, "FMH.UnforbidCorpses".Translate(), ref _selected.UnforbidCorpses );
             cur.y += _entryHeight;
 
             // hunting grounds (4)
