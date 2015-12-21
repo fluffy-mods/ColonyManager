@@ -118,7 +118,7 @@
 
 	<ThingDef ParentName="BenchBase">
 		<DefName>FM_AIManager</DefName>
-		<label>artificial intelligence mananger</label>
+		<label>AI manager</label>
 		<ThingClass>FluffyManager.Building_AIManager</ThingClass>
 		<Description>An enormous supercomputer capable of autonously managing your colony. Claims that the AI has a malevolent psychopath subroutine are entirely false. We promise.</Description>
 		<graphicData>
