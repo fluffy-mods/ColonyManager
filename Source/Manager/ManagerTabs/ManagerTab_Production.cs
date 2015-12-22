@@ -56,7 +56,7 @@ namespace FluffyManager
             set
             {
                 _selected = (ManagerJob_Production)value;
-                _selected?.ForceRecache();
+                _selected?.ForceRecacheOtherRecipe();
                 if ( _selected != null && _selected.Managed && Source != SourceOptions.Current )
                 {
                     Source = SourceOptions.Current;
@@ -280,7 +280,7 @@ namespace FluffyManager
                             Action action = delegate
                             {
                                 _selected.SetNewRecipe( recipe );
-                                _selected.ForceRecache();
+                                _selected.ForceRecacheOtherRecipe();
                             };
                             options.Add( new FloatMenuOption( label, action ) );
                         }
@@ -512,7 +512,7 @@ namespace FluffyManager
         {
             base.PreOpen();
             Refresh();
-            if (_selected != null && _selected.Managed) _selected.ForceRecache();
+            if (_selected != null && _selected.Managed) _selected.ForceRecacheOtherRecipe();
         }
     }
 }

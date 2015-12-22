@@ -7,10 +7,14 @@
 using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 using Verse;
 using System.Reflection;
+#if DEBUG_JOBS
+using System.Text;
+#endif
 
 namespace FluffyManager
 {
@@ -32,6 +36,10 @@ namespace FluffyManager
         public bool                  maxSkil;
         public List<RecipeDef>       OtherRecipeDefs                        = new List<RecipeDef>();
         public new Trigger_Threshold Trigger;
+
+#if DEBUG_JOBS
+        public static StringBuilder  debug                                  = new StringBuilder();
+#endif
 
         public override bool Completed
         {
@@ -111,16 +119,11 @@ namespace FluffyManager
 #endif
 
                             // skip workgiver if it applies only to pawns (cooks are not repairers!)
-                            if ( workGiver.billGiversAllAnimals
-                                 ||
-                                 workGiver.billGiversAllAnimalsCorpses
-                                 ||
-                                 workGiver.billGiversAllHumanlikes
-                                 ||
-                                 workGiver.billGiversAllHumanlikesCorpses
-                                 ||
-                                 workGiver.billGiversAllMechanoids
-                                 ||
+                            if ( workGiver.billGiversAllAnimals ||
+                                 workGiver.billGiversAllAnimalsCorpses ||
+                                 workGiver.billGiversAllHumanlikes ||
+                                 workGiver.billGiversAllHumanlikesCorpses ||
+                                 workGiver.billGiversAllMechanoids ||
                                  workGiver.billGiversAllMechanoidsCorpses )
                             {
                                 continue;
@@ -163,7 +166,7 @@ namespace FluffyManager
             History = new History( new[] { Trigger.ThresholdFilter.Summary } );
         }
 
-        public void ForceRecache()
+        public void ForceRecacheOtherRecipe()
         {
             _timeSinceLastOtherRecipeCheck = _recacheThreshold;
         }
@@ -219,7 +222,7 @@ namespace FluffyManager
             BillGivers = new BillGiverTracker( this );
 
             // set the last cache time so it gets updated.
-            _timeSinceLastOtherRecipeCheck = _recacheThreshold;
+            ForceRecacheOtherRecipe();
 
             // null targets cache so it gets updated
             _targets = null;
@@ -230,6 +233,12 @@ namespace FluffyManager
         /// </summary>
         public static void GlobalWork()
         {
+#if DEBUG_JOBS
+            var watch = Stopwatch.StartNew();
+            debug = new StringBuilder();
+            debug.AppendLine( "Manager :: Starting global priority check" );
+#endif
+
             // get a list of all assigned bills, their worktables, and the priority of the job they belong to.
             List<BillTablePriority> all = new List<BillTablePriority>();
             foreach ( ManagerJob_Production job in Manager.Get.JobStack.FullStack<ManagerJob_Production>() )
@@ -245,6 +254,14 @@ namespace FluffyManager
                 return;
             }
 
+#if DEBUG_JOBS
+            debug.AppendLine( "All currently managed bills:" );
+            foreach ( BillTablePriority entry in all )
+            {
+                debug.AppendLine( " - " + entry.ToString() );
+            }
+#endif
+
             // loop through distinct worktables that have more than one bill
             foreach (
                 Building_WorkTable table in
@@ -256,9 +273,7 @@ namespace FluffyManager
 
                 // get all actual bills on the table (private field)
                 object rawBillsOnTable;
-                if (
-                    !Utilities.TryGetPrivateField( table.billStack.GetType(), table.billStack, "bills",
-                                                   out rawBillsOnTable ) )
+                if ( !Utilities.TryGetPrivateField( table.billStack.GetType(), table.billStack, "bills", out rawBillsOnTable ) )
                 {
                     Log.Warning( "Failed to get real billstack for " + table );
                     continue;
@@ -271,6 +286,20 @@ namespace FluffyManager
                     Log.Warning( "Failed to convert real billstack for " + table );
                     continue;
                 }
+
+#if DEBUG_JOBS
+                debug.AppendLine();
+                debug.AppendLine( "Bills for table " + table.GetUniqueLoadID() + " (managed):" );
+                foreach( Bill bill in managerBills )
+                {
+                    debug.AppendLine( " - " + bill.GetUniqueLoadID() );
+                }
+                debug.AppendLine( "Bills for table " + table.GetUniqueLoadID() + " (on table):" );
+                foreach( Bill bill in billsOnTable )
+                {
+                    debug.AppendLine( " - " + bill.GetUniqueLoadID() );
+                }
+#endif
 
                 // get the set difference of the two lists - these are external/manual bills
                 List<Bill> manualBills = billsOnTable.Except( managerBills ).ToList();
@@ -293,7 +322,37 @@ namespace FluffyManager
                 {
                     Log.Warning( "Failed to set billstack for " + table );
                 }
+
+#if DEBUG_JOBS
+                // fetch the list again to see what happened.
+                // get all actual bills on the table (private field)
+                if( !Utilities.TryGetPrivateField( table.billStack.GetType(), table.billStack, "bills", out rawBillsOnTable ) )
+                {
+                    Log.Warning( "Failed to get real billstack for " + table );
+                    continue;
+                }
+
+                // give it it's type back.
+                billsOnTable = rawBillsOnTable as List<Bill>;
+                if( billsOnTable == null )
+                {
+                    Log.Warning( "Failed to convert real billstack for " + table );
+                    continue;
+                }
+
+                debug.AppendLine( "Bills for table " + table.GetUniqueLoadID() + " (after priority sort):" );
+                foreach( Bill bill in billsOnTable )
+                {
+                    debug.AppendLine( " - " + bill.GetUniqueLoadID() );
+                }
+#endif
             }
+
+#if DEBUG_JOBS
+            watch.Stop();
+            debug.AppendLine( "Execution time: " + watch.ElapsedMilliseconds + "ms" );
+            Log.Message( debug.ToString() );
+#endif
         }
 
         public override void ExposeData()
@@ -336,17 +395,26 @@ namespace FluffyManager
         /// <returns></returns>
         public override bool TryDoJob()
         {
+#if DEBUG_JOBS
+            var watch = Stopwatch.StartNew();
+            debug = new StringBuilder();
+            debug.AppendLine( "Manager :: Doing work for " + Bill.GetUniqueLoadID() );
+#endif
+
             // flag to see if anything meaningful was done, if false at end, manager will also do next job.
             bool actionTaken = false;
 
             if ( Trigger.State )
             {
+#if DEBUG_JOBS
+                debug.AppendLine( "Job is ACTIVE, commencing work " );
+#endif
 
                 // BillGivers that we should work with.
                 List<Building_WorkTable> workers = BillGivers.SelectedBillGivers;
 
-                // clean up bills on workstations that do not meet selection criteria (area, count, etc) (anymore).
-                CleanNoLongerAllowedBillgivers( workers, BillGivers.AssignedBillGiversAndBillsDictionary,
+                // Delete assigned bills on billgivers that are invalid (no longer allowed / deleted).
+                CleanBillgivers( workers, BillGivers.AssignedBillGiversAndBillsDictionary,
                                                 ref actionTaken );
 
                 // check if there's places we need to add the bill.
@@ -354,7 +422,14 @@ namespace FluffyManager
                 {
                     Building_WorkTable worker = workers[workerIndex];
 #if DEBUG_JOBS
-                    Log.Message( "Checking worker " + worker.LabelCap );
+                    debug.AppendLine( "Checking workstation " + worker.GetUniqueLoadID() + " for changes to be made." );
+                    debug.AppendLine( "Current bills in billstack:" );
+                    foreach ( Bill bill in worker.BillStack )
+                    {
+                        bool match = BillGivers.AssignedBillGiversAndBillsDictionary.Contains(
+                                new KeyValuePair<Bill_Production, Building_WorkTable>( bill as Bill_Production, worker ) );
+                        debug.AppendLine( " - " + bill.GetUniqueLoadID() + (match ? "<- match!" : "") );
+                    }
 #endif
                     bool billPresent = false;
 
@@ -367,24 +442,7 @@ namespace FluffyManager
                         foreach ( Bill t in worker.BillStack )
                         {
                             Bill_Production thatBill = t as Bill_Production;
-
-#if DEBUG_JOBS
-                            string debugMsg = "Managed bills: (checking: " + t.GetUniqueLoadID() + ")";
-                            foreach(
-                                KeyValuePair<Bill_Production, Building_WorkTable> pair in
-                                    BillGivers.AssignedBillGiversAndBillsDictionary )
-                            {
-                                debugMsg += "\n" + pair.Key.GetUniqueLoadID();
-                                if (
-                                    BillGivers.AssignedBillGiversAndBillsDictionary.Contains(
-                                        new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )
-                                {
-                                    debugMsg += " <- match!";
-                                }
-                            }
-                            Log.Message(debugMsg);
-#endif
-
+                            
                             // if there is a bill, and it's managed by us, check to see if it's up-to-date.
                             if( thatBill != null &&
                                  thatBill.recipe == Bill.recipe &&
@@ -396,7 +454,7 @@ namespace FluffyManager
                                      thatBill.repeatCount == 0 )
                                 {
 #if DEBUG_JOBS
-                                    Log.Message( "Trying to unsuspend and/or bump targetCount" );
+                                    debug.AppendLine( "Trying to unsuspend and/or bump targetCount" );
 #endif
                                     thatBill.suspended = Bill.suspended;
                                     thatBill.repeatCount = this.CountPerWorker( workerIndex );
@@ -409,14 +467,14 @@ namespace FluffyManager
                         }
                     }
 #if DEBUG_JOBS
-                    Log.Message( "Billstack scanned, bill was " + ( billPresent ? "" : "not " ) + "set" );
+                    debug.AppendLine( "Billstack scanned, bill was " + ( billPresent ? "" : "not " ) + "set" );
 #endif
 
                     // if bill wasn't present, add it.
                     if ( !billPresent )
                     {
 #if DEBUG_JOBS
-                        Log.Message( "Trying to add bill" );
+                        debug.AppendLine( "Trying to add bill" );
 #endif
                         Bill_Production copy = Bill.Copy();
                         copy.repeatMode = BillRepeatMode.RepeatCount;
@@ -424,13 +482,32 @@ namespace FluffyManager
                         worker.BillStack?.AddBill( copy );
                         BillGivers.AssignedBillGiversAndBillsDictionary.Add( copy, worker );
                         actionTaken = true;
+
+#if DEBUG_JOBS
+                        debug.AppendLine( "Worker (" + worker.GetUniqueLoadID() + ") billstack after work is done:" );
+                        foreach( Bill bill in worker.BillStack )
+                        {
+                            debug.AppendLine( " - " + bill.GetUniqueLoadID() );
+                        }
+#endif
                     }
                 }
             }
             else // Trigger false, clean up.
             {
+#if DEBUG_JOBS
+                debug.AppendLine( "Job is INACTIVE, cleaning up." );
+#endif
                 CleanUp();
             }
+
+#if DEBUG_JOBS
+            debug.AppendLine( "Done. " + ( actionTaken ? "Action" : "NO action" ) + " was taken." );
+            watch.Stop();
+            debug.AppendLine( "Execution time: " + watch.ElapsedMilliseconds + "ms" );
+            Log.Message( debug.ToString() );
+#endif
+
             return actionTaken;
         }
 
@@ -440,29 +517,36 @@ namespace FluffyManager
         /// <param name="workers">Allowed workstations</param>
         /// <param name="assignedBills">Managed bills/workstations</param>
         /// <param name="actionTaken">Was anything done?</param>
-        private void CleanNoLongerAllowedBillgivers( List<Building_WorkTable> workers,
-                                                     Dictionary<Bill_Production, Building_WorkTable> assignedBills,
-                                                     ref bool actionTaken )
+        private void CleanBillgivers( List<Building_WorkTable> workers,
+                                      Dictionary<Bill_Production, Building_WorkTable> assignedBills,
+                                      ref bool actionTaken )
         {
 #if DEBUG_JOBS
-            Log.Message( "Cleaning no longer allowed billgivers" );
+            debug.AppendLine( "Cleaning no longer allowed billgivers:" );
 #endif
-            Dictionary<Bill_Production, Building_WorkTable> toBeDeleted =
-                new Dictionary<Bill_Production, Building_WorkTable>();
-            foreach (
-                KeyValuePair<Bill_Production, Building_WorkTable> pair in
-                    assignedBills.Where( pair => !workers.Contains( pair.Value ) ) )
+
+            // get list of keys to iterate over
+            List<Bill_Production> keys = new List<Bill_Production>( assignedBills.Keys );
+
+            // check each assigned bill to see if it's in the list of allowed workers.
+            foreach ( Bill_Production key in keys )
             {
+                if ( workers.Contains( assignedBills[key] ) )
+                {
+                    continue;
+                }
 #if DEBUG_JOBS
-                Log.Message( "Deleting " + pair.Key.LabelCap + " from " + pair.Value.LabelCap );
+                debug.AppendLine( " - removing bill: " + key.GetUniqueLoadID() + ", " +
+                                  assignedBills[key].GetUniqueLoadID() );
 #endif
-                pair.Value.BillStack.Delete( pair.Key );
-                toBeDeleted.Add( pair.Key, pair.Value );
+                // remove from workstation billstack
+                assignedBills[key].BillStack.Delete( key );
+
+                // remove from managed list
+                assignedBills.Remove( key );
+
+                // this counts as work
                 actionTaken = true;
-            }
-            foreach ( KeyValuePair<Bill_Production, Building_WorkTable> pair in toBeDeleted )
-            {
-                assignedBills.Remove( pair.Key );
             }
         }
 
@@ -475,24 +559,36 @@ namespace FluffyManager
         {
             if ( thatBill.storeMode != Bill.storeMode )
             {
+#if DEBUG_JOBS
+                debug.AppendLine( "Updating Bill.storeMode" );
+#endif
                 thatBill.storeMode = Bill.storeMode;
                 actionTaken = true;
             }
 
             if ( thatBill.ingredientFilter != Bill.ingredientFilter )
             {
+#if DEBUG_JOBS
+                debug.AppendLine( "Updating Bill.ingredientFilter" );
+#endif
                 thatBill.ingredientFilter = Bill.ingredientFilter;
                 actionTaken = true;
             }
 
             if ( Math.Abs( thatBill.ingredientSearchRadius - Bill.ingredientSearchRadius ) > 1 )
             {
+#if DEBUG_JOBS
+                debug.AppendLine( "Updating Bill.ingredientSearchRadius" );
+#endif
                 thatBill.ingredientSearchRadius = Bill.ingredientSearchRadius;
                 actionTaken = true;
             }
 
             if ( thatBill.minSkillLevel != Bill.minSkillLevel )
             {
+#if DEBUG_JOBS
+                debug.AppendLine( "Updating Bill.minSkillLevel" );
+#endif
                 thatBill.minSkillLevel = Bill.minSkillLevel;
                 actionTaken = true;
             }
@@ -503,10 +599,6 @@ namespace FluffyManager
         /// </summary>
         public override void CleanUp()
         {
-#if DEBUG_JOBS
-            Log.Message( "Cleaning up obsolete bills" );
-#endif
-
             // remove managed bills from worktables.
             List<Bill_Production> toBeDeleted = new List<Bill_Production>();
             foreach (
@@ -515,10 +607,14 @@ namespace FluffyManager
             {
                 pair.Value.BillStack.Delete( pair.Key );
 #if DEBUG_JOBS
-                Log.Message( "Checking worker " + pair.Value.LabelCap );
+                debug.AppendLine( " - deleting " + pair.Key.GetUniqueLoadID() + " from " + pair.Value.GetUniqueLoadID() );
 #endif
             }
 
+            // clear out managed list
+#if DEBUG_JOBS
+            debug.AppendLine( "Clearing list of managed bills." );
+#endif
             BillGivers.AssignedBillGiversAndBillsDictionary.Clear();
         }
 
@@ -590,6 +686,11 @@ namespace FluffyManager
                 this.bill = bill;
                 this.table = table;
                 this.priority = priority;
+            }
+
+            public override string ToString()
+            {
+                return "( bill: " + bill.GetUniqueLoadID() + ", table: " + table.GetUniqueLoadID() + ", priority: " + priority + " )";
             }
         }
     }
