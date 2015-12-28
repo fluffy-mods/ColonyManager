@@ -126,12 +126,9 @@ namespace FluffyManager
             }
         }
 
-        public void DoWork()
+        public bool DoWork()
         {
-#if DEBUG_JOBS
-            Log.Message( "Trying to do work" );
-#endif
-            JobStack.TryDoNextJob();
+            return JobStack.TryDoNextJob();
         }
 
         public override void MapComponentTick()

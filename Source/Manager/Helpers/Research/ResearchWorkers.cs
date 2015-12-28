@@ -9,8 +9,11 @@ namespace FluffyManager
     {
         public static void UnlockPowerTab()
         {
-            Manager.Get.ManagerTabs.Add( new ManagerTab_Power() );
-            Manager.Get.RefreshTabs();
+            if ( !Manager.Get.ManagerTabs.OfType<ManagerTab_Power>().Any() )
+            {
+                Manager.Get.ManagerTabs.Add( new ManagerTab_Power() );
+                Manager.Get.RefreshTabs();
+            }
         }
     }
 }

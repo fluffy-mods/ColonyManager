@@ -15,6 +15,7 @@ namespace FluffyManager
         // just to give different versions a common interface.
     }
 
+    // special blinking LED texture/glower logic + automagically doing jobs.
     public class Building_AIManager : Building_ManagerStation
     {
         private readonly Color[] _colors =
@@ -136,7 +137,7 @@ namespace FluffyManager
                 // primary colour
                 if ( tick % ManagerStation.props.Speed == 0 )
                 {
-                    PrimaryColour = Manager.Get.JobStack.TryDoNextJob() ? Color.green : Color.red;
+                    PrimaryColour = Manager.Get.DoWork() ? Color.green : Color.red;
                 }
 
                 // blinking on primary
