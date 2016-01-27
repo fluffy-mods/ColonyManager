@@ -218,7 +218,7 @@ namespace FluffyManager
             GUI.BeginGroup( rect );
 
             // draw labels
-            Utilities.Label( nameColumnHeaderRect, WorkTypeDef.pawnLabel + "s", null, TextAnchor.LowerCenter );
+            Utilities.Label( nameColumnHeaderRect, WorkTypeDef.pawnLabel + "FM.PluralSuffix".Translate(), null, TextAnchor.LowerCenter );
             Utilities.Label( activityColumnHeaderRect, "FM.Activity".Translate(), null, TextAnchor.LowerCenter );
             Utilities.Label( priorityColumnHeaderRect, workLabel, null, TextAnchor.LowerCenter );
 
