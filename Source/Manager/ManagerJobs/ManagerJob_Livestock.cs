@@ -1,15 +1,15 @@
 ﻿// Manager/ManagerJob_Livestock.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-22 15:53
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
-using RimWorld;
 using Verse.Sound;
 
 namespace FluffyManager
@@ -72,7 +72,7 @@ namespace FluffyManager
             // set areas for restriction and taming to unrestricted
             TameArea = null;
             RestrictToArea = false;
-            RestrictArea = Utilities_Livestock.AgeSexArray.Select( k => (Area)null).ToList();
+            RestrictArea = Utilities_Livestock.AgeSexArray.Select( k => (Area)null ).ToList();
 
             // set defaults for boolean options
             TryTameMore = false;
@@ -93,7 +93,7 @@ namespace FluffyManager
             Scribe_Values.LookValue( ref ButcherExcess, "ButcherExcess", true );
             Scribe_Values.LookValue( ref ButcherTrained, "ButcherTrained", false );
             Scribe_Values.LookValue( ref RestrictToArea, "RestrictToArea", false );
-            Scribe_Collections.LookList( ref RestrictArea, "AreaRestrictions", LookMode.MapReference);
+            Scribe_Collections.LookList( ref RestrictArea, "AreaRestrictions", LookMode.MapReference );
             Scribe_References.LookReference( ref TameArea, "TameArea" );
             Scribe_Values.LookValue( ref TryTameMore, "TryTameMore", false );
             Scribe_Deep.LookDeep( ref Training, "Training" );
@@ -120,9 +120,9 @@ namespace FluffyManager
             Log.Message("Doing livestock (" + Trigger.pawnKind.LabelCap + ") job");
 #endif
 
-            // update changes in game designations in our managed list 
-            // intersect filters our list down to designations that exist both in our list and in the game state. 
-            // This should handle manual cancellations and natural completions. 
+            // update changes in game designations in our managed list
+            // intersect filters our list down to designations that exist both in our list and in the game state.
+            // This should handle manual cancellations and natural completions.
             // it deliberately won't add new designations made manually.
             Designations = Designations.Intersect( Find.DesignationManager.allDesignations ).ToList();
 
@@ -145,7 +145,7 @@ namespace FluffyManager
         {
             if ( RestrictToArea )
             {
-                for (int i = 0; i < Utilities_Livestock.AgeSexArray.Length; i++ )
+                for ( int i = 0; i < Utilities_Livestock.AgeSexArray.Length; i++ )
                 {
                     foreach ( Pawn p in Trigger.pawnKind.GetTame( Utilities_Livestock.AgeSexArray[i] ) )
                     {
@@ -203,7 +203,11 @@ namespace FluffyManager
                 {
                     foreach ( TrainableDef def in Training.Defs )
                     {
+                        bool dump;
                         if ( !animal.training.IsCompleted( def ) &&
+
+                             // only train if allowed.
+                             animal.training.CanAssignToTrain( def, out dump ).Accepted &&
 
                              // only ever assign training, never de-asign.
                              animal.training.GetWanted( def ) != Training[def] &&
@@ -227,32 +231,31 @@ namespace FluffyManager
             foreach ( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
             {
                 // not enough animals?
-                int deficit = Trigger.CountTargets[ageSex] 
-                                - Trigger.pawnKind.GetTame( ageSex ).Count 
+                int deficit = Trigger.CountTargets[ageSex]
+                                - Trigger.pawnKind.GetTame( ageSex ).Count
                                 - DesignationsOfOn( DesignationDefOf.Tame, ageSex ).Count;
-
 
 #if DEBUG_LIFESTOCK
                 Log.Message( "Taming " + ageSex + ", deficit: " + deficit );
 #endif
 
-                if( deficit > 0 )
+                if ( deficit > 0 )
                 {
                     // get the 'home' position
                     IntVec3 position = Utilities.GetBasePosition();
 
                     // get list of animals in sorted by youngest weighted to distance.
                     List<Pawn> animals = Trigger.pawnKind.GetWild( ageSex )
-                                                .Where(p => Find.DesignationManager.DesignationOn( p ) == null
-                                                        && TameArea == null || TameArea.ActiveCells.Contains(p.Position))
-                                                .OrderBy( p => p.ageTracker.AgeBiologicalTicks / (p.Position.DistanceToSquared(position) * 2 ))
+                                                .Where( p => Find.DesignationManager.DesignationOn( p ) == null
+                                                         && TameArea == null || TameArea.ActiveCells.Contains( p.Position ) )
+                                                .OrderBy( p => p.ageTracker.AgeBiologicalTicks / ( p.Position.DistanceToSquared( position ) * 2 ) )
                                                 .ToList();
 
 #if DEBUG_LIFESTOCK
                     Log.Message( "Wild: " + animals.Count );
 #endif
 
-                    for( int i = 0; i < deficit && i < animals.Count; i++ )
+                    for ( int i = 0; i < deficit && i < animals.Count; i++ )
                     {
 #if DEBUG_LIFESTOCK
                         Log.Message( "Adding taming designation: " + animals[i].GetUniqueLoadID() );
@@ -287,24 +290,22 @@ namespace FluffyManager
                 return;
             }
 
-
 #if DEBUG_LIFESTOCK
             Log.Message("Doing butchery: " + Trigger.pawnKind.LabelCap);
 #endif
 
-            foreach( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
+            foreach ( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
             {
                 // too many animals?
                 int surplus = Trigger.pawnKind.GetTame( ageSex ).Count
                               - DesignationsOfOn( DesignationDefOf.Slaughter, ageSex ).Count
                               - Trigger.CountTargets[ageSex];
 
-
 #if DEBUG_LIFESTOCK
                 Log.Message( "Butchering " + ageSex + ", surplus" + surplus );
 #endif
 
-                if( surplus > 0 )
+                if ( surplus > 0 )
                 {
                     // should slaughter oldest adults, youngest juveniles.
                     bool oldestFirst = ageSex == Utilities_Livestock.AgeAndSex.AdultFemale || ageSex == Utilities_Livestock.AgeAndSex.AdultMale;
@@ -316,24 +317,23 @@ namespace FluffyManager
                                          .OrderBy( p => ( oldestFirst ? -1 : 1 ) * p.ageTracker.AgeBiologicalTicks )
                                          .ToList();
 
-
 #if DEBUG_LIFESTOCK
                     Log.Message("Tame animals: " + animals.Count);
 #endif
 
-                    for( int i = 0; i < surplus && i < animals.Count; i++ )
+                    for ( int i = 0; i < surplus && i < animals.Count; i++ )
                     {
 #if DEBUG_LIFESTOCK
                         Log.Message( "Butchering " + animals[i].GetUniqueLoadID() );
 #endif
-                        AddDesignation( animals[i], DesignationDefOf.Slaughter);
+                        AddDesignation( animals[i], DesignationDefOf.Slaughter );
                     }
                 }
 
                 // remove extra designations
                 while ( surplus < 0 )
                 {
-                    if( TryRemoveDesignation( ageSex, DesignationDefOf.Slaughter ) )
+                    if ( TryRemoveDesignation( ageSex, DesignationDefOf.Slaughter ) )
                     {
 #if DEBUG_LIFESTOCK
                         Log.Message( "Removed extra butchery designation" );
@@ -489,7 +489,7 @@ namespace FluffyManager
         {
             public DefMap<TrainableDef, bool> TrainingTargets = new DefMap<TrainableDef, bool>();
 
-            public bool this[ TrainableDef index ]
+            public bool this[TrainableDef index]
             {
                 get { return TrainingTargets[index]; }
                 set { SetWantedRecursive( index, value ); }
@@ -508,7 +508,8 @@ namespace FluffyManager
             private void SetWantedRecursive( TrainableDef td, bool wanted )
             {
                 // cop out if nothing changed
-                if ( TrainingTargets[td] == wanted ) return;
+                if ( TrainingTargets[td] == wanted )
+                    return;
 
                 // make changes
                 TrainingTargets[td] = wanted;
