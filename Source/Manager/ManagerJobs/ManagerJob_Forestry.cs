@@ -1,7 +1,7 @@
 ﻿// Manager/ManagerJob_Forestry.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-05 22:41
 
 using RimWorld;
@@ -15,24 +15,51 @@ namespace FluffyManager
 {
     public class ManagerJob_Forestry : ManagerJob
     {
-        private Utilities.CachedValue<int> _designatedWoodCachedValue = new Utilities.CachedValue<int>();
-        private readonly float            _margin                    = Utilities.Margin;
+        #region Fields
+
+        public static bool                ClearWindCells             = true;
         public Dictionary<ThingDef, bool> AllowedTrees;
         public bool                       AllowSaplings;
-        public static bool                ClearWindCells             = true;
         public List<Designation>          Designations               = new List<Designation>();
         public History                    History;
         public Area                       LoggingArea;
         public new Trigger_Threshold      Trigger;
+        private readonly float            _margin                    = Utilities.Margin;
+        private Utilities.CachedValue<int> _designatedWoodCachedValue = new Utilities.CachedValue<int>();
 
-        public override string Label
+        #endregion Fields
+
+        #region Constructors
+
+        public ManagerJob_Forestry()
         {
-            get { return "FMF.Forestry".Translate(); }
+            // populate the trigger field, set the root category to wood.
+            Trigger = new Trigger_Threshold( this );
+            Trigger.ThresholdFilter.SetDisallowAll();
+            Trigger.ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
+
+            // populate the list of trees from the plants in the biome - allow all by default.
+            // A tree is defined as any plant that yields wood
+            AllowedTrees =
+                Find.Map.Biome.AllWildPlants.Where( pd => pd.plant.harvestTag == "Wood" ||  pd.plant.harvestedThingDef == Utilities_Forestry.Wood )
+                    // add harvesttag to allow non-wood yielding woody plants.
+                    .ToDictionary( pk => pk, v => true );
+
+            History = new History( new[] { "stock", "designated" }, new[] { Color.white, Color.grey } );
         }
+
+        #endregion Constructors
+
+        #region Properties
 
         public override bool Completed
         {
             get { return !Trigger.State; }
+        }
+
+        public override string Label
+        {
+            get { return "FMF.Forestry".Translate(); }
         }
 
         public override ManagerTab Tab
@@ -50,21 +77,7 @@ namespace FluffyManager
 
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.PlantCutting;
 
-        public ManagerJob_Forestry()
-        {
-            // populate the trigger field, set the root category to meats and allow all but human meat.
-            Trigger = new Trigger_Threshold( this );
-            Trigger.ThresholdFilter.SetDisallowAll();
-            Trigger.ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
-
-            // populate the list of trees from the plants in the biome - allow all by default.
-            // A tree is defined as any plant that yields wood
-            AllowedTrees =
-                Find.Map.Biome.AllWildPlants.Where( pd => pd.plant.harvestedThingDef == Utilities_Forestry.Wood )
-                    .ToDictionary( pk => pk, v => true );
-
-            History = new History( new[] { "stock", "designated" }, new[] { Color.white, Color.grey } );
-        }
+        #endregion Properties
 
         #region Overrides of ManagerJob
 
@@ -89,11 +102,43 @@ namespace FluffyManager
             }
         }
 
-        #endregion
+        #endregion Overrides of ManagerJob
 
-        public override void Tick()
+        #region Methods
+
+        public static void DesignateWindCells()
         {
-            History.Update( Trigger.CurCount, GetWoodInDesignations() );
+            foreach ( IntVec3 cell in GetWindCells() )
+            {
+                // confirm there is a plant here that it is a tree and that it has no current designation
+                Plant plant = cell.GetPlant();
+                if ( plant != null &&
+                     plant.def.plant.IsTree &&
+                     Find.DesignationManager.DesignationOn( plant, DesignationDefOf.CutPlant ) == null )
+                {
+                    Find.DesignationManager.AddDesignation( new Designation( plant, DesignationDefOf.CutPlant ) );
+                }
+            }
+        }
+
+        public static void GlobalWork()
+        {
+            // designate wind cells
+            if ( ClearWindCells )
+            {
+                DesignateWindCells();
+            }
+        }
+
+        public void AddRelevantGameDesignations()
+        {
+            // get list of game designations not managed by this job that could be assigned by this job.
+            foreach ( Designation des in Find.DesignationManager.DesignationsOfDef( DesignationDefOf.CutPlant )
+                                             .Except( Designations )
+                                             .Where( des => IsValidForestryTarget( des.target ) ) )
+            {
+                AddDesignation( des );
+            }
         }
 
         /// <summary>
@@ -120,49 +165,6 @@ namespace FluffyManager
 
             // clear the list completely
             Designations.Clear();
-        }
-
-        public void AddRelevantGameDesignations()
-        {
-            // get list of game designations not managed by this job that could be assigned by this job.
-            foreach ( Designation des in Find.DesignationManager.DesignationsOfDef( DesignationDefOf.CutPlant )
-                                             .Except( Designations )
-                                             .Where( des => IsValidForestryTarget( des.target ) ) )
-            {
-                AddDesignation( des );
-            }
-        }
-
-        private bool IsValidForestryTarget( TargetInfo t )
-        {
-            return t.HasThing
-                   && IsValidForestryTarget( t.Thing );
-        }
-
-        private bool IsValidForestryTarget( Thing t )
-        {
-            return t is Plant
-                   && IsValidForestryTarget( (Plant)t );
-        }
-
-        private bool IsValidForestryTarget( Plant p )
-        {
-            return p.def.plant != null
-
-                // non-biome trees won't be on the list
-                   && AllowedTrees.ContainsKey( p.def )
-
-                // also filters out non-tree plants
-                   && AllowedTrees[p.def]
-                   && p.SpawnedInWorld
-                   && Find.DesignationManager.DesignationOn( p ) == null
-
-                // cut only mature trees, or saplings that yield wood.
-                   && ( ( AllowSaplings && p.YieldNow() > 1 )
-                        || p.LifeStage == PlantLifeStage.Mature )
-                   && ( LoggingArea == null
-                        || LoggingArea.ActiveCells.Contains( p.Position ) )
-                   && p.Position.CanReachColony();
         }
 
         public override void DrawListEntry( Rect rect, bool overview = true, bool active = true )
@@ -201,6 +203,37 @@ namespace FluffyManager
             History.DrawPlot( rect, Trigger.Count );
         }
 
+        public int GetWoodInDesignations()
+        {
+            int count = 0;
+
+            // try get cache
+            if ( _designatedWoodCachedValue.TryGetValue( out count ) )
+            {
+                return count;
+            }
+
+            foreach ( Designation des in Designations )
+            {
+                if ( des.target.HasThing &&
+                     des.target.Thing is Plant )
+                {
+                    Plant plant = des.target.Thing as Plant;
+                    count += plant.YieldNow();
+                }
+            }
+
+            // update cache
+            _designatedWoodCachedValue.Update( count );
+
+            return count;
+        }
+
+        public override void Tick()
+        {
+            History.Update( Trigger.CurCount, GetWoodInDesignations() );
+        }
+
         public override bool TryDoJob()
         {
             // keep track if any actual work was done.
@@ -217,7 +250,7 @@ namespace FluffyManager
 
             // add external designations
             AddRelevantGameDesignations();
-            
+
             // get current lumber count
             int count = Trigger.CurCount + GetWoodInDesignations();
 
@@ -235,6 +268,16 @@ namespace FluffyManager
             return workDone;
         }
 
+        private static List<IntVec3> GetWindCells()
+        {
+            return Find.ListerBuildings
+                       .AllBuildingsColonistOfClass<Building_WindTurbine>()
+                       .SelectMany( turbine => Building_WindTurbine.CalculateWindCells( turbine.Position,
+                                                                                        turbine.Rotation,
+                                                                                        turbine.RotatedSize ) )
+                       .ToList();
+        }
+
         private void AddDesignation( Designation des )
         {
             // add to game
@@ -242,15 +285,6 @@ namespace FluffyManager
 
             // add to internal list
             Designations.Add( des );
-        }
-
-        public static void GlobalWork()
-        {
-            // designate wind cells
-            if( ClearWindCells )
-            {
-                DesignateWindCells();
-            }
         }
 
         private void AddDesignation( Plant p, DesignationDef def = null )
@@ -262,31 +296,6 @@ namespace FluffyManager
             AddDesignation( des );
         }
 
-        public static void DesignateWindCells()
-        {
-            foreach ( IntVec3 cell in GetWindCells() )
-            {
-                // confirm there is a plant here that it is a tree and that it has no current designation
-                Plant plant = cell.GetPlant();
-                if ( plant != null &&
-                     plant.def.plant.IsTree &&
-                     Find.DesignationManager.DesignationOn( plant, DesignationDefOf.CutPlant ) == null )
-                {
-                    Find.DesignationManager.AddDesignation( new Designation( plant, DesignationDefOf.CutPlant ) );
-                }
-            }
-        }
-
-        private static List<IntVec3> GetWindCells()
-        {
-            return Find.ListerBuildings
-                       .AllBuildingsColonistOfClass<Building_WindTurbine>()
-                       .SelectMany( turbine => Building_WindTurbine.CalculateWindCells( turbine.Position,
-                                                                                        turbine.Rotation,
-                                                                                        turbine.RotatedSize ) )
-                       .ToList();
-        }
-
         private void CleanAreaDesignations()
         {
             foreach ( Designation des in Designations )
@@ -295,9 +304,8 @@ namespace FluffyManager
                 {
                     des.Delete();
                 }
-                else if ( !LoggingArea.ActiveCells.Contains( des.target.Thing.Position )
-                          &&
-                          ( !IsInWindTurbineArea( des.target.Thing.Position ) || !ClearWindCells ) )
+                else if ( !LoggingArea.ActiveCells.Contains( des.target.Thing.Position ) &&
+                        ( !IsInWindTurbineArea( des.target.Thing.Position ) || !ClearWindCells ) )
                 {
                     des.Delete();
                 }
@@ -329,14 +337,14 @@ namespace FluffyManager
                 position.z /= homeCells.Count;
             }
 
-            // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
+            // get a list of trees that are not designated in the logging grounds and are reachable, sorted by yield / distance * 2
             List<Plant> list = Find.ListerThings.AllThings.Where( p => IsValidForestryTarget( p ) )
 
-                // OrderBy defaults to ascending, switch sign on current yield to get descending
+                                   // OrderBy defaults to ascending, switch sign on current yield to get descending
                                    .Select( p => p as Plant )
                                    .OrderBy(
                                        p =>
-                                           - p.YieldNow() /
+                                           -p.YieldNow() /
                                            ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) )
                                    .ToList();
 
@@ -348,30 +356,38 @@ namespace FluffyManager
             return GetWindCells().Contains( position );
         }
 
-        public int GetWoodInDesignations()
+        private bool IsValidForestryTarget( TargetInfo t )
         {
-            int count = 0;
-
-            // try get cache
-            if ( _designatedWoodCachedValue.TryGetValue( out count ) )
-            {
-                return count;
-            }
-
-            foreach ( Designation des in Designations )
-            {
-                if ( des.target.HasThing &&
-                     des.target.Thing is Plant )
-                {
-                    Plant plant = des.target.Thing as Plant;
-                    count += plant.YieldNow();
-                }
-            }
-
-            // update cache
-            _designatedWoodCachedValue.Update( count );
-
-            return count;
+            return t.HasThing
+                   && IsValidForestryTarget( t.Thing );
         }
+
+        private bool IsValidForestryTarget( Thing t )
+        {
+            return t is Plant
+                   && IsValidForestryTarget( (Plant)t );
+        }
+
+        private bool IsValidForestryTarget( Plant p )
+        {
+            return p.def.plant != null
+
+                   // non-biome trees won't be on the list
+                   && AllowedTrees.ContainsKey( p.def )
+
+                   // also filters out non-tree plants
+                   && AllowedTrees[p.def]
+                   && p.SpawnedInWorld
+                   && Find.DesignationManager.DesignationOn( p ) == null
+
+                   // cut only mature trees, or saplings that yield something right now.
+                   && ( ( AllowSaplings && p.YieldNow() > 1 )
+                        || p.LifeStage == PlantLifeStage.Mature )
+                   && ( LoggingArea == null
+                        || LoggingArea.ActiveCells.Contains( p.Position ) )
+                   && p.Position.CanReachColony();
+        }
+
+        #endregion Methods
     }
 }

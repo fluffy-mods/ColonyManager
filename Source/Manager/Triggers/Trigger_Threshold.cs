@@ -1,11 +1,11 @@
 ﻿// Manager/TriggerThreshold.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-04 19:25
 
-using System;
 using RimWorld;
+using System;
 using UnityEngine;
 using Verse;
 
@@ -13,6 +13,68 @@ namespace FluffyManager
 {
     public class Trigger_Threshold : Trigger
     {
+        #region Fields
+
+        public static int DefaultCount = 500;
+
+        public static int DefaultMaxUpperThreshold = 3000;
+
+        public int Count;
+
+        public int MaxUpperThreshold;
+
+        public Ops Op;
+
+        public Zone_Stockpile stockpile;
+
+        public ThingFilter ThresholdFilter;
+
+        #endregion Fields
+
+        #region Constructors
+
+        public Trigger_Threshold( ManagerJob_Production job )
+        {
+            Op = Ops.LowerThan;
+            MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
+            // TODO: Better way of setting sensible defaults?
+            Count = MaxUpperThreshold / 20;
+            ThresholdFilter = new ThingFilter();
+            ThresholdFilter.SetDisallowAll();
+            if ( job.MainProduct.ThingDef != null )
+            {
+                ThresholdFilter.SetAllow( job.MainProduct.ThingDef, true );
+            }
+            if ( job.MainProduct.CategoryDef != null )
+            {
+                ThresholdFilter.SetAllow( job.MainProduct.CategoryDef, true );
+            }
+        }
+
+        public Trigger_Threshold( ManagerJob_Hunting job )
+        {
+            Op = Ops.LowerThan;
+            MaxUpperThreshold = DefaultMaxUpperThreshold;
+            Count = DefaultCount;
+            ThresholdFilter = new ThingFilter();
+            ThresholdFilter.SetDisallowAll();
+            ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
+        }
+
+        public Trigger_Threshold( ManagerJob_Forestry job )
+        {
+            Op = Ops.LowerThan;
+            MaxUpperThreshold = DefaultMaxUpperThreshold;
+            Count = DefaultCount;
+            ThresholdFilter = new ThingFilter();
+            ThresholdFilter.SetDisallowAll();
+            ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
+        }
+
+        #endregion Constructors
+
+        #region Enums
+
         public enum Ops
         {
             LowerThan,
@@ -20,14 +82,9 @@ namespace FluffyManager
             HigherThan
         }
 
-        public static int DefaultCount = 500;
-        public static int DefaultMaxUpperThreshold = 3000;
-        
-        public int Count;
-        public int MaxUpperThreshold;
-        public Ops Op;
-        public ThingFilter ThresholdFilter;
-        public Zone_Stockpile stockpile;
+        #endregion Enums
+
+        #region Properties
 
         public int CurCount
         {
@@ -101,43 +158,9 @@ namespace FluffyManager
             get { return "FMP.ThresholdCount".Translate( CurCount, Count ); }
         }
 
-        public Trigger_Threshold( ManagerJob_Production job )
-        {
-            Op = Ops.LowerThan;
-            MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
-            // TODO: Better way of setting sensible defaults?
-            Count = MaxUpperThreshold / 20;
-            ThresholdFilter = new ThingFilter();
-            ThresholdFilter.SetDisallowAll();
-            if ( job.MainProduct.ThingDef != null )
-            {
-                ThresholdFilter.SetAllow( job.MainProduct.ThingDef, true );
-            }
-            if ( job.MainProduct.CategoryDef != null )
-            {
-                ThresholdFilter.SetAllow( job.MainProduct.CategoryDef, true );
-            }
-        }
+        #endregion Properties
 
-        public Trigger_Threshold( ManagerJob_Hunting job )
-        {
-            Op = Ops.LowerThan;
-            MaxUpperThreshold = DefaultMaxUpperThreshold;
-            Count = DefaultCount;
-            ThresholdFilter = new ThingFilter();
-            ThresholdFilter.SetDisallowAll();
-            ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
-        }
-
-        public Trigger_Threshold( ManagerJob_Forestry job )
-        {
-            Op = Ops.LowerThan;
-            MaxUpperThreshold = DefaultMaxUpperThreshold;
-            Count = DefaultCount;
-            ThresholdFilter = new ThingFilter();
-            ThresholdFilter.SetDisallowAll();
-            ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
-        }
+        #region Methods
 
         public override void DrawProgressBar( Rect rect, bool active )
         {
@@ -168,7 +191,7 @@ namespace FluffyManager
             TooltipHandler.TipRegion( rect, StatusTooltip );
         }
 
-        public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false )
+        public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false, string label = null, string tooltip = null )
         {
             // target threshold
             Rect thresholdLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
@@ -177,14 +200,20 @@ namespace FluffyManager
                 Widgets.DrawAltRect( thresholdLabelRect );
             }
             Widgets.DrawHighlightIfMouseover( thresholdLabelRect );
-            Utilities.Label( thresholdLabelRect,
-                             "FMP.ThresholdCount".Translate( CurCount, Count ) + ":",
-                             ThresholdFilter?.Summary() + 
-                             "FMP.ThresholdCountTooltip".Translate( CurCount, Count ));
-            
+            if ( label.NullOrEmpty() )
+            {
+                label = "FMP.ThresholdCount".Translate( CurCount, Count ) + ":";
+            }
+            if ( tooltip.NullOrEmpty() )
+            {
+                tooltip = ThresholdFilter?.Summary() + "\n" + "FMP.ThresholdCountTooltip".Translate( CurCount, Count );
+            }
+
+            Utilities.Label( thresholdLabelRect, label, tooltip );
+
             // add a little icon to mark interactivity
             Rect searchIconRect = new Rect( thresholdLabelRect.xMax - Utilities.Margin - entryHeight, cur.y, entryHeight, entryHeight );
-            if( searchIconRect.height > Utilities.SmallIconSize )
+            if ( searchIconRect.height > Utilities.SmallIconSize )
             {
                 // center it.
                 searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - Utilities.SmallIconSize ) / 2 );
@@ -219,5 +248,7 @@ namespace FluffyManager
             // TODO: Implement Trigger_Threshold.ToString()
             return "Trigger_Threshold.ToString() not implemented";
         }
+
+        #endregion Methods
     }
 }

@@ -1,7 +1,7 @@
 ﻿// Manager/ManagerTab_Forestry.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-14 21:18
 
 using System.Collections.Generic;
@@ -13,15 +13,22 @@ namespace FluffyManager
 {
     internal class ManagerTab_Forestry : ManagerTab
     {
+        #region Fields
+
         private const float EntryHeight = 30f;
         private const float Margin = Utilities.Margin;
         private static ManagerJob_Forestry _selected = new ManagerJob_Forestry();
+        private readonly float _topAreaHeight = 30f;
         private Vector2 _animalsScrollPosition = Vector2.zero;
         private Vector2 _button = new Vector2( 200f, 40f );
         private List<ManagerJob_Forestry> _jobs;
         private float _leftRowHeight = 9999f;
         private Vector2 _scrollPosition = Vector2.zero;
-        private readonly float _topAreaHeight = 30f;
+
+        #endregion Fields
+
+        #region Properties
+
         public override Texture2D Icon { get; } = Resources.IconForestry;
 
         public override IconAreas IconArea
@@ -39,6 +46,10 @@ namespace FluffyManager
             get { return _selected; }
             set { _selected = (ManagerJob_Forestry)value; }
         }
+
+        #endregion Properties
+
+        #region Methods
 
         public void DoContent( Rect rect )
         {
@@ -80,22 +91,13 @@ namespace FluffyManager
             GUI.BeginGroup( colRects[0] );
             cur = Vector2.zero;
 
-            // target count (1)
-            Rect targetCountTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            // trigger config (1)
             int currentCount = _selected.Trigger.CurCount;
             int designatedCount = _selected.GetWoodInDesignations();
             int targetCount = _selected.Trigger.Count;
-            Widgets.DrawAltRect( targetCountTitleRect );
-            Utilities.Label( targetCountTitleRect,
-                             "FMF.TargetCount".Translate( currentCount, designatedCount, targetCount ),
-                             "FMF.TargetCountTooltip".Translate( currentCount, designatedCount, targetCount ),
-                             TextAnchor.MiddleLeft, Margin );
-            cur.y += EntryHeight;
-
-            Rect targetCountRect = new Rect( cur.x, cur.y, colWidth, Utilities.SliderHeight );
-            Widgets.DrawAltRect( targetCountRect );
-            _selected.Trigger.Count = (int)GUI.HorizontalSlider( targetCountRect, _selected.Trigger.Count, 0, 2000 );
-            cur.y += Utilities.SliderHeight;
+            _selected.Trigger.DrawTriggerConfig( ref cur, colRects[0].width, EntryHeight, true,
+                "FMF.TargetCount".Translate( currentCount, designatedCount, targetCount ),
+                "FMF.TargetCountTooltip".Translate( currentCount, designatedCount, targetCount ) );
 
             // Clear wind cells (2)
             Rect clearWindCellsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
@@ -179,7 +181,8 @@ namespace FluffyManager
 
                 // draw the toggle
                 Utilities.DrawToggle( toggleRect, def.LabelCap, _selected.AllowedTrees[def],
-                                      delegate { _selected.AllowedTrees[def] = !_selected.AllowedTrees[def]; } );
+                                      delegate
+                                      { _selected.AllowedTrees[def] = !_selected.AllowedTrees[def]; } );
 
                 // update current position
                 cur.y += EntryHeight;
@@ -326,5 +329,7 @@ namespace FluffyManager
         {
             _jobs = Manager.Get.JobStack.FullStack<ManagerJob_Forestry>();
         }
+
+        #endregion Methods
     }
 }
