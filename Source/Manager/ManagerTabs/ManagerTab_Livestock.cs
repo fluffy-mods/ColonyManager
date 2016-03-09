@@ -1,12 +1,12 @@
 ﻿// Manager/ManagerTab_Livestock.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-22 15:52
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -14,11 +14,14 @@ namespace FluffyManager
 {
     public class ManagerTab_Livestock : ManagerTab
     {
+        #region Fields
+
+        private float                                             _actualHeight          = 999f;
+        private Vector2                                           _animalsScrollPosition = Vector2.zero;
         private List<PawnKindDef>                                 _availablePawnKinds;
         private List<ManagerJob_Livestock>                        _currentJobs;
         private float                                             _entryHeight           = 30f;
         private float                                             _listEntryHeight       = Utilities.LargeListEntryHeight;
-        private float                                             _smallIconSize         = Utilities.SmallIconSize;
 
         // init with 5's if new job.
         private Dictionary<Utilities_Livestock.AgeAndSex, string> _newCounts             = Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => "5" );
@@ -27,14 +30,19 @@ namespace FluffyManager
         private Vector2                                           _scrollPosition        = Vector2.zero;
         private PawnKindDef                                       _selectedAvailable;
         private ManagerJob_Livestock                              _selectedCurrent;
+        private float                                             _smallIconSize         = Utilities.SmallIconSize;
         private float                                             _topAreaHeight         = 30f;
-        private float                                             _actualHeight          = 999f;
-        private Vector2                                           _animalsScrollPosition = Vector2.zero;
+
+        #endregion Fields
+
+        #region Properties
+
+        public override Texture2D Icon => Resources.IconLivestock;
 
         // public override Texture2D Icon {                       get; }
-        public override IconAreas                                 IconArea               => IconAreas.Middle;
-        public override string                                    Label                  => "FML.Livestock".Translate();
-        public override Texture2D                                 Icon                   => Resources.IconLivestock;
+        public override IconAreas IconArea => IconAreas.Middle;
+
+        public override string Label => "FML.Livestock".Translate();
 
         public override ManagerJob Selected
         {
@@ -50,34 +58,9 @@ namespace FluffyManager
             }
         }
 
-        public override void PreOpen()
-        {
-            Refresh();
-        }
+        #endregion Properties
 
-        private void Refresh()
-        {
-            // currently managed
-            _currentJobs = Manager.Get.JobStack.FullStack<ManagerJob_Livestock>();
-
-            // concatenate lists of animals on biome and animals in colony.
-            _availablePawnKinds = Find.Map.Biome.AllWildAnimals.ToList();
-            _availablePawnKinds.AddRange(
-                Find.ListerPawns.PawnsInFaction( Faction.OfColony )
-                    .Where( p => p.RaceProps.Animal )
-                    .Select( p => p.kindDef ) );
-            _availablePawnKinds = _availablePawnKinds
-
-                // get distinct pawnkinds from the merges
-                .Distinct()
-
-                // remove already managed pawnkinds
-                .Where( pk => !_currentJobs.Select( job => job.Trigger.pawnKind ).Contains( pk ) )
-
-                // order by label
-                .OrderBy( def => def.LabelCap )
-                .ToList();
-        }
+        #region Methods
 
         public override void DoWindowContents( Rect canvas )
         {
@@ -87,6 +70,11 @@ namespace FluffyManager
 
             DoLeftRow( leftRow );
             DoContent( contentCanvas );
+        }
+
+        public override void PreOpen()
+        {
+            Refresh();
         }
 
         private void DoContent( Rect rect )
@@ -314,16 +302,17 @@ namespace FluffyManager
             {
                 Rect viewRect = animalsRect;
                 viewRect.height = _actualHeight;
-                if ( _actualHeight > animalsRect.height ) viewRect.width -= 16f;
+                if ( _actualHeight > animalsRect.height )
+                    viewRect.width -= 16f;
 
-                Widgets.BeginScrollView(animalsRect, ref _animalsScrollPosition, viewRect);
+                Widgets.BeginScrollView( animalsRect, ref _animalsScrollPosition, viewRect );
                 GUI.BeginGroup( viewRect );
                 cur = Vector2.zero;
 
                 // tamed animals
                 DrawAnimalListheader( ref cur, new Vector2( viewRect.width, _entryHeight / 3 * 2 ), pawnKind,
                                       "FML.Tame".Translate().CapitalizeFirst() );
-                List<Pawn> tame = pawnKind.GetTame(  );
+                List<Pawn> tame = pawnKind.GetTame();
                 if ( tame.Count == 0 )
                 {
                     Utilities.Label( ref cur, viewRect.width, _entryHeight,
@@ -392,179 +381,6 @@ namespace FluffyManager
             GUI.EndGroup(); // window
         }
 
-        private void DrawAnimalRow( ref Vector2 cur, Vector2 size, Pawn p, bool alt )
-        {
-            // highlights and interactivity.
-            Rect row = new Rect( cur.x, cur.y, size.x, size.y );
-            if ( alt )
-            {
-                Widgets.DrawAltRect( row );
-            }
-            Widgets.DrawHighlightIfMouseover( row );
-            if ( Widgets.InvisibleButton( row ) )
-            {
-                // move camera and select
-                Find.MainTabsRoot.EscapeCurrentTab();
-                Find.CameraMap.JumpTo( p.PositionHeld );
-                Find.Selector.ClearSelection();
-                if ( p.SpawnedInWorld )
-                {
-                    Find.Selector.Select( p );
-                }
-            }
-
-            // use a third of available screenspace for labels
-            Rect nameRect = new Rect( cur.x, cur.y, size.x / 3f, size.y );
-            Utilities.Label( nameRect, p.LabelCap, anchor: TextAnchor.MiddleCenter, font: GameFont.Tiny );
-            cur.x += size.x / 3f;
-
-            // gender, lifestage, current meat (and if applicable, milking + shearing)
-            int cols = 3;
-
-            // extra columns?
-            if ( p.kindDef.Milkable() ) cols++;
-            if ( p.kindDef.Shearable() ) cols++;
-            
-            float colwidth = size.x * 2 / 3 / cols;
-
-            // gender column
-            Rect genderRect = new Rect( cur.x, cur.y, colwidth, size.y );
-            Rect genderIconRect =
-                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( genderRect );
-            switch ( p.gender )
-            {
-                case Gender.Female:
-                    GUI.DrawTexture( genderIconRect, Resources.FemaleIcon );
-                    break;
-                case Gender.Male:
-                    GUI.DrawTexture( genderIconRect, Resources.MaleIcon );
-                    break;
-                case Gender.None:
-                    GUI.DrawTexture( genderIconRect, Resources.UnkownIcon );
-                    break;
-            }
-            TooltipHandler.TipRegion( genderRect, p.gender.GetLabel() );
-            cur.x += colwidth;
-
-            // lifestage column
-            Rect ageRect = new Rect( cur.x, cur.y, colwidth, size.y );
-            Rect ageIconRect = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect );
-            GUI.DrawTexture( ageIconRect, Resources.LifeStages[p.ageTracker.CurLifeStageIndex] );
-            TooltipHandler.TipRegion( ageRect, p.ageTracker.AgeTooltipString );
-            cur.x += colwidth;
-
-            // meat column
-            Rect meatRect = new Rect( cur.x, cur.y, colwidth, size.y );
-            // NOTE: When splitting tabs into separate mods; estimated meat count is defined in the Hunting helper.
-            Utilities.Label( meatRect, p.EstimatedMeatCount().ToString(), p.EstimatedMeatCount().ToString(), TextAnchor.MiddleCenter,
-                             font: GameFont.Tiny );
-            cur.x += colwidth;
-
-            // milk column
-            if ( p.Milkable() )
-            {
-                Rect milkRect = new Rect( cur.x, cur.y, colwidth, size.y );
-                CompMilkable comp = p.TryGetComp<CompMilkable>();
-                Utilities.Label( milkRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate( comp.props.milkDef.LabelCap, comp.props.milkAmount ),
-                                 TextAnchor.MiddleCenter, font: GameFont.Tiny );
-            }
-            if ( p.kindDef.Milkable() ) cur.x += colwidth;
-
-            // wool column
-            if ( p.Shearable() )
-            {
-                Rect woolRect = new Rect( cur.x, cur.y, colwidth, size.y );
-                CompShearable comp = p.TryGetComp<CompShearable>();
-                Utilities.Label( woolRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate(comp.props.woolDef.LabelCap, comp.props.woolAmount ),
-                                 TextAnchor.MiddleCenter, font: GameFont.Tiny );
-            }
-            if( p.kindDef.Milkable() ) cur.x += colwidth;
-            
-            // do the carriage return on ref cur
-            cur.x = 0f;
-            cur.y += size.y;
-        }
-
-        private void DrawAnimalListheader( ref Vector2 cur, Vector2 size, PawnKindDef pawnKind, string header )
-        {
-            // use a third of available screenspace for labels
-            Rect headerRect = new Rect( cur.x, cur.y, size.x / 3f, size.y );
-            Utilities.Label( headerRect, header, anchor: TextAnchor.MiddleCenter, font: GameFont.Tiny );
-            cur.x += size.x / 3f;
-
-            // gender, lifestage, current meat (and if applicable, milking + shearing)
-            int cols = 3;
-
-            // extra columns?
-            bool milk = pawnKind.Milkable();
-            bool wool = pawnKind.Shearable();
-            if ( milk )
-            {
-                cols++;
-            }
-            if ( wool )
-            {
-                cols++;
-            }
-            float colwidth = size.x * 2 / 3 / cols;
-
-            // gender header
-            Rect genderRect = new Rect( cur.x, cur.y, colwidth, size.y );
-            Rect genderMale =
-                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( genderRect, - _smallIconSize / 2 );
-            Rect genderFemale =
-                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( genderRect, _smallIconSize / 2 );
-            GUI.DrawTexture( genderMale, Resources.MaleIcon );
-            GUI.DrawTexture( genderFemale, Resources.FemaleIcon );
-            TooltipHandler.TipRegion( genderRect, "FML.GenderHeader".Translate() );
-            cur.x += colwidth;
-
-            // lifestage header
-            Rect ageRect = new Rect( cur.x, cur.y, colwidth, size.y );
-            Rect ageRectC = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect, _smallIconSize / 2 );
-            Rect ageRectB = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect );
-            Rect ageRectA = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect, - _smallIconSize / 2 );
-            GUI.DrawTexture( ageRectC, Resources.LifeStages[2] );
-            GUI.DrawTexture( ageRectB, Resources.LifeStages[1] );
-            GUI.DrawTexture( ageRectA, Resources.LifeStages[0] );
-            TooltipHandler.TipRegion( ageRect, "FML.AgeHeader".Translate() );
-            cur.x += colwidth;
-
-            // meat header
-            Rect meatRect = new Rect( cur.x, cur.y, colwidth, size.y );
-            Rect meatIconRect =
-                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( meatRect );
-            GUI.DrawTexture( meatIconRect, Resources.MeatIcon );
-            TooltipHandler.TipRegion( meatRect, "FML.MeatHeader".Translate() );
-            cur.x += colwidth;
-
-            // milk header
-            if ( milk )
-            {
-                Rect milkRect = new Rect( cur.x, cur.y, colwidth, size.y );
-                Rect milkIconRect =
-                    new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( milkRect );
-                GUI.DrawTexture( milkIconRect, Resources.MilkIcon );
-                TooltipHandler.TipRegion( milkRect, "FML.MilkHeader".Translate() );
-                cur.x += colwidth;
-            }
-
-            // wool header
-            if ( wool )
-            {
-                Rect woolRect = new Rect( cur.x, cur.y, colwidth, size.y );
-                Rect woolIconRect =
-                    new Rect( 0f, 0f, Utilities.MediumIconSize, Utilities.MediumIconSize ).CenteredIn( woolRect );
-                GUI.DrawTexture( woolIconRect, Resources.WoolIcon );
-                TooltipHandler.TipRegion( woolRect, "FML.WoolHeader".Translate() );
-                cur.x += colwidth;
-            }
-
-            // start next row
-            cur.x = 0f;
-            cur.y += size.y;
-        }
-
         private void DoCountField( Rect rect, Utilities_Livestock.AgeAndSex ageSex )
         {
             if ( _newCounts == null ||
@@ -619,6 +435,185 @@ namespace FluffyManager
             {
                 DrawAvailableJobList( outRect, viewRect );
             }
+        }
+
+        private void DrawAnimalListheader( ref Vector2 cur, Vector2 size, PawnKindDef pawnKind, string header )
+        {
+            // use a third of available screenspace for labels
+            Rect headerRect = new Rect( cur.x, cur.y, size.x / 3f, size.y );
+            Utilities.Label( headerRect, header, anchor: TextAnchor.MiddleCenter, font: GameFont.Tiny );
+            cur.x += size.x / 3f;
+
+            // gender, lifestage, current meat (and if applicable, milking + shearing)
+            int cols = 3;
+
+            // extra columns?
+            bool milk = pawnKind.Milkable();
+            bool wool = pawnKind.Shearable();
+            if ( milk )
+            {
+                cols++;
+            }
+            if ( wool )
+            {
+                cols++;
+            }
+            float colwidth = size.x * 2 / 3 / cols;
+
+            // gender header
+            Rect genderRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            Rect genderMale =
+                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( genderRect, -_smallIconSize / 2 );
+            Rect genderFemale =
+                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( genderRect, _smallIconSize / 2 );
+            GUI.DrawTexture( genderMale, Resources.MaleIcon );
+            GUI.DrawTexture( genderFemale, Resources.FemaleIcon );
+            TooltipHandler.TipRegion( genderRect, "FML.GenderHeader".Translate() );
+            cur.x += colwidth;
+
+            // lifestage header
+            Rect ageRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            Rect ageRectC = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect, _smallIconSize / 2 );
+            Rect ageRectB = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect );
+            Rect ageRectA = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect, -_smallIconSize / 2 );
+            GUI.DrawTexture( ageRectC, Resources.LifeStages[2] );
+            GUI.DrawTexture( ageRectB, Resources.LifeStages[1] );
+            GUI.DrawTexture( ageRectA, Resources.LifeStages[0] );
+            TooltipHandler.TipRegion( ageRect, "FML.AgeHeader".Translate() );
+            cur.x += colwidth;
+
+            // meat header
+            Rect meatRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            Rect meatIconRect =
+                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( meatRect );
+            GUI.DrawTexture( meatIconRect, Resources.MeatIcon );
+            TooltipHandler.TipRegion( meatRect, "FML.MeatHeader".Translate() );
+            cur.x += colwidth;
+
+            // milk header
+            if ( milk )
+            {
+                Rect milkRect = new Rect( cur.x, cur.y, colwidth, size.y );
+                Rect milkIconRect =
+                    new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( milkRect );
+                GUI.DrawTexture( milkIconRect, Resources.MilkIcon );
+                TooltipHandler.TipRegion( milkRect, "FML.MilkHeader".Translate() );
+                cur.x += colwidth;
+            }
+
+            // wool header
+            if ( wool )
+            {
+                Rect woolRect = new Rect( cur.x, cur.y, colwidth, size.y );
+                Rect woolIconRect =
+                    new Rect( 0f, 0f, Utilities.MediumIconSize, Utilities.MediumIconSize ).CenteredIn( woolRect );
+                GUI.DrawTexture( woolIconRect, Resources.WoolIcon );
+                TooltipHandler.TipRegion( woolRect, "FML.WoolHeader".Translate() );
+                cur.x += colwidth;
+            }
+
+            // start next row
+            cur.x = 0f;
+            cur.y += size.y;
+        }
+
+        private void DrawAnimalRow( ref Vector2 cur, Vector2 size, Pawn p, bool alt )
+        {
+            // highlights and interactivity.
+            Rect row = new Rect( cur.x, cur.y, size.x, size.y );
+            if ( alt )
+            {
+                Widgets.DrawAltRect( row );
+            }
+            Widgets.DrawHighlightIfMouseover( row );
+            if ( Widgets.InvisibleButton( row ) )
+            {
+                // move camera and select
+                Find.MainTabsRoot.EscapeCurrentTab();
+                Find.CameraMap.JumpTo( p.PositionHeld );
+                Find.Selector.ClearSelection();
+                if ( p.SpawnedInWorld )
+                {
+                    Find.Selector.Select( p );
+                }
+            }
+
+            // use a third of available screenspace for labels
+            Rect nameRect = new Rect( cur.x, cur.y, size.x / 3f, size.y );
+            Utilities.Label( nameRect, p.LabelCap, anchor: TextAnchor.MiddleCenter, font: GameFont.Tiny );
+            cur.x += size.x / 3f;
+
+            // gender, lifestage, current meat (and if applicable, milking + shearing)
+            int cols = 3;
+
+            // extra columns?
+            if ( p.kindDef.Milkable() )
+                cols++;
+            if ( p.kindDef.Shearable() )
+                cols++;
+
+            float colwidth = size.x * 2 / 3 / cols;
+
+            // gender column
+            Rect genderRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            Rect genderIconRect =
+                new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( genderRect );
+            switch ( p.gender )
+            {
+                case Gender.Female:
+                    GUI.DrawTexture( genderIconRect, Resources.FemaleIcon );
+                    break;
+
+                case Gender.Male:
+                    GUI.DrawTexture( genderIconRect, Resources.MaleIcon );
+                    break;
+
+                case Gender.None:
+                    GUI.DrawTexture( genderIconRect, Resources.UnkownIcon );
+                    break;
+            }
+            TooltipHandler.TipRegion( genderRect, p.gender.GetLabel() );
+            cur.x += colwidth;
+
+            // lifestage column
+            Rect ageRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            Rect ageIconRect = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect );
+            GUI.DrawTexture( ageIconRect, Resources.LifeStages[p.ageTracker.CurLifeStageIndex] );
+            TooltipHandler.TipRegion( ageRect, p.ageTracker.AgeTooltipString );
+            cur.x += colwidth;
+
+            // meat column
+            Rect meatRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            // NOTE: When splitting tabs into separate mods; estimated meat count is defined in the Hunting helper.
+            Utilities.Label( meatRect, p.EstimatedMeatCount().ToString(), p.EstimatedMeatCount().ToString(), TextAnchor.MiddleCenter,
+                             font: GameFont.Tiny );
+            cur.x += colwidth;
+
+            // milk column
+            if ( p.Milkable() )
+            {
+                Rect milkRect = new Rect( cur.x, cur.y, colwidth, size.y );
+                CompMilkable comp = p.TryGetComp<CompMilkable>();
+                Utilities.Label( milkRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate( comp.props.milkDef.LabelCap, comp.props.milkAmount ),
+                                 TextAnchor.MiddleCenter, font: GameFont.Tiny );
+            }
+            if ( p.kindDef.Milkable() )
+                cur.x += colwidth;
+
+            // wool column
+            if ( p.Shearable() )
+            {
+                Rect woolRect = new Rect( cur.x, cur.y, colwidth, size.y );
+                CompShearable comp = p.TryGetComp<CompShearable>();
+                Utilities.Label( woolRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate( comp.props.woolDef.LabelCap, comp.props.woolAmount ),
+                                 TextAnchor.MiddleCenter, font: GameFont.Tiny );
+            }
+            if ( p.kindDef.Milkable() )
+                cur.x += colwidth;
+
+            // do the carriage return on ref cur
+            cur.x = 0f;
+            cur.y += size.y;
         }
 
         private void DrawAvailableJobList( Rect outRect, Rect viewRect )
@@ -709,5 +704,31 @@ namespace FluffyManager
             GUI.EndGroup();
             Widgets.EndScrollView();
         }
+
+        private void Refresh()
+        {
+            // currently managed
+            _currentJobs = Manager.Get.JobStack.FullStack<ManagerJob_Livestock>();
+
+            // concatenate lists of animals on biome and animals in colony.
+            _availablePawnKinds = Find.Map.Biome.AllWildAnimals.ToList();
+            _availablePawnKinds.AddRange(
+                Find.ListerPawns.AllPawns
+                    .Where( p => p.RaceProps.Animal )
+                    .Select( p => p.kindDef ) );
+            _availablePawnKinds = _availablePawnKinds
+
+                // get distinct pawnkinds from the merges
+                .Distinct()
+
+                // remove already managed pawnkinds
+                .Where( pk => !_currentJobs.Select( job => job.Trigger.pawnKind ).Contains( pk ) )
+
+                // order by label
+                .OrderBy( def => def.LabelCap )
+                .ToList();
+        }
+
+        #endregion Methods
     }
 }
