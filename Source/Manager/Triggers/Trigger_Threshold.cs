@@ -6,6 +6,7 @@
 
 using RimWorld;
 using System;
+using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -15,19 +16,15 @@ namespace FluffyManager
     {
         #region Fields
 
-        public static int DefaultCount = 500;
-
+        public static int DefaultCount             = 500;
         public static int DefaultMaxUpperThreshold = 3000;
-
-        public int Count;
-
-        public int MaxUpperThreshold;
-
-        public Ops Op;
-
+        public int        Count;
+        public int        MaxUpperThreshold;
+        public Ops        Op;
         public Zone_Stockpile stockpile;
+        public ThingFilter    ThresholdFilter;
 
-        public ThingFilter ThresholdFilter;
+        private string _stockpile_scribe;
 
         #endregion Fields
 
@@ -241,6 +238,17 @@ namespace FluffyManager
             Scribe_Values.LookValue( ref MaxUpperThreshold, "MaxUpperThreshold" );
             Scribe_Values.LookValue( ref Op, "Operator" );
             Scribe_Deep.LookDeep( ref ThresholdFilter, "ThresholdFilter" );
+
+            // stockpile needs special treatment - is not referenceable.
+            if ( Scribe.mode == LoadSaveMode.Saving )
+            {
+                _stockpile_scribe = stockpile.ToString();
+            }
+            Scribe_Values.LookValue( ref _stockpile_scribe, "Stockpile" );
+            if ( Scribe.mode == LoadSaveMode.PostLoadInit )
+            {
+                stockpile = Find.ZoneManager.AllZones.Where( z => z is Zone_Stockpile && z.label == _stockpile_scribe ).FirstOrDefault() as Zone_Stockpile;
+            }
         }
 
         public override string ToString()

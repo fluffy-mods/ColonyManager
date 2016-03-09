@@ -112,7 +112,7 @@ namespace FluffyManager
 
             Rect clearAdditionalAreasSelectorRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( clearAdditionalAreasSelectorRect );
-            AreaAllowedGUI.DoAllowedAreaSelectorsMC( clearAdditionalAreasSelectorRect, ref _selected.ClearAreas );
+            AreaAllowedGUI.DoAllowedAreaSelectorsMC( clearAdditionalAreasSelectorRect, ref _selected.ClearAreas, lrMargin: Margin );
             cur.y += EntryHeight;
 
             // Allow saplings (4)
@@ -127,9 +127,9 @@ namespace FluffyManager
                              lrMargin: Margin );
             cur.y += EntryHeight;
 
-            Rect loggingAreaRect = new Rect( cur.x + Margin, cur.y, colWidth - 2 * Margin, EntryHeight );
+            Rect loggingAreaRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( loggingAreaRect );
-            AreaAllowedGUI.DoAllowedAreaSelectors( loggingAreaRect, ref _selected.LoggingArea );
+            AreaAllowedGUI.DoAllowedAreaSelectors( loggingAreaRect, ref _selected.LoggingArea, lrMargin: Margin );
             cur.y += EntryHeight;
 
             GUI.EndGroup();

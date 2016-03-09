@@ -78,6 +78,7 @@
   <FMF.LoggingArea>Alllow logging in:</FMF.LoggingArea>
   <FMF.TargetCount>Target count: {0}+{1}/{2}</FMF.TargetCount>
   <FMF.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMF.TargetCountTooltip>
+  <FMF.ClearAreas>Clear areas of all vegetation:</FMF.ClearAreas>
 
   <!-- Production Tab -->
   <!-- Miscelaneous -->

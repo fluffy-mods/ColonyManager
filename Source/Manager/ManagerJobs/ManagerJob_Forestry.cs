@@ -42,11 +42,14 @@ namespace FluffyManager
             Trigger.ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
 
             // populate the list of trees from the plants in the biome - allow all by default.
-            // A tree is defined as any plant that yields wood
+            // A tree is defined as any plant that yields wood or has a wood harvesting tag.
             AllowedTrees =
                 Find.Map.Biome.AllWildPlants.Where( pd => pd.plant.harvestTag == "Wood" ||  pd.plant.harvestedThingDef == Utilities_Forestry.Wood )
                     // add harvesttag to allow non-wood yielding woody plants.
                     .ToDictionary( pk => pk, v => true );
+
+            // initialize clearAreas list with current areas
+            ClearAreas = Find.AreaManager.AllAreas.Where( area => area.AssignableAsAllowed( AllowedAreaMode.Humanlike ) ).ToDictionary( a => a, v => false );
 
             History = new History( new[] { "stock", "designated" }, new[] { Color.white, Color.grey } );
         }
