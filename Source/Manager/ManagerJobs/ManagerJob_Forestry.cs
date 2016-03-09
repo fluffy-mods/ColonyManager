@@ -20,11 +20,14 @@ namespace FluffyManager
         public static bool                ClearWindCells             = true;
         public Dictionary<ThingDef, bool> AllowedTrees;
         public bool                       AllowSaplings;
+        public Dictionary<Area, bool>     ClearAreas                 = new Dictionary<Area, bool>();
         public List<Designation>          Designations               = new List<Designation>();
         public History                    History;
         public Area                       LoggingArea;
         public new Trigger_Threshold      Trigger;
         private readonly float            _margin                    = Utilities.Margin;
+        private List<bool>                _clearAreas_allowed;
+        private List<Area>                _clearAreas_areas;
         private Utilities.CachedValue<int> _designatedWoodCachedValue = new Utilities.CachedValue<int>();
 
         #endregion Fields
@@ -79,42 +82,18 @@ namespace FluffyManager
 
         #endregion Properties
 
-        #region Overrides of ManagerJob
-
-        public override void ExposeData()
-        {
-            // scribe base things
-            base.ExposeData();
-
-            // settings
-            Scribe_References.LookReference( ref LoggingArea, "LoggingArea" );
-            Scribe_Collections.LookDictionary( ref AllowedTrees, "AllowedTrees", LookMode.DefReference, LookMode.Value );
-            Scribe_Values.LookValue( ref AllowSaplings, "AllowSaplings", false );
-            Scribe_Values.LookValue( ref ClearWindCells, "ClearWindCells", true );
-
-            // trigger
-            Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
-
-            if ( Manager.LoadSaveMode == Manager.Modes.Normal )
-            {
-                // scribe history
-                Scribe_Deep.LookDeep( ref History, "History" );
-            }
-        }
-
-        #endregion Overrides of ManagerJob
-
         #region Methods
 
-        public static void DesignateWindCells()
+        public static void DoClearAreaDesignations( IEnumerable<IntVec3> cells, bool allPlants = false )
         {
-            foreach ( IntVec3 cell in GetWindCells() )
+            foreach ( IntVec3 cell in cells )
             {
                 // confirm there is a plant here that it is a tree and that it has no current designation
                 Plant plant = cell.GetPlant();
                 if ( plant != null &&
-                     plant.def.plant.IsTree &&
-                     Find.DesignationManager.DesignationOn( plant, DesignationDefOf.CutPlant ) == null )
+                     ( allPlants || plant.def.plant.IsTree ) &&
+                     Find.DesignationManager.AllDesignationsOn( plant ).ToList().NullOrEmpty() )
+                //DesignationOn( plant, DesignationDefOf.CutPlant ) == null )
                 {
                     Find.DesignationManager.AddDesignation( new Designation( plant, DesignationDefOf.CutPlant ) );
                 }
@@ -126,7 +105,7 @@ namespace FluffyManager
             // designate wind cells
             if ( ClearWindCells )
             {
-                DesignateWindCells();
+                DoClearAreaDesignations( GetWindCells() );
             }
         }
 
@@ -203,6 +182,44 @@ namespace FluffyManager
             History.DrawPlot( rect, Trigger.Count );
         }
 
+        public override void ExposeData()
+        {
+            // scribe base things
+            base.ExposeData();
+
+            // settings
+            Scribe_References.LookReference( ref LoggingArea, "LoggingArea" );
+            Scribe_Collections.LookDictionary( ref AllowedTrees, "AllowedTrees", LookMode.DefReference, LookMode.Value );
+            Scribe_Values.LookValue( ref AllowSaplings, "AllowSaplings", false );
+            Scribe_Values.LookValue( ref ClearWindCells, "ClearWindCells", true );
+
+            // clearing areas list
+            if ( Scribe.mode == LoadSaveMode.Saving )
+            {
+                _clearAreas_allowed = new List<bool>( ClearAreas.Values );
+                _clearAreas_areas = new List<Area>( ClearAreas.Keys );
+            }
+            Scribe_Collections.LookList( ref _clearAreas_allowed, "ClearAreas_allowed", LookMode.Value );
+            Scribe_Collections.LookList( ref _clearAreas_areas, "ClearAreas_areas", LookMode.MapReference );
+            if ( Scribe.mode == LoadSaveMode.PostLoadInit )
+            {
+                ClearAreas = new Dictionary<Area, bool>();
+                for ( int i = 0; i < _clearAreas_areas.Count; i++ )
+                {
+                    ClearAreas.Add( _clearAreas_areas[i], _clearAreas_allowed[i] );
+                }
+            }
+
+            // trigger
+            Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
+
+            if ( Manager.LoadSaveMode == Manager.Modes.Normal )
+            {
+                // scribe history
+                Scribe_Deep.LookDeep( ref History, "History" );
+            }
+        }
+
         public int GetWoodInDesignations()
         {
             int count = 0;
@@ -245,6 +262,12 @@ namespace FluffyManager
                 CleanAreaDesignations();
             }
 
+            // clear selected areas
+            if ( ClearAreas.Any() )
+            {
+                DoClearAreas();
+            }
+
             // clean dead designations
             CleanDesignations();
 
@@ -266,6 +289,19 @@ namespace FluffyManager
             }
 
             return workDone;
+        }
+
+        public void UpdateClearAreas()
+        {
+            Dictionary<Area, bool> _clearAreas = new Dictionary<Area, bool>();
+
+            foreach ( Area area in Find.AreaManager.AllAreas.Where( area => area.AssignableAsAllowed( AllowedAreaMode.Humanlike ) ) )
+            {
+                // add all areas in the game, set to true if area already existed and was true.
+                _clearAreas.Add( area, ClearAreas.ContainsKey( area ) && ClearAreas[area] );
+            }
+
+            ClearAreas = _clearAreas;
         }
 
         private static List<IntVec3> GetWindCells()
@@ -309,6 +345,15 @@ namespace FluffyManager
                 {
                     des.Delete();
                 }
+            }
+        }
+
+        private void DoClearAreas()
+        {
+            foreach ( var area in ClearAreas )
+            {
+                if ( area.Value )
+                    DoClearAreaDesignations( area.Key.ActiveCells );
             }
         }
 

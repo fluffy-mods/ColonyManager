@@ -55,9 +55,11 @@
     <Compile Include="Helpers\Research\ResearchWorkers.cs" />
     <Compile Include="Helpers\Resources.cs" />
     <Compile Include="Helpers\UI\StockpileGUI.cs" />
+    <Compile Include="ManagerJobs\ManagerJob_Foraging.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Forestry.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Hunting.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Livestock.cs" />
+    <Compile Include="ManagerTabs\ManagerTab_Foraging.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Power.cs" />
     <Compile Include="Triggers\Trigger_PawnKind.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Forestry.cs" />

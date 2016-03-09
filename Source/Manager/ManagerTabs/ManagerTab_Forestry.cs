@@ -104,19 +104,31 @@ namespace FluffyManager
             Utilities.DrawToggle( clearWindCellsRect, "FMF.ClearWindCells".Translate(), ref ManagerJob_Forestry.ClearWindCells );
             cur.y += EntryHeight;
 
-            // Allow saplings (3)
+            // clear additional areas(3)
+            Rect clearAdditionalAreasLabelRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            Widgets.DrawAltRect( clearAdditionalAreasLabelRect );
+            Utilities.Label( clearAdditionalAreasLabelRect, "FMF.ClearAreas".Translate(), anchor: TextAnchor.MiddleLeft, lrMargin: Margin );
+            cur.y += EntryHeight;
+
+            Rect clearAdditionalAreasSelectorRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            Widgets.DrawAltRect( clearAdditionalAreasSelectorRect );
+            AreaAllowedGUI.DoAllowedAreaSelectorsMC( clearAdditionalAreasSelectorRect, ref _selected.ClearAreas );
+            cur.y += EntryHeight;
+
+            // Allow saplings (4)
             Rect allowSaplingsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-            Widgets.DrawAltRect( allowSaplingsRect );
             Utilities.DrawToggle( allowSaplingsRect, "FMF.AllowSaplings".Translate(), ref _selected.AllowSaplings );
             cur.y += EntryHeight;
 
-            // Logging area (4)
+            // Logging area (5)
             Rect loggingAreaTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            Widgets.DrawAltRect( loggingAreaTitleRect );
             Utilities.Label( loggingAreaTitleRect, "FMF.LoggingArea".Translate(), anchor: TextAnchor.MiddleLeft,
                              lrMargin: Margin );
             cur.y += EntryHeight;
 
             Rect loggingAreaRect = new Rect( cur.x + Margin, cur.y, colWidth - 2 * Margin, EntryHeight );
+            Widgets.DrawAltRect( loggingAreaRect );
             AreaAllowedGUI.DoAllowedAreaSelectors( loggingAreaRect, ref _selected.LoggingArea );
             cur.y += EntryHeight;
 
@@ -328,6 +340,10 @@ namespace FluffyManager
         public void Refresh()
         {
             _jobs = Manager.Get.JobStack.FullStack<ManagerJob_Forestry>();
+
+            // makes sure the list of possible areas is up-to-date with the area in the game.
+            foreach ( var job in _jobs )
+                job.UpdateClearAreas();
         }
 
         #endregion Methods
