@@ -353,7 +353,7 @@ namespace FluffyManager
             foreach ( var area in ClearAreas )
             {
                 if ( area.Value )
-                    DoClearAreaDesignations( area.Key.ActiveCells );
+                    DoClearAreaDesignations( area.Key.ActiveCells, true );
             }
         }
 
