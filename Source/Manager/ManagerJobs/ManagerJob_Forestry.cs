@@ -114,7 +114,7 @@ namespace FluffyManager
 
         public void AddRelevantGameDesignations()
         {
-            // get list of game designations not managed by this job that could be assigned by this job.
+            // get list of game designations not managed by this job that could have been assigned by this job.
             foreach ( Designation des in Find.DesignationManager.DesignationsOfDef( DesignationDefOf.CutPlant )
                                              .Except( Designations )
                                              .Where( des => IsValidForestryTarget( des.target ) ) )
@@ -362,28 +362,7 @@ namespace FluffyManager
 
         private List<Plant> GetLoggableTreesSorted()
         {
-            // we need to define a 'base' position to calculate distances.
-            // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
-            IntVec3 position = IntVec3.Zero;
-            Building managerStation =
-                Find.ListerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
-            if ( managerStation != null )
-            {
-                position = managerStation.Position;
-            }
-
-            // otherwise, use the average of the home area. Not ideal, but it'll do.
-            else
-            {
-                List<IntVec3> homeCells = Find.AreaManager.Get<Area_Home>().ActiveCells.ToList();
-                for ( int i = 0; i < homeCells.Count; i++ )
-                {
-                    position += homeCells[i];
-                }
-                position.x /= homeCells.Count;
-                position.y /= homeCells.Count;
-                position.z /= homeCells.Count;
-            }
+            IntVec3 position = Utilities.GetBaseCenter();
 
             // get a list of trees that are not designated in the logging grounds and are reachable, sorted by yield / distance * 2
             List<Plant> list = Find.ListerThings.AllThings.Where( p => IsValidForestryTarget( p ) )

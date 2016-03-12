@@ -68,6 +68,15 @@ namespace FluffyManager
             ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
         }
 
+        public Trigger_Threshold( ManagerJob_Foraging job )
+        {
+            Op = Ops.LowerThan;
+            MaxUpperThreshold = DefaultMaxUpperThreshold;
+            Count = DefaultCount;
+            ThresholdFilter = new ThingFilter();
+            ThresholdFilter.SetDisallowAll();
+        }
+
         #endregion Constructors
 
         #region Enums
@@ -242,9 +251,9 @@ namespace FluffyManager
             // stockpile needs special treatment - is not referenceable.
             if ( Scribe.mode == LoadSaveMode.Saving )
             {
-                _stockpile_scribe = stockpile.ToString();
+                _stockpile_scribe = stockpile?.ToString() ?? "null";
             }
-            Scribe_Values.LookValue( ref _stockpile_scribe, "Stockpile" );
+            Scribe_Values.LookValue( ref _stockpile_scribe, "Stockpile", "null" );
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
             {
                 stockpile = Find.ZoneManager.AllZones.Where( z => z is Zone_Stockpile && z.label == _stockpile_scribe ).FirstOrDefault() as Zone_Stockpile;

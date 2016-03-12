@@ -1,16 +1,16 @@
 ﻿// Manager/Utilities.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-04 19:28
 
 using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using Verse;
-using System.Reflection;
 
 namespace FluffyManager
 {
@@ -39,6 +39,34 @@ namespace FluffyManager
             inner.x += x;
             inner.y += y;
             return inner;
+        }
+
+        public static IntVec3 GetBaseCenter()
+        {
+            // we need to define a 'base' position to calculate distances.
+            // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
+            IntVec3 position = IntVec3.Zero;
+            Building managerStation =
+                Find.ListerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
+            if ( managerStation != null )
+            {
+                position = managerStation.Position;
+            }
+
+            // otherwise, use the average of the home area. Not ideal, but it'll do.
+            else
+            {
+                List<IntVec3> homeCells = Find.AreaManager.Get<Area_Home>().ActiveCells.ToList();
+                for ( int i = 0; i < homeCells.Count; i++ )
+                {
+                    position += homeCells[i];
+                }
+                position.x /= homeCells.Count;
+                position.y /= homeCells.Count;
+                position.z /= homeCells.Count;
+            }
+
+            return position;
         }
 
         public static string Summary( this ThingFilter filter )
@@ -88,7 +116,7 @@ namespace FluffyManager
                 return string.Join( ", ", filter.AllowedThingDefs.Select( td => td.LabelCap ).ToArray() );
             }
 
-            // TODO: main routine 
+            // TODO: main routine
             // NOTE: when I can be arsed to care enough.
             // get list of allowed thingdefs.
             // get list of categories.
@@ -257,34 +285,6 @@ namespace FluffyManager
         {
             int num;
             return int.TryParse( text, out num );
-        }
-
-        public static IntVec3 GetBasePosition()
-        {
-            // we need to define a 'base' position to calculate distances.
-            // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
-            IntVec3 position = IntVec3.Zero;
-            Building managerStation =
-                Find.ListerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
-            if ( managerStation != null )
-            {
-                position = managerStation.Position;
-            }
-
-            // otherwise, use the average of the home area. Not ideal, but it'll do.
-            else
-            {
-                List<IntVec3> homeCells = Find.AreaManager.Get<Area_Home>().ActiveCells.ToList();
-                for ( int i = 0; i < homeCells.Count(); i++ )
-                {
-                    position += homeCells[i];
-                }
-                position.x /= homeCells.Count;
-                position.y /= homeCells.Count;
-                position.z /= homeCells.Count;
-            }
-
-            return position;
         }
 
         public static void DrawStatusForListEntry<T>( this T job, Rect rect, Trigger trigger ) where T : ManagerJob
@@ -479,13 +479,14 @@ namespace FluffyManager
         public class CachedValue<T>
         {
             private T _cached;
+            private T _default;
             public int timeSet;
             public int updateInterval;
 
-            public CachedValue( T value = default(T), int updateInterval = 250 )
+            public CachedValue( T value = default( T ), int updateInterval = 250 )
             {
                 this.updateInterval = updateInterval;
-                _cached = value;
+                _cached = _default = value;
                 timeSet = Find.TickManager.TicksGame;
             }
 
@@ -496,7 +497,7 @@ namespace FluffyManager
                     value = _cached;
                     return true;
                 }
-                value = default(T);
+                value = _default;
                 return false;
             }
 
@@ -523,9 +524,9 @@ namespace FluffyManager
         public static void LabelOutline( Rect icon, string label, string tooltip, TextAnchor anchor, float lrMargin, float tbMargin, GameFont font, Color textColour, Color outlineColour )
         {
             // horribly inefficient way of getting an outline to show - draw 4 background coloured labels with a 1px offset, then draw the foreground on top.
-            int[] offsets = { - 1, 0, 1 };
+            int[] offsets = { -1, 0, 1 };
 
-            foreach (int xOffset in offsets)
+            foreach ( int xOffset in offsets )
                 foreach ( int yOffset in offsets )
                 {
                     Rect offsetIcon = icon;
@@ -542,7 +543,7 @@ namespace FluffyManager
             string text = null;
             if ( Scribe.mode == LoadSaveMode.Saving )
             {
-                text = String.Join(":", values.ConvertAll(i => i.ToString()).ToArray() );
+                text = String.Join( ":", values.ConvertAll( i => i.ToString() ).ToArray() );
             }
             Scribe_Values.LookValue( ref text, label );
             if ( Scribe.mode == LoadSaveMode.LoadingVars )

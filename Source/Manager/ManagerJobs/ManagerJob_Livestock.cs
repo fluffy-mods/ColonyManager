@@ -242,7 +242,7 @@ namespace FluffyManager
                 if ( deficit > 0 )
                 {
                     // get the 'home' position
-                    IntVec3 position = Utilities.GetBasePosition();
+                    IntVec3 position = Utilities.GetBaseCenter();
 
                     // get list of animals in sorted by youngest weighted to distance.
                     List<Pawn> animals = Trigger.pawnKind.GetWild( ageSex )

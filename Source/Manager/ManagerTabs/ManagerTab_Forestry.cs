@@ -19,8 +19,8 @@ namespace FluffyManager
         private const float Margin = Utilities.Margin;
         private static ManagerJob_Forestry _selected = new ManagerJob_Forestry();
         private readonly float _topAreaHeight = 30f;
-        private Vector2 _animalsScrollPosition = Vector2.zero;
         private Vector2 _button = new Vector2( 200f, 40f );
+        private Vector2 _contentScrollPosition = Vector2.zero;
         private List<ManagerJob_Forestry> _jobs;
         private float _leftRowHeight = 9999f;
         private Vector2 _scrollPosition = Vector2.zero;
@@ -153,7 +153,7 @@ namespace FluffyManager
             }
 
             // start scrolling view
-            Widgets.BeginScrollView( outRect, ref _animalsScrollPosition, viewRect );
+            Widgets.BeginScrollView( outRect, ref _contentScrollPosition, viewRect );
 
             // list of keys in allowed trees list (all plans that yield wood in biome, static)
             List<ThingDef> treeDefs = new List<ThingDef>( _selected.AllowedTrees.Keys );

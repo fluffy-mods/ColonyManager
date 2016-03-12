@@ -74,7 +74,7 @@
   <FMF.Options>Options</FMF.Options>
   <FMF.Trees>Allowed trees</FMF.Trees>
   <FMF.ClearWindCells>Clear wind turbine cells</FMF.ClearWindCells>
-  <FMF.AllowSaplings>Allow cutting non-mature trees</FMF.AllowSaplings>
+  <FMF.AllowSaplings>Allow cutting not fully matured trees</FMF.AllowSaplings>
   <FMF.LoggingArea>Alllow logging in:</FMF.LoggingArea>
   <FMF.TargetCount>Target count: {0}+{1}/{2}</FMF.TargetCount>
   <FMF.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMF.TargetCountTooltip>

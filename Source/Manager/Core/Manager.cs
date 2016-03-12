@@ -1,7 +1,7 @@
 ﻿// Manager/Manager.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-05 22:59
 
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ namespace FluffyManager
             ImportExport,
             Normal
         }
-                
+
         public static Modes      LoadSaveMode           = Modes.Normal;
         private List<ManagerTab> _managerTabsLeft;
         private List<ManagerTab> _managerTabsMiddle;
@@ -33,7 +33,8 @@ namespace FluffyManager
             new ManagerTab_ImportExport(),
             new ManagerTab_Hunting(),
             new ManagerTab_Forestry(),
-            new ManagerTab_Livestock()
+            new ManagerTab_Livestock(),
+            new ManagerTab_Foraging()
             // Power is added by ResearchWorkers.UnlockPowerTab() after the appropriate research is done.
         };
 
@@ -108,7 +109,7 @@ namespace FluffyManager
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Values.LookValue( ref HelpShown, "HelpShown", false);
+            Scribe_Values.LookValue( ref HelpShown, "HelpShown", false );
             Scribe_Deep.LookDeep( ref _stack, "JobStack" );
 
             foreach ( ManagerTab tab in ManagerTabs )
@@ -116,7 +117,7 @@ namespace FluffyManager
                 IExposable exposableTab = tab as IExposable;
                 if ( exposableTab != null )
                 {
-                    Scribe_Deep.LookDeep(ref exposableTab, tab.Label);
+                    Scribe_Deep.LookDeep( ref exposableTab, tab.Label );
                 }
             }
 
@@ -162,7 +163,7 @@ namespace FluffyManager
             DeepProfiler.Start( "Global work for production manager" );
             ManagerJob_Production.GlobalWork();
             DeepProfiler.End();
-            
+
             // clear turbine cells.
             DeepProfiler.Start( "Global work for forestry manager" );
             ManagerJob_Forestry.GlobalWork();
@@ -180,7 +181,7 @@ namespace FluffyManager
             // replace stack
             _stack = jobstack;
 
-            // touch new jobs in inappropriate places
+            // touch new jobs in inappropriate places (reset timing so they are properly performed)
             foreach ( ManagerJob job in _stack.FullStack() )
             {
                 job.Touch();
