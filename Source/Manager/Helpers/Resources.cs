@@ -1,7 +1,7 @@
 ﻿// Manager/Resources.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-17 12:59
 
 using System.Collections.Generic;
@@ -12,6 +12,8 @@ namespace FluffyManager
 {
     public static class Resources
     {
+        #region Fields
+
         public static readonly Texture2D
 
             // sorting arrows
@@ -32,6 +34,7 @@ namespace FluffyManager
             IconImportExport             = ContentFinder<Texture2D>.Get( "UI/Icons/ImportExport" ),
             IconForestry                 = ContentFinder<Texture2D>.Get( "UI/Icons/Tree" ),
             IconLivestock                = ContentFinder<Texture2D>.Get( "UI/Icons/Livestock" ),
+            IconForaging                 = ContentFinder<Texture2D>.Get( "UI/Icons/Foraging" ),
             IconPower                    = ContentFinder<Texture2D>.Get( "UI/Icons/Power" ),
 
             // misc
@@ -55,5 +58,7 @@ namespace FluffyManager
             UnkownIcon                   = ContentFinder<Texture2D>.Get( "UI/Icons/unknown" );
 
         public static Texture2D[] LifeStages = { StageA, StageB, StageC };
+
+        #endregion Fields
     }
 }

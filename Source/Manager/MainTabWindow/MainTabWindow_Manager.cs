@@ -1,7 +1,7 @@
 ﻿// Manager/MainTabWindow_Manager.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-04 19:24
 
 using RimWorld;
@@ -12,10 +12,16 @@ namespace FluffyManager
 {
     internal class MainTabWindow_Manager : MainTabWindow
     {
+        #region Fields
+
         public static ManagerTab CurrentTab;
+        public ManagerTab DefaultTab = Manager.Get.ManagerTabs[0];
         private static float _iconSize = 30f;
         private static float _margin = Utilities.Margin;
-        public ManagerTab DefaultTab = Manager.Get.ManagerTabs[0];
+
+        #endregion Fields
+
+        #region Constructors
 
         public MainTabWindow_Manager()
         {
@@ -24,6 +30,10 @@ namespace FluffyManager
                 CurrentTab = DefaultTab;
             }
         }
+
+        #endregion Constructors
+
+        #region Methods
 
         public static void GoTo( ManagerTab tab, ManagerJob job = null )
         {
@@ -141,11 +151,13 @@ namespace FluffyManager
 
             if ( !Manager.Get.HelpShown )
             {
-                Find.WindowStack.Add( new Dialog_Message("FM.HelpMessage".Translate(), "FM.HelpTitle".Translate()));
+                Find.WindowStack.Add( new Dialog_Message( "FM.HelpMessage".Translate(), "FM.HelpTitle".Translate() ) );
                 Manager.Get.HelpShown = true;
             }
 
             CurrentTab.PreOpen();
         }
+
+        #endregion Methods
     }
 }

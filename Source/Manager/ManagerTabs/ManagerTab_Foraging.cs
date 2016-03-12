@@ -25,7 +25,7 @@ namespace FluffyManager
 
         #region Properties
 
-        public override Texture2D Icon { get; } = Resources.IconForestry;
+        public override Texture2D Icon { get; } = Resources.IconForaging;
 
         public override IconAreas IconArea
         {
