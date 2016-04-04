@@ -214,6 +214,7 @@ namespace FluffyManager
                 for ( int i = 0; i < targets.Count && count < Trigger.Count; i++ )
                 {
                     Designation des = new Designation( targets[i], DesignationDefOf.HarvestPlant );
+                    count += targets[i].YieldNow();
                     AddDesignation( des );
                     workDone = true;
                 }
@@ -239,6 +240,7 @@ namespace FluffyManager
                 {
                     des.Delete();
                 }
+
                 // if area is not null and does not contain designate location, remove designation.
                 else if ( !ForagingArea?.ActiveCells.Contains( des.target.Thing.Position ) ?? false )
                 {
@@ -276,10 +278,8 @@ namespace FluffyManager
         {
             return p.def.plant != null
 
-                   // non-biome plants won't be on the list
+                   // non-biome plants won't be on the list, also filters non-yield or wood plants
                    && AllowedPlants.ContainsKey( p.def )
-
-                   // also filters out non-yielding plants and trees
                    && AllowedPlants[p.def]
                    && p.SpawnedInWorld
                    && Find.DesignationManager.DesignationOn( p ) == null
