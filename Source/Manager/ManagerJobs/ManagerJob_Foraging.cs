@@ -281,7 +281,7 @@ namespace FluffyManager
                    // non-biome plants won't be on the list, also filters non-yield or wood plants
                    && AllowedPlants.ContainsKey( p.def )
                    && AllowedPlants[p.def]
-                   && p.SpawnedInWorld
+                   && p.Spawned
                    && Find.DesignationManager.DesignationOn( p ) == null
 
                    // cut only mature plants, or non-mature that yield something right now.

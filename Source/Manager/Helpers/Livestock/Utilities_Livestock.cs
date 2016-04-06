@@ -63,7 +63,7 @@ namespace FluffyManager
             }
 
             // if not, get a new list.
-            cached = Find.ListerPawns.AllPawns
+            cached = Find.MapPawns.AllPawns
                          .Where( p => p.RaceProps.Animal // is animal
                                       && !p.Dead // is alive
                                       && p.kindDef == pawnKind ); // is our managed pawnkind
@@ -135,11 +135,11 @@ namespace FluffyManager
                 {
                     return ret;
                 }
-                ret = pawnKind.race.comps.Any( cp => cp.milkDef != null );
+                ret = pawnKind.race.comps.OfType<CompProperties_Milkable>().Any( cp => cp.milkDef != null );
                 _milkablePawnkind[pawnKind].Update( ret );
                 return ret;
             }
-            ret = pawnKind.race.comps.Any( cp => cp.milkDef != null );
+            ret = pawnKind.race.comps.OfType<CompProperties_Milkable>().Any( cp => cp.milkDef != null );
             _milkablePawnkind.Add( pawnKind, new Utilities.CachedValue<bool>( ret, Int32.MaxValue ) );
             return ret;
         }
@@ -183,11 +183,11 @@ namespace FluffyManager
                 {
                     return ret;
                 }
-                ret = pawnKind.race.comps.Any( cp => cp.woolDef != null );
+                ret = pawnKind.race.comps.OfType<CompProperties_Shearable>().Any( cp => cp.woolDef != null );
                 _shearablePawnkind[pawnKind].Update( ret );
                 return ret;
             }
-            ret = pawnKind.race.comps.Any( cp => cp.woolDef != null );
+            ret = pawnKind.race.comps.OfType<CompProperties_Shearable>().Any( cp => cp.woolDef != null );
             _shearablePawnkind.Add( pawnKind, new Utilities.CachedValue<bool>( ret, Int32.MaxValue ) );
             return ret;
         }

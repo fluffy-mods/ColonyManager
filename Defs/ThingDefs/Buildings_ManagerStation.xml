@@ -101,7 +101,7 @@
 		<surfaceType>Item</surfaceType>
 		<tickerType>Normal</tickerType>
 		<comps>
-			<li>
+			<li Class="CompProperties_Power">
 				<compClass>CompPowerTrader</compClass>
 				<basePowerConsumption>100</basePowerConsumption>
 				<startElectricalFires>true</startElectricalFires>
@@ -113,7 +113,9 @@
 				<speed>500</speed>
 			</li>     
 		</comps>
-		<researchPrerequisite>ManagingSoftware</researchPrerequisite>
+		<researchPrerequisites>
+			<li>ManagingSoftware</li>
+		</researchPrerequisites>
 	</ThingDef>
 
 	<ThingDef ParentName="BenchBase">
@@ -146,7 +148,7 @@
 		<pathCost>100</pathCost>
 		<tickerType>Normal</tickerType>
 		<comps>
-			<li>
+			<li Class="CompProperties_Power">
 				<compClass>CompPowerTrader</compClass>
 				<basePowerConsumption>500</basePowerConsumption>
 				<startElectricalFires>true</startElectricalFires>
@@ -157,13 +159,15 @@
 				<compClass>FluffyManager.Comp_ManagerStation</compClass>
 				<speed>250</speed>
 			</li>     
-			<li>
+			<li Class="CompProperties_Glower">
 		        <compClass>CompGlower</compClass>
 		        <glowRadius>3</glowRadius>
 		        <glowColor>(255,0,0,0)</glowColor>
 			</li>
 		</comps>
-		<researchPrerequisite>AdvancedManagingSoftware</researchPrerequisite>
+		<researchPrerequisites>
+			<li>AdvancedManagingSoftware</li>
+		</researchPrerequisites>
 	</ThingDef>
 
 </ThingDefs>

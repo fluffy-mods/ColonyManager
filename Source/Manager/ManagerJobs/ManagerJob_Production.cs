@@ -668,7 +668,7 @@ namespace FluffyManager
                 if ( maxSkil )
                 {
                     Bill.minSkillLevel =
-                        Find.ListerPawns.FreeColonistsSpawned.Max(
+                        Find.MapPawns.FreeColonistsSpawned.Max(
                             pawn => pawn.skills.GetSkill( Bill.recipe.workSkill ).level );
                 }
             }

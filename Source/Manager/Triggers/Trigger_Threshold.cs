@@ -212,7 +212,8 @@ namespace FluffyManager
             }
             if ( tooltip.NullOrEmpty() )
             {
-                tooltip = ThresholdFilter?.Summary() + "\n" + "FMP.ThresholdCountTooltip".Translate( CurCount, Count );
+                // TODO: Re-implement filter summary method.
+                tooltip = "FMP.ThresholdCountTooltip".Translate( CurCount, Count );
             }
 
             Utilities.Label( thresholdLabelRect, label, tooltip );

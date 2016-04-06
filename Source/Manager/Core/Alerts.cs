@@ -37,7 +37,7 @@ namespace FluffyManager
         private bool AnyConsciousManagerPawn()
         {
             return
-                Find.ListerPawns.FreeColonistsSpawned.Any(
+                Find.MapPawns.FreeColonistsSpawned.Any(
                     pawn => !pawn.health.Dead && !pawn.Downed &&
                             pawn.workSettings.WorkIsActive( Utilities.WorkTypeDefOf_Managing ) ) ||
                 Find.ListerBuildings.ColonistsHaveBuilding( DefDatabase<ThingDef>.GetNamed( "FM_AIManager" ) );

@@ -532,7 +532,7 @@ namespace FluffyManager
                 Find.MainTabsRoot.EscapeCurrentTab();
                 Find.CameraMap.JumpTo( p.PositionHeld );
                 Find.Selector.ClearSelection();
-                if ( p.SpawnedInWorld )
+                if ( p.Spawned )
                 {
                     Find.Selector.Select( p );
                 }
@@ -594,7 +594,7 @@ namespace FluffyManager
             {
                 Rect milkRect = new Rect( cur.x, cur.y, colwidth, size.y );
                 CompMilkable comp = p.TryGetComp<CompMilkable>();
-                Utilities.Label( milkRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate( comp.props.milkDef.LabelCap, comp.props.milkAmount ),
+                Utilities.Label( milkRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate( comp.Props.milkDef.LabelCap, comp.Props.milkAmount ),
                                  TextAnchor.MiddleCenter, font: GameFont.Tiny );
             }
             if ( p.kindDef.Milkable() )
@@ -605,7 +605,7 @@ namespace FluffyManager
             {
                 Rect woolRect = new Rect( cur.x, cur.y, colwidth, size.y );
                 CompShearable comp = p.TryGetComp<CompShearable>();
-                Utilities.Label( woolRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate( comp.props.woolDef.LabelCap, comp.props.woolAmount ),
+                Utilities.Label( woolRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate( comp.Props.woolDef.LabelCap, comp.Props.woolAmount ),
                                  TextAnchor.MiddleCenter, font: GameFont.Tiny );
             }
             if ( p.kindDef.Milkable() )
@@ -713,7 +713,7 @@ namespace FluffyManager
             // concatenate lists of animals on biome and animals in colony.
             _availablePawnKinds = Find.Map.Biome.AllWildAnimals.ToList();
             _availablePawnKinds.AddRange(
-                Find.ListerPawns.AllPawns
+                Find.MapPawns.AllPawns
                     .Where( p => p.RaceProps.Animal )
                     .Select( p => p.kindDef ) );
             _availablePawnKinds = _availablePawnKinds

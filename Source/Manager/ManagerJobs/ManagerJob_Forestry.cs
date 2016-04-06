@@ -404,7 +404,7 @@ namespace FluffyManager
 
                    // also filters out non-tree plants
                    && AllowedTrees[p.def]
-                   && p.SpawnedInWorld
+                   && p.Spawned
                    && Find.DesignationManager.DesignationOn( p ) == null
 
                    // cut only mature trees, or saplings that yield something right now.

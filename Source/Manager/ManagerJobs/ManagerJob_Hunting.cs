@@ -74,7 +74,7 @@ namespace FluffyManager
                     List<ThingDef> humanLikeRaces =
                         DefDatabase<ThingDef>.AllDefsListForReading.Where( def => def.category == ThingCategory.Pawn &&
                                                                                   def.race.Humanlike &&
-                                                                                  def.race.isFlesh )
+                                                                                  def.race.IsFlesh )
                                              .ToList();
 
                     _humanLikeMeatDefs = new List<ThingDef>();
@@ -407,7 +407,7 @@ namespace FluffyManager
             IntVec3 position = Utilities.GetBaseCenter();
 
             // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
-            List<Pawn> list = Find.ListerPawns.AllPawns.Where( p => IsValidHuntingTarget( p ) )
+            List<Pawn> list = Find.MapPawns.AllPawns.Where( p => IsValidHuntingTarget( p ) )
 
                                   // OrderBy defaults to ascending, switch sign on estimated meat count to get descending
                                   .OrderBy(
@@ -429,7 +429,7 @@ namespace FluffyManager
         {
             return p.RaceProps.Animal
                    && !p.health.Dead
-                   && p.SpawnedInWorld
+                   && p.Spawned
 
                    // wild animals only
                    && p.Faction == null

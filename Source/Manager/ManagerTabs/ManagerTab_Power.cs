@@ -90,7 +90,7 @@ namespace FluffyManager
                 overallHistory.UpdateMax( 0, 0,
                                           (int)
                                               _batteries.Sum(
-                                                  list => list.Sum( battery => battery.props.storedEnergyMax ) ) );
+                                                  list => list.Sum( battery => battery.Props.storedEnergyMax ) ) );
             }
 
             // update the history tracker.

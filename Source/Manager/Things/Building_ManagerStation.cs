@@ -43,7 +43,7 @@ namespace FluffyManager
             {
                 ColorInt newColour = new ColorInt( (int)( value.r * 255 ), (int)( value.g * 255 ),
                                                    (int)( value.b * 255 ), 0 );
-                Glower.props.glowColor = newColour;
+                Glower.Props.glowColor = newColour;
                 _primaryColor = value;
                 _glowDirty = true;
             }
@@ -90,7 +90,7 @@ namespace FluffyManager
             set
             {
                 _powered = value;
-                Glower.Lit = value;
+                Glower.SetLit( value );
                 PrimaryColourBlinker = value ? PrimaryColour : Color.black;
                 SecondaryColour = value ? _colors[_secondaryColourIndex] : Color.black;
             }
@@ -126,7 +126,7 @@ namespace FluffyManager
                 int tick = Find.TickManager.TicksGame;
 
                 // turn on glower
-                Glower.Lit = true;
+                Glower.SetLit( true );
 
                 // random blinking on secondary
                 if ( tick % 30 == Rand.RangeInclusive( 0, 25 ) )

@@ -181,7 +181,7 @@ namespace FluffyManager
         private void RefreshWorkers()
         {
             IEnumerable<Pawn> temp =
-                Find.ListerPawns.FreeColonistsSpawned.Where( pawn => !pawn.story.WorkTypeIsDisabled( WorkTypeDef ) );
+                Find.MapPawns.FreeColonistsSpawned.Where( pawn => !pawn.story.WorkTypeIsDisabled( WorkTypeDef ) );
 
             // sort by either specific skill def or average over job - depending on which is known.
             temp = SkillDef != null
@@ -275,7 +275,7 @@ namespace FluffyManager
                 Find.MainTabsRoot.EscapeCurrentTab();
                 Find.CameraMap.JumpTo( pawn.PositionHeld );
                 Find.Selector.ClearSelection();
-                if ( pawn.SpawnedInWorld )
+                if ( pawn.Spawned )
                 {
                     Find.Selector.Select( pawn );
                 }
@@ -292,7 +292,7 @@ namespace FluffyManager
             Rect priorityPosition = new Rect( 0f, 0f, 24f, 24f ).CenteredOnXIn( priorityRect )
                                                                 .CenteredOnYIn( priorityRect );
             Text.Font = GameFont.Medium;
-            WidgetsWork.DrawWorkBoxFor( new Vector2( priorityPosition.xMin, priorityPosition.yMin ), pawn, WorkTypeDef );
+            WidgetsWork.DrawWorkBoxFor( new Vector2( priorityPosition.xMin, priorityPosition.yMin ), pawn, WorkTypeDef, false );
             Text.Font = GameFont.Small;
         }
 
