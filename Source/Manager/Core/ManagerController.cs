@@ -15,13 +15,22 @@ namespace FluffyManager
 
         public Bootstrap()
         {
-            if ( GameObject != null )
+            LongEventHandler.ExecuteWhenFinished( delegate
             {
-                return;
-            }
-            GameObject = new GameObject( "Manager_Controller" );
-            GameObject.AddComponent<ManagerController>();
-            Object.DontDestroyOnLoad( GameObject );
+                Log.Message( "Colony Manager :: Initializing..." );
+
+                // load resources from main thread.
+                Resources.Init();
+
+                // initialize gameobject.
+                if ( GameObject != null )
+                {
+                    return;
+                }
+                GameObject = new GameObject( "Manager_Controller" );
+                GameObject.AddComponent<ManagerController>();
+                Object.DontDestroyOnLoad( GameObject );
+            } );
         }
 
         protected override void FillTab() {}
