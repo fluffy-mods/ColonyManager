@@ -25,17 +25,11 @@ namespace FluffyManager
 
         #region Properties
 
-        public override Texture2D Icon { get; } = Resources.IconForaging;
+        public override Texture2D Icon => Resources.IconForaging;
 
-        public override IconAreas IconArea
-        {
-            get { return IconAreas.Middle; }
-        }
+        public override IconAreas IconArea => IconAreas.Middle;
 
-        public override string Label
-        {
-            get { return "FMG.Foraging".Translate(); }
-        }
+        public override string Label => "FMG.Foraging".Translate();
 
         public override ManagerJob Selected
         {
