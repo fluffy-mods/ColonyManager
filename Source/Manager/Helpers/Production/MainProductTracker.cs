@@ -1,7 +1,7 @@
 ﻿// Manager/MainProductTracker.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-04 19:30
 
 using System;
@@ -167,6 +167,16 @@ namespace FluffyManager
 
                     if ( _recipe.specialProducts[0] == SpecialProductType.Butchery )
                     {
+                        // if stone cutting, set stone block category
+                        if ( _recipe.defName == "MakeStoneBlocks" )
+                        {
+                            Clear();
+                            _categoryDef = DefDatabase<ThingCategoryDef>.GetNamed( "StoneBlocks" );
+                            Type = Types.Category;
+                            Count = 20;
+                            return;
+                        }
+
                         if ( allowedThingDef.butcherProducts != null &&
                              allowedThingDef.butcherProducts.Count > 0 )
                         {
@@ -237,7 +247,7 @@ namespace FluffyManager
                 }
             }
 
-                // ReSharper disable once UnusedVariable
+            // ReSharper disable once UnusedVariable
             catch ( Exception e )
             {
 #if DEBUG

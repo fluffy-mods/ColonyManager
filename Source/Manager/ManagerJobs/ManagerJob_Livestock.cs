@@ -117,7 +117,7 @@ namespace FluffyManager
             bool actionTaken = false;
 
 #if DEBUG_LIFESTOCK
-            Log.Message("Doing livestock (" + Trigger.pawnKind.LabelCap + ") job");
+            Log.Message( "Doing livestock (" + Trigger.pawnKind.LabelCap + ") job" );
 #endif
 
             // update changes in game designations in our managed list
@@ -247,10 +247,14 @@ namespace FluffyManager
                     // get list of animals in sorted by youngest weighted to distance.
                     List<Pawn> animals = Trigger.pawnKind.GetWild( ageSex )
                                                 .Where( p => p != null && p.Spawned &&
-                                                         Find.DesignationManager.DesignationOn( p ) == null
-                                                         && TameArea == null || TameArea.ActiveCells.Contains( p.Position ) )
-                                                .OrderBy( p => p.ageTracker.AgeBiologicalTicks / ( p.Position.DistanceToSquared( position ) * 2 ) )
-                                                .ToList();
+                                                         Find.DesignationManager.DesignationOn( p ) == null &&
+                                                         ( TameArea == null || TameArea.ActiveCells.Contains( p.Position ) ) ).ToList();
+
+                    // skip if no animals available.
+                    if ( animals.Count == 0 )
+                        continue;
+
+                    animals = animals.OrderBy( p => p.ageTracker.AgeBiologicalTicks / ( p.Position.DistanceToSquared( position ) * 2 ) ).ToList();
 
 #if DEBUG_LIFESTOCK
                     Log.Message( "Wild: " + animals.Count );
@@ -292,7 +296,7 @@ namespace FluffyManager
             }
 
 #if DEBUG_LIFESTOCK
-            Log.Message("Doing butchery: " + Trigger.pawnKind.LabelCap);
+            Log.Message( "Doing butchery: " + Trigger.pawnKind.LabelCap );
 #endif
 
             foreach ( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
@@ -319,7 +323,7 @@ namespace FluffyManager
                                          .ToList();
 
 #if DEBUG_LIFESTOCK
-                    Log.Message("Tame animals: " + animals.Count);
+                    Log.Message( "Tame animals: " + animals.Count );
 #endif
 
                     for ( int i = 0; i < surplus && i < animals.Count; i++ )

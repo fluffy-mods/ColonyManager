@@ -25,7 +25,7 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\Assemblies\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEBUG_JOBS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEBUG_LIFESTOCK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
