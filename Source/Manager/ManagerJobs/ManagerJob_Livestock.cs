@@ -578,7 +578,7 @@ namespace FluffyManager
 
             public void ExposeData()
             {
-                Scribe_Values.LookValue( ref TrainYoung, "TrainYoung" );
+                Scribe_Values.LookValue( ref TrainYoung, "TrainYoung", false );
                 Scribe_Deep.LookDeep( ref TrainingTargets, "TrainingTargets" );
             }
         }
