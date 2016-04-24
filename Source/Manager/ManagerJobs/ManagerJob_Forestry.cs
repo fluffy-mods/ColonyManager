@@ -49,7 +49,7 @@ namespace FluffyManager
                     .ToDictionary( pk => pk, v => true );
 
             // initialize clearAreas list with current areas
-            ClearAreas = Find.AreaManager.AllAreas.Where( area => area.AssignableAsAllowed( AllowedAreaMode.Humanlike ) ).ToDictionary( a => a, v => false );
+            UpdateClearAreas();
 
             History = new History( new[] { "stock", "designated" }, new[] { Color.white, Color.grey } );
         }
@@ -199,17 +199,26 @@ namespace FluffyManager
             // clearing areas list
             if ( Scribe.mode == LoadSaveMode.Saving )
             {
-                _clearAreas_allowed = new List<bool>( ClearAreas.Values );
+                // make sure areas list doesn't contain deleted areas
+                UpdateClearAreas();
+
+                // create scribe helper vars
                 _clearAreas_areas = new List<Area>( ClearAreas.Keys );
+                _clearAreas_allowed = new List<bool>( ClearAreas.Values );
             }
-            Scribe_Collections.LookList( ref _clearAreas_allowed, "ClearAreas_allowed", LookMode.Value );
+
+            // scribe that stuff
             Scribe_Collections.LookList( ref _clearAreas_areas, "ClearAreas_areas", LookMode.MapReference );
+            Scribe_Collections.LookList( ref _clearAreas_allowed, "ClearAreas_allowed", LookMode.Value );
+
+            // initialize areas dict from scribe helpers
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
             {
                 ClearAreas = new Dictionary<Area, bool>();
                 for ( int i = 0; i < _clearAreas_areas.Count; i++ )
                 {
-                    ClearAreas.Add( _clearAreas_areas[i], _clearAreas_allowed[i] );
+                    if ( _clearAreas_areas[i] != null )
+                        ClearAreas.Add( _clearAreas_areas[i], _clearAreas_allowed[i] );
                 }
             }
 
@@ -294,17 +303,30 @@ namespace FluffyManager
             return workDone;
         }
 
-        public void UpdateClearAreas()
+        internal void UpdateClearAreas()
         {
-            Dictionary<Area, bool> _clearAreas = new Dictionary<Area, bool>();
-
-            foreach ( Area area in Find.AreaManager.AllAreas.Where( area => area.AssignableAsAllowed( AllowedAreaMode.Humanlike ) ) )
+            // init list of areas
+            if ( ClearAreas == null || ClearAreas.Count == 0 )
+                ClearAreas = Find.AreaManager.AllAreas.Where( area => area.AssignableAsAllowed( AllowedAreaMode.Humanlike ) ).ToDictionary( a => a, v => false );
+            else
             {
-                // add all areas in the game, set to true if area already existed and was true.
-                _clearAreas.Add( area, ClearAreas.ContainsKey( area ) && ClearAreas[area] );
-            }
+                // iterate over areas, add new areas.
+                foreach ( Area area in Find.AreaManager.AllAreas.Where( a => a.AssignableAsAllowed( AllowedAreaMode.Humanlike ) ) )
+                {
+                    if ( !ClearAreas.ContainsKey( area ) )
+                        ClearAreas.Add( area, false );
+                }
 
-            ClearAreas = _clearAreas;
+                // iterate over existing areas, clear deleted areas.
+                var Areas = new List<Area>( ClearAreas.Keys );
+                foreach ( var area in Areas )
+                {
+                    if ( !Find.AreaManager.AllAreas.Contains( area ) )
+                    {
+                        ClearAreas.Remove( area );
+                    }
+                }
+            }
         }
 
         private static List<IntVec3> GetWindCells()

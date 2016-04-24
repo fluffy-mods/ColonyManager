@@ -332,6 +332,11 @@ namespace FluffyManager
             }
         }
 
+        public override void PostClose()
+        {
+            Refresh();
+        }
+
         public override void PreOpen()
         {
             Refresh();
