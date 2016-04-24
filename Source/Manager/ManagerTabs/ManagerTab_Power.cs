@@ -1,14 +1,14 @@
 ﻿// Manager/ManagerTab_Power.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-12-02 21:12
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -16,6 +16,8 @@ namespace FluffyManager
 {
     public class ManagerTab_Power : ManagerTab, IExposable
     {
+        #region Fields
+
         private List<List<CompPowerBattery>> _batteries;
         private List<ThingDef> _batteryDefs;
         private Vector2 _consumptionScrollPos = Vector2.zero;
@@ -25,10 +27,10 @@ namespace FluffyManager
         private List<List<CompPowerTrader>> _traders;
         private History overallHistory;
         private History tradingHistory;
-        public override string Label => "FME.Power".Translate();
-        public override Texture2D Icon => Resources.IconPower;
-        public override IconAreas IconArea => IconAreas.Middle;
-        public override ManagerJob Selected { get; set; }
+
+        #endregion Fields
+
+        #region Constructors
 
         public ManagerTab_Power()
         {
@@ -66,10 +68,80 @@ namespace FluffyManager
             };
         }
 
+        #endregion Constructors
+
+        #region Properties
+
+        public static bool AnyPoweredStationOnline
+        {
+            get
+            {
+                return Find.ListerBuildings
+                    .AllBuildingsColonistOfClass<Building_ManagerStation>()
+                    .Select( t => t.TryGetComp<CompPowerTrader>() )
+                    .Any( c => c != null && c.PowerOn );
+            }
+        }
+
+        public override Texture2D Icon => Resources.IconPower;
+
+        public override IconAreas IconArea => IconAreas.Middle;
+
+        public override string Label => "FME.Power".Translate();
+
+        public override ManagerJob Selected { get; set; }
+
+        public override bool Visible
+        {
+            get
+            {
+                return AnyPoweredStationOnline;
+            }
+        }
+
+        #endregion Properties
+
+        #region Methods
+
+        public override void DoWindowContents( Rect canvas )
+        {
+            // set up rects
+            Rect overviewRect = new Rect( 0f, 0f, canvas.width, 150f );
+            Rect consumtionRect = new Rect( 0f, overviewRect.height + Utilities.Margin,
+                                            ( canvas.width - Utilities.Margin ) / 2f,
+                                            canvas.height - overviewRect.height - Utilities.Margin );
+            Rect productionRect = new Rect( consumtionRect.xMax + Utilities.Margin,
+                                            overviewRect.height + Utilities.Margin,
+                                            ( canvas.width - Utilities.Margin ) / 2f,
+                                            canvas.height - overviewRect.height - Utilities.Margin );
+
+            // draw area BG's
+            Widgets.DrawMenuSection( overviewRect );
+            Widgets.DrawMenuSection( consumtionRect );
+            Widgets.DrawMenuSection( productionRect );
+
+            // draw contents
+            DrawOverview( overviewRect );
+            DrawConsumption( consumtionRect );
+            DrawProduction( productionRect );
+        }
+
         public void ExposeData()
         {
             Scribe_Deep.LookDeep( ref tradingHistory, "tradingHistory" );
             Scribe_Deep.LookDeep( ref overallHistory, "overallHistory" );
+        }
+
+        public override void PreOpen()
+        {
+            base.PreOpen();
+
+            // close this tab if it was selected but no longer available
+            if ( !AnyPoweredStationOnline && MainTabWindow_Manager.CurrentTab == this )
+            {
+                MainTabWindow_Manager.CurrentTab = MainTabWindow_Manager.DefaultTab;
+                MainTabWindow_Manager.CurrentTab.PreOpen();
+            }
         }
 
         public override void Tick()
@@ -100,86 +172,9 @@ namespace FluffyManager
                                    GetCurrentBatteries().Sum() );
         }
 
-        private int[] GetCurrentTrade()
-        {
-            return _traders.Select( list => (int)list.Sum( trader => trader.PowerOutput ) ).ToArray();
-        }
-
-        private int[] GetCurrentBatteries()
-        {
-            return _batteries.Select( list => (int)list.Sum( battery => battery.StoredEnergy ) ).ToArray();
-        }
-
-        private IEnumerable<ThingDef> GetTraderDefs()
-        {
-            return from td in DefDatabase<ThingDef>.AllDefsListForReading
-                   where td.HasComp( typeof (CompPowerTrader) )
-                   select td;
-        }
-
-        private IEnumerable<ThingDef> GetBatteryDefs()
-        {
-            return from td in DefDatabase<ThingDef>.AllDefsListForReading
-                   where td.HasComp( typeof (CompPowerBattery) )
-                   select td;
-        }
-
-        private void RefreshCompLists()
-        {
-            // get list of power trader comps per def for consumers and producers.
-            _traders = _traderDefs.Select( def => Find.ListerBuildings.AllBuildingsColonistOfDef( def )
-                                                      .Select( t => t.GetComp<CompPowerTrader>() )
-                                                      .ToList() )
-                                  .ToList();
-
-            // get list of lists of powertrader comps per thingdef.
-            _batteries = _batteryDefs
-                .Select( v => Find.ListerBuildings.AllBuildingsColonistOfDef( v )
-                                  .Select( t => t.GetComp<CompPowerBattery>() )
-                                  .ToList() )
-                .ToList();
-        }
-
-        public override void DoWindowContents( Rect canvas )
-        {
-            // set up rects
-            Rect overviewRect = new Rect( 0f, 0f, canvas.width, 150f );
-            Rect consumtionRect = new Rect( 0f, overviewRect.height + Utilities.Margin,
-                                            ( canvas.width - Utilities.Margin ) / 2f,
-                                            canvas.height - overviewRect.height - Utilities.Margin );
-            Rect productionRect = new Rect( consumtionRect.xMax + Utilities.Margin,
-                                            overviewRect.height + Utilities.Margin,
-                                            ( canvas.width - Utilities.Margin ) / 2f,
-                                            canvas.height - overviewRect.height - Utilities.Margin );
-
-            // draw area BG's
-            Widgets.DrawMenuSection( overviewRect );
-            Widgets.DrawMenuSection( consumtionRect );
-            Widgets.DrawMenuSection( productionRect );
-
-            // draw contents
-            DrawOverview( overviewRect );
-            DrawConsumption( consumtionRect );
-            DrawProduction( productionRect );
-        }
-
-        private void DrawProduction( Rect canvas )
-        {
-            // setup rects 
-            Rect plotRect = new Rect( canvas.xMin, canvas.yMin, canvas.width, ( canvas.height - Utilities.Margin ) / 2f );
-            Rect legendRect = new Rect( canvas.xMin, plotRect.yMax + Utilities.Margin, canvas.width,
-                                        ( canvas.height - Utilities.Margin ) / 2f );
-
-            // draw the plot
-            tradingHistory.DrawPlot( plotRect, positiveOnly: true );
-
-            // draw the detailed legend
-            tradingHistory.DrawDetailedLegend( legendRect, ref _productionScrollPos, null, true );
-        }
-
         private void DrawConsumption( Rect canvas )
         {
-            // setup rects 
+            // setup rects
             Rect plotRect = new Rect( canvas.xMin, canvas.yMin, canvas.width, ( canvas.height - Utilities.Margin ) / 2f );
             Rect legendRect = new Rect( canvas.xMin, plotRect.yMax + Utilities.Margin, canvas.width,
                                         ( canvas.height - Utilities.Margin ) / 2f );
@@ -193,7 +188,7 @@ namespace FluffyManager
 
         private void DrawOverview( Rect canvas )
         {
-            // setup rects 
+            // setup rects
             Rect legendRect = new Rect( canvas.xMin, canvas.yMin, ( canvas.width - Utilities.Margin ) / 2f,
                                         canvas.height - Utilities.ButtonSize.y - Utilities.Margin );
             Rect plotRect = new Rect( legendRect.xMax + Utilities.Margin, canvas.yMin,
@@ -240,5 +235,61 @@ namespace FluffyManager
                 Find.WindowStack.Add( new FloatMenu( periodOptions ) );
             }
         }
+
+        private void DrawProduction( Rect canvas )
+        {
+            // setup rects
+            Rect plotRect = new Rect( canvas.xMin, canvas.yMin, canvas.width, ( canvas.height - Utilities.Margin ) / 2f );
+            Rect legendRect = new Rect( canvas.xMin, plotRect.yMax + Utilities.Margin, canvas.width,
+                                        ( canvas.height - Utilities.Margin ) / 2f );
+
+            // draw the plot
+            tradingHistory.DrawPlot( plotRect, positiveOnly: true );
+
+            // draw the detailed legend
+            tradingHistory.DrawDetailedLegend( legendRect, ref _productionScrollPos, null, true );
+        }
+
+        private IEnumerable<ThingDef> GetBatteryDefs()
+        {
+            return from td in DefDatabase<ThingDef>.AllDefsListForReading
+                   where td.HasComp( typeof( CompPowerBattery ) )
+                   select td;
+        }
+
+        private int[] GetCurrentBatteries()
+        {
+            return _batteries.Select( list => (int)list.Sum( battery => battery.StoredEnergy ) ).ToArray();
+        }
+
+        private int[] GetCurrentTrade()
+        {
+            return _traders.Select( list => (int)list.Sum( trader => trader.PowerOn ? trader.PowerOutput : 0f ) ).ToArray();
+        }
+
+        private IEnumerable<ThingDef> GetTraderDefs()
+        {
+            return from td in DefDatabase<ThingDef>.AllDefsListForReading
+                   where td.HasComp( typeof( CompPowerTrader ) )
+                   select td;
+        }
+
+        private void RefreshCompLists()
+        {
+            // get list of power trader comps per def for consumers and producers.
+            _traders = _traderDefs.Select( def => Find.ListerBuildings.AllBuildingsColonistOfDef( def )
+                                                      .Select( t => t.GetComp<CompPowerTrader>() )
+                                                      .ToList() )
+                                  .ToList();
+
+            // get list of lists of powertrader comps per thingdef.
+            _batteries = _batteryDefs
+                .Select( v => Find.ListerBuildings.AllBuildingsColonistOfDef( v )
+                                  .Select( t => t.GetComp<CompPowerBattery>() )
+                                  .ToList() )
+                .ToList();
+        }
+
+        #endregion Methods
     }
 }

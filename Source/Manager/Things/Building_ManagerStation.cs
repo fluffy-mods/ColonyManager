@@ -1,7 +1,7 @@
 ﻿// Manager/Building_ManagerStation.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-04 19:30
 
 using RimWorld;
@@ -10,14 +10,11 @@ using Verse;
 
 namespace FluffyManager
 {
-    public class Building_ManagerStation : Building_WorkTable
-    {
-        // just to give different versions a common interface.
-    }
-
     // special blinking LED texture/glower logic + automagically doing jobs.
     public class Building_AIManager : Building_ManagerStation
     {
+        #region Fields
+
         private readonly Color[] _colors =
         {
             Color.white, Color.green, Color.red, Color.blue, Color.yellow, Color.cyan
@@ -26,15 +23,57 @@ namespace FluffyManager
         private bool _glowDirty;
         private CompGlower _glower;
         private bool _graphicDirty;
+        private Comp_ManagerStation _managerStation;
         private bool _powered;
         private CompPowerTrader _powerTrader;
-        private Comp_ManagerStation _managerStation;
+        private Color _primaryBlinkerColour = Color.black;
         private Color _primaryColor = Color.black;
         private Color _secondaryColor = Color.black;
         private int _secondaryColourIndex;
-        private Color _primaryBlinkerColour = Color.black;
+
+        #endregion Fields
+
+        #region Constructors
+
+        public Building_AIManager()
+        {
+            _powerTrader = PowerComp as CompPowerTrader;
+            _glower = GetComp<CompGlower>();
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
         public override Color DrawColor => PrimaryColourBlinker;
         public override Color DrawColorTwo => SecondaryColour;
+
+        public CompGlower Glower
+        {
+            get { return _glower ?? ( _glower = GetComp<CompGlower>() ); }
+        }
+
+        public Comp_ManagerStation ManagerStation
+        {
+            get { return _managerStation ?? ( _managerStation = GetComp<Comp_ManagerStation>() ); }
+        }
+
+        public bool Powered
+        {
+            get { return _powered; }
+            set
+            {
+                _powered = value;
+                Glower.SetLit( value );
+                PrimaryColourBlinker = value ? PrimaryColour : Color.black;
+                SecondaryColour = value ? _colors[_secondaryColourIndex] : Color.black;
+            }
+        }
+
+        public CompPowerTrader PowerTrader
+        {
+            get { return _powerTrader ?? ( _powerTrader = PowerComp as CompPowerTrader ); }
+        }
 
         public Color PrimaryColour
         {
@@ -49,19 +88,14 @@ namespace FluffyManager
             }
         }
 
-        public CompGlower Glower
+        public Color PrimaryColourBlinker
         {
-            get { return _glower ?? ( _glower = GetComp<CompGlower>() ); }
-        }
-
-        public CompPowerTrader PowerTrader
-        {
-            get { return _powerTrader ?? ( _powerTrader = PowerComp as CompPowerTrader ); }
-        }
-
-        public Comp_ManagerStation ManagerStation
-        {
-            get { return _managerStation ?? ( _managerStation = GetComp<Comp_ManagerStation>() ); }
+            get { return _primaryBlinkerColour; }
+            set
+            {
+                _primaryBlinkerColour = value;
+                _graphicDirty = true;
+            }
         }
 
         public Color SecondaryColour
@@ -84,33 +118,9 @@ namespace FluffyManager
             }
         }
 
-        public bool Powered
-        {
-            get { return _powered; }
-            set
-            {
-                _powered = value;
-                Glower.SetLit( value );
-                PrimaryColourBlinker = value ? PrimaryColour : Color.black;
-                SecondaryColour = value ? _colors[_secondaryColourIndex] : Color.black;
-            }
-        }
+        #endregion Properties
 
-        public Color PrimaryColourBlinker
-        {
-            get { return _primaryBlinkerColour; }
-            set
-            {
-                _primaryBlinkerColour = value;
-                _graphicDirty = true;
-            }
-        }
-
-        public Building_AIManager()
-        {
-            _powerTrader = PowerComp as CompPowerTrader;
-            _glower = GetComp<CompGlower>();
-        }
+        #region Methods
 
         public override void Tick()
         {
@@ -170,5 +180,12 @@ namespace FluffyManager
                 _glowDirty = false;
             }
         }
+
+        #endregion Methods
+    }
+
+    public class Building_ManagerStation : Building_WorkTable
+    {
+        // just to give different versions a common interface.
     }
 }

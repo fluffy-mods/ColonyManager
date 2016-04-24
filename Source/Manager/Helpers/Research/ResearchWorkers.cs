@@ -7,13 +7,13 @@ namespace FluffyManager
 {
     public static class ResearchWorkers
     {
+        #region Methods
+
         public static void UnlockPowerTab()
         {
-            if ( !Manager.Get.ManagerTabs.OfType<ManagerTab_Power>().Any() )
-            {
-                Manager.Get.ManagerTabs.Add( new ManagerTab_Power() );
-                Manager.Get.RefreshTabs();
-            }
+            Manager.Get._powerUnlocked = true;
         }
+
+        #endregion Methods
     }
 }

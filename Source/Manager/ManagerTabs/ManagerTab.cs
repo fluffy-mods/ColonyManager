@@ -1,7 +1,7 @@
 ﻿// Manager/ManagerTab.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-04 19:23
 
 using UnityEngine;
@@ -12,6 +12,14 @@ namespace FluffyManager
 {
     public abstract class ManagerTab
     {
+        #region Fields
+
+        public float DefaultLeftRowSize = 300f;
+
+        #endregion Fields
+
+        #region Enums
+
         public enum IconAreas
         {
             Left = 0,
@@ -19,7 +27,9 @@ namespace FluffyManager
             Right = 2
         }
 
-        public float DefaultLeftRowSize = 300f;
+        #endregion Enums
+
+        #region Properties
 
         public virtual Texture2D Icon
         {
@@ -37,11 +47,41 @@ namespace FluffyManager
         }
 
         public abstract ManagerJob Selected { get; set; }
-        public virtual void Tick() {}
+
+        public virtual bool Visible
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        #endregion Properties
+
+        #region Methods
+
         public abstract void DoWindowContents( Rect canvas );
-        public virtual void PostClose() {}
-        public virtual void PostOpen() {}
-        public virtual void PreClose() {}
-        public virtual void PreOpen() {}
+
+        public virtual void PostClose()
+        {
+        }
+
+        public virtual void PostOpen()
+        {
+        }
+
+        public virtual void PreClose()
+        {
+        }
+
+        public virtual void PreOpen()
+        {
+        }
+
+        public virtual void Tick()
+        {
+        }
+
+        #endregion Methods
     }
 }

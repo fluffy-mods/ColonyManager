@@ -5,6 +5,7 @@
 // Created 2015-11-04 19:24
 
 using RimWorld;
+using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -15,7 +16,7 @@ namespace FluffyManager
         #region Fields
 
         public static ManagerTab CurrentTab;
-        public ManagerTab DefaultTab = Manager.Get.ManagerTabs[0];
+        public static ManagerTab DefaultTab = Manager.Get.ManagerTabs[0];
         private static float _iconSize = 30f;
         private static float _margin = Utilities.Margin;
 
@@ -58,11 +59,11 @@ namespace FluffyManager
             Text.Font = GameFont.Small;
 
             // three areas of icons for tabs, left middle and right.
-            Rect leftIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsLeft.Count * ( _iconSize + _margin ),
+            Rect leftIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsLeft.Count() * ( _iconSize + _margin ),
                                        _iconSize );
-            Rect middleIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsMiddle.Count * ( _iconSize + _margin ),
+            Rect middleIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsMiddle.Count() * ( _iconSize + _margin ),
                                          _iconSize );
-            Rect rightIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsRight.Count * ( _iconSize + _margin ),
+            Rect rightIcons = new Rect( 0f, 0f, _margin + Manager.Get.ManagerTabsRight.Count() * ( _iconSize + _margin ),
                                         _iconSize );
 
             // finetune rects
@@ -155,6 +156,8 @@ namespace FluffyManager
                 Manager.Get.HelpShown = true;
             }
 
+            Manager.Get.RefreshTabs();
+            Manager.Get.AddPowerTabIfUnlocked();
             CurrentTab.PreOpen();
         }
 

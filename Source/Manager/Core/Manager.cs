@@ -4,6 +4,7 @@
 //
 // Created 2015-11-05 22:59
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -35,7 +36,7 @@ namespace FluffyManager
             new ManagerTab_Forestry(),
             new ManagerTab_Livestock(),
             new ManagerTab_Foraging()
-            // Power is added by ResearchWorkers.UnlockPowerTab() after the appropriate research is done.
+            // Power is added by Manager.UnlockPowerTab() after the appropriate research is done.
         };
 
         public void RefreshTabs()
@@ -45,13 +46,26 @@ namespace FluffyManager
             _managerTabsRight = null;
         }
 
+        internal bool _powerUnlocked = false;
+        private bool _powerTabAdded = false;
+
+        public void AddPowerTabIfUnlocked()
+        {
+            if ( _powerUnlocked &&
+                 !_powerTabAdded )
+            {
+                ManagerTabs.Add( new ManagerTab_Power() );
+                _powerTabAdded = true;
+            }
+        }
+
         public List<ManagerTab> ManagerTabsLeft
         {
             get
             {
                 if ( _managerTabsLeft == null )
                 {
-                    _managerTabsLeft = ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Left ).ToList();
+                    _managerTabsLeft = ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Left && tab.Visible ).ToList();
                 }
                 return _managerTabsLeft;
             }
@@ -64,7 +78,7 @@ namespace FluffyManager
                 if ( _managerTabsMiddle == null )
                 {
                     _managerTabsMiddle =
-                        ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Middle ).ToList();
+                        ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Middle && tab.Visible ).ToList();
                 }
                 return _managerTabsMiddle;
             }
@@ -76,7 +90,7 @@ namespace FluffyManager
             {
                 if ( _managerTabsRight == null )
                 {
-                    _managerTabsRight = ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Right ).ToList();
+                    _managerTabsRight = ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Right && tab.Visible ).ToList();
                 }
                 return _managerTabsRight;
             }
