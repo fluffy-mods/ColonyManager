@@ -246,7 +246,8 @@ namespace FluffyManager
 
                     // get list of animals in sorted by youngest weighted to distance.
                     List<Pawn> animals = Trigger.pawnKind.GetWild( ageSex )
-                                                .Where( p => Find.DesignationManager.DesignationOn( p ) == null
+                                                .Where( p => p != null && p.Spawned &&
+                                                         Find.DesignationManager.DesignationOn( p ) == null
                                                          && TameArea == null || TameArea.ActiveCells.Contains( p.Position ) )
                                                 .OrderBy( p => p.ageTracker.AgeBiologicalTicks / ( p.Position.DistanceToSquared( position ) * 2 ) )
                                                 .ToList();

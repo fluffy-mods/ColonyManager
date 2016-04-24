@@ -1,13 +1,13 @@
 ﻿// Manager/Utilities_Livestock.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-29 21:15
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using Verse;
 
 namespace FluffyManager
@@ -36,10 +36,13 @@ namespace FluffyManager
             {
                 case AgeAndSex.AdultFemale:
                     return p.gender == Gender.Female && p.ageTracker.CurLifeStageIndex >= 2;
+
                 case AgeAndSex.AdultMale:
                     return p.gender == Gender.Male && p.ageTracker.CurLifeStageIndex >= 2;
+
                 case AgeAndSex.JuvenileFemale:
                     return p.gender == Gender.Female && p.ageTracker.CurLifeStageIndex < 2;
+
                 case AgeAndSex.JuvenileMale:
                 default:
                     return p.gender == Gender.Male && p.ageTracker.CurLifeStageIndex < 2;
@@ -77,7 +80,8 @@ namespace FluffyManager
             // else add it
             else
             {
-                _allCache.Add( pawnKind, new Utilities.CachedValue<IEnumerable<Pawn>>( cached ) );
+                // severely limit cache to only apply for one cycle (one job)
+                _allCache.Add( pawnKind, new Utilities.CachedValue<IEnumerable<Pawn>>( cached, 2 ) );
             }
             return cached;
         }
@@ -127,7 +131,8 @@ namespace FluffyManager
 
         public static bool Milkable( this PawnKindDef pawnKind )
         {
-            if ( pawnKind == null ) return false;
+            if ( pawnKind == null )
+                return false;
             bool ret = false;
             if ( _milkablePawnkind.ContainsKey( pawnKind ) )
             {
@@ -166,7 +171,7 @@ namespace FluffyManager
         {
             CompMilkable comp = pawn?.TryGetComp<CompMilkable>();
             object active = false;
-            if( comp != null )
+            if ( comp != null )
             {
                 active = comp.GetPrivatePropertyValue( "Active" );
             }
@@ -175,11 +180,12 @@ namespace FluffyManager
 
         public static bool Shearable( this PawnKindDef pawnKind )
         {
-            if( pawnKind == null ) return false;
+            if ( pawnKind == null )
+                return false;
             bool ret = false;
-            if( _shearablePawnkind.ContainsKey( pawnKind ) )
+            if ( _shearablePawnkind.ContainsKey( pawnKind ) )
             {
-                if( _shearablePawnkind[pawnKind].TryGetValue( out ret ) )
+                if ( _shearablePawnkind[pawnKind].TryGetValue( out ret ) )
                 {
                     return ret;
                 }
@@ -195,9 +201,9 @@ namespace FluffyManager
         public static bool Shearable( this Pawn pawn )
         {
             bool ret = false;
-            if( _shearablePawn.ContainsKey( pawn ) )
+            if ( _shearablePawn.ContainsKey( pawn ) )
             {
-                if( _shearablePawn[pawn].TryGetValue( out ret ) )
+                if ( _shearablePawn[pawn].TryGetValue( out ret ) )
                 {
                     return ret;
                 }
@@ -214,7 +220,7 @@ namespace FluffyManager
         {
             CompShearable comp = pawn?.TryGetComp<CompShearable>();
             object active = false;
-            if( comp != null )
+            if ( comp != null )
             {
                 active = comp.GetPrivatePropertyValue( "Active" );
             }
