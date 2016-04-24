@@ -1,7 +1,7 @@
 ﻿// Manager/ManagerJob_Production.cs
-// 
+//
 // Copyright Karel Kroeze, 2015.
-// 
+//
 // Created 2015-11-05 22:59
 
 using RimWorld;
@@ -12,8 +12,11 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 using System.Reflection;
+
 #if DEBUG_JOBS
+
 using System.Text;
+
 #endif
 
 namespace FluffyManager
@@ -243,6 +246,8 @@ namespace FluffyManager
             List<BillTablePriority> all = new List<BillTablePriority>();
             foreach ( ManagerJob_Production job in Manager.Get.JobStack.FullStack<ManagerJob_Production>() )
             {
+                bool dump = false;
+                job.CleanBillgivers( ref dump );
                 all.AddRange(
                     job.BillGivers.AssignedBillGiversAndBillsDictionary.Select(
                         pair => new BillTablePriority( pair.Key, pair.Value, job.Priority ) ) );
@@ -290,12 +295,12 @@ namespace FluffyManager
 #if DEBUG_JOBS
                 debug.AppendLine();
                 debug.AppendLine( "Bills for table " + table.GetUniqueLoadID() + " (managed):" );
-                foreach( Bill bill in managerBills )
+                foreach ( Bill bill in managerBills )
                 {
                     debug.AppendLine( " - " + bill.GetUniqueLoadID() );
                 }
                 debug.AppendLine( "Bills for table " + table.GetUniqueLoadID() + " (on table):" );
-                foreach( Bill bill in billsOnTable )
+                foreach ( Bill bill in billsOnTable )
                 {
                     debug.AppendLine( " - " + bill.GetUniqueLoadID() );
                 }
@@ -326,7 +331,7 @@ namespace FluffyManager
 #if DEBUG_JOBS
                 // fetch the list again to see what happened.
                 // get all actual bills on the table (private field)
-                if( !Utilities.TryGetPrivateField( table.billStack.GetType(), table.billStack, "bills", out rawBillsOnTable ) )
+                if ( !Utilities.TryGetPrivateField( table.billStack.GetType(), table.billStack, "bills", out rawBillsOnTable ) )
                 {
                     Log.Warning( "Failed to get real billstack for " + table );
                     continue;
@@ -334,14 +339,14 @@ namespace FluffyManager
 
                 // give it it's type back.
                 billsOnTable = rawBillsOnTable as List<Bill>;
-                if( billsOnTable == null )
+                if ( billsOnTable == null )
                 {
                     Log.Warning( "Failed to convert real billstack for " + table );
                     continue;
                 }
 
                 debug.AppendLine( "Bills for table " + table.GetUniqueLoadID() + " (after priority sort):" );
-                foreach( Bill bill in billsOnTable )
+                foreach ( Bill bill in billsOnTable )
                 {
                     debug.AppendLine( " - " + bill.GetUniqueLoadID() );
                 }
@@ -414,8 +419,7 @@ namespace FluffyManager
                 List<Building_WorkTable> workers = BillGivers.SelectedBillGivers;
 
                 // Delete assigned bills on billgivers that are invalid (no longer allowed / deleted).
-                CleanBillgivers( workers, BillGivers.AssignedBillGiversAndBillsDictionary,
-                                                ref actionTaken );
+                CleanBillgivers( ref actionTaken );
 
                 // check if there's places we need to add the bill.
                 for ( int workerIndex = 0; workerIndex < workers.Count; workerIndex++ )
@@ -428,7 +432,7 @@ namespace FluffyManager
                     {
                         bool match = BillGivers.AssignedBillGiversAndBillsDictionary.Contains(
                                 new KeyValuePair<Bill_Production, Building_WorkTable>( bill as Bill_Production, worker ) );
-                        debug.AppendLine( " - " + bill.GetUniqueLoadID() + (match ? "<- match!" : "") );
+                        debug.AppendLine( " - " + bill.GetUniqueLoadID() + ( match ? "<- match!" : "" ) );
                     }
 #endif
                     bool billPresent = false;
@@ -437,14 +441,13 @@ namespace FluffyManager
                     if ( worker.BillStack != null &&
                          worker.BillStack.Count > 0 )
                     {
-
                         // loop over billstack to see if our bill is set.
                         foreach ( Bill t in worker.BillStack )
                         {
                             Bill_Production thatBill = t as Bill_Production;
-                            
+
                             // if there is a bill, and it's managed by us, check to see if it's up-to-date.
-                            if( thatBill != null &&
+                            if ( thatBill != null &&
                                  thatBill.recipe == Bill.recipe &&
                                  BillGivers.AssignedBillGiversAndBillsDictionary.Contains(
                                      new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )
@@ -485,7 +488,7 @@ namespace FluffyManager
 
 #if DEBUG_JOBS
                         debug.AppendLine( "Worker (" + worker.GetUniqueLoadID() + ") billstack after work is done:" );
-                        foreach( Bill bill in worker.BillStack )
+                        foreach ( Bill bill in worker.BillStack )
                         {
                             debug.AppendLine( " - " + bill.GetUniqueLoadID() );
                         }
@@ -517,33 +520,40 @@ namespace FluffyManager
         /// <param name="workers">Allowed workstations</param>
         /// <param name="assignedBills">Managed bills/workstations</param>
         /// <param name="actionTaken">Was anything done?</param>
-        private void CleanBillgivers( List<Building_WorkTable> workers,
-                                      Dictionary<Bill_Production, Building_WorkTable> assignedBills,
-                                      ref bool actionTaken )
+        private void CleanBillgivers( ref bool actionTaken )
         {
 #if DEBUG_JOBS
             debug.AppendLine( "Cleaning no longer allowed billgivers:" );
 #endif
 
-            // get list of keys to iterate over
-            List<Bill_Production> keys = new List<Bill_Production>( assignedBills.Keys );
+            // get list of workers, bills to iterate over
+            var workers = BillGivers.AssignedBillGivers;
+            var assignedBills = BillGivers.AssignedBillGiversAndBillsDictionary;
+            List<Bill_Production> bills = new List<Bill_Production>( assignedBills.Keys );
 
             // check each assigned bill to see if it's in the list of allowed workers.
-            foreach ( Bill_Production key in keys )
+            foreach ( Bill_Production bill in bills )
             {
-                if ( workers.Contains( assignedBills[key] ) )
+                // check for each bill if it's still on the table
+                if ( assignedBills[bill].BillStack.IndexOf( bill ) < 0 )
+                {
+                    assignedBills.Remove( bill );
+                    continue;
+                }
+
+                if ( workers.Contains( assignedBills[bill] ) )
                 {
                     continue;
                 }
 #if DEBUG_JOBS
-                debug.AppendLine( " - removing bill: " + key.GetUniqueLoadID() + ", " +
-                                  assignedBills[key].GetUniqueLoadID() );
+                debug.AppendLine( " - removing bill: " + bill.GetUniqueLoadID() + ", " +
+                                  assignedBills[bill].GetUniqueLoadID() );
 #endif
                 // remove from workstation billstack
-                assignedBills[key].BillStack.Delete( key );
+                assignedBills[bill].BillStack.Delete( bill );
 
                 // remove from managed list
-                assignedBills.Remove( key );
+                assignedBills.Remove( bill );
 
                 // this counts as work
                 actionTaken = true;
