@@ -32,9 +32,8 @@ namespace FluffyManager
         {
             get
             {
+                // state for lifestock trigger includes counts as well as training targets.
                 return Trigger.State;
-
-                // we're only done when all counts are spot on.
             }
         }
 
@@ -193,12 +192,31 @@ namespace FluffyManager
             Find.DesignationManager.AddDesignation( des );
         }
 
-        private void DoTrainingJobs( ref bool actionTaken )
+        private bool TrainingRequired
+        {
+            get
+            {
+                // if nothing is selected, the answer is simple
+                if ( !Training.Any )
+                    return false;
+
+                // otherwise, do a 'dry run' of the training assignment - the logic is entirely the same.
+                bool actionTaken = false;
+                DoTrainingJobs( ref actionTaken, false );
+                return actionTaken;
+            }
+        }
+
+        internal void DoTrainingJobs( ref bool actionTaken, bool assign = true )
         {
             actionTaken = false;
 
             foreach ( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
             {
+                // skip juveniles if TrainYoung is not enabled.
+                if ( ageSex.Juvenile() && !Training.TrainYoung )
+                    continue;
+
                 foreach ( Pawn animal in Trigger.pawnKind.GetTame( ageSex ) )
                 {
                     foreach ( TrainableDef def in Training.Defs )
@@ -213,7 +231,8 @@ namespace FluffyManager
                              animal.training.GetWanted( def ) != Training[def] &&
                              Training[def] )
                         {
-                            animal.training.SetWanted( def, Training[def] );
+                            if ( assign )
+                                animal.training.SetWanted( def, Training[def] );
                             actionTaken = true;
                         }
                     }
@@ -474,15 +493,15 @@ namespace FluffyManager
             for ( int i = 0; i < Training.Count; i++ )
             {
                 Rect cell = new Rect( i * width, 0f, width, rect.height );
-                bool vis;
-                AcceptanceReport report = CanBeTrained( Trigger.pawnKind, keys[i], out vis );
-                if ( vis && report.Accepted )
+                bool visible;
+                AcceptanceReport report = CanBeTrained( Trigger.pawnKind, keys[i], out visible );
+                if ( visible && report.Accepted )
                 {
                     bool checkOn = Training[keys[i]];
                     Utilities.DrawToggle( cell, keys[i].LabelCap, ref checkOn, 16f, 0f, GameFont.Tiny );
                     Training[keys[i]] = checkOn;
                 }
-                else if ( vis )
+                else if ( visible )
                 {
                     Utilities.Label( cell, keys[i].LabelCap, report.Reason, font: GameFont.Tiny, color: Color.grey );
                 }
@@ -493,11 +512,25 @@ namespace FluffyManager
         public class TrainingTracker : IExposable
         {
             public DefMap<TrainableDef, bool> TrainingTargets = new DefMap<TrainableDef, bool>();
+            public bool TrainYoung = false;
 
             public bool this[TrainableDef index]
             {
                 get { return TrainingTargets[index]; }
                 set { SetWantedRecursive( index, value ); }
+            }
+
+            public bool Any
+            {
+                get
+                {
+                    foreach ( var def in Defs )
+                    {
+                        if ( TrainingTargets[def] )
+                            return true;
+                    }
+                    return false;
+                }
             }
 
             public int Count
@@ -545,6 +578,7 @@ namespace FluffyManager
 
             public void ExposeData()
             {
+                Scribe_Values.LookValue( ref TrainYoung, "TrainYoung" );
                 Scribe_Deep.LookDeep( ref TrainingTargets, "TrainingTargets" );
             }
         }

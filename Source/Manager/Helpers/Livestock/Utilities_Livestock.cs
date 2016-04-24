@@ -22,6 +22,11 @@ namespace FluffyManager
             JuvenileMale = 3
         }
 
+        public static bool Juvenile( this AgeAndSex ageSex )
+        {
+            return ageSex == AgeAndSex.JuvenileFemale || ageSex == AgeAndSex.JuvenileMale;
+        }
+
         public static AgeAndSex[] AgeSexArray = (AgeAndSex[])Enum.GetValues( typeof (AgeAndSex) );
 
         private static Dictionary<PawnKindDef, Utilities.CachedValue<IEnumerable<Pawn>>> _allCache =

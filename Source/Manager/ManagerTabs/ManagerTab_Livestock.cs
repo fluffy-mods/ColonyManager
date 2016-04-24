@@ -240,23 +240,27 @@ namespace FluffyManager
             _selectedCurrent.DrawTrainingSelector( trainingRect, Utilities.Margin );
             cur.y += _entryHeight;
 
+            if ( _selectedCurrent.Training.Any )
+            {
+                Rect trainYoungRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+                if ( optionIndex++ % 2 == 0 )
+                    Widgets.DrawAltRect( trainYoungRect );
+                Utilities.DrawToggle( trainYoungRect, "FML.TrainYoung".Translate(), ref _selectedCurrent.Training.TrainYoung );
+                cur.y += _entryHeight;
+            }
+
             // butchery stuff
             Rect butcherExcessRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
             if ( optionIndex++ % 2 == 0 )
-            {
                 Widgets.DrawAltRect( butcherExcessRect );
-            }
-            cur.y += _entryHeight;
-            Rect butcherTrainedRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
-            if ( optionIndex++ % 2 == 0 )
-            {
-                Widgets.DrawAltRect( butcherTrainedRect );
-            }
+            Utilities.DrawToggle( butcherExcessRect, "FML.ButcherExcess".Translate(), ref _selectedCurrent.ButcherExcess );
             cur.y += _entryHeight;
 
-            Utilities.DrawToggle( butcherExcessRect, "FML.ButcherExcess".Translate(), ref _selectedCurrent.ButcherExcess );
-            Utilities.DrawToggle( butcherTrainedRect, "FML.ButcherTrained".Translate(),
-                                  ref _selectedCurrent.ButcherTrained );
+            Rect butcherTrainedRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+            if ( optionIndex++ % 2 == 0 )
+                Widgets.DrawAltRect( butcherTrainedRect );
+            Utilities.DrawToggle( butcherTrainedRect, "FML.ButcherTrained".Translate(), ref _selectedCurrent.ButcherTrained );
+            cur.y += _entryHeight;
 
             // try tame more?
             Rect tameMoreRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );

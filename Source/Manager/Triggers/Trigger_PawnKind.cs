@@ -90,27 +90,11 @@ namespace FluffyManager
 
         private bool AllTrainingWantedSet()
         {
-            // loop through all set training targets, then through all animals to see if they're actually set. For the first that is not set, return false.
-            // if the loop is completed, everything is set - return true.
-            // This is rediculously expensive, and not meant to be called on tick - but as part of the cached Completed routine.
-            foreach ( TrainableDef def in Job.Training.Defs )
-            {
-                if ( Job.Training[def] )
-                {
-                    foreach ( Utilities_Livestock.AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
-                    {
-                        foreach ( Pawn p in pawnKind.GetTame( ageSex ) )
-                        {
-                            if ( !p.training.GetWanted( def ) &&
-                                 !p.training.IsCompleted( def ) )
-                            {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-            return true;
+            // do a dry run of the training assignment (no assignments are set).
+            // this is rediculously expensive, and should never be called on tick.
+            bool actionTaken = false;
+            Job.DoTrainingJobs( ref actionTaken, false );
+            return actionTaken;
         }
 
         #endregion Methods

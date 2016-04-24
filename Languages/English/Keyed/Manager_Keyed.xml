@@ -174,5 +174,6 @@
   <FML.MilkHeader>Progress till next milking</FML.MilkHeader>
   <FML.WoolHeader>Progress till next shearing</FML.WoolHeader>
   <FML.Yields>yields {0} x{1}</FML.Yields>
+  <FML.TrainYoung>Train young animals</FML.TrainYoung>
 
 </LanguageData>
