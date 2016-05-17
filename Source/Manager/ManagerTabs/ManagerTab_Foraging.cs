@@ -84,10 +84,27 @@ namespace FluffyManager
             // trigger config (1)
             int currentCount = _selected.Trigger.CurCount;
             int designatedCount = _selected.CurrentDesignatedCount;
-            int targetCount = _selected.Trigger.Count;
-            _selected.Trigger.DrawTriggerConfig( ref cur, colRects[0].width, EntryHeight, true,
-                "FMG.TargetCount".Translate( currentCount, designatedCount, targetCount ),
-                "FMG.TargetCountTooltip".Translate( currentCount, designatedCount, targetCount ) );
+            int targetCount = _selected.Trigger.CountLowerThreshold;
+            int targetCountUpper = _selected.Trigger.CountUpperThreshold;
+
+            string targetCountString;
+            string tooltipString;
+
+            if (_selected.Trigger.Op == Trigger_Threshold.Ops.Margins)
+            {
+                targetCountString = "FMG.TargetCountHysteresis".Translate(currentCount, designatedCount, targetCount, targetCountUpper) + ":";
+                tooltipString = "FMG.TargetCountTooltip".Translate(currentCount, designatedCount, targetCountUpper);
+            }
+
+            else
+            {
+                targetCountString = "FMG.TargetCount".Translate(currentCount, designatedCount, targetCount) + ":";
+                tooltipString = "FMG.TargetCountTooltip".Translate(currentCount, designatedCount, targetCount);
+            }
+                
+
+
+            _selected.Trigger.DrawTriggerConfig( ref cur, colRects[0].width, EntryHeight, true, targetCountString, tooltipString);
 
             // Force mature plants only (2)
             Rect forceMatureRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );

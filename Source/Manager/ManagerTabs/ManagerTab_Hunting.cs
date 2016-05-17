@@ -88,7 +88,7 @@ namespace FluffyManager
             int currentCount = _selected.Trigger.CurCount;
             int corpseCount = _selected.GetMeatInCorpses();
             int designatedCount = _selected.GetMeatInDesignations();
-            int targetCount = _selected.Trigger.Count;
+            int targetCount = _selected.Trigger.CountLowerThreshold;
             Utilities.Label( targetCountTitleRect,
                              "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ),
                              "FMH.TargetCountTooltip".Translate( currentCount, corpseCount, designatedCount, targetCount ),
@@ -99,7 +99,7 @@ namespace FluffyManager
 
             Rect targetCountRect = new Rect( cur.x, cur.y, colWidth, Utilities.SliderHeight );
             Widgets.DrawAltRect( targetCountRect );
-            _selected.Trigger.Count = (int)GUI.HorizontalSlider( targetCountRect, _selected.Trigger.Count, 0, 2000 );
+            _selected.Trigger.CountLowerThreshold = (int)GUI.HorizontalSlider( targetCountRect, _selected.Trigger.CountLowerThreshold, 0, 2000 );
             cur.y += Utilities.SliderHeight;
 
             // allow human meat (2)

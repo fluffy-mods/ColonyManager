@@ -60,7 +60,10 @@ namespace FluffyManager
 
         public override bool Completed
         {
-            get { return !Trigger.State; }
+            get
+            {
+                return !Trigger.State;
+            }
         }
 
         public override string Label
@@ -182,7 +185,7 @@ namespace FluffyManager
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            History.DrawPlot( rect, Trigger.Count );
+            History.DrawPlot( rect, Trigger.CountLowerThreshold );
         }
 
         public override void ExposeData()
@@ -293,13 +296,16 @@ namespace FluffyManager
             List<Plant> trees = GetLoggableTreesSorted();
 
             // designate untill we're either out of trees or we have enough designated.
-            for ( int i = 0; i < trees.Count && count < Trigger.Count; i++ )
+            int targetCount = (Trigger.Op == Trigger_Threshold.Ops.Margins) ? Trigger.CountUpperThreshold : Trigger.CountLowerThreshold;
+            if (Trigger.State)
             {
-                workDone = true;
-                AddDesignation( trees[i], DesignationDefOf.HarvestPlant );
-                count += trees[i].YieldNow();
+                for (int i = 0; i < trees.Count && count < targetCount; i++)
+                {
+                    workDone = true;
+                    AddDesignation(trees[i], DesignationDefOf.HarvestPlant);
+                    count += trees[i].YieldNow();
+                }
             }
-
             return workDone;
         }
 

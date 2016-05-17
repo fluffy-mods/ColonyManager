@@ -668,7 +668,7 @@ namespace FluffyManager
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            History.DrawPlot( rect, Trigger.Count );
+            History.DrawPlot( rect, Trigger.CountLowerThreshold );
         }
 
         public override void Tick()

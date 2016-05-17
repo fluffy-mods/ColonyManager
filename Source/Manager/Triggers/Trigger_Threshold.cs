@@ -16,15 +16,24 @@ namespace FluffyManager
     {
         #region Fields
 
-        public static int DefaultCount             = 500;
+        public static int DefaultCountLowerLimit   = 250;
         public static int DefaultMaxUpperThreshold = 3000;
-        public int        Count;
+        public int        CountLowerThreshold;
+        public int        CountUpperThreshold;
         public int        MaxUpperThreshold;
         public Ops        Op;
         public Zone_Stockpile stockpile;
         public ThingFilter    ThresholdFilter;
-
+        public int MinimumThresholdSeparation
+        {
+            get
+            {
+                return 1;
+            }
+        }
         private string _stockpile_scribe;
+        private bool state = true;
+        private const int minimumThresholdSeperation = 1;
 
         #endregion Fields
 
@@ -35,7 +44,8 @@ namespace FluffyManager
             Op = Ops.LowerThan;
             MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
             // TODO: Better way of setting sensible defaults?
-            Count = MaxUpperThreshold / 20;
+            CountLowerThreshold = MaxUpperThreshold / 20;
+            CountUpperThreshold = CountLowerThreshold + 1;
             ThresholdFilter = new ThingFilter();
             ThresholdFilter.SetDisallowAll();
             if ( job.MainProduct.ThingDef != null )
@@ -52,7 +62,8 @@ namespace FluffyManager
         {
             Op = Ops.LowerThan;
             MaxUpperThreshold = DefaultMaxUpperThreshold;
-            Count = DefaultCount;
+            CountLowerThreshold = DefaultCountLowerLimit;
+            CountUpperThreshold = CountLowerThreshold + 1; ;
             ThresholdFilter = new ThingFilter();
             ThresholdFilter.SetDisallowAll();
             ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
@@ -62,7 +73,8 @@ namespace FluffyManager
         {
             Op = Ops.LowerThan;
             MaxUpperThreshold = DefaultMaxUpperThreshold;
-            Count = DefaultCount;
+            CountLowerThreshold = DefaultCountLowerLimit;
+            CountUpperThreshold = CountLowerThreshold + 1;
             ThresholdFilter = new ThingFilter();
             ThresholdFilter.SetDisallowAll();
             ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
@@ -72,7 +84,8 @@ namespace FluffyManager
         {
             Op = Ops.LowerThan;
             MaxUpperThreshold = DefaultMaxUpperThreshold;
-            Count = DefaultCount;
+            CountLowerThreshold = DefaultCountLowerLimit;
+            CountUpperThreshold = CountLowerThreshold + 1; ;
             ThresholdFilter = new ThingFilter();
             ThresholdFilter.SetDisallowAll();
         }
@@ -85,7 +98,8 @@ namespace FluffyManager
         {
             LowerThan,
             Equals,
-            HigherThan
+            HigherThan,
+            Margins
         }
 
         #endregion Enums
@@ -120,7 +134,7 @@ namespace FluffyManager
         {
             get
             {
-                switch ( Op )
+                switch (Op)
                 {
                     case Ops.LowerThan:
                         return " < ";
@@ -130,6 +144,9 @@ namespace FluffyManager
 
                     case Ops.HigherThan:
                         return " > ";
+
+                    case Ops.Margins:
+                        return "Between:";
 
                     default:
                         return " ? ";
@@ -144,24 +161,35 @@ namespace FluffyManager
                 switch ( Op )
                 {
                     case Ops.LowerThan:
-                        return CurCount < Count;
+                        state = (CurCount < CountLowerThreshold);
+                        break;
 
                     case Ops.Equals:
-                        return CurCount == Count;
+                        state = (CurCount == CountLowerThreshold);
+                        break;
 
                     case Ops.HigherThan:
-                        return CurCount > Count;
+                        state = (CurCount > CountLowerThreshold);
+                        break;
+
+                    case Ops.Margins:
+                        // When we are under the lower limit or when we were still trying to reach the upper limit
+                        state = (CurCount < CountLowerThreshold) || (state && (CurCount < CountUpperThreshold));
+                        //Log.Message("state = " + state + ";CurCount = " + CurCount + ";Lower = " + CountLowerThreshold + ";Upper = " + CountUpperThreshold);
+                        break;
 
                     default:
                         Log.Warning( "Trigger_ThingThreshold was defined without a correct operator" );
-                        return true;
+                        state = true;
+                        break;
                 }
+                return state;
             }
         }
 
         public override string StatusTooltip
         {
-            get { return "FMP.ThresholdCount".Translate( CurCount, Count ); }
+            get { return "FMP.ThresholdCount".Translate( CurCount, CountLowerThreshold); }
         }
 
         #endregion Properties
@@ -171,7 +199,7 @@ namespace FluffyManager
         public override void DrawProgressBar( Rect rect, bool active )
         {
             // bar always goes a little beyond the actual target
-            int max = Math.Max( (int)( Count * 1.2f ), CurCount );
+            int max = Math.Max( (int)(CountLowerThreshold * 1.2f ), CurCount );
 
             // draw a box for the bar
             GUI.color = Color.gray;
@@ -181,7 +209,7 @@ namespace FluffyManager
             // get the bar rect
             Rect barRect = rect.ContractedBy( 2f );
             float unit = barRect.height / max;
-            float markHeight = barRect.yMin + ( max - Count ) * unit;
+            float markHeight = barRect.yMin + ( max - CountLowerThreshold) * unit;
             barRect.yMin += ( max - CurCount ) * unit;
 
             // draw the bar
@@ -206,14 +234,22 @@ namespace FluffyManager
                 Widgets.DrawAltRect( thresholdLabelRect );
             }
             Widgets.DrawHighlightIfMouseover( thresholdLabelRect );
-            if ( label.NullOrEmpty() )
+            if (label.NullOrEmpty())
             {
-                label = "FMP.ThresholdCount".Translate( CurCount, Count ) + ":";
+                if (Op == Ops.Margins)
+                {
+                    label = "FMP.ThresholdCountHysteresis".Translate(CurCount, CountLowerThreshold, CountUpperThreshold) + ":";
+                }
+                else
+
+                {
+                    label = "FMP.ThresholdCount".Translate(CurCount, CountLowerThreshold) + ":";
+                }
             }
             if ( tooltip.NullOrEmpty() )
             {
                 // TODO: Re-implement filter summary method.
-                tooltip = "FMP.ThresholdCountTooltip".Translate( CurCount, Count );
+                tooltip = "FMP.ThresholdCountTooltip".Translate( CurCount, CountLowerThreshold);
             }
 
             Utilities.Label( thresholdLabelRect, label, tooltip );
@@ -238,13 +274,41 @@ namespace FluffyManager
             {
                 Widgets.DrawAltRect( thresholdRect );
             }
-            Count = (int)GUI.HorizontalSlider( thresholdRect, Count, 0, MaxUpperThreshold );
+            if (Op == Ops.Margins)
+            {
+                int previousLower = CountLowerThreshold;
+                
+                CountLowerThreshold = (int)GUI.HorizontalScrollbar(thresholdRect, CountLowerThreshold, 1, 0, MaxUpperThreshold - minimumThresholdSeperation);
+                thresholdRect.y += Utilities.SliderHeight;
+                cur.y += Utilities.SliderHeight;
+                if (CountLowerThreshold != previousLower)
+                {
+                    //CountUpperThreshold += CountLowerThreshold - previousLower;
+                }
+                if (CountUpperThreshold > MaxUpperThreshold)
+                {
+                    CountUpperThreshold = MaxUpperThreshold;
+                }
+                // It is not possible that the Upper threshold suddenly becomes smaller than the lower, so don't check that.
+
+                CountUpperThreshold = (int)GUI.HorizontalScrollbar(thresholdRect, CountUpperThreshold, 1, minimumThresholdSeperation, MaxUpperThreshold);
+                if (CountUpperThreshold < CountLowerThreshold)
+                {
+                    CountUpperThreshold = CountLowerThreshold + minimumThresholdSeperation;
+                }
+            }
+            else
+            {
+                CountLowerThreshold = (int)GUI.HorizontalScrollbar(thresholdRect, CountLowerThreshold, 1, 0, MaxUpperThreshold);
+                CountUpperThreshold = CountLowerThreshold + MinimumThresholdSeparation;
+            }
             cur.y += Utilities.SliderHeight;
         }
 
         public override void ExposeData()
         {
-            Scribe_Values.LookValue( ref Count, "Count" );
+            Scribe_Values.LookValue(ref CountLowerThreshold, "CountLowerThreshold");
+            Scribe_Values.LookValue(ref CountUpperThreshold, "CountUpperThreshold");
             Scribe_Values.LookValue( ref MaxUpperThreshold, "MaxUpperThreshold" );
             Scribe_Values.LookValue( ref Op, "Operator" );
             Scribe_Deep.LookDeep( ref ThresholdFilter, "ThresholdFilter" );

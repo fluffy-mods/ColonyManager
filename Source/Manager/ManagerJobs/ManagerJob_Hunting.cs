@@ -178,7 +178,7 @@ namespace FluffyManager
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            History.DrawPlot( rect, Trigger.Count );
+            History.DrawPlot( rect, Trigger.CountLowerThreshold );
         }
 
         public override void ExposeData()
@@ -314,12 +314,16 @@ namespace FluffyManager
             // note; attempt to balance cost and benefit, current formula: value = meat / ( distance ^ 2)
             List<Pawn> huntableAnimals = GetHuntableAnimalsSorted();
 
-            // while totalCount < count AND we have animals that can be designated, designate animal.
-            for ( int i = 0; i < huntableAnimals.Count && totalCount < Trigger.Count; i++ )
+            int targetCount = (Trigger.Op == Trigger_Threshold.Ops.Margins) ? Trigger.CountUpperThreshold : Trigger.CountLowerThreshold;
+            if (Trigger.State)
             {
-                AddDesignation( huntableAnimals[i] );
-                totalCount += huntableAnimals[i].EstimatedMeatCount();
-                workDone = true;
+                // while totalCount < count AND we have animals that can be designated, designate animal.
+                for (int i = 0; i < huntableAnimals.Count && totalCount < targetCount; i++)
+                {
+                    AddDesignation(huntableAnimals[i]);
+                    totalCount += huntableAnimals[i].EstimatedMeatCount();
+                    workDone = true;
+                }
             }
 
             // unforbid if required
