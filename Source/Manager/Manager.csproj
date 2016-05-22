@@ -17,7 +17,7 @@
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\..\..\Desktop\RimWorld1135Win\Mods\RW_Manager\Assemblies\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEBUG_JOBS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEBUG_JOBS;DEBUG_SCRIBE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>

@@ -34,7 +34,7 @@ namespace FluffyManager
             copy.ingredientSearchRadius = bill.ingredientSearchRadius;
             copy.storeMode = bill.storeMode;
             copy.minSkillLevel = bill.minSkillLevel;
-
+            
             return copy;
         }
 
