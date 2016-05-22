@@ -47,11 +47,6 @@ namespace FluffyManager
         public static int CountPerWorker( this ManagerJob_Production job, int workerIndex )
         {
             int n = job.BillGivers.CurBillGiverCount;
-            {
-                // This bill will not be triggered.
-                return 0;
-            }
-            
             int diff = job.Trigger.CountLowerThreshold - job.Trigger.CurCount;
             if (job.Trigger.Op == Trigger_Threshold.Ops.Margins)
             {

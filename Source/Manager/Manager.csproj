@@ -16,8 +16,8 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\Assemblies\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEBUG_WORKGIVER;</DefineConstants>
+    <OutputPath>..\..\..\..\..\Desktop\RimWorld1135Win\Mods\RW_Manager\Assemblies\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;DEBUG_JOBS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
@@ -31,7 +31,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\RimWorld1135Win_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\RimWorld1135Win\RimWorld1135Win_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Community Core Library">
+      <HintPath>..\..\..\..\..\Desktop\RimWorld1135Win\Mods\Community Core Library\Assemblies\Community Core Library.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -41,7 +45,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\RimWorld1135Win_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\RimWorld1135Win\RimWorld1135Win_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
