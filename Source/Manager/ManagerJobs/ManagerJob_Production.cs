@@ -405,7 +405,6 @@ namespace FluffyManager
             debug = new StringBuilder();
             debug.AppendLine( "Manager :: Doing work for " + Bill.GetUniqueLoadID() );
 #endif
-
             // flag to see if anything meaningful was done, if false at end, manager will also do next job.
             bool actionTaken = false;
 
@@ -432,6 +431,11 @@ namespace FluffyManager
                         bool match = BillGivers.AssignedBillGiversAndBillsDictionary.Contains(
                                 new KeyValuePair<Bill_Production, Building_WorkTable>( bill as Bill_Production, worker ) );
                         debug.AppendLine( " - " + bill.GetUniqueLoadID() + ( match ? "<- match!" : "" ) );
+                        
+                    }
+                    foreach (var s in BillGivers.AssignedBillGiversAndBillsDictionary.Select( t => t.Key))
+                    {
+                        debug.AppendLine( "Current bills in BillGivers: " + s.GetUniqueLoadID() ); 
                     }
 #endif
                     bool billPresent = false;
@@ -447,16 +451,13 @@ namespace FluffyManager
 #if DEBUG_JOBS
                             debug.AppendLine( "Checking: " + thatBill.GetUniqueLoadID() );
 #endif
-
                             // if there is a bill, and it's managed by us, check to see if it's up-to-date.
                             if ( thatBill != null &&
                                  thatBill.recipe == Bill.recipe &&
-                                 BillGivers.AssignedBillGiversAndBillsDictionary.Contains(
-                                     new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )
+                                 BillGivers.AssignedBillGiversAndBillsDictionary.Contains(new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )
                             {
                                 billPresent = true;
-                                if ( thatBill.suspended != Bill.suspended ||
-                                     thatBill.repeatCount == 0 )
+                                if ( ( thatBill.suspended != Bill.suspended ) || ( thatBill.repeatCount == 0 ) )
                                 {
 #if DEBUG_JOBS
                                     debug.AppendLine( "Trying to unsuspend and/or bump targetCount" );

@@ -178,12 +178,11 @@ namespace FluffyManager
                 {
                     Log.Message( "Recipe: " + Recipe.label );
                 }
-                Log.Message( Recipe.CurrentRecipeUsers().Count.ToString() );
+                Log.Message( Recipe.CurrentRecipeUsers().First().ToString() );
 #endif
                 try
                 {
-                    Building_WorkTable worker = Recipe.CurrentRecipeUsers().DefaultIfEmpty( null )
-                                                      .FirstOrDefault( b => b.GetUniqueLoadID() == _assignedWorkersScribeID[i] );
+                    Building_WorkTable worker = Recipe.CurrentRecipeUsers().DefaultIfEmpty( null ).FirstOrDefault( b => b.GetUniqueLoadID() == _assignedWorkersScribeID[i] );
                     Bill_Production bill = null;
                     if ( worker == null )
                     {
