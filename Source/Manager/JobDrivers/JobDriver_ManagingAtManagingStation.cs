@@ -16,10 +16,10 @@ namespace FluffyManager
     {
         protected override IEnumerable<Toil> MakeNewToils()
         {
-            yield return Toils_Reserve.Reserve( TargetIndex.A ).FailOnDespawnedOrForbiddenPlacedTargets();
+            yield return Toils_Reserve.Reserve( TargetIndex.A ).FailOnDespawnedOrForbiddenPlacedThings();
             yield return Toils_Goto.GotoThing( TargetIndex.A, PathEndMode.InteractionCell )
-                                   .FailOnDespawnedOrForbiddenPlacedTargets();
-            yield return Manage( TargetIndex.A ).FailOnDespawnedOrForbiddenPlacedTargets();
+                                   .FailOnDespawnedOrForbiddenPlacedThings();
+            yield return Manage( TargetIndex.A ).FailOnDespawnedOrForbiddenPlacedThings();
             yield return Toils_Reserve.Release( TargetIndex.A );
         }
 
@@ -39,7 +39,7 @@ namespace FluffyManager
             }
             Toil toil = new Toil();
             toil.defaultDuration =
-                (int)( comp.props.Speed * ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
+                (int)( comp.Props.Speed * ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
 #if DEBUG_WORKGIVER
             Log.Message("Pawn stat: " + pawn.GetStatValue(StatDef.Named("ManagingSpeed")) + " (+0.5) Station speed: " + comp.props.Speed + "Total time: " + toil.defaultDuration);
 #endif

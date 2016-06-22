@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-  <name>Colony Manager V2.0</name>
+  <name>Fluffy Manager</name>
   <author>Fluffy</author>
-  <url></url>
-  <targetVersion>A12D</targetVersion>
+  <url>https://ludeon.com/forums/index.php?topic=16120.0</url>
+  <targetVersion>0.14.1210</targetVersion>
   <description></description>
 </ModMetaData>

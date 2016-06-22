@@ -98,7 +98,7 @@ namespace FluffyManager
 
         public static List<Pawn> GetTame( this PawnKindDef pawnKind )
         {
-            return pawnKind.GetAll().Where( p => p.Faction == Faction.OfColony ).ToList();
+            return pawnKind.GetAll().Where( p => p.Faction == Faction.OfPlayer ).ToList();
         }
 
         public static IEnumerable<Pawn> GetAll( this PawnKindDef pawnKind, AgeAndSex ageSex )
@@ -121,11 +121,11 @@ namespace FluffyManager
         public static List<Pawn> GetTame( this PawnKindDef pawnKind, AgeAndSex ageSex )
         {
 #if DEBUG_LIFESTOCK_COUNTS
-            List<Pawn> tame = GetAll( ageSex ).Where( p => p.Faction == Faction.OfColony ).ToList();
+            List<Pawn> tame = GetAll( ageSex ).Where( p => p.Faction == Faction.OfPlayer ).ToList();
             Log.Message( "Tamecount " + ageSex + ": " + tame.Count );
             return tame;
 #else
-            return pawnKind.GetAll( ageSex ).Where( p => p.Faction == Faction.OfColony ).ToList();
+            return pawnKind.GetAll( ageSex ).Where( p => p.Faction == Faction.OfPlayer ).ToList();
 #endif
         }
 

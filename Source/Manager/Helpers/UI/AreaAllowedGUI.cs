@@ -107,7 +107,7 @@ namespace FluffyManager
             {
                 if ( area != null )
                     area.MarkForDraw();
-                if ( Widgets.InvisibleButton( rect ) )
+                if ( Widgets.ButtonInvisible( rect ) )
                 {
                     SoundDefOf.DesignateDragStandardChanged.PlayOneShotOnCamera();
                     return !status;

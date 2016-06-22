@@ -15,7 +15,7 @@ namespace FluffyManager
         public Vector2 FilterScrollPosition = Vector2.zero;
         public string Input;
         public Trigger_Threshold Trigger;
-        public override Vector2 InitialWindowSize => new Vector2( 300f, 500 );
+        public override Vector2 InitialSize => new Vector2( 300f, 500 );
         ThingFilterUI filterUI = new ThingFilterUI();
 
         public override void DoWindowContents( Rect inRect )
@@ -33,7 +33,7 @@ namespace FluffyManager
             StockpileGUI.DoStockpileSelectors(zoneRect, ref Trigger.stockpile);
 
             // draw operator button
-            if ( Widgets.TextButton( buttonRect, Trigger.OpString ) )
+            if ( Widgets.ButtonText( buttonRect, Trigger.OpString ) )
             {
                 List<FloatMenuOption> list = new List<FloatMenuOption>
                 {

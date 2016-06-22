@@ -81,7 +81,7 @@ namespace FluffyManager
             _finalListHeight = cur.y + _entryHeight;
             
             // final button
-            if ( Widgets.TextButton( buttonRect, "FMP.AddIngredientBills".Translate() ) )
+            if ( Widgets.ButtonText( buttonRect, "FMP.AddIngredientBills".Translate() ) )
             {
                 foreach ( IngredientSelector ingredient in ingredients )
                 {
@@ -153,7 +153,7 @@ namespace FluffyManager
                 if ( allowedThingDefs.Count > 1 )
                 {
                     Widgets.DrawHighlightIfMouseover( thingRect );
-                    if ( Widgets.InvisibleButton( thingRect ) )
+                    if ( Widgets.ButtonInvisible( thingRect ) )
                     {
                         List<FloatMenuOption> options = allowedThingDefs
                             .Where( RecipeSelector.HasRecipe )
@@ -325,7 +325,7 @@ namespace FluffyManager
                 if ( recipes.Count > 0 )
                 {
                     Widgets.DrawHighlightIfMouseover( rect );
-                    if ( Widgets.InvisibleButton( rect ) )
+                    if ( Widgets.ButtonInvisible( rect ) )
                     {
                         List<FloatMenuOption> options = recipes
                         .Select(

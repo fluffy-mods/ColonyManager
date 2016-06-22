@@ -332,10 +332,11 @@ namespace FluffyManager
         private static List<IntVec3> GetWindCells()
         {
             return Find.ListerBuildings
-                       .AllBuildingsColonistOfClass<Building_WindTurbine>()
-                       .SelectMany( turbine => Building_WindTurbine.CalculateWindCells( turbine.Position,
-                                                                                        turbine.Rotation,
-                                                                                        turbine.RotatedSize ) )
+                       .allBuildingsColonist
+                       .Where( b => b.GetComp<CompPowerPlantWind>() != null )
+                       .SelectMany( turbine => WindTurbineUtility.CalculateWindCells( turbine.Position,
+                                                                                      turbine.Rotation,
+                                                                                      turbine.RotatedSize ) )
                        .ToList();
         }
 

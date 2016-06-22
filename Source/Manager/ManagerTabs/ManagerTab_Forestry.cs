@@ -209,7 +209,7 @@ namespace FluffyManager
             // do the button
             if ( !_selected.Managed )
             {
-                if ( Widgets.TextButton( buttonRect, "FM.Manage".Translate() ) )
+                if ( Widgets.ButtonText( buttonRect, "FM.Manage".Translate() ) )
                 {
                     // activate job, add it to the stack
                     _selected.Managed = true;
@@ -221,7 +221,7 @@ namespace FluffyManager
             }
             else
             {
-                if ( Widgets.TextButton( buttonRect, "FM.Delete".Translate() ) )
+                if ( Widgets.ButtonText( buttonRect, "FM.Delete".Translate() ) )
                 {
                     // inactivate job, remove from the stack.
                     Manager.Get.JobStack.Delete( _selected );
@@ -280,7 +280,7 @@ namespace FluffyManager
                 jobRect.width -= 50f;
 
                 job.DrawListEntry( jobRect, false );
-                if ( Widgets.InvisibleButton( jobRect ) )
+                if ( Widgets.ButtonInvisible( jobRect ) )
                 {
                     _selected = job;
                 }
@@ -301,7 +301,7 @@ namespace FluffyManager
             Widgets.Label( newRect, "<" + "FMF.NewForestryJob".Translate() + ">" );
             Text.Anchor = TextAnchor.UpperLeft;
 
-            if ( Widgets.InvisibleButton( newRect ) )
+            if ( Widgets.ButtonInvisible( newRect ) )
             {
                 Selected = new ManagerJob_Forestry();
             }

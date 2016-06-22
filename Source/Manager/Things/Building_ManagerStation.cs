@@ -145,7 +145,7 @@ namespace FluffyManager
                 }
 
                 // primary colour
-                if ( tick % ManagerStation.props.Speed == 0 )
+                if ( tick % ManagerStation.Props.Speed == 0 )
                 {
                     PrimaryColour = Manager.Get.DoWork() ? Color.green : Color.red;
                 }

@@ -11,7 +11,7 @@ namespace FluffyManager
 {
     public class CompProperties_ManagerStation : CompProperties
     {
-        public int Speed;
+        public int Speed = 250;
         public CompProperties_ManagerStation() {}
         public CompProperties_ManagerStation( Type compClass ) : base( compClass ) {}
     }

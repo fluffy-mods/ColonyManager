@@ -220,7 +220,7 @@ namespace FluffyManager
             }
             GUI.DrawTexture( searchIconRect, Resources.Search );
             Widgets.DrawHighlightIfMouseover( periodRect );
-            if ( Widgets.InvisibleButton( periodRect ) )
+            if ( Widgets.ButtonInvisible( periodRect ) )
             {
                 List<FloatMenuOption> periodOptions = new List<FloatMenuOption>();
                 for ( int i = 0; i < History.periods.Length; i++ )

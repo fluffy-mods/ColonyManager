@@ -101,7 +101,7 @@ namespace FluffyManager
                 // add / remove to the stack
                 if ( Source == SourceOptions.Current )
                 {
-                    if ( Widgets.TextButton( buttonRect, "FM.Delete".Translate() ) )
+                    if ( Widgets.ButtonText( buttonRect, "FM.Delete".Translate() ) )
                     {
                         _selected.Delete();
                         _selected = null;
@@ -114,9 +114,9 @@ namespace FluffyManager
                 {
                     if ( _selected.Trigger.IsValid )
                     {
-                        Widgets.LabelCheckbox(ingredientCheck, "FMP.IngredientDialogTitle".Translate(), ref _selected._createIngredientBills, !_selected._hasMeaningfulIngredientChoices);
+                        Widgets.CheckboxLabeled(ingredientCheck, "FMP.IngredientDialogTitle".Translate(), ref _selected._createIngredientBills, !_selected._hasMeaningfulIngredientChoices);
 
-                        if ( Widgets.TextButton( buttonRect, "FM.Manage".Translate() ) )
+                        if ( Widgets.ButtonText( buttonRect, "FM.Manage".Translate() ) )
                         {
                             _selected.Managed = true;
                             Manager.Get.JobStack.Add( _selected );
@@ -227,14 +227,13 @@ namespace FluffyManager
                     if( optionindex % 2 == 0 ) Widgets.DrawAltRect( skillLabelRect );
                     Utilities.Label( skillLabelRect,
                                      "MinimumSkillLevel".Translate( _selected.Bill.recipe.workSkill.label.ToLower() )
-                                     + ": " + _selected.Bill.minSkillLevel.ToString( "#####0" ),
+                                     + ": " + _selected.Bill.allowedSkillRange.ToString(),
                                      anchor: TextAnchor.MiddleLeft, lrMargin: 6f );
                     cur.y += _entryHeight;
 
                     Rect skillRect = new Rect( cur.x, cur.y, width, Utilities.SliderHeight );
                     if( optionindex % 2 == 0 ) Widgets.DrawAltRect( skillRect );
-                    _selected.Bill.minSkillLevel =
-                        (int)GUI.HorizontalSlider( skillRect, _selected.Bill.minSkillLevel, 0f, 20f );
+                    Widgets.IntRange( skillRect, 2134112311, ref _selected.Bill.allowedSkillRange, 0, 20, "AllowedSkillRange".Translate() );
                     cur.y += Utilities.SliderHeight;
 
                     Rect snapToHighestRect = new Rect( cur.x, cur.y, width, _entryHeight );
@@ -266,7 +265,7 @@ namespace FluffyManager
                     GUI.DrawTexture( searchIconRect, Resources.Search );
 
                     // draw a floatmenu on click
-                    if( Widgets.InvisibleButton( otherRecipeAvailableRect ) )
+                    if( Widgets.ButtonInvisible( otherRecipeAvailableRect ) )
                     {
                         List<FloatMenuOption> options = new List<FloatMenuOption>();
                         string curLabel = "Current: " + _selected.Label +
@@ -405,7 +404,7 @@ namespace FluffyManager
             if ( SourceFilter != "" )
             {
                 Rect clearFilter = new Rect( filterRect.width + 10f, filterRect.yMin, _entryHeight, _entryHeight );
-                if ( Widgets.ImageButton( clearFilter, Widgets.CheckboxOffTex ) )
+                if ( Widgets.ButtonImage( clearFilter, Widgets.CheckboxOffTex ) )
                 {
                     SourceFilter = "";
                 }
@@ -480,7 +479,7 @@ namespace FluffyManager
                 }
 
                 current.DrawListEntry( jobRect, false, Source == SourceOptions.Current );
-                if ( Widgets.InvisibleButton( jobRect ) )
+                if ( Widgets.ButtonInvisible( jobRect ) )
                 {
                     _selected = current;
                 }

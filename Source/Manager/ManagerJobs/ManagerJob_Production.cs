@@ -594,12 +594,12 @@ namespace FluffyManager
                 actionTaken = true;
             }
 
-            if ( thatBill.minSkillLevel != Bill.minSkillLevel )
+            if ( thatBill.allowedSkillRange != Bill.allowedSkillRange )
             {
 #if DEBUG_JOBS
                 debug.AppendLine( "Updating Bill.minSkillLevel" );
 #endif
-                thatBill.minSkillLevel = Bill.minSkillLevel;
+                thatBill.allowedSkillRange = Bill.allowedSkillRange;
                 actionTaken = true;
             }
         }
@@ -677,9 +677,9 @@ namespace FluffyManager
             {
                 if ( maxSkil )
                 {
-                    Bill.minSkillLevel =
-                        Find.MapPawns.FreeColonistsSpawned.Max(
+                    var highestSkill = Find.MapPawns.FreeColonistsSpawned.Max(
                             pawn => pawn.skills.GetSkill( Bill.recipe.workSkill ).level );
+                    Bill.allowedSkillRange = new IntRange( highestSkill, highestSkill );                        
                 }
             }
             History.Update( Trigger.CurCount );

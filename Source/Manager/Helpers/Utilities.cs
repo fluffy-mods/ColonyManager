@@ -314,7 +314,7 @@ namespace FluffyManager
                     }
                     else
                     {
-                        if ( Widgets.ImageButton( stampRect, Resources.StampStart ) )
+                        if ( Widgets.ButtonImage( stampRect, Resources.StampStart ) )
                         {
                             job.Suspended = false;
                         }
@@ -377,7 +377,7 @@ namespace FluffyManager
 
             // interactivity
             Widgets.DrawHighlightIfMouseover( rect );
-            if ( Widgets.InvisibleButton( rect ) )
+            if ( Widgets.ButtonInvisible( rect ) )
             {
                 checkOn = !checkOn;
             }
@@ -408,7 +408,7 @@ namespace FluffyManager
 
             // interactivity
             Widgets.DrawHighlightIfMouseover( rect );
-            if ( Widgets.InvisibleButton( rect ) )
+            if ( Widgets.ButtonInvisible( rect ) )
             {
                 if ( checkOn )
                 {

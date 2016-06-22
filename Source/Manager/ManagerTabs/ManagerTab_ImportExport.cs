@@ -115,7 +115,7 @@ namespace FluffyManager
                     GenUI.ErrorDialog( "ProblemSavingFile".Translate( ex.ToString() ) );
                     throw;
                 }
-                ScribeHeaderUtility.WriteGameDataHeader();
+                ScribeMetaHeaderUtility.WriteMetaHeader();
 
                 _jobStackIO = Manager.Get.JobStack;
                 Scribe_Deep.LookDeep( ref _jobStackIO, "JobStack" );
@@ -139,7 +139,7 @@ namespace FluffyManager
                 // load stuff
                 Scribe.InitLoading( _folder + "/" + file.FileInfo.Name );
                 Manager.LoadSaveMode = Manager.Modes.ImportExport;
-                ScribeHeaderUtility.LoadGameDataHeader( ScribeHeaderUtility.ScribeHeaderMode.Map );
+                ScribeMetaHeaderUtility.LoadGameDataHeader( ScribeMetaHeaderUtility.ScribeHeaderMode.Map, false );
                 Scribe.EnterNode( "JobStack" );
                 _jobStackIO.ExposeData();
                 Scribe.ExitNode();
@@ -209,13 +209,13 @@ namespace FluffyManager
             GUI.color = Color.white;
 
             // load button
-            if ( Widgets.TextButton( buttonRect, "FM.Import".Translate() ) )
+            if ( Widgets.ButtonText( buttonRect, "FM.Import".Translate() ) )
             {
                 TryImport( file );
             }
 
             // delete button
-            if ( Widgets.ImageButton( deleteRect, Resources.DeleteX ) )
+            if ( Widgets.ButtonImage( deleteRect, Resources.DeleteX ) )
             {
                 Find.WindowStack.Add( new Dialog_Confirm( "ConfirmDelete".Translate( file.FileInfo.Name ), delegate
                 {
@@ -288,7 +288,7 @@ namespace FluffyManager
             }
             if ( GenText.IsValidFilename( _saveName ) )
             {
-                if ( Widgets.TextButton( buttonRect, "FM.Export".Translate() ) )
+                if ( Widgets.ButtonText( buttonRect, "FM.Export".Translate() ) )
                 {
                     TryExport( _saveName );
                 }

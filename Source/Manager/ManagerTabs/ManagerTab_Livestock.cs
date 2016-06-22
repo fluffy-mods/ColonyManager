@@ -360,7 +360,7 @@ namespace FluffyManager
             // add / remove to the stack
             if ( _selectedCurrent.Managed )
             {
-                if ( Widgets.TextButton( buttonRect, "FM.Delete".Translate() ) )
+                if ( Widgets.ButtonText( buttonRect, "FM.Delete".Translate() ) )
                 {
                     _selectedCurrent.Delete();
                     _selectedCurrent = null;
@@ -372,7 +372,7 @@ namespace FluffyManager
             }
             else
             {
-                if ( Widgets.TextButton( buttonRect, "FM.Manage".Translate() ) )
+                if ( Widgets.ButtonText( buttonRect, "FM.Manage".Translate() ) )
                 {
                     _selectedCurrent.Managed = true;
                     _onCurrentTab = true;
@@ -530,11 +530,11 @@ namespace FluffyManager
                 Widgets.DrawAltRect( row );
             }
             Widgets.DrawHighlightIfMouseover( row );
-            if ( Widgets.InvisibleButton( row ) )
+            if ( Widgets.ButtonInvisible( row ) )
             {
                 // move camera and select
                 Find.MainTabsRoot.EscapeCurrentTab();
-                Find.CameraMap.JumpTo( p.PositionHeld );
+                Find.CameraDriver.JumpTo( p.PositionHeld );
                 Find.Selector.ClearSelection();
                 if ( p.Spawned )
                 {
@@ -656,7 +656,7 @@ namespace FluffyManager
                 Utilities.Label( row, label, null, TextAnchor.MiddleLeft, Utilities.Margin * 2 );
 
                 // button
-                if ( Widgets.InvisibleButton( row ) )
+                if ( Widgets.ButtonInvisible( row ) )
                 {
                     _selectedAvailable = _availablePawnKinds[i]; // for highlighting to work
                     Selected = new ManagerJob_Livestock( _availablePawnKinds[i] ); // for details
@@ -699,7 +699,7 @@ namespace FluffyManager
                 _currentJobs[i].DrawListEntry( row, false, true );
 
                 // button
-                if ( Widgets.InvisibleButton( row ) )
+                if ( Widgets.ButtonInvisible( row ) )
                 {
                     Selected = _currentJobs[i];
                 }
