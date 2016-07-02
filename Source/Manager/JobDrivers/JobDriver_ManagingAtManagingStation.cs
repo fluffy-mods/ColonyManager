@@ -41,7 +41,7 @@ namespace FluffyManager
             toil.defaultDuration =
                 (int)( comp.Props.Speed * ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
 #if DEBUG_WORKGIVER
-            Log.Message("Pawn stat: " + pawn.GetStatValue(StatDef.Named("ManagingSpeed")) + " (+0.5) Station speed: " + comp.props.Speed + "Total time: " + toil.defaultDuration);
+            Log.Message("Pawn stat: " + pawn.GetStatValue(StatDef.Named("ManagingSpeed")) + " (+0.5) Station speed: " + comp.Props.Speed + "Total time: " + toil.defaultDuration);
 #endif
             toil.defaultCompleteMode = ToilCompleteMode.Delay;
             toil.tickAction =

@@ -65,8 +65,7 @@ namespace FluffyManager
             DrawQualityFilterConfig( ref curY, viewRect.width, filter );
 
             // main listing
-            Rect listingRect = new Rect( 0f, curY, 9999f, 9999f );
-            float labelWidth = width - Widgets.CheckboxSize - Utilities.Margin;
+            Rect listingRect = new Rect( 0f, curY, viewRect.width, 9999f );
             Listing_TreeThingFilter listingTreeThingFilter = new Listing_TreeThingFilter( listingRect, filter, parentFilter );
             TreeNode_ThingCategory node = ThingCategoryNodeDatabase.RootNode;
             if ( parentFilter != null )

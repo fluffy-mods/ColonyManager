@@ -70,7 +70,7 @@ namespace FluffyManager
             }
 
             // keep track of location
-            Vector2 cur;
+            Vector2 cur = Vector2.zero;
 
             // begin window
             GUI.BeginGroup( rect );
@@ -81,7 +81,6 @@ namespace FluffyManager
 
             GUI.DrawTexture( colRects[0], Resources.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[0] );
-            cur = Vector2.zero;
 
             // target count (1)
             Rect targetCountTitleRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
@@ -96,11 +95,10 @@ namespace FluffyManager
                              _margin );
             Widgets.DrawAltRect( targetCountTitleRect );
             cur.y += _entryHeight;
-
-            Rect targetCountRect = new Rect( cur.x, cur.y, colWidth, Utilities.SliderHeight );
-            Widgets.DrawAltRect( targetCountRect );
-            _selected.Trigger.Count = (int)GUI.HorizontalSlider( targetCountRect, _selected.Trigger.Count, 0, 2000 );
-            cur.y += Utilities.SliderHeight;
+            
+            _selected.Trigger.DrawTriggerConfig( ref cur, colWidth, _entryHeight, true,
+                                                 "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ),
+                                                 "FMH.TargetCountTooltip".Translate( currentCount, corpseCount, designatedCount, targetCount ) );
 
             // allow human meat (2)
             Rect humanMeatRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );

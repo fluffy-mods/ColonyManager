@@ -220,25 +220,24 @@ namespace FluffyManager
                 Utilities.DrawToggle(prioritizeRect, "FMP.PrioritizeManual".Translate(), ref ManagerJob_Production.prioritizeManual);
                 cur.y += _entryHeight;
                 
-                // min skill (5)
+                // skill range (5)
                 if ( _selected.Bill.recipe.workSkill != null )
                 {
                     Rect skillLabelRect = new Rect( cur.x, cur.y, width, _entryHeight );
                     if( optionindex % 2 == 0 ) Widgets.DrawAltRect( skillLabelRect );
                     Utilities.Label( skillLabelRect,
-                                     "MinimumSkillLevel".Translate( _selected.Bill.recipe.workSkill.label.ToLower() )
-                                     + ": " + _selected.Bill.allowedSkillRange.ToString(),
-                                     anchor: TextAnchor.MiddleLeft, lrMargin: 6f );
+                                     "FMP.AllowedSkillRange".Translate()
+                                     + ": " + _selected.Bill.allowedSkillRange );
                     cur.y += _entryHeight;
 
                     Rect skillRect = new Rect( cur.x, cur.y, width, Utilities.SliderHeight );
                     if( optionindex % 2 == 0 ) Widgets.DrawAltRect( skillRect );
-                    Widgets.IntRange( skillRect, 2134112311, ref _selected.Bill.allowedSkillRange, 0, 20, "AllowedSkillRange".Translate() );
+                    Widgets.IntRange( skillRect, 2134112311, ref _selected.Bill.allowedSkillRange, 0, 20 );
                     cur.y += Utilities.SliderHeight;
 
                     Rect snapToHighestRect = new Rect( cur.x, cur.y, width, _entryHeight );
                     if( optionindex++ % 2 == 0 ) Widgets.DrawAltRect( snapToHighestRect );
-                    Utilities.DrawToggle( snapToHighestRect, "FMP.SnapToHighestSkill".Translate(), ref _selected.maxSkil );
+                    Utilities.DrawToggle( snapToHighestRect, "FMP.SnapToHighestSkill".Translate(), ref _selected.restrictToMaxSkill );
                     cur.y += _entryHeight;
                     
                 }
