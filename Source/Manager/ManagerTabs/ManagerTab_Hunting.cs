@@ -83,18 +83,10 @@ namespace FluffyManager
             GUI.BeginGroup( colRects[0] );
 
             // target count (1)
-            Rect targetCountTitleRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             int currentCount = _selected.Trigger.CurCount;
             int corpseCount = _selected.GetMeatInCorpses();
             int designatedCount = _selected.GetMeatInDesignations();
             int targetCount = _selected.Trigger.Count;
-            Utilities.Label( targetCountTitleRect,
-                             "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ),
-                             "FMH.TargetCountTooltip".Translate( currentCount, corpseCount, designatedCount, targetCount ),
-                             TextAnchor.MiddleLeft,
-                             _margin );
-            Widgets.DrawAltRect( targetCountTitleRect );
-            cur.y += _entryHeight;
             
             _selected.Trigger.DrawTriggerConfig( ref cur, colWidth, _entryHeight, true,
                                                  "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ),

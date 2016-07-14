@@ -172,7 +172,8 @@ namespace FluffyManager
             if ( CountCache.ContainsKey( stockpileFilter ) )
             {
                 FilterCountCache filterCountCache = CountCache[stockpileFilter];
-                if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 )
+                if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 &&  // less than 250 ticks ago
+                     Find.TickManager.TicksGame > filterCountCache.TimeSet )         // cache is not from future (switching games without restarting could cause this).
                 {
                     count = filterCountCache.Cache;
                     return true;

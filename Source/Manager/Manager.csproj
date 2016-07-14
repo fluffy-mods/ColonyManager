@@ -60,8 +60,10 @@
     <Compile Include="ManagerJobs\ManagerJob_Forestry.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Hunting.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Livestock.cs" />
+    <Compile Include="ManagerJobs\ManagerJob_Trading.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Foraging.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Power.cs" />
+    <Compile Include="ManagerTabs\ManagerTab_Trading.cs" />
     <Compile Include="Triggers\Trigger_PawnKind.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Forestry.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Hunting.cs" />

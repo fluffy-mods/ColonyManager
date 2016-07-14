@@ -35,6 +35,7 @@ namespace FluffyManager
             IconLivestock                = ContentFinder<Texture2D>.Get( "UI/Icons/Livestock" ),
             IconForaging                 = ContentFinder<Texture2D>.Get( "UI/Icons/Foraging" ),
             IconPower                    = ContentFinder<Texture2D>.Get( "UI/Icons/Power" ),
+            IconTrading                  = ContentFinder<Texture2D>.Get( "UI/Icons/Power" ),
 
             // misc
             SlightlyDarkBackground       = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .4f ),
