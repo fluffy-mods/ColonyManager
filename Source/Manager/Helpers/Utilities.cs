@@ -41,6 +41,17 @@ namespace FluffyManager
             return inner;
         }
 
+
+        public static bool HasCompOrChildCompOf( this ThingDef def, Type compType )
+        {
+            for ( int index = 0; index < def.comps.Count; ++index )
+            {
+                if ( compType.IsAssignableFrom( def.comps[index].compClass )  )
+                    return true;
+            }
+            return false;
+        }
+
         public static IntVec3 GetBaseCenter()
         {
             // we need to define a 'base' position to calculate distances.
