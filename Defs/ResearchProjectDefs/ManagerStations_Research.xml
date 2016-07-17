@@ -11,7 +11,6 @@ Allows building manager desks with a computer, pre-installed with a host of guar
         </description>
         <baseCost>1500</baseCost>
         <prerequisites></prerequisites>
-        <techLevel>Industrial</techLevel>
     </ResearchProjectDef>
 
     <ResearchProjectDef>
