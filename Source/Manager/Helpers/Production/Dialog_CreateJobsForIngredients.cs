@@ -223,9 +223,9 @@ namespace FluffyManager
                     .FirstOrDefault(job => job.Bill.recipe == curRecipe);
 
                 // if there is a job for the recipe, add our job's count - any settings beyond that are user responsibility.
-                if ( curJob != null && curJob.Trigger.Count < targetCount )
+                if ( curJob != null && curJob.Trigger.CountLowerThreshold< targetCount )
                 {
-                    curJob.Trigger.Count = targetCount;
+                    curJob.Trigger.CountLowerThreshold = targetCount;
                     Messages.Message( "FMP.IncreasedThreshold".Translate( curRecipe.LabelCap, targetCount ),
                                       MessageSound.Benefit );
                 }

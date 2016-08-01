@@ -34,7 +34,7 @@ namespace FluffyManager
         public abstract string[] Targets { get; }
         public virtual SkillDef SkillDef { get; } = null;
         public abstract WorkTypeDef WorkTypeDef { get; }
-        
+
         public virtual void ExposeData()
         {
             Scribe_Values.LookValue( ref ActionInterval, "ActionInterval" );
@@ -62,7 +62,7 @@ namespace FluffyManager
 
         public abstract void DrawListEntry( Rect rect, bool overview = true, bool active = true );
         public abstract void DrawOverviewDetails( Rect rect );
-        public virtual void Tick() {}
+        public virtual void Tick() { }
 
         public override string ToString()
         {

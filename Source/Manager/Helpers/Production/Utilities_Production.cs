@@ -34,7 +34,7 @@ namespace FluffyManager
             copy.ingredientSearchRadius = bill.ingredientSearchRadius;
             copy.storeMode = bill.storeMode;
             copy.minSkillLevel = bill.minSkillLevel;
-
+            
             return copy;
         }
 
@@ -47,7 +47,11 @@ namespace FluffyManager
         public static int CountPerWorker( this ManagerJob_Production job, int workerIndex )
         {
             int n = job.BillGivers.CurBillGiverCount;
-            int diff = job.Trigger.Count - job.Trigger.CurCount;
+            int diff = job.Trigger.CountLowerThreshold - job.Trigger.CurCount;
+            if (job.Trigger.Op == Trigger_Threshold.Ops.Margins)
+            {
+                diff = job.Trigger.CountUpperThreshold - job.Trigger.CurCount;
+            }
 
             int bills;
 

@@ -163,7 +163,7 @@ namespace FluffyManager
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            History.DrawPlot( rect, Trigger.Count );
+            History.DrawPlot( rect, Trigger.CountLowerThreshold);
         }
 
         public override void ExposeData()
@@ -207,18 +207,22 @@ namespace FluffyManager
 
             // designate plants until trigger is met.
             int count = Trigger.CurCount + CurrentDesignatedCount;
-            if ( count < Trigger.Count )
+
+            int targetCount = CurrentDesignatedCount + ((Trigger.Op == Trigger_Threshold.Ops.Margins) ? Trigger.CountUpperThreshold : Trigger.CountLowerThreshold);
+            Log.Message("state = " + Trigger.State + ";CurCount = " + Trigger.CurCount + ";Lower = " + Trigger.CountLowerThreshold + ";Upper = " + Trigger.CountUpperThreshold + ";CurrentDesignatedCount = " + CurrentDesignatedCount + ";target = " + targetCount);
+            if (Trigger.State)
             {
                 var targets = GetValidForagingTargetsSorted();
-
-                for ( int i = 0; i < targets.Count && count < Trigger.Count; i++ )
+                Log.Message("ValidForagingTargetsCount = " + targets.Count);
+                for (int i = 0; i < targets.Count && count < targetCount; i++)
                 {
-                    Designation des = new Designation( targets[i], DesignationDefOf.HarvestPlant );
+                    Designation des = new Designation(targets[i], DesignationDefOf.HarvestPlant);
                     count += targets[i].YieldNow();
-                    AddDesignation( des );
+                    AddDesignation(des);
                     workDone = true;
                 }
             }
+            
 
             return workDone;
         }
@@ -252,6 +256,7 @@ namespace FluffyManager
         private List<Plant> GetValidForagingTargetsSorted()
         {
             IntVec3 position = Utilities.GetBaseCenter();
+
 
             return Find.ListerThings.AllThings
                         .Where( t => IsValidForagingTarget( t ) )

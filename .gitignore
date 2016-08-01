@@ -53,3 +53,6 @@ Source/BetterAnimalsTab/obj/Debug/BetterAnimalsTab.pdb
 *.cache
 *.pxd
 *.pdb
+*.csproj
+*.dll
+*.csproj

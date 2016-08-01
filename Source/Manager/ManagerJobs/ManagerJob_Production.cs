@@ -23,25 +23,25 @@ namespace FluffyManager
 {
     public class ManagerJob_Production : ManagerJob
     {
-        public static bool           prioritizeManual                       = true;
-        internal bool                _createIngredientBills;
-        internal bool                _hasMeaningfulIngredientChoices;
-        private readonly float       _margin                                = Utilities.Margin;
-        private bool                 _otherRecipeAvailable;
-        private int                  _recacheThreshold                      = 1000;
-        private string[]             _targets;
-        private int                  _timeSinceLastOtherRecipeCheck;
-        private WorkTypeDef          _workTypeDef;
-        public Bill_Production       Bill;
-        public BillGiverTracker      BillGivers;
-        public History               History;
-        public MainProductTracker    MainProduct;
-        public bool                  maxSkil;
-        public List<RecipeDef>       OtherRecipeDefs                        = new List<RecipeDef>();
+        public static bool prioritizeManual = true;
+        internal bool _createIngredientBills;
+        internal bool _hasMeaningfulIngredientChoices;
+        private readonly float _margin = Utilities.Margin;
+        private bool _otherRecipeAvailable;
+        private int _recacheThreshold = 1000;
+        private string[] _targets;
+        private int _timeSinceLastOtherRecipeCheck;
+        private WorkTypeDef _workTypeDef;
+        public Bill_Production Bill;
+        public BillGiverTracker BillGivers;
+        public History History;
+        public MainProductTracker MainProduct;
+        public bool maxSkil;
+        public List<RecipeDef> OtherRecipeDefs = new List<RecipeDef>();
         public new Trigger_Threshold Trigger;
 
 #if DEBUG_JOBS
-        public static StringBuilder  debug                                  = new StringBuilder();
+        public static StringBuilder debug = new StringBuilder();
 #endif
 
         public override bool Completed
@@ -405,7 +405,6 @@ namespace FluffyManager
             debug = new StringBuilder();
             debug.AppendLine( "Manager :: Doing work for " + Bill.GetUniqueLoadID() );
 #endif
-
             // flag to see if anything meaningful was done, if false at end, manager will also do next job.
             bool actionTaken = false;
 
@@ -414,7 +413,6 @@ namespace FluffyManager
 #if DEBUG_JOBS
                 debug.AppendLine( "Job is ACTIVE, commencing work " );
 #endif
-
                 // BillGivers that we should work with.
                 List<Building_WorkTable> workers = BillGivers.SelectedBillGivers;
 
@@ -427,12 +425,17 @@ namespace FluffyManager
                     Building_WorkTable worker = workers[workerIndex];
 #if DEBUG_JOBS
                     debug.AppendLine( "Checking workstation " + worker.GetUniqueLoadID() + " for changes to be made." );
-                    debug.AppendLine( "Current bills in billstack:" );
+                    debug.AppendLine( "Current bills in billstack: " + worker.BillStack.Count );
                     foreach ( Bill bill in worker.BillStack )
                     {
                         bool match = BillGivers.AssignedBillGiversAndBillsDictionary.Contains(
                                 new KeyValuePair<Bill_Production, Building_WorkTable>( bill as Bill_Production, worker ) );
                         debug.AppendLine( " - " + bill.GetUniqueLoadID() + ( match ? "<- match!" : "" ) );
+                        
+                    }
+                    foreach (var s in BillGivers.AssignedBillGiversAndBillsDictionary.Select( t => t.Key))
+                    {
+                        debug.AppendLine( "Current bills in BillGivers: " + s.GetUniqueLoadID() ); 
                     }
 #endif
                     bool billPresent = false;
@@ -445,16 +448,16 @@ namespace FluffyManager
                         foreach ( Bill t in worker.BillStack )
                         {
                             Bill_Production thatBill = t as Bill_Production;
-
+#if DEBUG_JOBS
+                            debug.AppendLine( "Checking: " + thatBill.GetUniqueLoadID() );
+#endif
                             // if there is a bill, and it's managed by us, check to see if it's up-to-date.
                             if ( thatBill != null &&
                                  thatBill.recipe == Bill.recipe &&
-                                 BillGivers.AssignedBillGiversAndBillsDictionary.Contains(
-                                     new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )
+                                 BillGivers.AssignedBillGiversAndBillsDictionary.Contains(new KeyValuePair<Bill_Production, Building_WorkTable>( thatBill, worker ) ) )
                             {
                                 billPresent = true;
-                                if ( thatBill.suspended != Bill.suspended ||
-                                     thatBill.repeatCount == 0 )
+                                if ( ( thatBill.suspended != Bill.suspended ) || ( thatBill.repeatCount == 0 ) )
                                 {
 #if DEBUG_JOBS
                                     debug.AppendLine( "Trying to unsuspend and/or bump targetCount" );
@@ -476,14 +479,19 @@ namespace FluffyManager
                     // if bill wasn't present, add it.
                     if ( !billPresent )
                     {
-#if DEBUG_JOBS
-                        debug.AppendLine( "Trying to add bill" );
-#endif
+
                         Bill_Production copy = Bill.Copy();
+#if DEBUG_JOBS
+                        debug.AppendLine( "Trying to add bill: " + copy.GetUniqueLoadID() );
+#endif
                         copy.repeatMode = BillRepeatMode.RepeatCount;
                         copy.repeatCount = this.CountPerWorker( workerIndex );
                         worker.BillStack?.AddBill( copy );
                         BillGivers.AssignedBillGiversAndBillsDictionary.Add( copy, worker );
+#if DEBUG_JOBS
+                        debug.AppendLine( "Added bill: " + copy.GetUniqueLoadID() + " to worker: " + worker.GetUniqueLoadID() );
+
+#endif
                         actionTaken = true;
 
 #if DEBUG_JOBS
@@ -525,7 +533,6 @@ namespace FluffyManager
 #if DEBUG_JOBS
             debug.AppendLine( "Cleaning no longer allowed billgivers:" );
 #endif
-
             // get list of workers, bills to iterate over
             var workers = BillGivers.AssignedBillGivers;
             var assignedBills = BillGivers.AssignedBillGiversAndBillsDictionary;
@@ -534,15 +541,24 @@ namespace FluffyManager
             // check each assigned bill to see if it's in the list of allowed workers.
             foreach ( Bill_Production bill in bills )
             {
+#if DEBUG_JOBS
+                debug.Append( "Checking: " + bill.GetUniqueLoadID() + ";" );
+#endif
                 // check for each bill if it's still on the table
                 if ( assignedBills[bill].BillStack.IndexOf( bill ) < 0 )
                 {
+#if DEBUG_JOBS
+                    debug.AppendLine( "IndexOf=>Remove:" + bill.GetUniqueLoadID() );
+#endif
                     assignedBills.Remove( bill );
                     continue;
                 }
 
                 if ( workers.Contains( assignedBills[bill] ) )
                 {
+#if DEBUG_JOBS
+                    debug.AppendLine( "Contains=>Remove:" + bill.GetUniqueLoadID() );
+#endif
                     continue;
                 }
 #if DEBUG_JOBS
@@ -668,7 +684,7 @@ namespace FluffyManager
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            History.DrawPlot( rect, Trigger.Count );
+            History.DrawPlot( rect, Trigger.CountLowerThreshold );
         }
 
         public override void Tick()

@@ -94,10 +94,23 @@ namespace FluffyManager
             // trigger config (1)
             int currentCount = _selected.Trigger.CurCount;
             int designatedCount = _selected.GetWoodInDesignations();
-            int targetCount = _selected.Trigger.Count;
-            _selected.Trigger.DrawTriggerConfig( ref cur, colRects[0].width, EntryHeight, true,
-                "FMF.TargetCount".Translate( currentCount, designatedCount, targetCount ),
-                "FMF.TargetCountTooltip".Translate( currentCount, designatedCount, targetCount ) );
+            int targetCount = _selected.Trigger.CountLowerThreshold;
+            int targetCountUpper = _selected.Trigger.CountUpperThreshold;
+
+            string tooltipString;
+            string targetCountString;
+            if (_selected.Trigger.Op == Trigger_Threshold.Ops.Margins)
+            {
+                targetCountString = "FMF.TargetCountHysteresis".Translate(currentCount, designatedCount, targetCount, targetCountUpper) + ":";
+                tooltipString = "FMF.TargetCountTooltip".Translate(currentCount, designatedCount, targetCount);
+            }
+            else
+            {
+                targetCountString = "FMF.TargetCount".Translate(currentCount, designatedCount, targetCount) + ":";
+                tooltipString = "FMF.TargetCountTooltip".Translate(currentCount, designatedCount, targetCount);
+            }
+
+            _selected.Trigger.DrawTriggerConfig( ref cur, colRects[0].width, EntryHeight, true, targetCountString, tooltipString);
 
             // Clear wind cells (2)
             Rect clearWindCellsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );

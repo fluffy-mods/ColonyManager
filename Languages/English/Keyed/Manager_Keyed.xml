@@ -65,6 +65,7 @@
   <FMH.Options>Options</FMH.Options>
   <FMH.Animals>Allowed animals</FMH.Animals>
   <FMH.TargetCount>Target count: {0}+{1}+{2}/{3}</FMH.TargetCount>
+  <FMH.TargetCountHysteresis>Threshold: {0}+{1}+{2}/[{3} - {4}]</FMH.TargetCountHysteresis>
   <FMH.TargetCountTooltip>Target: {3}\n{0} in storage\n{1} expected from butchery\n{2} expected from current designations.</FMH.TargetCountTooltip>
 
   <!-- Forestry Tab -->
@@ -75,8 +76,9 @@
   <FMF.Trees>Allowed trees</FMF.Trees>
   <FMF.ClearWindCells>Clear wind turbine cells</FMF.ClearWindCells>
   <FMF.AllowSaplings>Allow cutting not fully matured trees</FMF.AllowSaplings>
-  <FMF.LoggingArea>Alllow logging in:</FMF.LoggingArea>
+  <FMF.LoggingArea>Allow logging in:</FMF.LoggingArea>
   <FMF.TargetCount>Target count: {0}+{1}/{2}</FMF.TargetCount>
+  <FMF.TargetCountHysteresis>Target count: {0}+{1}/[{2} - {3}]</FMF.TargetCountHysteresis>
   <FMF.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMF.TargetCountTooltip>
   <FMF.ClearAreas>Clear areas of all vegetation:</FMF.ClearAreas>
 
@@ -86,6 +88,7 @@
   <FMG.NewForagingJobTooltip>Create a new foraging job</FMG.NewForagingJobTooltip>
   <FMG.Options>Options</FMG.Options>
   <FMG.TargetCount>Target count: {0}+{1}/{2}</FMG.TargetCount>
+  <FMG.TargetCountHysteresis>Target count: {0}+{1}/[{2} - {3}]</FMG.TargetCountHysteresis>
   <FMG.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMG.TargetCountTooltip>
   <FMG.ForceMature>Only fully matured plants</FMG.ForceMature>
   <FMG.ForagingArea>Allow foraging in:</FMG.ForagingArea>
@@ -113,6 +116,7 @@
 
   <!-- Thresholds -->
   <FMP.ThresholdCount>Threshold: {0}/{1}</FMP.ThresholdCount>
+  <FMP.ThresholdCountHysteresis>Threshold: {0}/[{1} - {2}]</FMP.ThresholdCountHysteresis>
   <FMP.ThresholdCountTooltip>Click to open threshold details.\n\nTarget: {1}\nIn production: {0}</FMP.ThresholdCountTooltip>
   <FMP.ThresholdDetails>Theshold details</FMP.ThresholdDetails>
 

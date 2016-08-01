@@ -127,7 +127,7 @@ namespace FluffyManager
                             if ( _selected._hasMeaningfulIngredientChoices &&
                                  _selected._createIngredientBills )
                             {
-                                Find.WindowStack.Add( new Dialog_CreateJobsForIngredients( _selected.Bill.recipe, _selected.Trigger.Count ) );
+                                Find.WindowStack.Add( new Dialog_CreateJobsForIngredients( _selected.Bill.recipe, _selected.Trigger.CountLowerThreshold ) );
                             }
 
                             Source = SourceOptions.Current;

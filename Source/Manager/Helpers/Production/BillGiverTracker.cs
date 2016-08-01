@@ -173,19 +173,16 @@ namespace FluffyManager
             for ( int i = 0; i < _assignedBillsScribeID.Count; i++ )
             {
 #if DEBUG_SCRIBE
-                        Log.Message( "Trying to find " + _assignedWorkersScribeID[i] + " | " + _assignedBillsScribeID[i] );
-                        if ( Recipe != null )
-                        {
-                            Log.Message( "Recipe: " + Recipe.label );
-                        }
-                        Log.Message( Recipe.CurrentRecipeUsers().Count.ToString() );
+                Log.Message( "Trying to find " + _assignedWorkersScribeID[i] + " | " + _assignedBillsScribeID[i] );
+                if ( Recipe != null )
+                {
+                    Log.Message( "Recipe: " + Recipe.label );
+                }
+                Log.Message( Recipe.CurrentRecipeUsers().First().ToString() );
 #endif
                 try
                 {
-                    Building_WorkTable worker = Recipe.CurrentRecipeUsers().DefaultIfEmpty( null )
-                                                      .FirstOrDefault(
-                                                          b =>
-                                                              b.GetUniqueLoadID() == _assignedWorkersScribeID[i] );
+                    Building_WorkTable worker = Recipe.CurrentRecipeUsers().DefaultIfEmpty( null ).FirstOrDefault( b => b.GetUniqueLoadID() == _assignedWorkersScribeID[i] );
                     Bill_Production bill = null;
                     if ( worker == null )
                     {
@@ -199,7 +196,7 @@ namespace FluffyManager
                     {
                         if ( current.GetUniqueLoadID() == _assignedBillsScribeID[i] )
                         {
-                            bill = (Bill_Production)current;
+                            bill = ( Bill_Production )current;
                         }
                     }
                     if ( bill == null )
@@ -214,7 +211,7 @@ namespace FluffyManager
                 {
                     error = true;
 #if DEBUG_SCRIBE
-                            Log.Warning( e.ToString() );
+                    Log.Warning( e.ToString() );
 #endif
                 }
             }
