@@ -29,7 +29,6 @@ Advancements in AI and colony-aware computers allow the building of Colony Aware
         <prerequisites>
             <li>ManagingSoftware</li>
         </prerequisites>
-        <techLevel>Spacer</techLevel>
     </ResearchProjectDef>
 
     <ResearchProjectDef>
@@ -48,6 +47,5 @@ Advancements in AI and colony-aware computers allow the building of Colony Aware
             <specialAction>FluffyManager.ResearchWorkers.UnlockPowerTab</specialAction>
           </li>
         </researchMods>
-        <techLevel>Spacer</techLevel>
     </ResearchProjectDef>
 </ResearchProjectDefs>
