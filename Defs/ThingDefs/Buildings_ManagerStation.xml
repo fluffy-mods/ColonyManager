@@ -19,6 +19,7 @@
 	<ThingDef Name="BenchBase" ParentName="BuildingBase" Abstract="True">
 		<castEdgeShadows>true</castEdgeShadows>
 		<staticSunShadowHeight>0.20</staticSunShadowHeight>
+		<minifiedDef>MinifiedFurniture</minifiedDef>
 	</ThingDef>
 
 
