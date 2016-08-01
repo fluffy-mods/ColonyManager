@@ -36,7 +36,7 @@ namespace FluffyManager
         public BillGiverTracker      BillGivers;
         public History               History;
         public MainProductTracker    MainProduct;
-        public bool                  maxSkil;
+        public bool                  restrictToMaxSkill;
         public List<RecipeDef>       OtherRecipeDefs                        = new List<RecipeDef>();
         public new Trigger_Threshold Trigger;
 
@@ -377,7 +377,7 @@ namespace FluffyManager
             {
                 BillGivers = new BillGiverTracker( this );
             }
-            Scribe_Values.LookValue( ref maxSkil, "maxSkill", false );
+            Scribe_Values.LookValue( ref restrictToMaxSkill, "maxSkill", false );
 
             // init main product, required by trigger.
             if ( MainProduct == null )
@@ -594,12 +594,12 @@ namespace FluffyManager
                 actionTaken = true;
             }
 
-            if ( thatBill.minSkillLevel != Bill.minSkillLevel )
+            if ( thatBill.allowedSkillRange != Bill.allowedSkillRange )
             {
 #if DEBUG_JOBS
                 debug.AppendLine( "Updating Bill.minSkillLevel" );
 #endif
-                thatBill.minSkillLevel = Bill.minSkillLevel;
+                thatBill.allowedSkillRange = Bill.allowedSkillRange;
                 actionTaken = true;
             }
         }
@@ -675,11 +675,11 @@ namespace FluffyManager
         {
             if ( Find.TickManager.TicksGame % 250 == 0 )
             {
-                if ( maxSkil )
+                if ( restrictToMaxSkill )
                 {
-                    Bill.minSkillLevel =
-                        Find.MapPawns.FreeColonistsSpawned.Max(
+                    var highestSkill = Find.MapPawns.FreeColonistsSpawned.Max(
                             pawn => pawn.skills.GetSkill( Bill.recipe.workSkill ).level );
+                    Bill.allowedSkillRange = new IntRange( highestSkill, highestSkill );                        
                 }
             }
             History.Update( Trigger.CurCount );

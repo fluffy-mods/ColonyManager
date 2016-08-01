@@ -108,13 +108,13 @@ namespace FluffyManager
             if ( !top )
             {
                 DrawOrderTooltips( upRect, topRect );
-                if ( Widgets.ImageButton( topRect, Resources.ArrowTop ) )
+                if ( Widgets.ButtonImage( topRect, Resources.ArrowTop ) )
                 {
                     Manager.Get.JobStack.TopPriority( job );
                     ret = true;
                 }
 
-                if ( Widgets.ImageButton( upRect, Resources.ArrowUp ) )
+                if ( Widgets.ButtonImage( upRect, Resources.ArrowUp ) )
                 {
                     Manager.Get.JobStack.IncreasePriority( job );
                     ret = true;
@@ -124,13 +124,13 @@ namespace FluffyManager
             if ( !bottom )
             {
                 DrawOrderTooltips( downRect, bottomRect, false );
-                if ( Widgets.ImageButton( downRect, Resources.ArrowDown ) )
+                if ( Widgets.ButtonImage( downRect, Resources.ArrowDown ) )
                 {
                     Manager.Get.JobStack.DecreasePriority( job );
                     ret = true;
                 }
 
-                if ( Widgets.ImageButton( bottomRect, Resources.ArrowBottom ) )
+                if ( Widgets.ButtonImage( bottomRect, Resources.ArrowBottom ) )
                 {
                     Manager.Get.JobStack.BottomPriority( job );
                     ret = true;
@@ -210,7 +210,7 @@ namespace FluffyManager
             Rect priorityColumnHeaderRect = new Rect( colWidth * 3.5f, 0f, colWidth * .5f, RowHeightPawnOverview );
 
             // label for priority column
-            string workLabel = Find.Map.playSettings.useWorkPriorities
+            string workLabel = Find.PlaySettings.useWorkPriorities
                 ? "FM.Priority".Translate()
                 : "FM.Enabled".Translate();
 
@@ -270,10 +270,10 @@ namespace FluffyManager
             Widgets.DrawHighlightIfMouseover( nameRect );
 
             // on click select and jump to location
-            if ( Widgets.InvisibleButton( nameRect ) )
+            if ( Widgets.ButtonInvisible( nameRect ) )
             {
                 Find.MainTabsRoot.EscapeCurrentTab();
-                Find.CameraMap.JumpTo( pawn.PositionHeld );
+                Find.CameraDriver.JumpTo( pawn.PositionHeld );
                 Find.Selector.ClearSelection();
                 if ( pawn.Spawned )
                 {
@@ -337,7 +337,7 @@ namespace FluffyManager
 
                     // go to job icon
                     Rect iconRect = new Rect( Margin, row.yMin + ( RowHeight - IconSize ) / 2, IconSize, IconSize );
-                    if ( Widgets.ImageButton( iconRect, Jobs[i].Tab.Icon ) )
+                    if ( Widgets.ButtonImage( iconRect, Jobs[i].Tab.Icon ) )
                     {
                         MainTabWindow_Manager.GoTo( Jobs[i].Tab, Jobs[i] );
                     }
@@ -351,7 +351,7 @@ namespace FluffyManager
                     jobRect.x += IconSize + 2 * Margin;
                     Jobs[i].DrawListEntry( jobRect, true, true );
                     Widgets.DrawHighlightIfMouseover( row );
-                    if ( Widgets.InvisibleButton( jobRect ) )
+                    if ( Widgets.ButtonInvisible( jobRect ) )
                     {
                         Selected = Jobs[i];
                     }

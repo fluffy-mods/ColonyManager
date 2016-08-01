@@ -41,6 +41,17 @@ namespace FluffyManager
             return inner;
         }
 
+
+        public static bool HasCompOrChildCompOf( this ThingDef def, Type compType )
+        {
+            for ( int index = 0; index < def.comps.Count; ++index )
+            {
+                if ( compType.IsAssignableFrom( def.comps[index].compClass )  )
+                    return true;
+            }
+            return false;
+        }
+
         public static IntVec3 GetBaseCenter()
         {
             // we need to define a 'base' position to calculate distances.
@@ -172,7 +183,8 @@ namespace FluffyManager
             if ( CountCache.ContainsKey( stockpileFilter ) )
             {
                 FilterCountCache filterCountCache = CountCache[stockpileFilter];
-                if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 )
+                if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 &&  // less than 250 ticks ago
+                     Find.TickManager.TicksGame > filterCountCache.TimeSet )         // cache is not from future (switching games without restarting could cause this).
                 {
                     count = filterCountCache.Cache;
                     return true;
@@ -314,7 +326,7 @@ namespace FluffyManager
                     }
                     else
                     {
-                        if ( Widgets.ImageButton( stampRect, Resources.StampStart ) )
+                        if ( Widgets.ButtonImage( stampRect, Resources.StampStart ) )
                         {
                             job.Suspended = false;
                         }
@@ -377,7 +389,7 @@ namespace FluffyManager
 
             // interactivity
             Widgets.DrawHighlightIfMouseover( rect );
-            if ( Widgets.InvisibleButton( rect ) )
+            if ( Widgets.ButtonInvisible( rect ) )
             {
                 checkOn = !checkOn;
             }
@@ -408,7 +420,7 @@ namespace FluffyManager
 
             // interactivity
             Widgets.DrawHighlightIfMouseover( rect );
-            if ( Widgets.InvisibleButton( rect ) )
+            if ( Widgets.ButtonInvisible( rect ) )
             {
                 if ( checkOn )
                 {

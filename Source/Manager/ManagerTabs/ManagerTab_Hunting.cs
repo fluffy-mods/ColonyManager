@@ -70,7 +70,7 @@ namespace FluffyManager
             }
 
             // keep track of location
-            Vector2 cur;
+            Vector2 cur = Vector2.zero;
 
             // begin window
             GUI.BeginGroup( rect );
@@ -81,26 +81,16 @@ namespace FluffyManager
 
             GUI.DrawTexture( colRects[0], Resources.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[0] );
-            cur = Vector2.zero;
 
             // target count (1)
-            Rect targetCountTitleRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             int currentCount = _selected.Trigger.CurCount;
             int corpseCount = _selected.GetMeatInCorpses();
             int designatedCount = _selected.GetMeatInDesignations();
             int targetCount = _selected.Trigger.Count;
-            Utilities.Label( targetCountTitleRect,
-                             "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ),
-                             "FMH.TargetCountTooltip".Translate( currentCount, corpseCount, designatedCount, targetCount ),
-                             TextAnchor.MiddleLeft,
-                             _margin );
-            Widgets.DrawAltRect( targetCountTitleRect );
-            cur.y += _entryHeight;
-
-            Rect targetCountRect = new Rect( cur.x, cur.y, colWidth, Utilities.SliderHeight );
-            Widgets.DrawAltRect( targetCountRect );
-            _selected.Trigger.Count = (int)GUI.HorizontalSlider( targetCountRect, _selected.Trigger.Count, 0, 2000 );
-            cur.y += Utilities.SliderHeight;
+            
+            _selected.Trigger.DrawTriggerConfig( ref cur, colWidth, _entryHeight, true,
+                                                 "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ),
+                                                 "FMH.TargetCountTooltip".Translate( currentCount, corpseCount, designatedCount, targetCount ) );
 
             // allow human meat (2)
             Rect humanMeatRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
@@ -207,7 +197,7 @@ namespace FluffyManager
             // do the button
             if ( !_selected.Managed )
             {
-                if ( Widgets.TextButton( buttonRect, "FM.Manage".Translate() ) )
+                if ( Widgets.ButtonText( buttonRect, "FM.Manage".Translate() ) )
                 {
                     // activate job, add it to the stack
                     _selected.Managed = true;
@@ -219,7 +209,7 @@ namespace FluffyManager
             }
             else
             {
-                if ( Widgets.TextButton( buttonRect, "FM.Delete".Translate() ) )
+                if ( Widgets.ButtonText( buttonRect, "FM.Delete".Translate() ) )
                 {
                     // inactivate job, remove from the stack.
                     Manager.Get.JobStack.Delete( _selected );
@@ -278,7 +268,7 @@ namespace FluffyManager
                 jobRect.width -= 50f;
 
                 job.DrawListEntry( jobRect, false, true );
-                if ( Widgets.InvisibleButton( jobRect ) )
+                if ( Widgets.ButtonInvisible( jobRect ) )
                 {
                     _selected = job;
                 }
@@ -299,7 +289,7 @@ namespace FluffyManager
             Widgets.Label( newRect, "<" + "FMH.NewHuntingJob".Translate() + ">" );
             Text.Anchor = TextAnchor.UpperLeft;
 
-            if ( Widgets.InvisibleButton( newRect ) )
+            if ( Widgets.ButtonInvisible( newRect ) )
             {
                 Selected = new ManagerJob_Hunting();
             }

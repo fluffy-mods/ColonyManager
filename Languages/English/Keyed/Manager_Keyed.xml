@@ -107,6 +107,7 @@
   <FMP.Bill>Bill</FMP.Bill>
   <FMP.Recipe>Recipe</FMP.Recipe>
   <FMP.AllowedIngredients>Allowed ingredients:</FMP.AllowedIngredients>
+  <FMP.AllowedSkillRange>Allowed skill range:</FMP.AllowedSkillRange>
   <FMP.PrioritizeManual>Prioritize manual bills</FMP.PrioritizeManual>
   <FMP.OtherRecipeAvailable>Other recipes available</FMP.OtherRecipeAvailable>
   <FMP.OtherRecipeAvailableTooltip>Other recipes producing the same product are available.\nClick to change this bill to another recipe.</FMP.OtherRecipeAvailableTooltip>

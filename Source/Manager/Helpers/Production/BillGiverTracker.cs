@@ -248,7 +248,7 @@ namespace FluffyManager
                              billgiverTooltip,
                              TextAnchor.MiddleLeft,
                              Utilities.Margin );
-            if ( Widgets.InvisibleButton( billgiverLabelRect ) )
+            if ( Widgets.ButtonInvisible( billgiverLabelRect ) )
             {
                 Find.WindowStack.Add( DetailsWindow );
             }

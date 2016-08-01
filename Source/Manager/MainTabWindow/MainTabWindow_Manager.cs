@@ -115,13 +115,13 @@ namespace FluffyManager
             if ( tab == CurrentTab )
             {
                 GUI.color = GenUI.MouseoverColor;
-                if ( Widgets.ImageButton( rect, tab.Icon, GenUI.MouseoverColor ) )
+                if ( Widgets.ButtonImage( rect, tab.Icon, GenUI.MouseoverColor ) )
                 {
                     tab.Selected = null;
                 }
                 GUI.color = Color.white;
             }
-            else if ( Widgets.ImageButton( rect, tab.Icon ) )
+            else if ( Widgets.ButtonImage( rect, tab.Icon ) )
             {
                 GoTo( tab );
             }

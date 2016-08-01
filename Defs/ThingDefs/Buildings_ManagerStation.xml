@@ -19,6 +19,8 @@
 	<ThingDef Name="BenchBase" ParentName="BuildingBase" Abstract="True">
 		<castEdgeShadows>true</castEdgeShadows>
 		<staticSunShadowHeight>0.20</staticSunShadowHeight>
+		<AltitudeLayer>Building</AltitudeLayer>
+		<minifiedDef>MinifiedFurniture</minifiedDef>
 	</ThingDef>
 
 
@@ -39,7 +41,6 @@
 			<li>Woody</li>
 			<li>Stony</li>
 		</stuffCategories>
-		<AltitudeLayer>Waist</AltitudeLayer>
 		<fillPercent>0.5</fillPercent>
 		<useHitPoints>True</useHitPoints>
 		<statBases>
@@ -84,7 +85,6 @@
 			<li>Woody</li>
 			<li>Stony</li>
 		</stuffCategories>
-		<AltitudeLayer>Waist</AltitudeLayer>
 		<fillPercent>0.5</fillPercent>
 		<useHitPoints>True</useHitPoints>
 		<statBases>
@@ -134,7 +134,6 @@
 			<Silver>5</Silver>
 			<AIPersonaCore>1</AIPersonaCore>
 		</costList>
-		<AltitudeLayer>Waist</AltitudeLayer>
 		<fillPercent>1</fillPercent>
 		<useHitPoints>True</useHitPoints>
 		<statBases>

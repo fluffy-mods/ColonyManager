@@ -87,7 +87,7 @@ namespace FluffyManager
                 if( zone != null )
                 {
                     if ( zone.AllSlotCellsList() != null && zone.AllSlotCellsList().Count > 0 )
-                        Find.CameraMap.JumpTo( zone.AllSlotCellsList().FirstOrDefault() );
+                        Find.CameraDriver.JumpTo( zone.AllSlotCellsList().FirstOrDefault() );
                 }
                 if( Input.GetMouseButton( 0 ) &&
                      zoneAllowed != zone )

@@ -25,13 +25,13 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\Assemblies\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\RimWorld1135Win_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\RimWorldWin_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -41,7 +41,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\RimWorld1135Win_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\RimWorldWin_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -60,8 +60,10 @@
     <Compile Include="ManagerJobs\ManagerJob_Forestry.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Hunting.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Livestock.cs" />
+    <Compile Include="ManagerJobs\ManagerJob_Trading.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Foraging.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Power.cs" />
+    <Compile Include="ManagerTabs\ManagerTab_Trading.cs" />
     <Compile Include="Triggers\Trigger_PawnKind.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Forestry.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Hunting.cs" />
@@ -78,7 +80,6 @@
     <Compile Include="ManagerTabs\ManagerTab_Overview.cs" />
     <Compile Include="Triggers\Trigger_Threshold.cs" />
     <Compile Include="Core\Manager.cs" />
-    <Compile Include="Core\ManagerController.cs" />
     <Compile Include="ManagerJobs\ManagerJob.cs" />
     <Compile Include="Helpers\UI\AreaAllowedGUI.cs" />
     <Compile Include="Helpers\UI\UIThingFilterSearchable.cs" />

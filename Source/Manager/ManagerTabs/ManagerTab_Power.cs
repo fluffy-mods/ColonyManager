@@ -151,6 +151,9 @@ namespace FluffyManager
             // once in a while, update the list of comps, and history thingcounts + theoretical maxes (where known).
             if ( Find.TickManager.TicksGame % 2000 == 0 )
             {
+                Log.Message( string.Join( ", ", _traderDefs.Select( d => d.LabelCap ).ToArray() ) );
+
+
                 // get all existing comps for all building defs that have power related comps (in essence, get all powertraders)
                 RefreshCompLists();
 
@@ -220,7 +223,7 @@ namespace FluffyManager
             }
             GUI.DrawTexture( searchIconRect, Resources.Search );
             Widgets.DrawHighlightIfMouseover( periodRect );
-            if ( Widgets.InvisibleButton( periodRect ) )
+            if ( Widgets.ButtonInvisible( periodRect ) )
             {
                 List<FloatMenuOption> periodOptions = new List<FloatMenuOption>();
                 for ( int i = 0; i < History.periods.Length; i++ )
@@ -270,7 +273,7 @@ namespace FluffyManager
         private IEnumerable<ThingDef> GetTraderDefs()
         {
             return from td in DefDatabase<ThingDef>.AllDefsListForReading
-                   where td.HasComp( typeof( CompPowerTrader ) )
+                   where td.HasCompOrChildCompOf( typeof( CompPowerTrader ) ) 
                    select td;
         }
 

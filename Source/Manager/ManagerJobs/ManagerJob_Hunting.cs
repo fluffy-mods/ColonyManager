@@ -223,7 +223,7 @@ namespace FluffyManager
                 // and that it's not forbidden (anymore) and can be reached.
                 Corpse corpse = current as Corpse;
                 if ( corpse != null &&
-                     !corpse.IsForbidden( Faction.OfColony ) &&
+                     !corpse.IsForbidden( Faction.OfPlayer ) &&
                      corpse.Position.CanReachColony() )
                 {
                     // check to see if it's buried.
@@ -275,7 +275,7 @@ namespace FluffyManager
                 Pawn target = des.target.Thing as Pawn;
                 if ( target != null &&
                      target.RaceProps.Animal &&
-                     !target.IsForbidden( Faction.OfColony ) &&
+                     !target.IsForbidden( Faction.OfPlayer ) &&
                      target.Position.CanReachColony() )
                 {
                     count += target.EstimatedMeatCount();
@@ -386,7 +386,7 @@ namespace FluffyManager
                 // don't unforbid corpses in storage - we're going to assume they were manually set.
                 if ( corpse != null &&
                      !corpse.IsInAnyStorage() &&
-                     corpse.IsForbidden( Faction.OfColony ) )
+                     corpse.IsForbidden( Faction.OfPlayer ) )
                 {
                     // only fresh corpses
                     CompRottable comp = corpse.GetComp<CompRottable>();

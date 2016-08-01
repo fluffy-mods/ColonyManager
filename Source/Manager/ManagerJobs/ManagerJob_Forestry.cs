@@ -93,9 +93,13 @@ namespace FluffyManager
             {
                 // confirm there is a plant here that it is a tree and that it has no current designation
                 Plant plant = cell.GetPlant();
-                if ( plant != null &&
-                     ( allPlants || plant.def.plant.IsTree ) &&
-                     Find.DesignationManager.AllDesignationsOn( plant ).ToList().NullOrEmpty() )
+                var zone = Find.ZoneManager.ZoneAt( cell ) as IPlantToGrowSettable;
+
+                if ( plant != null && ( // there is a plant here
+                        ( zone == null && ( plant.def.plant.IsTree || allPlants ) ) || // this is not a growing zone, and the plant is a tree or we're cutting everything
+                        ( allPlants && zone?.GetPlantDefToGrow() != plant.def ) // this is a growing zone, and the plant is not the plant set to grow in this zone
+                     ) &&
+                     Find.DesignationManager.AllDesignationsOn( plant ).ToList().NullOrEmpty() ) // there's not yet a designation on this plant
                 //DesignationOn( plant, DesignationDefOf.CutPlant ) == null )
                 {
                     Find.DesignationManager.AddDesignation( new Designation( plant, DesignationDefOf.CutPlant ) );
@@ -332,10 +336,11 @@ namespace FluffyManager
         private static List<IntVec3> GetWindCells()
         {
             return Find.ListerBuildings
-                       .AllBuildingsColonistOfClass<Building_WindTurbine>()
-                       .SelectMany( turbine => Building_WindTurbine.CalculateWindCells( turbine.Position,
-                                                                                        turbine.Rotation,
-                                                                                        turbine.RotatedSize ) )
+                       .allBuildingsColonist
+                       .Where( b => b.GetComp<CompPowerPlantWind>() != null )
+                       .SelectMany( turbine => WindTurbineUtility.CalculateWindCells( turbine.Position,
+                                                                                      turbine.Rotation,
+                                                                                      turbine.RotatedSize ) )
                        .ToList();
         }
 

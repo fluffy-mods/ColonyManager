@@ -48,7 +48,6 @@ namespace FluffyManager
         
         // interval per period
         private static Dictionary<Period, int> _intervals = new Dictionary<Period, int>();
-        private static readonly Texture2D _plotBG         = Resources.SlightlyDarkBackground;
         private static readonly float _yAxisMargin        = 40f;
         public  static Period[] periods                   = (Period[])Enum.GetValues( typeof (Period) );
 
@@ -262,7 +261,7 @@ namespace FluffyManager
             // get out early if no chapters.
             if ( chapters.Count == 0 )
             {
-                GUI.DrawTexture( rect.ContractedBy(Utilities.Margin), _plotBG );
+                GUI.DrawTexture( rect.ContractedBy(Utilities.Margin), Resources.SlightlyDarkBackground );
                 Utilities.Label( rect, "FM.HistoryNoChapters".Translate(), null, TextAnchor.MiddleCenter, color: Color.grey );
                 return;
             }
@@ -284,7 +283,7 @@ namespace FluffyManager
             float bu = hu * bi; // height per break
 
             // plot the line(s)
-            GUI.DrawTexture( plot, _plotBG );
+            GUI.DrawTexture( plot, Resources.SlightlyDarkBackground );
             GUI.BeginGroup( plot );
             foreach ( Chapter chapter in chapters )
             {
@@ -406,7 +405,7 @@ namespace FluffyManager
                                             Utilities.SmallIconSize );
 
                 Widgets.DrawHighlightIfMouseover( switchRect );
-                if ( Widgets.ImageButton( switchRect, Resources.Cog ) )
+                if ( Widgets.ButtonImage( switchRect, Resources.Cog ) )
                 {
                     List<FloatMenuOption> options =
                         periods.Select(
@@ -438,7 +437,7 @@ namespace FluffyManager
             // get out early if no chapters.
             if( ChaptersOrdered.Count == 0 )
             {
-                GUI.DrawTexture( canvas.ContractedBy( Utilities.Margin ), _plotBG );
+                GUI.DrawTexture( canvas.ContractedBy( Utilities.Margin ), Resources.SlightlyDarkBackground );
                 Utilities.Label( canvas, "FM.HistoryNoChapters".Translate(), null, TextAnchor.MiddleCenter, color: Color.grey );
                 return;
             }
@@ -553,7 +552,7 @@ namespace FluffyManager
                 TooltipHandler.TipRegion( row, tooltip);
 
                 // handle input
-                if ( Widgets.InvisibleButton( row ) )
+                if ( Widgets.ButtonInvisible( row ) )
                 {
                     if ( Event.current.button == 0 )
                     {

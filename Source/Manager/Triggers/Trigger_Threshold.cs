@@ -228,7 +228,7 @@ namespace FluffyManager
             GUI.DrawTexture( searchIconRect, Resources.Search );
 
             cur.y += entryHeight;
-            if ( Widgets.InvisibleButton( thresholdLabelRect ) )
+            if ( Widgets.ButtonInvisible( thresholdLabelRect ) )
             {
                 Find.WindowStack.Add( DetailsWindow );
             }

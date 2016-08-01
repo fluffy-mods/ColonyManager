@@ -15,7 +15,7 @@ namespace FluffyManager
         private string _input;
         public ManagerJob_Production Job;
         public Vector2 Scrollposition = new Vector2( 0f, 0f );
-        public override Vector2 InitialWindowSize => new Vector2( 300f, 500 );
+        public override Vector2 InitialSize => new Vector2( 300f, 500 );
 
         public override void DoWindowContents( Rect inRect )
         {
@@ -44,7 +44,7 @@ namespace FluffyManager
                 {
                     GUI.DrawTexture( all, TexUI.HighlightTex );
                 }
-                if ( Widgets.InvisibleButton( all ) )
+                if ( Widgets.ButtonInvisible( all ) )
                 {
                     Job.BillGivers.BillGiverSelection = AssignedBillGiverOptions.All;
                 }
@@ -94,7 +94,7 @@ namespace FluffyManager
                 {
                     GUI.DrawTexture( area, TexUI.HighlightTex );
                 }
-                if ( Widgets.InvisibleButton( area ) )
+                if ( Widgets.ButtonInvisible( area ) )
                 {
                     Job.BillGivers.BillGiverSelection = AssignedBillGiverOptions.Count;
                 }
@@ -130,7 +130,7 @@ namespace FluffyManager
                     GUI.DrawTexture( specific, TexUI.HighlightTex );
                 }
                 TooltipHandler.TipRegion( specific, "FMP.SpecificWorkstationsTooltip" );
-                if ( Widgets.InvisibleButton( specific ) )
+                if ( Widgets.ButtonInvisible( specific ) )
                 {
                     Job.BillGivers.BillGiverSelection = AssignedBillGiverOptions.Specific;
                 }
@@ -157,14 +157,14 @@ namespace FluffyManager
             if ( Job.BillGivers.SpecificBillGivers.Contains( billgiver ) )
             {
                 GUI.DrawTexture( iconRect, Widgets.CheckboxOnTex );
-                if ( Widgets.InvisibleButton( row ) )
+                if ( Widgets.ButtonInvisible( row ) )
                 {
                     Job.BillGivers.SpecificBillGivers.Remove( billgiver );
                 }
             }
             else
             {
-                if ( Widgets.InvisibleButton( row ) )
+                if ( Widgets.ButtonInvisible( row ) )
                 {
                     Job.BillGivers.SpecificBillGivers.Add( billgiver );
                 }
@@ -173,7 +173,7 @@ namespace FluffyManager
             if ( Mouse.IsOver( row ) )
             {
                 GUI.DrawTexture( row, TexUI.HighlightTex );
-                Find.CameraMap.JumpTo( billgiver.PositionHeld );
+                Find.CameraDriver.JumpTo( billgiver.PositionHeld );
             }
         }
 

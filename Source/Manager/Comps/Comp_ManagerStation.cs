@@ -12,17 +12,7 @@ namespace FluffyManager
     {
         // todo add automatic work setup.
         // todo add research and more workstations.
-        public CompProperties_ManagerStation props;
 
-        public override void Initialize( CompProperties vprops )
-        {
-            base.Initialize( vprops );
-            props = vprops as CompProperties_ManagerStation;
-            if ( props == null )
-            {
-                Log.Warning( "props went horribly wrong." );
-                props = new CompProperties_ManagerStation { Speed = 250 };
-            }
-        }
+        public CompProperties_ManagerStation Props => props as CompProperties_ManagerStation;
     }
 }

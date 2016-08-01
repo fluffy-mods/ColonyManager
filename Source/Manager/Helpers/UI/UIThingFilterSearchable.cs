@@ -43,11 +43,11 @@ namespace FluffyManager
             }
 
             // draw buttons + logic
-            if ( Widgets.TextButton( clearButtonRect, "ClearAll".Translate() ) )
+            if ( Widgets.ButtonTextSubtle( clearButtonRect, "ClearAll".Translate() ) )
             {
                 filter.SetDisallowAll();
             }
-            if ( Widgets.TextButton( allButtonRect, "AllowAll".Translate() ) )
+            if ( Widgets.ButtonTextSubtle( allButtonRect, "AllowAll".Translate() ) )
             {
                 filter.SetAllowAll( parentFilter );
             }
@@ -65,11 +65,8 @@ namespace FluffyManager
             DrawQualityFilterConfig( ref curY, viewRect.width, filter );
 
             // main listing
-            Rect listingRect = new Rect( 0f, curY, 9999f, 9999f );
-            float labelWidth = width - Widgets.CheckboxSize - Utilities.Margin;
-            Listing_TreeThingFilter listingTreeThingFilter = new Listing_TreeThingFilter( listingRect, filter,
-                                                                                          parentFilter,
-                                                                                          labelWidth, true );
+            Rect listingRect = new Rect( 0f, curY, viewRect.width, 9999f );
+            Listing_TreeThingFilter listingTreeThingFilter = new Listing_TreeThingFilter( listingRect, filter, parentFilter );
             TreeNode_ThingCategory node = ThingCategoryNodeDatabase.RootNode;
             if ( parentFilter != null )
             {
@@ -98,7 +95,7 @@ namespace FluffyManager
             }
             Rect rect = new Rect( 20f, y, width - 20f, 26f );
             FloatRange allowedHitPointsPercents = filter.AllowedHitPointsPercents;
-            Widgets.FloatRange( rect, 1, ref allowedHitPointsPercents, 0f, 1f, ToStringStyle.PercentZero, "HitPoints" );
+            Widgets.FloatRange( rect, 1, ref allowedHitPointsPercents, 0f, 1f, "HitPoints", ToStringStyle.PercentZero );
             filter.AllowedHitPointsPercents = allowedHitPointsPercents;
             y += 26f;
             y += 5f;
