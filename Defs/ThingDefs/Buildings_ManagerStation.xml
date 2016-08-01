@@ -20,6 +20,7 @@
 		<castEdgeShadows>true</castEdgeShadows>
 		<staticSunShadowHeight>0.20</staticSunShadowHeight>
 		<AltitudeLayer>Building</AltitudeLayer>
+		<minifiedDef>MinifiedFurniture</minifiedDef>
 	</ThingDef>
 
 
