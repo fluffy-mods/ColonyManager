@@ -10,6 +10,8 @@ Develop basic software for colony management.
 Allows building manager desks with a computer, pre-installed with a host of guaranteed bug free(tm) managing software.
         </description>
         <baseCost>1500</baseCost>
+        <techLevel>Industrial</techLevel>
+        <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
         <prerequisites></prerequisites>
     </ResearchProjectDef>
 
@@ -22,6 +24,8 @@ Develop advanced software for colony management.
 Advancements in AI and colony-aware computers allow the building of Colony Aware Supercomputers, preinstalled with FluffyOS. Some colonists have reported doors opening and closing, airconditioning systems going haywire, and electric smelters suddenly turning on. Nevertheless, the manufacturer guarantees(tm) that FluffyOS is not programmed to kill colonists. 
         </description>
         <baseCost>2500</baseCost>
+        <techLevel>Spacer</techLevel>
+        <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
         <prerequisites>
             <li>ManagingSoftware</li>
         </prerequisites>
@@ -34,6 +38,8 @@ Advancements in AI and colony-aware computers allow the building of Colony Aware
         <description>Create management software to monitor the colony's power usage. 
         </description>
         <baseCost>1000</baseCost>
+        <techLevel>Industrial</techLevel>
+        <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
         <prerequisites>
             <li>ManagingSoftware</li>
         </prerequisites>
