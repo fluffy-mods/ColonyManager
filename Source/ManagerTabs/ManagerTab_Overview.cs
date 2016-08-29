@@ -292,7 +292,7 @@ namespace FluffyManager
             Rect priorityPosition = new Rect( 0f, 0f, 24f, 24f ).CenteredOnXIn( priorityRect )
                                                                 .CenteredOnYIn( priorityRect );
             Text.Font = GameFont.Medium;
-            WidgetsWork.DrawWorkBoxFor( new Vector2( priorityPosition.xMin, priorityPosition.yMin ), pawn, WorkTypeDef, false );
+            WidgetsWork.DrawWorkBoxFor( priorityPosition.xMin, priorityPosition.yMin, pawn, WorkTypeDef, false );
             Text.Font = GameFont.Small;
         }
 

@@ -7,8 +7,8 @@
     <ProjectGuid>{25FE2988-9C8E-4470-A810-6A0F6F1940DB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Fluffy</RootNamespace>
-    <AssemblyName>Manager</AssemblyName>
+    <RootNamespace>Fluffy_Manager</RootNamespace>
+    <AssemblyName>Fluffy_ColonyManager</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -16,7 +16,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\Assemblies\</OutputPath>
+    <OutputPath>..\Assemblies\</OutputPath>
     <DefineConstants>TRACE;DEBUG;DEBUG_WORKGIVER;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
@@ -24,14 +24,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Assemblies\</OutputPath>
+    <OutputPath>..\Assemblies\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\RimWorldWin_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\RimWorld1280Win_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -41,7 +41,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\RimWorldWin_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\RimWorld1280Win_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -100,6 +100,9 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>C:\Users\karel\Documents\RimWorld\release Fluffy_ColonyManager $(TargetDir)\..</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

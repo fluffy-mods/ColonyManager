@@ -371,7 +371,8 @@ namespace FluffyManager
                 }
             }
             stringBuilder.AppendLine();
-            string extraDescriptionLine = _selected.Bill.recipe.IngredientValueGetter.ExtraDescriptionLine();
+            // TODO: Check A15 fix, this seems very odd.
+            string extraDescriptionLine = _selected.Bill.recipe.IngredientValueGetter.ExtraDescriptionLine( _selected.Bill.recipe );
             if ( extraDescriptionLine != null )
             {
                 stringBuilder.AppendLine( extraDescriptionLine );
