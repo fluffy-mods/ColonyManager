@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <!-- Work tables -->
+
+  <FM_BasicManagerStation.label>基础管理办公桌</FM_BasicManagerStation.label>
+  <FM_BasicManagerStation.description>一张简单的办公桌，上面有一些管理者工作所必须的工具。</FM_BasicManagerStation.description>
+
+  <FM_ManagerStation.label>管理办公桌</FM_ManagerStation.label>
+  <FM_ManagerStation.description>一张办公桌，带有电脑和必要的工具，让管理者更高效地工作。</FM_ManagerStation.description>
+
+  <FM_AIManager.label>AI管理者</FM_AIManager.label>
+  <FM_AIManager.description>一台能够自主管理你的殖民地的超级计算机。我们再次申明：那些声称我们的AI带有邪恶心灵子程序的完全是诽谤！</FM_AIManager.description>
+
+
+</LanguageData>
