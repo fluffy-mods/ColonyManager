@@ -1,12 +1,10 @@
-﻿// Manager/ManagerTab_Livestock.cs
-//
-// Copyright Karel Kroeze, 2015.
-//
-// Created 2015-11-22 15:52
+﻿// // Karel Kroeze
+// // ManagerTab_Livestock.cs
+// // 2016-12-09
 
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -16,24 +14,27 @@ namespace FluffyManager
     {
         #region Fields
 
-        private float                                             _actualHeight          = 999f;
-        private Vector2                                           _animalsScrollPosition = Vector2.zero;
-        private List<PawnKindDef>                                 _availablePawnKinds;
-        private List<ManagerJob_Livestock>                        _currentJobs;
-        private float                                             _entryHeight           = 30f;
-        private float                                             _listEntryHeight       = Utilities.LargeListEntryHeight;
+        private float _actualHeight = 999f;
+        private Vector2 _animalsScrollPosition = Vector2.zero;
+        private List<PawnKindDef> _availablePawnKinds;
+        private List<ManagerJob_Livestock> _currentJobs;
+        private float _entryHeight = 30f;
+        private float _listEntryHeight = Utilities.LargeListEntryHeight;
 
         // init with 5's if new job.
-        private Dictionary<Utilities_Livestock.AgeAndSex, string> _newCounts             = Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => "5" );
+        private Dictionary<Utilities_Livestock.AgeAndSex, string> _newCounts =
+            Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => "5" );
 
-        private bool                                              _onCurrentTab;
-        private Vector2                                           _scrollPosition        = Vector2.zero;
-        private PawnKindDef                                       _selectedAvailable;
-        private ManagerJob_Livestock                              _selectedCurrent;
-        private float                                             _smallIconSize         = Utilities.SmallIconSize;
-        private float                                             _topAreaHeight         = 30f;
+        private bool _onCurrentTab;
+        private Vector2 _scrollPosition = Vector2.zero;
+        private PawnKindDef _selectedAvailable;
+        private ManagerJob_Livestock _selectedCurrent;
+        private float _smallIconSize = Utilities.SmallIconSize;
+        private float _topAreaHeight = 30f;
 
         #endregion Fields
+
+        public ManagerTab_Livestock( Manager manager ) : base( manager ) { }
 
         #region Properties
 
@@ -53,7 +54,7 @@ namespace FluffyManager
                 // in either case, available selection can be cleared.
                 _onCurrentTab = value != null;
                 _selectedAvailable = null;
-                _selectedCurrent = (ManagerJob_Livestock)value;
+                _selectedCurrent = (ManagerJob_Livestock) value;
                 _newCounts = _selectedCurrent?.Trigger?.CountTargets.ToDictionary( k => k.Key, v => v.Value.ToString() );
             }
         }
@@ -64,18 +65,15 @@ namespace FluffyManager
 
         public override void DoWindowContents( Rect canvas )
         {
-            Rect leftRow = new Rect( 0f, 31f, DefaultLeftRowSize, canvas.height - 31f );
-            Rect contentCanvas = new Rect( leftRow.xMax + Utilities.Margin, 0f,
-                                           canvas.width - leftRow.width - Utilities.Margin, canvas.height );
+            var leftRow = new Rect( 0f, 31f, DefaultLeftRowSize, canvas.height - 31f );
+            var contentCanvas = new Rect( leftRow.xMax + Utilities.Margin, 0f,
+                                          canvas.width - leftRow.width - Utilities.Margin, canvas.height );
 
             DoLeftRow( leftRow );
             DoContent( contentCanvas );
         }
 
-        public override void PreOpen()
-        {
-            Refresh();
-        }
+        public override void PreOpen() { Refresh(); }
 
         private void DoContent( Rect rect )
         {
@@ -93,23 +91,23 @@ namespace FluffyManager
             rect = rect.AtZero();
 
             // rects
-            Rect optionsColumnRect = new Rect( Utilities.Margin / 2,
-                                               _topAreaHeight,
-                                               rect.width / 2 - Utilities.Margin,
-                                               rect.height - _topAreaHeight - Utilities.Margin - Utilities.ButtonSize.y );
-            Rect animalsRect = new Rect( optionsColumnRect.xMax + Utilities.Margin,
-                                         _topAreaHeight,
-                                         rect.width / 2 - Utilities.Margin,
-                                         rect.height - _topAreaHeight - Utilities.Margin - Utilities.ButtonSize.y );
+            var optionsColumnRect = new Rect( Utilities.Margin / 2,
+                                              _topAreaHeight,
+                                              rect.width / 2 - Utilities.Margin,
+                                              rect.height - _topAreaHeight - Utilities.Margin - Utilities.ButtonSize.y );
+            var animalsRect = new Rect( optionsColumnRect.xMax + Utilities.Margin,
+                                        _topAreaHeight,
+                                        rect.width / 2 - Utilities.Margin,
+                                        rect.height - _topAreaHeight - Utilities.Margin - Utilities.ButtonSize.y );
 
-            Rect optionsColumnTitle = new Rect( optionsColumnRect.xMin,
-                                                0f,
-                                                optionsColumnRect.width,
-                                                _topAreaHeight );
-            Rect animalsColumnTitle = new Rect( animalsRect.xMin,
-                                                0f,
-                                                animalsRect.width,
-                                                _topAreaHeight );
+            var optionsColumnTitle = new Rect( optionsColumnRect.xMin,
+                                               0f,
+                                               optionsColumnRect.width,
+                                               _topAreaHeight );
+            var animalsColumnTitle = new Rect( animalsRect.xMin,
+                                               0f,
+                                               animalsRect.width,
+                                               _topAreaHeight );
 
             // backgrounds
             GUI.DrawTexture( optionsColumnRect, Resources.SlightlyDarkBackground );
@@ -124,23 +122,23 @@ namespace FluffyManager
             // options
             GUI.BeginGroup( optionsColumnRect );
             Vector2 cur = Vector2.zero;
-            int optionIndex = 1;
+            var optionIndex = 1;
 
             // counts header
             Utilities.Label( ref cur, optionsColumnRect.width, _entryHeight, "FML.TargetCounts".Translate(),
                              alt: optionIndex % 2 == 0 );
 
             // counts table
-            int cols = 3;
+            var cols = 3;
             float fifth = optionsColumnRect.width / 5;
-            float[] widths = { fifth, fifth * 2, fifth * 2 };
-            float[] heights = { _entryHeight / 3 * 2, _entryHeight, _entryHeight };
+            float[] widths = {fifth, fifth * 2, fifth * 2};
+            float[] heights = {_entryHeight / 3 * 2, _entryHeight, _entryHeight};
 
             // set up a 3x3 table of rects
-            Rect[,] countRects = new Rect[cols, cols];
-            for ( int x = 0; x < cols; x++ )
+            var countRects = new Rect[cols, cols];
+            for ( var x = 0; x < cols; x++ )
             {
-                for ( int y = 0; y < cols; y++ )
+                for ( var y = 0; y < cols; y++ )
                 {
                     // kindof overkill for a 3x3 table, but ok.
                     countRects[x, y] = new Rect( widths.Take( x ).Sum(), cur.y + heights.Take( y ).Sum(), widths[x],
@@ -170,7 +168,7 @@ namespace FluffyManager
             cur.y += 3 * _entryHeight;
 
             // restrict to area
-            Rect restrictAreaRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+            var restrictAreaRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
             if ( optionIndex % 2 == 0 )
             {
                 Widgets.DrawAltRect( restrictAreaRect );
@@ -182,10 +180,10 @@ namespace FluffyManager
             {
                 // area selectors table
                 // set up a 3x3 table of rects
-                Rect[,] areaRects = new Rect[cols, cols];
-                for ( int x = 0; x < cols; x++ )
+                var areaRects = new Rect[cols, cols];
+                for ( var x = 0; x < cols; x++ )
                 {
-                    for ( int y = 0; y < cols; y++ )
+                    for ( var y = 0; y < cols; y++ )
                     {
                         // kindof overkill for a 3x3 table, but ok.
                         areaRects[x, y] = new Rect( widths.Take( x ).Sum(), cur.y + heights.Take( y ).Sum(), widths[x],
@@ -209,20 +207,24 @@ namespace FluffyManager
 
                 // do the selectors
                 _selectedCurrent.RestrictArea[0] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 1],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              0], AllowedAreaMode.Animal,
+                                                                                          _selectedCurrent.RestrictArea[0],
+                                                                                          manager,
+                                                                                          AllowedAreaMode.Animal,
                                                                                           Utilities.Margin );
                 _selectedCurrent.RestrictArea[1] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 1],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              1], AllowedAreaMode.Animal,
+                                                                                          _selectedCurrent.RestrictArea[1],
+                                                                                          manager,
+                                                                                          AllowedAreaMode.Animal,
                                                                                           Utilities.Margin );
                 _selectedCurrent.RestrictArea[2] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 2],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              2], AllowedAreaMode.Animal,
+                                                                                          _selectedCurrent.RestrictArea[2],
+                                                                                          manager,
+                                                                                          AllowedAreaMode.Animal,
                                                                                           Utilities.Margin );
                 _selectedCurrent.RestrictArea[3] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 2],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              3], AllowedAreaMode.Animal,
+                                                                                          _selectedCurrent.RestrictArea[3],
+                                                                                          manager,
+                                                                                          AllowedAreaMode.Animal,
                                                                                           Utilities.Margin );
 
                 cur.y += 3 * _entryHeight;
@@ -232,7 +234,7 @@ namespace FluffyManager
             // train
             Utilities.Label( ref cur, optionsColumnRect.width, _entryHeight, "FML.Training".Translate(),
                              alt: optionIndex % 2 == 0 );
-            Rect trainingRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+            var trainingRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
             if ( optionIndex++ % 2 == 0 )
             {
                 Widgets.DrawAltRect( trainingRect );
@@ -242,28 +244,30 @@ namespace FluffyManager
 
             if ( _selectedCurrent.Training.Any )
             {
-                Rect trainYoungRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+                var trainYoungRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
                 if ( optionIndex++ % 2 == 0 )
                     Widgets.DrawAltRect( trainYoungRect );
-                Utilities.DrawToggle( trainYoungRect, "FML.TrainYoung".Translate(), ref _selectedCurrent.Training.TrainYoung );
+                Utilities.DrawToggle( trainYoungRect, "FML.TrainYoung".Translate(),
+                                      ref _selectedCurrent.Training.TrainYoung );
                 cur.y += _entryHeight;
             }
 
             // butchery stuff
-            Rect butcherExcessRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+            var butcherExcessRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
             if ( optionIndex++ % 2 == 0 )
                 Widgets.DrawAltRect( butcherExcessRect );
             Utilities.DrawToggle( butcherExcessRect, "FML.ButcherExcess".Translate(), ref _selectedCurrent.ButcherExcess );
             cur.y += _entryHeight;
 
-            Rect butcherTrainedRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+            var butcherTrainedRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
             if ( optionIndex++ % 2 == 0 )
                 Widgets.DrawAltRect( butcherTrainedRect );
-            Utilities.DrawToggle( butcherTrainedRect, "FML.ButcherTrained".Translate(), ref _selectedCurrent.ButcherTrained );
+            Utilities.DrawToggle( butcherTrainedRect, "FML.ButcherTrained".Translate(),
+                                  ref _selectedCurrent.ButcherTrained );
             cur.y += _entryHeight;
 
             // try tame more?
-            Rect tameMoreRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+            var tameMoreRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
             cur.y += _entryHeight;
 
             Utilities.DrawToggle( tameMoreRect, "FML.TameMore".Translate(), ref _selectedCurrent.TryTameMore );
@@ -275,13 +279,13 @@ namespace FluffyManager
             // area to train from (if taming more);
             if ( _selectedCurrent.TryTameMore )
             {
-                Rect tameAreaRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+                var tameAreaRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
                 if ( optionIndex % 2 == 0 )
                 {
                     Widgets.DrawAltRect( tameAreaRect );
                 }
                 cur.y += _entryHeight;
-                Rect tameAreaSelectorRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+                var tameAreaSelectorRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
                 if ( optionIndex % 2 == 0 )
                 {
                     Widgets.DrawAltRect( tameAreaSelectorRect );
@@ -289,7 +293,7 @@ namespace FluffyManager
                 cur.y += _entryHeight;
 
                 Utilities.Label( tameAreaRect, "FML.TameArea".Translate() );
-                AreaAllowedGUI.DoAllowedAreaSelectors( tameAreaSelectorRect, ref _selectedCurrent.TameArea,
+                AreaAllowedGUI.DoAllowedAreaSelectors( tameAreaSelectorRect, ref _selectedCurrent.TameArea, manager,
                                                        AllowedAreaMode.Any, Utilities.Margin );
 
                 // why am I getting an error for not being at upperleft? Oh well, force it.
@@ -316,14 +320,14 @@ namespace FluffyManager
                 // tamed animals
                 DrawAnimalListheader( ref cur, new Vector2( viewRect.width, _entryHeight / 3 * 2 ), pawnKind,
                                       "FML.Tame".Translate().CapitalizeFirst() );
-                List<Pawn> tame = pawnKind.GetTame();
+                List<Pawn> tame = pawnKind.GetTame( manager );
                 if ( tame.Count == 0 )
                 {
                     Utilities.Label( ref cur, viewRect.width, _entryHeight,
                                      "FML.NoAnimals".Translate( "FML.Tame".Translate() ),
                                      anchor: TextAnchor.MiddleCenter, color: Color.grey );
                 }
-                for ( int i = 0; i < tame.Count; i++ )
+                for ( var i = 0; i < tame.Count; i++ )
                 {
                     DrawAnimalRow( ref cur, new Vector2( viewRect.width, _entryHeight ), tame[i], i % 2 == 0 );
                 }
@@ -333,14 +337,14 @@ namespace FluffyManager
                 // wild animals
                 DrawAnimalListheader( ref cur, new Vector2( viewRect.width, _entryHeight / 3 * 2 ), pawnKind,
                                       "FML.Wild".Translate().CapitalizeFirst() );
-                List<Pawn> wild = pawnKind.GetWild();
+                List<Pawn> wild = pawnKind.GetWild( manager );
                 if ( wild.Count == 0 )
                 {
                     Utilities.Label( ref cur, viewRect.width, _entryHeight,
                                      "FML.NoAnimals".Translate( "FML.Wild".Translate() ), null, TextAnchor.MiddleCenter,
                                      color: Color.grey );
                 }
-                for ( int i = 0; i < wild.Count; i++ )
+                for ( var i = 0; i < wild.Count; i++ )
                 {
                     DrawAnimalRow( ref cur, new Vector2( animalsRect.width, _entryHeight ), wild[i], i % 2 == 0 );
                 }
@@ -353,9 +357,9 @@ namespace FluffyManager
             }
 
             // bottom button
-            Rect buttonRect = new Rect( rect.xMax - Utilities.ButtonSize.x, rect.yMax - Utilities.ButtonSize.y,
-                                        Utilities.ButtonSize.x - Utilities.Margin,
-                                        Utilities.ButtonSize.y - Utilities.Margin );
+            var buttonRect = new Rect( rect.xMax - Utilities.ButtonSize.x, rect.yMax - Utilities.ButtonSize.y,
+                                       Utilities.ButtonSize.x - Utilities.Margin,
+                                       Utilities.ButtonSize.y - Utilities.Margin );
 
             // add / remove to the stack
             if ( _selectedCurrent.Managed )
@@ -376,7 +380,7 @@ namespace FluffyManager
                 {
                     _selectedCurrent.Managed = true;
                     _onCurrentTab = true;
-                    Manager.Get.JobStack.Add( _selectedCurrent );
+                    Manager.For( manager ).JobStack.Add( _selectedCurrent );
                     Refresh();
                 }
                 TooltipHandler.TipRegion( buttonRect, "FMP.ManageBillTooltip".Translate() );
@@ -411,18 +415,18 @@ namespace FluffyManager
             Widgets.DrawMenuSection( rect, false );
 
             // tabs
-            List<TabRecord> tabs = new List<TabRecord>();
-            TabRecord availableTabRecord = new TabRecord( "FMP.Available".Translate(), delegate
-            {
-                _onCurrentTab = false;
-                Refresh();
-            }, !_onCurrentTab );
+            var tabs = new List<TabRecord>();
+            var availableTabRecord = new TabRecord( "FMP.Available".Translate(), delegate
+                                                                                     {
+                                                                                         _onCurrentTab = false;
+                                                                                         Refresh();
+                                                                                     }, !_onCurrentTab );
             tabs.Add( availableTabRecord );
-            TabRecord currentTabRecord = new TabRecord( "FMP.Current".Translate(), delegate
-            {
-                _onCurrentTab = true;
-                Refresh();
-            }, _onCurrentTab );
+            var currentTabRecord = new TabRecord( "FMP.Current".Translate(), delegate
+                                                                                 {
+                                                                                     _onCurrentTab = true;
+                                                                                     Refresh();
+                                                                                 }, _onCurrentTab );
             tabs.Add( currentTabRecord );
 
             TabDrawer.DrawTabs( rect, tabs );
@@ -444,12 +448,12 @@ namespace FluffyManager
         private void DrawAnimalListheader( ref Vector2 cur, Vector2 size, PawnKindDef pawnKind, string header )
         {
             // use a third of available screenspace for labels
-            Rect headerRect = new Rect( cur.x, cur.y, size.x / 3f, size.y );
+            var headerRect = new Rect( cur.x, cur.y, size.x / 3f, size.y );
             Utilities.Label( headerRect, header, anchor: TextAnchor.MiddleCenter, font: GameFont.Tiny );
             cur.x += size.x / 3f;
 
             // gender, lifestage, current meat (and if applicable, milking + shearing)
-            int cols = 3;
+            var cols = 3;
 
             // extra columns?
             bool milk = pawnKind.Milkable();
@@ -465,7 +469,7 @@ namespace FluffyManager
             float colwidth = size.x * 2 / 3 / cols;
 
             // gender header
-            Rect genderRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            var genderRect = new Rect( cur.x, cur.y, colwidth, size.y );
             Rect genderMale =
                 new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( genderRect, -_smallIconSize / 2 );
             Rect genderFemale =
@@ -476,7 +480,7 @@ namespace FluffyManager
             cur.x += colwidth;
 
             // lifestage header
-            Rect ageRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            var ageRect = new Rect( cur.x, cur.y, colwidth, size.y );
             Rect ageRectC = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect, _smallIconSize / 2 );
             Rect ageRectB = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect );
             Rect ageRectA = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect, -_smallIconSize / 2 );
@@ -487,7 +491,7 @@ namespace FluffyManager
             cur.x += colwidth;
 
             // meat header
-            Rect meatRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            var meatRect = new Rect( cur.x, cur.y, colwidth, size.y );
             Rect meatIconRect =
                 new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( meatRect );
             GUI.DrawTexture( meatIconRect, Resources.MeatIcon );
@@ -497,7 +501,7 @@ namespace FluffyManager
             // milk header
             if ( milk )
             {
-                Rect milkRect = new Rect( cur.x, cur.y, colwidth, size.y );
+                var milkRect = new Rect( cur.x, cur.y, colwidth, size.y );
                 Rect milkIconRect =
                     new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( milkRect );
                 GUI.DrawTexture( milkIconRect, Resources.MilkIcon );
@@ -508,7 +512,7 @@ namespace FluffyManager
             // wool header
             if ( wool )
             {
-                Rect woolRect = new Rect( cur.x, cur.y, colwidth, size.y );
+                var woolRect = new Rect( cur.x, cur.y, colwidth, size.y );
                 Rect woolIconRect =
                     new Rect( 0f, 0f, Utilities.MediumIconSize, Utilities.MediumIconSize ).CenteredIn( woolRect );
                 GUI.DrawTexture( woolIconRect, Resources.WoolIcon );
@@ -524,7 +528,7 @@ namespace FluffyManager
         private void DrawAnimalRow( ref Vector2 cur, Vector2 size, Pawn p, bool alt )
         {
             // highlights and interactivity.
-            Rect row = new Rect( cur.x, cur.y, size.x, size.y );
+            var row = new Rect( cur.x, cur.y, size.x, size.y );
             if ( alt )
             {
                 Widgets.DrawAltRect( row );
@@ -543,12 +547,12 @@ namespace FluffyManager
             }
 
             // use a third of available screenspace for labels
-            Rect nameRect = new Rect( cur.x, cur.y, size.x / 3f, size.y );
+            var nameRect = new Rect( cur.x, cur.y, size.x / 3f, size.y );
             Utilities.Label( nameRect, p.LabelCap, anchor: TextAnchor.MiddleCenter, font: GameFont.Tiny );
             cur.x += size.x / 3f;
 
             // gender, lifestage, current meat (and if applicable, milking + shearing)
-            int cols = 3;
+            var cols = 3;
 
             // extra columns?
             if ( p.kindDef.Milkable() )
@@ -559,7 +563,7 @@ namespace FluffyManager
             float colwidth = size.x * 2 / 3 / cols;
 
             // gender column
-            Rect genderRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            var genderRect = new Rect( cur.x, cur.y, colwidth, size.y );
             Rect genderIconRect =
                 new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( genderRect );
             switch ( p.gender )
@@ -580,25 +584,27 @@ namespace FluffyManager
             cur.x += colwidth;
 
             // lifestage column
-            Rect ageRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            var ageRect = new Rect( cur.x, cur.y, colwidth, size.y );
             Rect ageIconRect = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect );
             GUI.DrawTexture( ageIconRect, Resources.LifeStages[p.ageTracker.CurLifeStageIndex] );
             TooltipHandler.TipRegion( ageRect, p.ageTracker.AgeTooltipString );
             cur.x += colwidth;
 
             // meat column
-            Rect meatRect = new Rect( cur.x, cur.y, colwidth, size.y );
+            var meatRect = new Rect( cur.x, cur.y, colwidth, size.y );
             // NOTE: When splitting tabs into separate mods; estimated meat count is defined in the Hunting helper.
-            Utilities.Label( meatRect, p.EstimatedMeatCount().ToString(), p.EstimatedMeatCount().ToString(), TextAnchor.MiddleCenter,
+            Utilities.Label( meatRect, p.EstimatedMeatCount().ToString(), p.EstimatedMeatCount().ToString(),
+                             TextAnchor.MiddleCenter,
                              font: GameFont.Tiny );
             cur.x += colwidth;
 
             // milk column
             if ( p.Milkable() )
             {
-                Rect milkRect = new Rect( cur.x, cur.y, colwidth, size.y );
-                CompMilkable comp = p.TryGetComp<CompMilkable>();
-                Utilities.Label( milkRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate( comp.Props.milkDef.LabelCap, comp.Props.milkAmount ),
+                var milkRect = new Rect( cur.x, cur.y, colwidth, size.y );
+                var comp = p.TryGetComp<CompMilkable>();
+                Utilities.Label( milkRect, comp.Fullness.ToString( "0%" ),
+                                 "FML.Yields".Translate( comp.Props.milkDef.LabelCap, comp.Props.milkAmount ),
                                  TextAnchor.MiddleCenter, font: GameFont.Tiny );
             }
             if ( p.kindDef.Milkable() )
@@ -607,9 +613,10 @@ namespace FluffyManager
             // wool column
             if ( p.Shearable() )
             {
-                Rect woolRect = new Rect( cur.x, cur.y, colwidth, size.y );
-                CompShearable comp = p.TryGetComp<CompShearable>();
-                Utilities.Label( woolRect, comp.Fullness.ToString( "0%" ), "FML.Yields".Translate( comp.Props.woolDef.LabelCap, comp.Props.woolAmount ),
+                var woolRect = new Rect( cur.x, cur.y, colwidth, size.y );
+                var comp = p.TryGetComp<CompShearable>();
+                Utilities.Label( woolRect, comp.Fullness.ToString( "0%" ),
+                                 "FML.Yields".Translate( comp.Props.woolDef.LabelCap, comp.Props.woolAmount ),
                                  TextAnchor.MiddleCenter, font: GameFont.Tiny );
             }
             if ( p.kindDef.Milkable() )
@@ -632,10 +639,10 @@ namespace FluffyManager
             Widgets.BeginScrollView( outRect, ref _scrollPosition, viewRect );
             GUI.BeginGroup( viewRect );
 
-            for ( int i = 0; i < _availablePawnKinds.Count; i++ )
+            for ( var i = 0; i < _availablePawnKinds.Count; i++ )
             {
                 // set up rect
-                Rect row = new Rect( 0f, _listEntryHeight * i, viewRect.width, _listEntryHeight );
+                var row = new Rect( 0f, _listEntryHeight * i, viewRect.width, _listEntryHeight );
 
                 // highlights
                 Widgets.DrawHighlightIfMouseover( row );
@@ -651,15 +658,15 @@ namespace FluffyManager
                 // draw label
                 string label = _availablePawnKinds[i].LabelCap + "\n<i>" +
                                "FML.TameWildCount".Translate(
-                                   _availablePawnKinds[i].GetTame().Count,
-                                   _availablePawnKinds[i].GetWild().Count ) + "</i>";
+                                                             _availablePawnKinds[i].GetTame( manager ).Count,
+                                                             _availablePawnKinds[i].GetWild( manager ).Count ) + "</i>";
                 Utilities.Label( row, label, null, TextAnchor.MiddleLeft, Utilities.Margin * 2 );
 
                 // button
                 if ( Widgets.ButtonInvisible( row ) )
                 {
                     _selectedAvailable = _availablePawnKinds[i]; // for highlighting to work
-                    Selected = new ManagerJob_Livestock( _availablePawnKinds[i] ); // for details
+                    Selected = new ManagerJob_Livestock( _availablePawnKinds[i], manager ); // for details
                 }
             }
 
@@ -679,10 +686,10 @@ namespace FluffyManager
             Widgets.BeginScrollView( outRect, ref _scrollPosition, viewRect );
             GUI.BeginGroup( viewRect );
 
-            for ( int i = 0; i < _currentJobs.Count; i++ )
+            for ( var i = 0; i < _currentJobs.Count; i++ )
             {
                 // set up rect
-                Rect row = new Rect( 0f, _listEntryHeight * i, viewRect.width, _listEntryHeight );
+                var row = new Rect( 0f, _listEntryHeight * i, viewRect.width, _listEntryHeight );
 
                 // highlights
                 Widgets.DrawHighlightIfMouseover( row );
@@ -712,14 +719,14 @@ namespace FluffyManager
         private void Refresh()
         {
             // currently managed
-            _currentJobs = Manager.Get.JobStack.FullStack<ManagerJob_Livestock>();
+            _currentJobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Livestock>();
 
             // concatenate lists of animals on biome and animals in colony.
-            _availablePawnKinds = Find.Map.Biome.AllWildAnimals.ToList();
+            _availablePawnKinds = manager.map.Biome.AllWildAnimals.ToList();
             _availablePawnKinds.AddRange(
-                Find.MapPawns.AllPawns
-                    .Where( p => p.RaceProps.Animal )
-                    .Select( p => p.kindDef ) );
+                                         manager.map.mapPawns.AllPawns
+                                            .Where( p => p.RaceProps.Animal )
+                                            .Select( p => p.kindDef ) );
             _availablePawnKinds = _availablePawnKinds
 
                 // get distinct pawnkinds from the merges

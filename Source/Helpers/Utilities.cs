@@ -1,14 +1,12 @@
-﻿// Manager/Utilities.cs
-//
-// Copyright Karel Kroeze, 2015.
-//
-// Created 2015-11-04 19:28
+﻿// // Karel Kroeze
+// // Utilities.cs
+// // 2016-12-09
 
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -22,8 +20,8 @@ namespace FluffyManager
         public static float BottomButtonHeight = 50f;
         public static Vector2 ButtonSize = new Vector2( 200f, 40f );
 
-        public static Dictionary<StockpileFilter, FilterCountCache> CountCache =
-            new Dictionary<StockpileFilter, FilterCountCache>();
+        public static Dictionary<MapStockpileFilter, FilterCountCache> CountCache =
+            new Dictionary<MapStockpileFilter, FilterCountCache>();
 
         public static float LargeIconSize = 32f;
         public static float ListEntryHeight = 30f;
@@ -44,21 +42,21 @@ namespace FluffyManager
 
         public static bool HasCompOrChildCompOf( this ThingDef def, Type compType )
         {
-            for ( int index = 0; index < def.comps.Count; ++index )
+            for ( var index = 0; index < def.comps.Count; ++index )
             {
-                if ( compType.IsAssignableFrom( def.comps[index].compClass )  )
+                if ( compType.IsAssignableFrom( def.comps[index].compClass ) )
                     return true;
             }
             return false;
         }
 
-        public static IntVec3 GetBaseCenter()
+        public static IntVec3 GetBaseCenter( this Map map )
         {
             // we need to define a 'base' position to calculate distances.
             // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
             IntVec3 position = IntVec3.Zero;
             Building managerStation =
-                Find.ListerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
+                map.listerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
             if ( managerStation != null )
             {
                 position = managerStation.Position;
@@ -67,8 +65,8 @@ namespace FluffyManager
             // otherwise, use the average of the home area. Not ideal, but it'll do.
             else
             {
-                List<IntVec3> homeCells = Find.AreaManager.Get<Area_Home>().ActiveCells.ToList();
-                for ( int i = 0; i < homeCells.Count; i++ )
+                List<IntVec3> homeCells = map.areaManager.Get<Area_Home>().ActiveCells.ToList();
+                for ( var i = 0; i < homeCells.Count; i++ )
                 {
                     position += homeCells[i];
                 }
@@ -145,8 +143,8 @@ namespace FluffyManager
                                   float tbMargin = 0f, GameFont font = GameFont.Small, Color? color = null )
         {
             // apply margins
-            Rect labelRect = new Rect( rect.xMin + lrMargin, rect.yMin + tbMargin, rect.width - 2 * lrMargin,
-                                       rect.height - 2 * tbMargin );
+            var labelRect = new Rect( rect.xMin + lrMargin, rect.yMin + tbMargin, rect.width - 2 * lrMargin,
+                                      rect.height - 2 * tbMargin );
 
             // draw label with anchor - reset anchor
             Text.Anchor = anchor;
@@ -169,7 +167,7 @@ namespace FluffyManager
                                   float tbMargin = 0f, bool alt = false,
                                   GameFont font = GameFont.Small, Color? color = null )
         {
-            Rect rect = new Rect( cur.x, cur.y, width, height );
+            var rect = new Rect( cur.x, cur.y, width, height );
             if ( alt )
             {
                 Widgets.DrawAltRect( rect );
@@ -178,13 +176,14 @@ namespace FluffyManager
             cur.y += height;
         }
 
-        private static bool TryGetCached( StockpileFilter stockpileFilter, out int count )
+        private static bool TryGetCached( MapStockpileFilter mapStockpileFilter, out int count )
         {
-            if ( CountCache.ContainsKey( stockpileFilter ) )
+            if ( CountCache.ContainsKey( mapStockpileFilter ) )
             {
-                FilterCountCache filterCountCache = CountCache[stockpileFilter];
-                if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 &&  // less than 250 ticks ago
-                     Find.TickManager.TicksGame > filterCountCache.TimeSet )         // cache is not from future (switching games without restarting could cause this).
+                FilterCountCache filterCountCache = CountCache[mapStockpileFilter];
+                if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 && // less than 250 ticks ago
+                     Find.TickManager.TicksGame > filterCountCache.TimeSet )
+                    // cache is not from future (switching games without restarting could cause this).
                 {
                     count = filterCountCache.Cache;
                     return true;
@@ -213,17 +212,17 @@ namespace FluffyManager
             return s;
         }
 
-        public static int CountProducts( ThingFilter filter, Zone_Stockpile stockpile = null )
+        public static int CountProducts( this Map map, ThingFilter filter, Zone_Stockpile stockpile = null )
         {
-            int count = 0;
+            var count = 0;
 
             // copout if filter is null
             if ( filter == null )
             {
                 return count;
             }
-            StockpileFilter cacheKey = new StockpileFilter( filter, stockpile );
-            if ( TryGetCached( cacheKey, out count ) )
+            var key = new MapStockpileFilter( map, filter, stockpile );
+            if ( TryGetCached( key, out count ) )
             {
                 return count;
             }
@@ -243,18 +242,18 @@ namespace FluffyManager
 #endif
 
                     // we don't need to bother with quality / hitpoints as these are non-existant/irrelevant for resources.
-                    count += Find.ResourceCounter.GetCount( td );
+                    count += map.resourceCounter.GetCount( td );
                 }
                 else
                 {
                     // otherwise, go look for stuff that matches our filters.
-                    List<Thing> thingList = Find.ListerThings.ThingsOfDef( td );
+                    List<Thing> thingList = map.listerThings.ThingsOfDef( td );
 
                     // if filtered by stockpile, filter the thinglist accordingly.
                     if ( stockpile != null )
                     {
                         SlotGroup areaSlotGroup = stockpile.slotGroup;
-                        thingList = thingList.Where( t => t.Position.GetSlotGroup() == areaSlotGroup ).ToList();
+                        thingList = thingList.Where( t => t.Position.GetSlotGroup( map ) == areaSlotGroup ).ToList();
                     }
                     foreach ( Thing t in thingList )
                     {
@@ -280,14 +279,14 @@ namespace FluffyManager
                 }
 
                 // update cache if exists.
-                if ( CountCache.ContainsKey( cacheKey ) )
+                if ( CountCache.ContainsKey( key ) )
                 {
-                    CountCache[cacheKey].Cache = count;
-                    CountCache[cacheKey].TimeSet = Find.TickManager.TicksGame;
+                    CountCache[key].Cache = count;
+                    CountCache[key].TimeSet = Find.TickManager.TicksGame;
                 }
                 else
                 {
-                    CountCache.Add( cacheKey, new FilterCountCache( count ) );
+                    CountCache.Add( key, new FilterCountCache( count ) );
                 }
             }
             return count;
@@ -305,7 +304,7 @@ namespace FluffyManager
                  job.Suspended )
             {
                 // put a stamp on it
-                Rect stampRect = new Rect( 0f, 0f, MediumIconSize, MediumIconSize );
+                var stampRect = new Rect( 0f, 0f, MediumIconSize, MediumIconSize );
 
                 // center stamp in available space
                 stampRect = stampRect.CenteredOnXIn( rect ).CenteredOnYIn( rect );
@@ -359,7 +358,8 @@ namespace FluffyManager
             TooltipHandler.TipRegion( progressRect, trigger.StatusTooltip );
             TooltipHandler.TipRegion( lastUpdateRect,
                                       "FM.LastUpdateTooltip".Translate(
-                                          ( Find.TickManager.TicksGame - job.LastAction ).TimeString() ) );
+                                                                       ( Find.TickManager.TicksGame - job.LastAction )
+                                                                           .TimeString() ) );
 
             GUI.EndGroup();
         }
@@ -369,7 +369,7 @@ namespace FluffyManager
         {
             // set up rects
             Rect labelRect = rect;
-            Rect checkRect = new Rect( rect.xMax - size - margin * 2, 0f, size, size );
+            var checkRect = new Rect( rect.xMax - size - margin * 2, 0f, size, size );
 
             // finetune rects
             checkRect = checkRect.CenteredOnYIn( labelRect );
@@ -400,7 +400,7 @@ namespace FluffyManager
         {
             // set up rects
             Rect labelRect = rect;
-            Rect checkRect = new Rect( rect.xMax - size - margin * 2, 0f, size, size );
+            var checkRect = new Rect( rect.xMax - size - margin * 2, 0f, size, size );
 
             // finetune rects
             checkRect = checkRect.CenteredOnYIn( labelRect );
@@ -471,18 +471,54 @@ namespace FluffyManager
             return test == value;
         }
 
-        public static object GetPrivatePropertyValue( this object src, string propName, BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic )
+        public static object GetPrivatePropertyValue( this object src, string propName,
+                                                      BindingFlags flags =
+                                                          BindingFlags.Instance | BindingFlags.NonPublic )
         {
             return src.GetType().GetProperty( propName, flags ).GetValue( src, null );
         }
 
-        public struct StockpileFilter
+        public static void LabelOutline( Rect icon, string label, string tooltip, TextAnchor anchor, float lrMargin,
+                                         float tbMargin, GameFont font, Color textColour, Color outlineColour )
+        {
+            // horribly inefficient way of getting an outline to show - draw 4 background coloured labels with a 1px offset, then draw the foreground on top.
+            int[] offsets = {-1, 0, 1};
+
+            foreach ( int xOffset in offsets )
+                foreach ( int yOffset in offsets )
+                {
+                    Rect offsetIcon = icon;
+                    offsetIcon.x += xOffset;
+                    offsetIcon.y += yOffset;
+                    Label( offsetIcon, label, null, anchor, lrMargin, tbMargin, font, outlineColour );
+                }
+
+            Label( icon, label, tooltip, anchor, lrMargin, tbMargin, font, textColour );
+        }
+
+        public static void Scribe_IntArray( ref List<int> values, string label )
+        {
+            string text = null;
+            if ( Scribe.mode == LoadSaveMode.Saving )
+            {
+                text = String.Join( ":", values.ConvertAll( i => i.ToString() ).ToArray() );
+            }
+            Scribe_Values.LookValue( ref text, label );
+            if ( Scribe.mode == LoadSaveMode.LoadingVars )
+            {
+                values = text.Split( ":".ToCharArray() ).ToList().ConvertAll( int.Parse );
+            }
+        }
+
+        public struct MapStockpileFilter
         {
             private ThingFilter filter;
             private Zone_Stockpile stockpile;
+            private Map map;
 
-            public StockpileFilter( ThingFilter filter, Zone_Stockpile stockpile )
+            public MapStockpileFilter( Map map, ThingFilter filter, Zone_Stockpile stockpile )
             {
+                this.map = map;
                 this.filter = filter;
                 this.stockpile = stockpile;
             }
@@ -495,7 +531,7 @@ namespace FluffyManager
             public int timeSet;
             public int updateInterval;
 
-            public CachedValue( T value = default( T ), int updateInterval = 250 )
+            public CachedValue( T value = default ( T ), int updateInterval = 250 )
             {
                 this.updateInterval = updateInterval;
                 _cached = _default = value;
@@ -530,37 +566,6 @@ namespace FluffyManager
             {
                 Cache = count;
                 TimeSet = Find.TickManager.TicksGame;
-            }
-        }
-
-        public static void LabelOutline( Rect icon, string label, string tooltip, TextAnchor anchor, float lrMargin, float tbMargin, GameFont font, Color textColour, Color outlineColour )
-        {
-            // horribly inefficient way of getting an outline to show - draw 4 background coloured labels with a 1px offset, then draw the foreground on top.
-            int[] offsets = { -1, 0, 1 };
-
-            foreach ( int xOffset in offsets )
-                foreach ( int yOffset in offsets )
-                {
-                    Rect offsetIcon = icon;
-                    offsetIcon.x += xOffset;
-                    offsetIcon.y += yOffset;
-                    Label( offsetIcon, label, null, anchor, lrMargin, tbMargin, font, outlineColour );
-                }
-
-            Label( icon, label, tooltip, anchor, lrMargin, tbMargin, font, textColour );
-        }
-
-        public static void Scribe_IntArray( ref List<int> values, string label )
-        {
-            string text = null;
-            if ( Scribe.mode == LoadSaveMode.Saving )
-            {
-                text = String.Join( ":", values.ConvertAll( i => i.ToString() ).ToArray() );
-            }
-            Scribe_Values.LookValue( ref text, label );
-            if ( Scribe.mode == LoadSaveMode.LoadingVars )
-            {
-                values = text.Split( ":".ToCharArray() ).ToList().ConvertAll( int.Parse );
             }
         }
     }

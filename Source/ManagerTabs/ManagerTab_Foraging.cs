@@ -1,7 +1,10 @@
-﻿using System;
+﻿// // Karel Kroeze
+// // ManagerTab_Foraging.cs
+// // 2016-12-09
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -19,7 +22,7 @@ namespace FluffyManager
         private List<ManagerJob_Foraging> _jobs;
         private float _leftRowHeight = 9999f;
         private Vector2 _scrollPosition = Vector2.zero;
-        private ManagerJob_Foraging _selected = new ManagerJob_Foraging();
+        private ManagerJob_Foraging _selected;
 
         #endregion Fields
 
@@ -34,7 +37,7 @@ namespace FluffyManager
         public override ManagerJob Selected
         {
             get { return _selected; }
-            set { _selected = (ManagerJob_Foraging)value; }
+            set { _selected = (ManagerJob_Foraging) value; }
         }
 
         #endregion Properties
@@ -50,15 +53,15 @@ namespace FluffyManager
             // some variables
             float width = rect.width;
             float height = rect.height - _topAreaHeight - _button.y - Margin;
-            int cols = 2;
+            var cols = 2;
             float colWidth = width / cols - Margin;
-            List<Rect> colRects = new List<Rect>();
-            List<Rect> colTitleRects = new List<Rect>();
-            Rect buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - Margin,
-                                        _button.y - Margin );
+            var colRects = new List<Rect>();
+            var colTitleRects = new List<Rect>();
+            var buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - Margin,
+                                       _button.y - Margin );
 
             // set up rects
-            for ( int j = 0; j < cols; j++ )
+            for ( var j = 0; j < cols; j++ )
             {
                 colRects.Add( new Rect( j * colWidth + j * Margin + Margin / 2, _topAreaHeight, colWidth, height ) );
                 colTitleRects.Add( new Rect( j * colWidth + j * Margin + Margin * 2.5f, 0f, colWidth, _topAreaHeight ) );
@@ -86,24 +89,25 @@ namespace FluffyManager
             int designatedCount = _selected.CurrentDesignatedCount;
             int targetCount = _selected.Trigger.Count;
             _selected.Trigger.DrawTriggerConfig( ref cur, colRects[0].width, EntryHeight, true,
-                "FMG.TargetCount".Translate( currentCount, designatedCount, targetCount ),
-                "FMG.TargetCountTooltip".Translate( currentCount, designatedCount, targetCount ) );
+                                                 "FMG.TargetCount".Translate( currentCount, designatedCount, targetCount ),
+                                                 "FMG.TargetCountTooltip".Translate( currentCount, designatedCount,
+                                                                                     targetCount ) );
 
             // Force mature plants only (2)
-            Rect forceMatureRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            var forceMatureRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Utilities.DrawToggle( forceMatureRect, "FMG.ForceMature".Translate(), ref _selected.ForceFullyMature );
             cur.y += EntryHeight;
 
             // Foraging area (3)
-            Rect foragingAreaTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            var foragingAreaTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( foragingAreaTitleRect );
             Utilities.Label( foragingAreaTitleRect, "FMG.ForagingArea".Translate(), anchor: TextAnchor.MiddleLeft,
                              lrMargin: Margin );
             cur.y += EntryHeight;
 
-            Rect foragingAreaRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            var foragingAreaRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( foragingAreaRect );
-            AreaAllowedGUI.DoAllowedAreaSelectors( foragingAreaRect, ref _selected.ForagingArea, lrMargin: Margin );
+            AreaAllowedGUI.DoAllowedAreaSelectors( foragingAreaRect, ref _selected.ForagingArea, manager, lrMargin: Margin );
             cur.y += EntryHeight;
 
             GUI.EndGroup();
@@ -120,7 +124,7 @@ namespace FluffyManager
             cur = Vector2.zero;
 
             Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
-            Rect viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedPlants.Count * EntryHeight );
+            var viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedPlants.Count * EntryHeight );
             if ( viewRect.height > outRect.height )
             {
                 viewRect.width -= 16f;
@@ -130,34 +134,41 @@ namespace FluffyManager
             Widgets.BeginScrollView( outRect, ref _contentScrollPosition, viewRect );
 
             // list of keys in allowed trees list (all plans that yield wood in biome, static)
-            List<ThingDef> plantDefs = new List<ThingDef>( _selected.AllowedPlants.Keys );
+            var plantDefs = new List<ThingDef>( _selected.AllowedPlants.Keys );
 
             // toggle all
-            Rect toggleAllRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            var toggleAllRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( toggleAllRect );
             Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
                                   _selected.AllowedPlants.Values.All( v => v ), delegate
-                                  {
-                                      foreach ( ThingDef def in plantDefs )
-                                      {
-                                          _selected.AllowedPlants[def] = true;
-                                      }
-                                  }, delegate
-                                  {
-                                      foreach ( ThingDef def in plantDefs )
-                                      {
-                                          _selected.AllowedPlants[def] = false;
-                                      }
-                                  } );
+                                                                                    {
+                                                                                        foreach (
+                                                                                            ThingDef def in plantDefs )
+                                                                                        {
+                                                                                            _selected.AllowedPlants[def]
+                                                                                                = true;
+                                                                                        }
+                                                                                    }, delegate
+                                                                                           {
+                                                                                               foreach (
+                                                                                                   ThingDef def in
+                                                                                                       plantDefs )
+                                                                                               {
+                                                                                                   _selected
+                                                                                                       .AllowedPlants[
+                                                                                                                      def
+                                                                                                       ] = false;
+                                                                                               }
+                                                                                           } );
 
             cur.y += EntryHeight;
 
             // toggle for each plant
-            int i = 1;
+            var i = 1;
 
             foreach ( ThingDef def in plantDefs )
             {
-                Rect toggleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+                var toggleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
 
                 // highlight alternate rows
                 if ( i++ % 2 == 0 )
@@ -167,8 +178,7 @@ namespace FluffyManager
 
                 // draw the toggle
                 Utilities.DrawToggle( toggleRect, def.LabelCap, _selected.AllowedPlants[def],
-                                      delegate
-                                      { _selected.AllowedPlants[def] = !_selected.AllowedPlants[def]; } );
+                                      delegate { _selected.AllowedPlants[def] = !_selected.AllowedPlants[def]; } );
 
                 // update current position
                 cur.y += EntryHeight;
@@ -187,7 +197,7 @@ namespace FluffyManager
                 {
                     // activate job, add it to the stack
                     _selected.Managed = true;
-                    Manager.Get.JobStack.Add( _selected );
+                    manager.JobStack.Add( _selected );
 
                     // refresh source list
                     Refresh();
@@ -198,7 +208,7 @@ namespace FluffyManager
                 if ( Widgets.ButtonText( buttonRect, "FM.Delete".Translate() ) )
                 {
                     // inactivate job, remove from the stack.
-                    Manager.Get.JobStack.Delete( _selected );
+                    manager.JobStack.Delete( _selected );
 
                     // remove content from UI
                     _selected = null;
@@ -218,7 +228,7 @@ namespace FluffyManager
 
             // content
             float height = _leftRowHeight;
-            Rect scrollView = new Rect( 0f, 0f, rect.width, height );
+            var scrollView = new Rect( 0f, 0f, rect.width, height );
             if ( height > rect.height )
             {
                 scrollView.width -= 16f;
@@ -229,11 +239,11 @@ namespace FluffyManager
 
             GUI.BeginGroup( scrollContent );
             Vector2 cur = Vector2.zero;
-            int i = 0;
+            var i = 0;
 
             foreach ( ManagerJob_Foraging job in _jobs )
             {
-                Rect row = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+                var row = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
                 if ( _selected == job )
                 {
@@ -247,7 +257,7 @@ namespace FluffyManager
 
                 Rect jobRect = row;
 
-                if ( ManagerTab_Overview.DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), job ) )
+                if ( ManagerTab_Overview.DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), manager, job ) )
                 {
                     Refresh();
                 }
@@ -263,7 +273,7 @@ namespace FluffyManager
             }
 
             // row for new job.
-            Rect newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+            var newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
             Widgets.DrawHighlightIfMouseover( newRect );
 
             if ( i % 2 == 1 )
@@ -277,7 +287,7 @@ namespace FluffyManager
 
             if ( Widgets.ButtonInvisible( newRect ) )
             {
-                Selected = new ManagerJob_Foraging();
+                Selected = new ManagerJob_Foraging( manager );
             }
 
             TooltipHandler.TipRegion( newRect, "FMG.NewForagingJobTooltip".Translate() );
@@ -292,9 +302,9 @@ namespace FluffyManager
         public override void DoWindowContents( Rect canvas )
         {
             // set up rects
-            Rect leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
-            Rect contentCanvas = new Rect( leftRow.xMax + Margin, 0f, canvas.width - leftRow.width - Margin,
-                                           canvas.height );
+            var leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
+            var contentCanvas = new Rect( leftRow.xMax + Margin, 0f, canvas.width - leftRow.width - Margin,
+                                          canvas.height );
 
             // draw overview row
             DoLeftRow( leftRow );
@@ -306,16 +316,15 @@ namespace FluffyManager
             }
         }
 
-        public override void PreOpen()
-        {
-            Refresh();
-        }
+        public override void PreOpen() { Refresh(); }
 
-        public void Refresh()
-        {
-            _jobs = Manager.Get.JobStack.FullStack<ManagerJob_Foraging>();
-        }
+        public void Refresh() { _jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Foraging>(); }
 
         #endregion Methods
+
+        public ManagerTab_Foraging( Manager manager ) : base( manager )
+        {
+            _selected = new ManagerJob_Foraging( manager );
+        }
     }
 }

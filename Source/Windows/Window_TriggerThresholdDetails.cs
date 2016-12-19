@@ -30,7 +30,7 @@ namespace FluffyManager
             filterUI.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter );
 
             // draw zone selector
-            StockpileGUI.DoStockpileSelectors(zoneRect, ref Trigger.stockpile);
+            StockpileGUI.DoStockpileSelectors( zoneRect, ref Trigger.stockpile, Trigger.manager );
 
             // draw operator button
             if ( Widgets.ButtonText( buttonRect, Trigger.OpString ) )

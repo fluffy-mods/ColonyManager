@@ -1,15 +1,12 @@
-﻿// Manager/ManagerTab_Overview.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-04 19:23
+﻿// // Karel Kroeze
+// // ManagerTab_Overview.cs
+// // 2016-12-09
 
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
 using UnityEngine;
 using Verse;
-using Resources = FluffyManager.Resources;
 
 namespace FluffyManager
 {
@@ -20,7 +17,7 @@ namespace FluffyManager
                            RowHeight = Utilities.LargeListEntryHeight,
                            RowHeightPawnOverview = 30f,
                            IconSize = 30f;
-        
+
         private Vector2 _overviewScrollPosition = Vector2.zero;
         private ManagerJob _selectedJob;
         private SkillDef _skillDef;
@@ -29,9 +26,9 @@ namespace FluffyManager
         public float OverviewHeight = 9999f;
         private List<Pawn> Workers = new List<Pawn>();
 
-        public static List<ManagerJob> Jobs
+        public List<ManagerJob> Jobs
         {
-            get { return Manager.Get.JobStack.FullStack(); }
+            get { return Manager.For( manager ).JobStack.FullStack(); }
         }
 
         public override Texture2D Icon
@@ -88,9 +85,10 @@ namespace FluffyManager
         /// <param name="rect"></param>
         /// <param name="job"></param>
         /// <returns></returns>
-        public static bool DrawOrderButtons<T>( Rect rect, T job ) where T : ManagerJob
+        public static bool DrawOrderButtons<T>( Rect rect, Manager manager, T job ) where T : ManagerJob
         {
-            bool ret = false;
+            var ret = false;
+            var jobStack = manager.JobStack;
 
             float width = rect.width / 2,
                   height = rect.height / 2;
@@ -100,7 +98,7 @@ namespace FluffyManager
                  topRect = new Rect( rect.xMin + width, rect.yMin, width, height ).ContractedBy( 1f ),
                  bottomRect = new Rect( rect.xMin + width, rect.yMin + height, width, height ).ContractedBy( 1f );
 
-            List<T> jobsOfType = Jobs.OfType<T>().OrderBy( j => j.Priority ).ToList();
+            List<T> jobsOfType = jobStack.FullStack<T>();
 
             bool top = jobsOfType.IndexOf( job ) == 0,
                  bottom = jobsOfType.IndexOf( job ) == jobsOfType.Count - 1;
@@ -110,13 +108,13 @@ namespace FluffyManager
                 DrawOrderTooltips( upRect, topRect );
                 if ( Widgets.ButtonImage( topRect, Resources.ArrowTop ) )
                 {
-                    Manager.Get.JobStack.TopPriority( job );
+                    jobStack.TopPriority( job );
                     ret = true;
                 }
 
                 if ( Widgets.ButtonImage( upRect, Resources.ArrowUp ) )
                 {
-                    Manager.Get.JobStack.IncreasePriority( job );
+                    jobStack.IncreasePriority( job );
                     ret = true;
                 }
             }
@@ -126,13 +124,13 @@ namespace FluffyManager
                 DrawOrderTooltips( downRect, bottomRect, false );
                 if ( Widgets.ButtonImage( downRect, Resources.ArrowDown ) )
                 {
-                    Manager.Get.JobStack.DecreasePriority( job );
+                    jobStack.DecreasePriority( job );
                     ret = true;
                 }
 
                 if ( Widgets.ButtonImage( bottomRect, Resources.ArrowBottom ) )
                 {
-                    Manager.Get.JobStack.BottomPriority( job );
+                    jobStack.BottomPriority( job );
                     ret = true;
                 }
             }
@@ -155,12 +153,12 @@ namespace FluffyManager
 
         public override void DoWindowContents( Rect canvas )
         {
-            Rect overviewRect = new Rect( 0f, 0f, OverviewWidthRatio * canvas.width, canvas.height );
-            Rect sideRectUpper = new Rect( overviewRect.xMax + Margin, 0f,
-                                           ( 1 - OverviewWidthRatio ) * canvas.width - Margin,
-                                           ( canvas.height - Margin ) / 2 );
-            Rect sideRectLower = new Rect( overviewRect.xMax + Margin, sideRectUpper.yMax + Margin, sideRectUpper.width,
-                                           sideRectUpper.height - 1 );
+            var overviewRect = new Rect( 0f, 0f, OverviewWidthRatio * canvas.width, canvas.height );
+            var sideRectUpper = new Rect( overviewRect.xMax + Margin, 0f,
+                                          ( 1 - OverviewWidthRatio ) * canvas.width - Margin,
+                                          ( canvas.height - Margin ) / 2 );
+            var sideRectLower = new Rect( overviewRect.xMax + Margin, sideRectUpper.yMax + Margin, sideRectUpper.width,
+                                          sideRectUpper.height - 1 );
 
             // draw the listing of current jobs.
             Widgets.DrawMenuSection( overviewRect );
@@ -181,12 +179,12 @@ namespace FluffyManager
         private void RefreshWorkers()
         {
             IEnumerable<Pawn> temp =
-                Find.MapPawns.FreeColonistsSpawned.Where( pawn => !pawn.story.WorkTypeIsDisabled( WorkTypeDef ) );
+                manager.map.mapPawns.FreeColonistsSpawned.Where( pawn => !pawn.story.WorkTypeIsDisabled( WorkTypeDef ) );
 
             // sort by either specific skill def or average over job - depending on which is known.
             temp = SkillDef != null
-                ? temp.OrderByDescending( pawn => pawn.skills.GetSkill( SkillDef ).level )
-                : temp.OrderByDescending( pawn => pawn.skills.AverageOfRelevantSkillsFor( WorkTypeDef ) );
+                       ? temp.OrderByDescending( pawn => pawn.skills.GetSkill( SkillDef ).Level )
+                       : temp.OrderByDescending( pawn => pawn.skills.AverageOfRelevantSkillsFor( WorkTypeDef ) );
 
             Workers = temp.ToList();
         }
@@ -194,8 +192,8 @@ namespace FluffyManager
         public void DrawPawnOverview( Rect rect )
         {
             // table body viewport
-            Rect tableOutRect = new Rect( 0f, RowHeightPawnOverview, rect.width, rect.height - RowHeightPawnOverview );
-            Rect tableViewRect = new Rect( 0f, RowHeightPawnOverview, rect.width, Workers.Count * RowHeightPawnOverview );
+            var tableOutRect = new Rect( 0f, RowHeightPawnOverview, rect.width, rect.height - RowHeightPawnOverview );
+            var tableViewRect = new Rect( 0f, RowHeightPawnOverview, rect.width, Workers.Count * RowHeightPawnOverview );
             if ( tableViewRect.height > tableOutRect.height )
             {
                 tableViewRect.width -= 16f;
@@ -205,20 +203,21 @@ namespace FluffyManager
             float colWidth = tableViewRect.width / 4 - Margin;
 
             // column headers
-            Rect nameColumnHeaderRect = new Rect( colWidth * 0, 0f, colWidth, RowHeightPawnOverview );
-            Rect activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth * 2.5f, RowHeightPawnOverview );
-            Rect priorityColumnHeaderRect = new Rect( colWidth * 3.5f, 0f, colWidth * .5f, RowHeightPawnOverview );
+            var nameColumnHeaderRect = new Rect( colWidth * 0, 0f, colWidth, RowHeightPawnOverview );
+            var activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth * 2.5f, RowHeightPawnOverview );
+            var priorityColumnHeaderRect = new Rect( colWidth * 3.5f, 0f, colWidth * .5f, RowHeightPawnOverview );
 
             // label for priority column
             string workLabel = Find.PlaySettings.useWorkPriorities
-                ? "FM.Priority".Translate()
-                : "FM.Enabled".Translate();
+                                   ? "FM.Priority".Translate()
+                                   : "FM.Enabled".Translate();
 
             // begin drawing
             GUI.BeginGroup( rect );
 
             // draw labels
-            Utilities.Label( nameColumnHeaderRect, WorkTypeDef.pawnLabel + "FM.PluralSuffix".Translate(), null, TextAnchor.LowerCenter );
+            Utilities.Label( nameColumnHeaderRect, WorkTypeDef.pawnLabel + "FM.PluralSuffix".Translate(), null,
+                             TextAnchor.LowerCenter );
             Utilities.Label( activityColumnHeaderRect, "FM.Activity".Translate(), null, TextAnchor.LowerCenter );
             Utilities.Label( priorityColumnHeaderRect, workLabel, null, TextAnchor.LowerCenter );
 
@@ -228,9 +227,9 @@ namespace FluffyManager
 
             // draw pawn rows
             Vector2 cur = Vector2.zero;
-            for ( int i = 0; i < Workers.Count; i++ )
+            for ( var i = 0; i < Workers.Count; i++ )
             {
-                Rect row = new Rect( cur.x, cur.y, tableViewRect.width, RowHeightPawnOverview );
+                var row = new Rect( cur.x, cur.y, tableViewRect.width, RowHeightPawnOverview );
                 if ( i % 2 == 0 )
                 {
                     Widgets.DrawAltRect( row );
@@ -262,9 +261,9 @@ namespace FluffyManager
             float colWidth = rect.width / 4 - Margin;
 
             // cell rects
-            Rect nameRect = new Rect( colWidth * 0, rect.yMin, colWidth, RowHeightPawnOverview );
-            Rect activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2.5f, RowHeightPawnOverview );
-            Rect priorityRect = new Rect( colWidth * 3.5f, rect.yMin, colWidth * .5f, RowHeightPawnOverview );
+            var nameRect = new Rect( colWidth * 0, rect.yMin, colWidth, RowHeightPawnOverview );
+            var activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2.5f, RowHeightPawnOverview );
+            var priorityRect = new Rect( colWidth * 3.5f, rect.yMin, colWidth * .5f, RowHeightPawnOverview );
 
             // name
             Widgets.DrawHighlightIfMouseover( nameRect );
@@ -321,9 +320,9 @@ namespace FluffyManager
 
                 Vector2 cur = Vector2.zero;
 
-                for ( int i = 0; i < Jobs.Count; i++ )
+                for ( var i = 0; i < Jobs.Count; i++ )
                 {
-                    Rect row = new Rect( cur.x, cur.y, contentRect.width, 50f );
+                    var row = new Rect( cur.x, cur.y, contentRect.width, 50f );
 
                     // highlights
                     if ( i % 2 == 1 )
@@ -336,14 +335,14 @@ namespace FluffyManager
                     }
 
                     // go to job icon
-                    Rect iconRect = new Rect( Margin, row.yMin + ( RowHeight - IconSize ) / 2, IconSize, IconSize );
+                    var iconRect = new Rect( Margin, row.yMin + ( RowHeight - IconSize ) / 2, IconSize, IconSize );
                     if ( Widgets.ButtonImage( iconRect, Jobs[i].Tab.Icon ) )
                     {
                         MainTabWindow_Manager.GoTo( Jobs[i].Tab, Jobs[i] );
                     }
 
                     // order buttons
-                    DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), Jobs[i] );
+                    DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), Manager.For( manager ), Jobs[i] );
 
                     // job specific overview.
                     Rect jobRect = row;
@@ -368,11 +367,10 @@ namespace FluffyManager
 
         #region Overrides of ManagerTab
 
-        public override void PreOpen()
-        {
-            RefreshWorkers();
-        }
+        public override void PreOpen() { RefreshWorkers(); }
 
         #endregion
+
+        public ManagerTab_Overview( Manager manager ) : base( manager ) {}
     }
 }

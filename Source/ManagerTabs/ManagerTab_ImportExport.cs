@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using HugsLib.Utils;
 using UnityEngine;
 using Verse;
 using Resources = FluffyManager.Resources;
@@ -30,6 +31,8 @@ namespace FluffyManager
         private List<SaveFileInfo> _saveFiles;
         private string _saveName = "";
         private string _saveNameBase = "ManagerSave_";
+
+        public ManagerTab_ImportExport( Manager manager ) : base( manager ) { }
 
         public override Texture2D Icon
         {
@@ -77,7 +80,7 @@ namespace FluffyManager
         public void Refresh()
         {
             // List of current job counts
-            _jobCounts = ( from job in Manager.Get.JobStack.FullStack()
+            _jobCounts = ( from job in Manager.For( manager ).JobStack.FullStack()
                            group job by job.Tab.Label
                            into jobs
                            select new Pair<string, int>( jobs.Key, jobs.Count() ) ).ToList();
@@ -117,7 +120,7 @@ namespace FluffyManager
                 }
                 ScribeMetaHeaderUtility.WriteMetaHeader();
 
-                _jobStackIO = Manager.Get.JobStack;
+                _jobStackIO = Manager.For( manager ).JobStack;
                 Scribe_Deep.LookDeep( ref _jobStackIO, "JobStack" );
             }
             catch ( Exception ex2 )
@@ -151,11 +154,11 @@ namespace FluffyManager
                 CrossRefResolver.ResolveAllCrossReferences();
 
                 // replace the old jobstack
-                Manager.Get.NewJobStack( _jobStackIO );
+                Manager.For( manager ).NewJobStack( _jobStackIO );
 
                 // remove invalid jobs
                 int invalid = 0;
-                foreach ( ManagerJob job in Manager.Get.JobStack.FullStack() )
+                foreach ( ManagerJob job in Manager.For( manager ).JobStack.FullStack() )
                 {
                     if ( !job.IsValid )
                     {
@@ -204,7 +207,7 @@ namespace FluffyManager
 
             // timestamp
             GUI.color = Color.gray;
-            Dialog_MapList.DrawDateAndVersion( file, timeRect );
+            Dialog_FileList.DrawDateAndVersion( file, timeRect );
             Text.Font = GameFont.Small;
             GUI.color = Color.white;
 

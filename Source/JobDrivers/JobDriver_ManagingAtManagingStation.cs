@@ -47,7 +47,7 @@ namespace FluffyManager
             toil.tickAction =
                 delegate { toil.actor.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Managing" ) ).Learn( 0.11f ); };
             List<Action> finishers = new List<Action>();
-            finishers.Add( delegate { Manager.Get.DoWork(); } );
+            finishers.Add( delegate { Manager.For( pawn.Map ).DoWork(); } );
             toil.finishActions = finishers;
             return toil;
         }

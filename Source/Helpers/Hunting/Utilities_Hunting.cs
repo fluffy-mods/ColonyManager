@@ -17,13 +17,12 @@ namespace FluffyManager
         public static int EstimatedMeatCount( this Pawn p )
         {
             // StatDef MeatAmount
-            // note; an attempt at future proofing, but will probably just make it more likely to break :p
             return (int)( StatDefOf.MeatAmount.defaultBaseValue * p.BodySize );
         }
 
         public static int GetMeatCount( this Corpse c )
         {
-            return EstimatedMeatCount( c.innerPawn );
+            return EstimatedMeatCount( c.InnerPawn );
         }
     }
 }

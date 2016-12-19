@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ModMetaData>
-  <name>RW_Manager</name>
+  <name>Colony Manager</name>
   <author>Fluffy</author>
   <url>https://ludeon.com/forums/index.php?topic=16120.0</url>
-  <targetVersion>0.16.1389</targetVersion>
-  <description/>
+  <targetVersion>0.16.1392</targetVersion>
+  <description>tag:Fluffylicious
+
+</description>
 </ModMetaData>

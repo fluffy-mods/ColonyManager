@@ -1,14 +1,11 @@
-﻿// Manager/ManagerTab_Power.cs
-//
-// Copyright Karel Kroeze, 2015.
-//
-// Created 2015-12-02 21:12
+﻿// // Karel Kroeze
+// // ManagerTab_Power.cs
+// // 2016-12-09
 
-using RimWorld;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -16,6 +13,49 @@ namespace FluffyManager
 {
     public class ManagerTab_Power : ManagerTab, IExposable
     {
+        #region Constructors
+
+        public ManagerTab_Power( Manager manager ) : base( manager )
+        {
+            // get list of thingdefs set to use the power comps - this should be static throughout the game (barring added mods midgame)
+            _traderDefs = GetTraderDefs().ToList();
+            _batteryDefs = GetBatteryDefs().ToList();
+
+            // get a dictionary of powercomps actually existing on the map for each thingdef.
+            RefreshCompLists();
+
+            // set up the history trackers.
+            tradingHistory =
+                new History(
+                    _traderDefs.Select(
+                                       def =>
+                                       new ThingCount( def,
+                                                       manager.map.listerBuildings.AllBuildingsColonistOfDef( def )
+                                                              .Count() ) )
+                               .ToArray() )
+                {
+                    DrawOptions = false,
+                    DrawInlineLegend = false,
+                    Suffix = "W",
+                    DrawInfoInBar = true,
+                    DrawMaxMarkers = true
+                };
+
+            overallHistory = new History( new[] {"Production", "Consumption", "Batteries"} )
+                             {
+                                 DrawOptions = false,
+                                 DrawInlineLegend = false,
+                                 Suffix = "W",
+                                 DrawIcons = false,
+                                 DrawCounts = false,
+                                 DrawInfoInBar = true,
+                                 DrawMaxMarkers = true,
+                                 MaxPerChapter = true
+                             };
+        }
+
+        #endregion Constructors
+
         #region Fields
 
         private List<List<CompPowerBattery>> _batteries;
@@ -30,56 +70,16 @@ namespace FluffyManager
 
         #endregion Fields
 
-        #region Constructors
-
-        public ManagerTab_Power()
-        {
-            // get list of thingdefs set to use the power comps - this should be static throughout the game (barring added mods midgame)
-            _traderDefs = GetTraderDefs().ToList();
-            _batteryDefs = GetBatteryDefs().ToList();
-
-            // get a dictionary of powercomps actually existing on the map for each thingdef.
-            RefreshCompLists();
-
-            // set up the history trackers.
-            tradingHistory =
-                new History(
-                    _traderDefs.Select(
-                        def => new ThingCount( def, Find.ListerBuildings.AllBuildingsColonistOfDef( def ).Count() ) )
-                               .ToArray() )
-                {
-                    DrawOptions = false,
-                    DrawInlineLegend = false,
-                    Suffix = "W",
-                    DrawInfoInBar = true,
-                    DrawMaxMarkers = true
-                };
-
-            overallHistory = new History( new[] { "Production", "Consumption", "Batteries" } )
-            {
-                DrawOptions = false,
-                DrawInlineLegend = false,
-                Suffix = "W",
-                DrawIcons = false,
-                DrawCounts = false,
-                DrawInfoInBar = true,
-                DrawMaxMarkers = true,
-                MaxPerChapter = true
-            };
-        }
-
-        #endregion Constructors
-
         #region Properties
 
-        public static bool AnyPoweredStationOnline
+        public bool AnyPoweredStationOnline
         {
             get
             {
-                return Find.ListerBuildings
-                    .AllBuildingsColonistOfClass<Building_ManagerStation>()
-                    .Select( t => t.TryGetComp<CompPowerTrader>() )
-                    .Any( c => c != null && c.PowerOn );
+                return manager.map.listerBuildings
+                              .AllBuildingsColonistOfClass<Building_ManagerStation>()
+                              .Select( t => t.TryGetComp<CompPowerTrader>() )
+                              .Any( c => c != null && c.PowerOn );
             }
         }
 
@@ -93,10 +93,7 @@ namespace FluffyManager
 
         public override bool Visible
         {
-            get
-            {
-                return AnyPoweredStationOnline;
-            }
+            get { return AnyPoweredStationOnline; }
         }
 
         #endregion Properties
@@ -106,14 +103,14 @@ namespace FluffyManager
         public override void DoWindowContents( Rect canvas )
         {
             // set up rects
-            Rect overviewRect = new Rect( 0f, 0f, canvas.width, 150f );
-            Rect consumtionRect = new Rect( 0f, overviewRect.height + Utilities.Margin,
-                                            ( canvas.width - Utilities.Margin ) / 2f,
-                                            canvas.height - overviewRect.height - Utilities.Margin );
-            Rect productionRect = new Rect( consumtionRect.xMax + Utilities.Margin,
-                                            overviewRect.height + Utilities.Margin,
-                                            ( canvas.width - Utilities.Margin ) / 2f,
-                                            canvas.height - overviewRect.height - Utilities.Margin );
+            var overviewRect = new Rect( 0f, 0f, canvas.width, 150f );
+            var consumtionRect = new Rect( 0f, overviewRect.height + Utilities.Margin,
+                                           ( canvas.width - Utilities.Margin ) / 2f,
+                                           canvas.height - overviewRect.height - Utilities.Margin );
+            var productionRect = new Rect( consumtionRect.xMax + Utilities.Margin,
+                                           overviewRect.height + Utilities.Margin,
+                                           ( canvas.width - Utilities.Margin ) / 2f,
+                                           canvas.height - overviewRect.height - Utilities.Margin );
 
             // draw area BG's
             Widgets.DrawMenuSection( overviewRect );
@@ -164,8 +161,8 @@ namespace FluffyManager
                 // update theoretical max for batteries, and reset observed max.
                 overallHistory.UpdateMax( 0, 0,
                                           (int)
-                                              _batteries.Sum(
-                                                  list => list.Sum( battery => battery.Props.storedEnergyMax ) ) );
+                                          _batteries.Sum(
+                                                         list => list.Sum( battery => battery.Props.storedEnergyMax ) ) );
             }
 
             // update the history tracker.
@@ -178,9 +175,9 @@ namespace FluffyManager
         private void DrawConsumption( Rect canvas )
         {
             // setup rects
-            Rect plotRect = new Rect( canvas.xMin, canvas.yMin, canvas.width, ( canvas.height - Utilities.Margin ) / 2f );
-            Rect legendRect = new Rect( canvas.xMin, plotRect.yMax + Utilities.Margin, canvas.width,
-                                        ( canvas.height - Utilities.Margin ) / 2f );
+            var plotRect = new Rect( canvas.xMin, canvas.yMin, canvas.width, ( canvas.height - Utilities.Margin ) / 2f );
+            var legendRect = new Rect( canvas.xMin, plotRect.yMax + Utilities.Margin, canvas.width,
+                                       ( canvas.height - Utilities.Margin ) / 2f );
 
             // draw the plot
             tradingHistory.DrawPlot( plotRect, negativeOnly: true );
@@ -192,12 +189,12 @@ namespace FluffyManager
         private void DrawOverview( Rect canvas )
         {
             // setup rects
-            Rect legendRect = new Rect( canvas.xMin, canvas.yMin, ( canvas.width - Utilities.Margin ) / 2f,
-                                        canvas.height - Utilities.ButtonSize.y - Utilities.Margin );
-            Rect plotRect = new Rect( legendRect.xMax + Utilities.Margin, canvas.yMin,
-                                      ( canvas.width - Utilities.Margin ) / 2f, canvas.height );
-            Rect buttonsRect = new Rect( canvas.xMin, legendRect.yMax + Utilities.Margin,
-                                         ( canvas.width - Utilities.Margin ) / 2f, Utilities.ButtonSize.y );
+            var legendRect = new Rect( canvas.xMin, canvas.yMin, ( canvas.width - Utilities.Margin ) / 2f,
+                                       canvas.height - Utilities.ButtonSize.y - Utilities.Margin );
+            var plotRect = new Rect( legendRect.xMax + Utilities.Margin, canvas.yMin,
+                                     ( canvas.width - Utilities.Margin ) / 2f, canvas.height );
+            var buttonsRect = new Rect( canvas.xMin, legendRect.yMax + Utilities.Margin,
+                                        ( canvas.width - Utilities.Margin ) / 2f, Utilities.ButtonSize.y );
 
             // draw the plot
             overallHistory.DrawPlot( plotRect );
@@ -225,15 +222,17 @@ namespace FluffyManager
             Widgets.DrawHighlightIfMouseover( periodRect );
             if ( Widgets.ButtonInvisible( periodRect ) )
             {
-                List<FloatMenuOption> periodOptions = new List<FloatMenuOption>();
-                for ( int i = 0; i < History.periods.Length; i++ )
+                var periodOptions = new List<FloatMenuOption>();
+                for ( var i = 0; i < History.periods.Length; i++ )
                 {
                     History.Period period = History.periods[i];
                     periodOptions.Add( new FloatMenuOption( period.ToString(), delegate
-                    {
-                        tradingHistory.periodShown = period;
-                        overallHistory.periodShown = period;
-                    } ) );
+                                                                                   {
+                                                                                       tradingHistory.periodShown =
+                                                                                           period;
+                                                                                       overallHistory.periodShown =
+                                                                                           period;
+                                                                                   } ) );
                 }
                 Find.WindowStack.Add( new FloatMenu( periodOptions ) );
             }
@@ -242,9 +241,9 @@ namespace FluffyManager
         private void DrawProduction( Rect canvas )
         {
             // setup rects
-            Rect plotRect = new Rect( canvas.xMin, canvas.yMin, canvas.width, ( canvas.height - Utilities.Margin ) / 2f );
-            Rect legendRect = new Rect( canvas.xMin, plotRect.yMax + Utilities.Margin, canvas.width,
-                                        ( canvas.height - Utilities.Margin ) / 2f );
+            var plotRect = new Rect( canvas.xMin, canvas.yMin, canvas.width, ( canvas.height - Utilities.Margin ) / 2f );
+            var legendRect = new Rect( canvas.xMin, plotRect.yMax + Utilities.Margin, canvas.width,
+                                       ( canvas.height - Utilities.Margin ) / 2f );
 
             // draw the plot
             tradingHistory.DrawPlot( plotRect, positiveOnly: true );
@@ -262,34 +261,36 @@ namespace FluffyManager
 
         private int[] GetCurrentBatteries()
         {
-            return _batteries.Select( list => (int)list.Sum( battery => battery.StoredEnergy ) ).ToArray();
+            return _batteries.Select( list => (int) list.Sum( battery => battery.StoredEnergy ) ).ToArray();
         }
 
         private int[] GetCurrentTrade()
         {
-            return _traders.Select( list => (int)list.Sum( trader => trader.PowerOn ? trader.PowerOutput : 0f ) ).ToArray();
+            return
+                _traders.Select( list => (int) list.Sum( trader => trader.PowerOn ? trader.PowerOutput : 0f ) )
+                        .ToArray();
         }
 
         private IEnumerable<ThingDef> GetTraderDefs()
         {
             return from td in DefDatabase<ThingDef>.AllDefsListForReading
-                   where td.HasCompOrChildCompOf( typeof( CompPowerTrader ) ) 
+                   where td.HasCompOrChildCompOf( typeof( CompPowerTrader ) )
                    select td;
         }
 
         private void RefreshCompLists()
         {
             // get list of power trader comps per def for consumers and producers.
-            _traders = _traderDefs.Select( def => Find.ListerBuildings.AllBuildingsColonistOfDef( def )
-                                                      .Select( t => t.GetComp<CompPowerTrader>() )
-                                                      .ToList() )
+            _traders = _traderDefs.Select( def => manager.map.listerBuildings.AllBuildingsColonistOfDef( def )
+                                                         .Select( t => t.GetComp<CompPowerTrader>() )
+                                                         .ToList() )
                                   .ToList();
 
             // get list of lists of powertrader comps per thingdef.
             _batteries = _batteryDefs
-                .Select( v => Find.ListerBuildings.AllBuildingsColonistOfDef( v )
-                                  .Select( t => t.GetComp<CompPowerBattery>() )
-                                  .ToList() )
+                .Select( v => manager.map.listerBuildings.AllBuildingsColonistOfDef( v )
+                                     .Select( t => t.GetComp<CompPowerBattery>() )
+                                     .ToList() )
                 .ToList();
         }
 

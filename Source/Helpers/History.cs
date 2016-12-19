@@ -111,7 +111,7 @@ namespace FluffyManager
             // create a chapter for each label
             for( int i = 0; i < thingCounts.Length; i++ )
             {
-                _chapters.Add( new Chapter( thingCounts[i], Size, colors[i % colors.Length] ) );
+                _chapters.Add( new Chapter( new ThingCountClass( thingCounts[i].ThingDef, thingCounts[i].Count ), Size, colors[i % colors.Length] ) );
             }
 
             // show all by default
@@ -491,7 +491,7 @@ namespace FluffyManager
                 GUI.BeginGroup( viewRect );
 
                 // if DrawIcons and a thing is set, draw the icon.
-                ThingDef thing = ChaptersOrdered[i].ThingCount?.thingDef;
+                ThingDef thing = ChaptersOrdered[i].ThingCount.thingDef;
                 if( DrawIcons && thing != null )
                 {
                     // draw the icon in correct proportions
@@ -589,7 +589,7 @@ namespace FluffyManager
             public Color                                  lineColor        = DefaultLineColor;
             public Texture2D                              _texture;
             public int                                    size             = Size;
-            public ThingCount                             ThingCount       = new ThingCount();
+            public ThingCountClass                             ThingCount       = new ThingCountClass();
             private int                                   _observedMax     = -1;
             private int                                   _specificMax     = -1;
 
@@ -607,7 +607,7 @@ namespace FluffyManager
                 lineColor = color;
             }
 
-            public Chapter( ThingCount thingCount, int size, Color color ) : this()
+            public Chapter( ThingCountClass thingCount, int size, Color color ) : this()
             {
                 this.label = thingCount.thingDef.LabelCap;
                 this.ThingCount = thingCount;

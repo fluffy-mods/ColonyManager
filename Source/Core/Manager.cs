@@ -1,18 +1,16 @@
-﻿// Manager/Manager.cs
-//
-// Copyright Karel Kroeze, 2015.
-//
-// Created 2015-11-05 22:59
+﻿// // Karel Kroeze
+// // Manager.cs
+// // 2016-12-09
 
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace FluffyManager
 {
-    public class Manager : MapComponent
+    public class Manager : MapComponent, ILoadReferenceable
     {
         public enum Modes
         {
@@ -20,43 +18,32 @@ namespace FluffyManager
             Normal
         }
 
-        public static Modes      LoadSaveMode           = Modes.Normal;
+        public static Modes LoadSaveMode = Modes.Normal;
+        public static bool HelpShown;
         private List<ManagerTab> _managerTabsLeft;
         private List<ManagerTab> _managerTabsMiddle;
         private List<ManagerTab> _managerTabsRight;
-        private JobStack         _stack;
-        public bool              HelpShown;
-
-        public List<ManagerTab> ManagerTabs = new List<ManagerTab>
-        {
-            new ManagerTab_Overview(),
-            new ManagerTab_Production(),
-            new ManagerTab_ImportExport(),
-            new ManagerTab_Hunting(),
-            new ManagerTab_Forestry(),
-            new ManagerTab_Livestock(),
-            new ManagerTab_Foraging()
-            // Power is added by Manager.UnlockPowerTab() after the appropriate research is done.
-        };
-
-        public void RefreshTabs()
-        {
-            _managerTabsLeft = null;
-            _managerTabsMiddle = null;
-            _managerTabsRight = null;
-        }
-
-        internal bool _powerUnlocked = false;
         private bool _powerTabAdded = false;
 
-        public void AddPowerTabIfUnlocked()
+        internal static bool _powerUnlocked = false;
+        private JobStack _stack;
+
+        public List<ManagerTab> ManagerTabs;
+
+        public Manager( Map map ) : base( map )
         {
-            if ( _powerUnlocked &&
-                 !_powerTabAdded )
-            {
-                ManagerTabs.Add( new ManagerTab_Power() );
-                _powerTabAdded = true;
-            }
+            _stack = new JobStack();
+            ManagerTabs = new List<ManagerTab>
+        {
+            new ManagerTab_Overview( this ),
+            new ManagerTab_Production( this ),
+            new ManagerTab_ImportExport( this ),
+            new ManagerTab_Hunting( this ),
+            new ManagerTab_Forestry( this ),
+            new ManagerTab_Livestock( this ),
+            new ManagerTab_Foraging( this )
+            // Power is added by Manager.UnlockPowerTab() after the appropriate research is done.
+        };
         }
 
         public List<ManagerTab> ManagerTabsLeft
@@ -65,7 +52,8 @@ namespace FluffyManager
             {
                 if ( _managerTabsLeft == null )
                 {
-                    _managerTabsLeft = ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Left && tab.Visible ).ToList();
+                    _managerTabsLeft =
+                        ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Left && tab.Visible ).ToList();
                 }
                 return _managerTabsLeft;
             }
@@ -90,7 +78,8 @@ namespace FluffyManager
             {
                 if ( _managerTabsRight == null )
                 {
-                    _managerTabsRight = ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Right && tab.Visible ).ToList();
+                    _managerTabsRight =
+                        ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Right && tab.Visible ).ToList();
                 }
                 return _managerTabsRight;
             }
@@ -98,37 +87,47 @@ namespace FluffyManager
 
         public JobStack JobStack => _stack ?? ( _stack = new JobStack() );
 
-        // copypasta from AutoEquip.
-        public static Manager Get
+        public void RefreshTabs()
         {
-            get
-            {
-                Manager getComponent =
-                    Find.Map.components.OfType<Manager>().FirstOrDefault();
-                if ( getComponent == null )
-                {
-                    getComponent = new Manager();
-                    Find.Map.components.Add( getComponent );
-                }
+            _managerTabsLeft = null;
+            _managerTabsMiddle = null;
+            _managerTabsRight = null;
+        }
 
-                return getComponent;
+        public void AddPowerTabIfUnlocked()
+        {
+            if ( _powerUnlocked &&
+                 !_powerTabAdded )
+            {
+                ManagerTabs.Add( new ManagerTab_Power( this ) );
+                _powerTabAdded = true;
             }
         }
 
-        public Manager()
+        public static implicit operator Map( Manager manager ) { return manager.map; }
+
+        // copypasta from AutoEquip.
+        public static Manager For( Map map )
         {
-            _stack = new JobStack();
+            var instance = map.GetComponent<Manager>();
+            if ( instance != null )
+                return instance;
+
+            instance = new Manager( map );
+            map.components.Add( instance );
+            return instance;
         }
 
         public override void ExposeData()
         {
             base.ExposeData();
+            // TODO: migrate HelpShown to HugsLib invisible setting.
             Scribe_Values.LookValue( ref HelpShown, "HelpShown", false );
             Scribe_Deep.LookDeep( ref _stack, "JobStack" );
 
             foreach ( ManagerTab tab in ManagerTabs )
             {
-                IExposable exposableTab = tab as IExposable;
+                var exposableTab = tab as IExposable;
                 if ( exposableTab != null )
                 {
                     Scribe_Deep.LookDeep( ref exposableTab, tab.Label );
@@ -141,10 +140,7 @@ namespace FluffyManager
             }
         }
 
-        public bool DoWork()
-        {
-            return JobStack.TryDoNextJob();
-        }
+        public bool DoWork() { return JobStack.TryDoNextJob(); }
 
         public override void MapComponentTick()
         {
@@ -175,12 +171,12 @@ namespace FluffyManager
         {
             // priority settings on worktables.
             DeepProfiler.Start( "Global work for production manager" );
-            ManagerJob_Production.GlobalWork();
+            // TODO: Fix global work for production jobs.
+            // ManagerJob_Production.GlobalWork();
             DeepProfiler.End();
 
             // clear turbine cells.
             DeepProfiler.Start( "Global work for forestry manager" );
-            ManagerJob_Forestry.GlobalWork();
             DeepProfiler.End();
         }
 
@@ -201,5 +197,7 @@ namespace FluffyManager
                 job.Touch();
             }
         }
+
+        public string GetUniqueLoadID() { return "Manager_" + map.GetUniqueLoadID(); }
     }
 }

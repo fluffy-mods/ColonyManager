@@ -1,12 +1,11 @@
-﻿// Manager/WorkGiver_Manager.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-04 19:25
+﻿// // Karel Kroeze
+// // WorkGiver_Manager.cs
+// // 2016-12-09
 
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
+using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -27,14 +26,14 @@ namespace FluffyManager
         public override bool HasJobOnThing( Pawn pawn, Thing t )
         {
 #if DEBUG_WORKGIVER
-            Log.Message("Checking " + t.LabelCap + " for job.");
-            Log.Message("ManagerStation" + ((t as Building_ManagerStation) != null));
-            Log.Message("Comp" + (t.TryGetComp<Comp_ManagerStation>() != null));
-            Log.Message("Incap" + (!pawn.Dead && !pawn.Downed && !pawn.IsBurning() && !t.IsBurning()));
-            Log.Message("CanReserve and reach" + (pawn.CanReserveAndReach(t, PathEndMode, Danger.Some)));
-            CompPowerTrader powera = t.TryGetComp<CompPowerTrader>();
-            Log.Message("Power" + (powera == null || powera.PowerOn));
-            Log.Message("Job" + (Manager.Get.JobStack.NextJob != null));
+            Log.Message( "Checking " + t.LabelCap + " for job." );
+            Log.Message( "ManagerStation" + ( t as Building_ManagerStation != null ) );
+            Log.Message( "Comp" + ( t.TryGetComp<Comp_ManagerStation>() != null ) );
+            Log.Message( "Incap" + ( !pawn.Dead && !pawn.Downed && !pawn.IsBurning() && !t.IsBurning() ) );
+            Log.Message( "CanReserve and reach" + pawn.CanReserveAndReach( t, PathEndMode, Danger.Some ) );
+            var powera = t.TryGetComp<CompPowerTrader>();
+            Log.Message( "Power" + ( powera == null || powera.PowerOn ) );
+            Log.Message( "Job" + ( Manager.For( pawn.Map ).JobStack.NextJob != null ) );
 #endif
             if ( !( t is Building_ManagerStation ) )
             {
@@ -59,14 +58,14 @@ namespace FluffyManager
                 return false;
             }
 
-            CompPowerTrader power = t.TryGetComp<CompPowerTrader>();
+            var power = t.TryGetComp<CompPowerTrader>();
             if ( power != null &&
                  !power.PowerOn )
             {
                 return false;
             }
 
-            if ( Manager.Get.JobStack.NextJob != null )
+            if ( Manager.For( pawn.Map ).JobStack.NextJob != null )
             {
                 return true;
             }
@@ -81,7 +80,7 @@ namespace FluffyManager
 
         public override IEnumerable<Thing> PotentialWorkThingsGlobal( Pawn pawn )
         {
-            return Find.ListerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>()
+            return pawn.Map.listerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>()
                        .Select( b => b as Thing );
         }
     }

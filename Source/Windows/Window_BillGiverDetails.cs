@@ -72,7 +72,7 @@ namespace FluffyManager
 
                 Widgets.Label( areaAreaLabel, "FMP.AllowedAreas".Translate() );
 
-                AreaAllowedGUI.DoAllowedAreaSelectors( areaAreaSelector, ref Job.BillGivers.AreaRestriction );
+                AreaAllowedGUI.DoAllowedAreaSelectors( areaAreaSelector, ref Job.BillGivers.AreaRestriction, Job.manager );
 
                 Color oldColor = GUI.color;
                 if ( _input.IsInt() )

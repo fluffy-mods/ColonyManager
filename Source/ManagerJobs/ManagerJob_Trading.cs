@@ -19,7 +19,7 @@ namespace FluffyManager
 
         public override string Label => "FMT.Trading".Translate();
         public override bool Completed => false;
-        public override ManagerTab Tab => Manager.Get.ManagerTabs.Find( tab => tab is ManagerTab_Trading );
+        public override ManagerTab Tab => manager.ManagerTabs.Find( tab => tab is ManagerTab_Trading );
         // TODO: string representation of filters.
         public override string[] Targets => new [] {""};
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Warden;
@@ -27,6 +27,8 @@ namespace FluffyManager
         // Trading jobs will never be managed in the sense that it requires a manager to interact.
         // It does require a trader to do things, but that's further down the line.
         public override bool Managed => false;
+
+        public ManagerJob_Trading( Manager manager ) : base( manager ) { }
 
         public override bool TryDoJob()
         {

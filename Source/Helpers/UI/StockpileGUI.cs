@@ -18,10 +18,10 @@ namespace FluffyManager
         private static List<Texture2D> textures; 
 
         // RimWorld.AreaAllowedGUI
-        public static void DoStockpileSelectors( Rect rect, ref Zone_Stockpile stockpile )
+        public static void DoStockpileSelectors( Rect rect, ref Zone_Stockpile stockpile, Map map )
         {
             // get all stockpiles
-            List<Zone_Stockpile> allStockpiles = Find.ZoneManager.AllZones.OfType<Zone_Stockpile>().ToList();
+            List<Zone_Stockpile> allStockpiles = map.zoneManager.AllZones.OfType<Zone_Stockpile>().ToList();
 
             // count + 1 for all stockpiles
             int areaCount = allStockpiles.Count + 1;

@@ -1,13 +1,11 @@
-﻿// Manager/ManagerJob_Hunting.cs
-//
-// Copyright Karel Kroeze, 2015.
-//
-// Created 2015-11-05 22:30
+﻿// // Karel Kroeze
+// // ManagerJob_Hunting.cs
+// // 2016-12-09
 
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -15,24 +13,9 @@ namespace FluffyManager
 {
     public class ManagerJob_Hunting : ManagerJob
     {
-        #region Fields
-
-        public Dictionary<PawnKindDef, bool> AllowedAnimals         = new Dictionary<PawnKindDef, bool>();
-        public List<Designation>             Designations           = new List<Designation>();
-        public History                       History;
-        public Area                          HuntingGrounds;
-        public new Trigger_Threshold         Trigger;
-        public bool                          UnforbidCorpses        = true;
-        private readonly float               _margin                = Utilities.Margin;
-        private Utilities.CachedValue<int>   _corpseCachedValue     = new Utilities.CachedValue<int>();
-        private Utilities.CachedValue<int>   _designatedCachedValue = new Utilities.CachedValue<int>();
-        private List<ThingDef> _humanLikeMeatDefs;
-
-        #endregion Fields
-
         #region Constructors
 
-        public ManagerJob_Hunting()
+        public ManagerJob_Hunting( Manager manager ) : base( manager )
         {
             // populate the trigger field, set the root category to meats and allow all but human meat.
             Trigger = new Trigger_Threshold( this );
@@ -41,13 +24,28 @@ namespace FluffyManager
             Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, false );
 
             // populate the list of animals from the animals in the biome - allow all by default.
-            AllowedAnimals = Find.Map.Biome.AllWildAnimals.ToDictionary( pk => pk, v => true );
+            AllowedAnimals = manager.map.Biome.AllWildAnimals.ToDictionary( pk => pk, v => true );
 
-            History = new History( new[] { "stock", "corpses", "designated" },
-                                   new Color[] { Color.white, new Color( .7f, .7f, .7f ), new Color( .4f, .4f, .4f ) } );
+            History = new History( new[] {"stock", "corpses", "designated"},
+                                   new Color[] {Color.white, new Color( .7f, .7f, .7f ), new Color( .4f, .4f, .4f )} );
         }
 
         #endregion Constructors
+
+        #region Fields
+
+        public Dictionary<PawnKindDef, bool> AllowedAnimals = new Dictionary<PawnKindDef, bool>();
+        public List<Designation> Designations = new List<Designation>();
+        public History History;
+        public Area HuntingGrounds;
+        public new Trigger_Threshold Trigger;
+        public bool UnforbidCorpses = true;
+        private readonly float _margin = Utilities.Margin;
+        private Utilities.CachedValue<int> _corpseCachedValue = new Utilities.CachedValue<int>();
+        private Utilities.CachedValue<int> _designatedCachedValue = new Utilities.CachedValue<int>();
+        private List<ThingDef> _humanLikeMeatDefs;
+
+        #endregion Fields
 
         #region Properties
 
@@ -60,8 +58,14 @@ namespace FluffyManager
         {
             get
             {
-                List<Corpse> corpses = Find.ListerThings.ThingsInGroup( ThingRequestGroup.Corpse ).ConvertAll( thing => thing as Corpse );
-                return corpses.Where( thing => AllowedAnimals.ContainsKey( thing.innerPawn.kindDef ) && AllowedAnimals[thing.innerPawn.kindDef] ).ToList();
+                List<Corpse> corpses =
+                    manager.map.listerThings.ThingsInGroup( ThingRequestGroup.Corpse )
+                           .ConvertAll( thing => thing as Corpse );
+                return
+                    corpses.Where(
+                                  thing =>
+                                  AllowedAnimals.ContainsKey( thing.InnerPawn.kindDef ) &&
+                                  AllowedAnimals[thing.InnerPawn.kindDef] ).ToList();
             }
         }
 
@@ -94,7 +98,7 @@ namespace FluffyManager
 
         public override ManagerTab Tab
         {
-            get { return Manager.Get.ManagerTabs.Find( tab => tab is ManagerTab_Hunting ); }
+            get { return Manager.For( manager ).ManagerTabs.Find( tab => tab is ManagerTab_Hunting ); }
         }
 
         public override string[] Targets
@@ -126,7 +130,7 @@ namespace FluffyManager
         {
             // get the intersection of bills in the game and bills in our list.
             List<Designation> GameDesignations =
-                Find.DesignationManager.DesignationsOfDef( DesignationDefOf.Hunt ).ToList();
+                manager.map.designationManager.DesignationsOfDef( DesignationDefOf.Hunt ).ToList();
             Designations = Designations.Intersect( GameDesignations ).ToList();
         }
 
@@ -176,10 +180,7 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public override void DrawOverviewDetails( Rect rect )
-        {
-            History.DrawPlot( rect, Trigger.Count );
-        }
+        public override void DrawOverviewDetails( Rect rect ) { History.DrawPlot( rect, Trigger.Count ); }
 
         public override void ExposeData()
         {
@@ -188,7 +189,8 @@ namespace FluffyManager
 
             // settings
             Scribe_References.LookReference( ref HuntingGrounds, "HuntingGrounds" );
-            Scribe_Collections.LookDictionary( ref AllowedAnimals, "AllowedAnimals", LookMode.DefReference,
+            // TODO: Verify def
+            Scribe_Collections.LookDictionary( ref AllowedAnimals, "AllowedAnimals", LookMode.Def,
                                                LookMode.Value );
 
             // human meat is saved in trigger's thingfilter.
@@ -208,7 +210,7 @@ namespace FluffyManager
         {
             // get current count + corpses in storage that is not a grave + designated count
             // current count in storage
-            int count = 0;
+            var count = 0;
 
             // try get cached value
             if ( _corpseCachedValue.TryGetValue( out count ) )
@@ -221,28 +223,25 @@ namespace FluffyManager
             {
                 // make sure it's a real corpse. (I dunno, poke it?)
                 // and that it's not forbidden (anymore) and can be reached.
-                Corpse corpse = current as Corpse;
+                var corpse = current as Corpse;
                 if ( corpse != null &&
                      !corpse.IsForbidden( Faction.OfPlayer ) &&
-                     corpse.Position.CanReachColony() )
+                     manager.map.reachability.CanReachColony( corpse.Position ) )
                 {
                     // check to see if it's buried.
-                    bool buried = false;
-                    SlotGroup slotGroup = Find.SlotGroupManager.SlotGroupAt( corpse.Position );
-                    if ( slotGroup != null )
-                    {
-                        Building_Storage building_Storage = slotGroup.parent as Building_Storage;
+                    var buried = false;
+                    SlotGroup slotGroup = manager.map.slotGroupManager.SlotGroupAt( corpse.Position );
+                    var building_Storage = slotGroup?.parent as Building_Storage;
 
-                        // Sarcophagus inherits grave, here's to hoping Ty and modders stick to that in the future.
-                        if ( building_Storage != null &&
-                             building_Storage.def == ThingDefOf.Grave )
-                        {
-                            buried = true;
-                        }
+                    // Sarcophagus inherits grave
+                    if ( building_Storage != null &&
+                         building_Storage.def == ThingDefOf.Grave )
+                    {
+                        buried = true;
                     }
 
                     // get the rottable comp and check how far gone it is.
-                    CompRottable rottable = corpse.TryGetComp<CompRottable>();
+                    var rottable = corpse.TryGetComp<CompRottable>();
 
                     if ( !buried && rottable?.Stage == RotStage.Fresh )
                     {
@@ -259,7 +258,7 @@ namespace FluffyManager
 
         public int GetMeatInDesignations()
         {
-            int count = 0;
+            var count = 0;
 
             // try get cache
             if ( _designatedCachedValue.TryGetValue( out count ) )
@@ -268,15 +267,15 @@ namespace FluffyManager
             }
 
             // designated animals
-            foreach ( Designation des in Find.DesignationManager.DesignationsOfDef( DesignationDefOf.Hunt ) )
+            foreach ( Designation des in manager.map.designationManager.DesignationsOfDef( DesignationDefOf.Hunt ) )
             {
                 // make sure target is a pawn, is an animal, is not forbidden and somebody can reach it.
                 // note: could be rolled into a fancy LINQ chain, but this is probably clearer.
-                Pawn target = des.target.Thing as Pawn;
+                var target = des.target.Thing as Pawn;
                 if ( target != null &&
                      target.RaceProps.Animal &&
                      !target.IsForbidden( Faction.OfPlayer ) &&
-                     target.Position.CanReachColony() )
+                     manager.map.reachability.CanReachColony( target.Position ) )
                 {
                     count += target.EstimatedMeatCount();
                 }
@@ -288,15 +287,12 @@ namespace FluffyManager
             return count;
         }
 
-        public override void Tick()
-        {
-            History.Update( Trigger.CurCount, GetMeatInCorpses(), GetMeatInDesignations() );
-        }
+        public override void Tick() { History.Update( Trigger.CurCount, GetMeatInCorpses(), GetMeatInDesignations() ); }
 
         public override bool TryDoJob()
         {
             // did we do any work?
-            bool workDone = false;
+            var workDone = false;
 
             // clean designations not in area
             CleanAreaDesignations();
@@ -315,7 +311,7 @@ namespace FluffyManager
             List<Pawn> huntableAnimals = GetHuntableAnimalsSorted();
 
             // while totalCount < count AND we have animals that can be designated, designate animal.
-            for ( int i = 0; i < huntableAnimals.Count && totalCount < Trigger.Count; i++ )
+            for ( var i = 0; i < huntableAnimals.Count && totalCount < Trigger.Count; i++ )
             {
                 AddDesignation( huntableAnimals[i] );
                 totalCount += huntableAnimals[i].EstimatedMeatCount();
@@ -334,7 +330,7 @@ namespace FluffyManager
         private void AddDesignation( Designation des )
         {
             // add to game
-            Find.DesignationManager.AddDesignation( des );
+            manager.map.designationManager.AddDesignation( des );
 
             // add to internal list
             Designations.Add( des );
@@ -343,7 +339,7 @@ namespace FluffyManager
         private void AddDesignation( Pawn p )
         {
             // create designation
-            Designation des = new Designation( p, DesignationDefOf.Hunt );
+            var des = new Designation( p, DesignationDefOf.Hunt );
 
             // pass to adder
             AddDesignation( des );
@@ -353,9 +349,9 @@ namespace FluffyManager
         {
             foreach (
                 Designation des in
-                    Find.DesignationManager.DesignationsOfDef( DesignationDefOf.Hunt )
-                        .Except( Designations )
-                        .Where( des => IsValidHuntingTarget( des.target ) ) )
+                    manager.map.designationManager.DesignationsOfDef( DesignationDefOf.Hunt )
+                           .Except( Designations )
+                           .Where( des => IsValidHuntingTarget( des.target ) ) )
             {
                 AddDesignation( des );
             }
@@ -389,7 +385,7 @@ namespace FluffyManager
                      corpse.IsForbidden( Faction.OfPlayer ) )
                 {
                     // only fresh corpses
-                    CompRottable comp = corpse.GetComp<CompRottable>();
+                    var comp = corpse.GetComp<CompRottable>();
                     if ( comp != null &&
                          comp.Stage == RotStage.Fresh )
                     {
@@ -404,25 +400,25 @@ namespace FluffyManager
         private List<Pawn> GetHuntableAnimalsSorted()
         {
             // get the 'home' position
-            IntVec3 position = Utilities.GetBaseCenter();
+            IntVec3 position = manager.map.GetBaseCenter();
 
             // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
-            List<Pawn> list = Find.MapPawns.AllPawns.Where( p => IsValidHuntingTarget( p ) )
+            List<Pawn> list = manager.map.mapPawns.AllPawns.Where( p => IsValidHuntingTarget( p ) )
 
-                                  // OrderBy defaults to ascending, switch sign on estimated meat count to get descending
-                                  .OrderBy(
-                                      p =>
-                                          -p.EstimatedMeatCount() /
-                                          ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) ).ToList();
+                // OrderBy defaults to ascending, switch sign on estimated meat count to get descending
+                                     .OrderBy(
+                                              p =>
+                                              -p.EstimatedMeatCount() /
+                                              ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) ).ToList();
 
             return list;
         }
 
-        private bool IsValidHuntingTarget( TargetInfo t )
+        private bool IsValidHuntingTarget( LocalTargetInfo t )
         {
             return t.HasThing
                    && t.Thing is Pawn
-                   && IsValidHuntingTarget( (Pawn)t.Thing );
+                   && IsValidHuntingTarget( (Pawn) t.Thing );
         }
 
         private bool IsValidHuntingTarget( Pawn p )
@@ -437,10 +433,10 @@ namespace FluffyManager
                    // non-biome animals won't be on the list
                    && AllowedAnimals.ContainsKey( p.kindDef )
                    && AllowedAnimals[p.kindDef]
-                   && Find.DesignationManager.DesignationOn( p ) == null
+                   && manager.map.designationManager.DesignationOn( p ) == null
                    && ( HuntingGrounds == null
                         || HuntingGrounds.ActiveCells.Contains( p.Position ) )
-                   && p.Position.CanReachColony();
+                   && manager.map.reachability.CanReachColony( p.Position );
         }
 
         #endregion Methods

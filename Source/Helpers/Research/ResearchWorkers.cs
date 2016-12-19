@@ -11,7 +11,7 @@ namespace FluffyManager
 
         public static void UnlockPowerTab()
         {
-            Manager.Get._powerUnlocked = true;
+            Manager._powerUnlocked = true;
         }
 
         #endregion Methods

@@ -1,12 +1,8 @@
-﻿// Manager/UIThingFilterSearchable.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-04 19:29
+﻿// // Karel Kroeze
+// // UIThingFilterSearchable.cs
+// // 2016-12-09
 
 using RimWorld;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using UnityEngine;
 using Verse;
 
@@ -27,8 +23,8 @@ namespace FluffyManager
             // set up buttons
             Text.Font = GameFont.Tiny;
             float width = canvas.width - 2f;
-            Rect clearButtonRect = new Rect( canvas.x + 1f, canvas.y + 1f, width / 2f, 24f );
-            Rect allButtonRect = new Rect( clearButtonRect.xMax + 1f, clearButtonRect.y, width / 2f, 24f );
+            var clearButtonRect = new Rect( canvas.x + 1f, canvas.y + 1f, width / 2f, 24f );
+            var allButtonRect = new Rect( clearButtonRect.xMax + 1f, clearButtonRect.y, width / 2f, 24f );
 
             // offset canvas position for buttons.
             if ( buttonsAtBottom )
@@ -54,8 +50,8 @@ namespace FluffyManager
             Text.Font = GameFont.Small;
 
             // do list
-            float curY = 2f;
-            Rect viewRect = new Rect( 0f, 0f, canvas.width - 16f, viewHeight );
+            var curY = 2f;
+            var viewRect = new Rect( 0f, 0f, canvas.width - 16f, viewHeight );
 
             // scrollview
             Widgets.BeginScrollView( canvas, ref scrollPosition, viewRect );
@@ -65,8 +61,8 @@ namespace FluffyManager
             DrawQualityFilterConfig( ref curY, viewRect.width, filter );
 
             // main listing
-            Rect listingRect = new Rect( 0f, curY, viewRect.width, 9999f );
-            Listing_TreeThingFilter listingTreeThingFilter = new Listing_TreeThingFilter( listingRect, filter, parentFilter );
+            var listingRect = new Rect( 0f, curY, viewRect.width, 9999f );
+            var listingTreeThingFilter = new Listing_TreeThingFilter( listingRect, filter, parentFilter, null, null );
             TreeNode_ThingCategory node = ThingCategoryNodeDatabase.RootNode;
             if ( parentFilter != null )
             {
@@ -93,7 +89,7 @@ namespace FluffyManager
             {
                 return;
             }
-            Rect rect = new Rect( 20f, y, width - 20f, 26f );
+            var rect = new Rect( 20f, y, width - 20f, 26f );
             FloatRange allowedHitPointsPercents = filter.AllowedHitPointsPercents;
             Widgets.FloatRange( rect, 1, ref allowedHitPointsPercents, 0f, 1f, "HitPoints", ToStringStyle.PercentZero );
             filter.AllowedHitPointsPercents = allowedHitPointsPercents;
@@ -108,7 +104,7 @@ namespace FluffyManager
             {
                 return;
             }
-            Rect rect = new Rect( 20f, y, width - 20f, 26f );
+            var rect = new Rect( 20f, y, width - 20f, 26f );
             QualityRange allowedQualityLevels = filter.AllowedQualityLevels;
             Widgets.QualityRange( rect, 2, ref allowedQualityLevels );
             filter.AllowedQualityLevels = allowedQualityLevels;

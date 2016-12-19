@@ -1,11 +1,10 @@
-﻿// Manager/ManagerTab_Forestry.cs
-//
-// Copyright Karel Kroeze, 2015.
-//
-// Created 2015-11-14 21:18
+﻿// // Karel Kroeze
+// // ManagerTab_Forestry.cs
+// // 2016-12-09
 
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -17,7 +16,7 @@ namespace FluffyManager
 
         private const float EntryHeight = 30f;
         private const float Margin = Utilities.Margin;
-        private static ManagerJob_Forestry _selected = new ManagerJob_Forestry();
+        private ManagerJob_Forestry _selected;
         private readonly float _topAreaHeight = 30f;
         private Vector2 _button = new Vector2( 200f, 40f );
         private Vector2 _contentScrollPosition = Vector2.zero;
@@ -44,7 +43,7 @@ namespace FluffyManager
         public override ManagerJob Selected
         {
             get { return _selected; }
-            set { _selected = (ManagerJob_Forestry)value; }
+            set { _selected = (ManagerJob_Forestry) value; }
         }
 
         #endregion Properties
@@ -60,15 +59,15 @@ namespace FluffyManager
             // some variables
             float width = rect.width;
             float height = rect.height - _topAreaHeight - _button.y - Margin;
-            int cols = 2;
+            var cols = 2;
             float colWidth = width / cols - Margin;
-            List<Rect> colRects = new List<Rect>();
-            List<Rect> colTitleRects = new List<Rect>();
-            Rect buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - Margin,
-                                        _button.y - Margin );
+            var colRects = new List<Rect>();
+            var colTitleRects = new List<Rect>();
+            var buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - Margin,
+                                       _button.y - Margin );
 
             // set up rects
-            for ( int j = 0; j < cols; j++ )
+            for ( var j = 0; j < cols; j++ )
             {
                 colRects.Add( new Rect( j * colWidth + j * Margin + Margin / 2, _topAreaHeight, colWidth, height ) );
                 colTitleRects.Add( new Rect( j * colWidth + j * Margin + Margin * 2.5f, 0f, colWidth, _topAreaHeight ) );
@@ -96,40 +95,43 @@ namespace FluffyManager
             int designatedCount = _selected.GetWoodInDesignations();
             int targetCount = _selected.Trigger.Count;
             _selected.Trigger.DrawTriggerConfig( ref cur, colRects[0].width, EntryHeight, true,
-                "FMF.TargetCount".Translate( currentCount, designatedCount, targetCount ),
-                "FMF.TargetCountTooltip".Translate( currentCount, designatedCount, targetCount ) );
+                                                 "FMF.TargetCount".Translate( currentCount, designatedCount, targetCount ),
+                                                 "FMF.TargetCountTooltip".Translate( currentCount, designatedCount,
+                                                                                     targetCount ) );
 
             // Clear wind cells (2)
-            Rect clearWindCellsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-            Utilities.DrawToggle( clearWindCellsRect, "FMF.ClearWindCells".Translate(), ref ManagerJob_Forestry.ClearWindCells );
+            var clearWindCellsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            Utilities.DrawToggle( clearWindCellsRect, "FMF.ClearWindCells".Translate(),
+                                  ref ManagerJob_Forestry.ClearWindCells );
             cur.y += EntryHeight;
 
             // clear additional areas(3)
-            Rect clearAdditionalAreasLabelRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            var clearAdditionalAreasLabelRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( clearAdditionalAreasLabelRect );
-            Utilities.Label( clearAdditionalAreasLabelRect, "FMF.ClearAreas".Translate(), anchor: TextAnchor.MiddleLeft, lrMargin: Margin );
+            Utilities.Label( clearAdditionalAreasLabelRect, "FMF.ClearAreas".Translate(), anchor: TextAnchor.MiddleLeft,
+                             lrMargin: Margin );
             cur.y += EntryHeight;
 
-            Rect clearAdditionalAreasSelectorRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            var clearAdditionalAreasSelectorRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( clearAdditionalAreasSelectorRect );
-            AreaAllowedGUI.DoAllowedAreaSelectorsMC( clearAdditionalAreasSelectorRect, ref _selected.ClearAreas, lrMargin: Margin );
+            AreaAllowedGUI.DoAllowedAreaSelectorsMC( clearAdditionalAreasSelectorRect, ref _selected.ClearAreas, Margin );
             cur.y += EntryHeight;
 
             // Allow saplings (4)
-            Rect allowSaplingsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            var allowSaplingsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Utilities.DrawToggle( allowSaplingsRect, "FMF.AllowSaplings".Translate(), ref _selected.AllowSaplings );
             cur.y += EntryHeight;
 
             // Logging area (5)
-            Rect loggingAreaTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            var loggingAreaTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( loggingAreaTitleRect );
             Utilities.Label( loggingAreaTitleRect, "FMF.LoggingArea".Translate(), anchor: TextAnchor.MiddleLeft,
                              lrMargin: Margin );
             cur.y += EntryHeight;
 
-            Rect loggingAreaRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            var loggingAreaRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( loggingAreaRect );
-            AreaAllowedGUI.DoAllowedAreaSelectors( loggingAreaRect, ref _selected.LoggingArea, lrMargin: Margin );
+            AreaAllowedGUI.DoAllowedAreaSelectors( loggingAreaRect, ref _selected.LoggingArea, manager, lrMargin: Margin );
             cur.y += EntryHeight;
 
             GUI.EndGroup();
@@ -146,7 +148,7 @@ namespace FluffyManager
             cur = Vector2.zero;
 
             Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
-            Rect viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedTrees.Count * EntryHeight );
+            var viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedTrees.Count * EntryHeight );
             if ( viewRect.height > outRect.height )
             {
                 viewRect.width -= 16f;
@@ -156,34 +158,39 @@ namespace FluffyManager
             Widgets.BeginScrollView( outRect, ref _contentScrollPosition, viewRect );
 
             // list of keys in allowed trees list (all plans that yield wood in biome, static)
-            List<ThingDef> treeDefs = new List<ThingDef>( _selected.AllowedTrees.Keys );
+            var treeDefs = new List<ThingDef>( _selected.AllowedTrees.Keys );
 
             // toggle all
-            Rect toggleAllRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+            var toggleAllRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( toggleAllRect );
             Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
                                   _selected.AllowedTrees.Values.All( v => v ), delegate
-                                  {
-                                      foreach ( ThingDef def in treeDefs )
-                                      {
-                                          _selected.AllowedTrees[def] = true;
-                                      }
-                                  }, delegate
-                                  {
-                                      foreach ( ThingDef def in treeDefs )
-                                      {
-                                          _selected.AllowedTrees[def] = false;
-                                      }
-                                  } );
+                                                                                   {
+                                                                                       foreach (
+                                                                                           ThingDef def in treeDefs )
+                                                                                       {
+                                                                                           _selected.AllowedTrees[def] =
+                                                                                               true;
+                                                                                       }
+                                                                                   }, delegate
+                                                                                          {
+                                                                                              foreach (
+                                                                                                  ThingDef def in
+                                                                                                      treeDefs )
+                                                                                              {
+                                                                                                  _selected.AllowedTrees
+                                                                                                      [def] = false;
+                                                                                              }
+                                                                                          } );
 
             cur.y += EntryHeight;
 
             // toggle for each tree
-            int i = 1;
+            var i = 1;
 
             foreach ( ThingDef def in treeDefs )
             {
-                Rect toggleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
+                var toggleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
 
                 // highlight alternate rows
                 if ( i++ % 2 == 0 )
@@ -193,8 +200,7 @@ namespace FluffyManager
 
                 // draw the toggle
                 Utilities.DrawToggle( toggleRect, def.LabelCap, _selected.AllowedTrees[def],
-                                      delegate
-                                      { _selected.AllowedTrees[def] = !_selected.AllowedTrees[def]; } );
+                                      delegate { _selected.AllowedTrees[def] = !_selected.AllowedTrees[def]; } );
 
                 // update current position
                 cur.y += EntryHeight;
@@ -213,7 +219,7 @@ namespace FluffyManager
                 {
                     // activate job, add it to the stack
                     _selected.Managed = true;
-                    Manager.Get.JobStack.Add( _selected );
+                    manager.JobStack.Add( _selected );
 
                     // refresh source list
                     Refresh();
@@ -224,7 +230,7 @@ namespace FluffyManager
                 if ( Widgets.ButtonText( buttonRect, "FM.Delete".Translate() ) )
                 {
                     // inactivate job, remove from the stack.
-                    Manager.Get.JobStack.Delete( _selected );
+                    manager.JobStack.Delete( _selected );
 
                     // remove content from UI
                     _selected = null;
@@ -244,7 +250,7 @@ namespace FluffyManager
 
             // content
             float height = _leftRowHeight;
-            Rect scrollView = new Rect( 0f, 0f, rect.width, height );
+            var scrollView = new Rect( 0f, 0f, rect.width, height );
             if ( height > rect.height )
             {
                 scrollView.width -= 16f;
@@ -255,11 +261,11 @@ namespace FluffyManager
 
             GUI.BeginGroup( scrollContent );
             Vector2 cur = Vector2.zero;
-            int i = 0;
+            var i = 0;
 
             foreach ( ManagerJob_Forestry job in _jobs )
             {
-                Rect row = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+                var row = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
                 if ( _selected == job )
                 {
@@ -273,7 +279,7 @@ namespace FluffyManager
 
                 Rect jobRect = row;
 
-                if ( ManagerTab_Overview.DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), job ) )
+                if ( ManagerTab_Overview.DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), manager, job ) )
                 {
                     Refresh();
                 }
@@ -289,7 +295,7 @@ namespace FluffyManager
             }
 
             // row for new job.
-            Rect newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+            var newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
             Widgets.DrawHighlightIfMouseover( newRect );
 
             if ( i % 2 == 1 )
@@ -303,7 +309,7 @@ namespace FluffyManager
 
             if ( Widgets.ButtonInvisible( newRect ) )
             {
-                Selected = new ManagerJob_Forestry();
+                Selected = new ManagerJob_Forestry( manager );
             }
 
             TooltipHandler.TipRegion( newRect, "FMF.NewForestryJobTooltip".Translate() );
@@ -318,9 +324,9 @@ namespace FluffyManager
         public override void DoWindowContents( Rect canvas )
         {
             // set up rects
-            Rect leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
-            Rect contentCanvas = new Rect( leftRow.xMax + Margin, 0f, canvas.width - leftRow.width - Margin,
-                                           canvas.height );
+            var leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
+            var contentCanvas = new Rect( leftRow.xMax + Margin, 0f, canvas.width - leftRow.width - Margin,
+                                          canvas.height );
 
             // draw overview row
             DoLeftRow( leftRow );
@@ -332,25 +338,21 @@ namespace FluffyManager
             }
         }
 
-        public override void PostClose()
-        {
-            Refresh();
-        }
+        public override void PostClose() { Refresh(); }
 
-        public override void PreOpen()
-        {
-            Refresh();
-        }
+        public override void PreOpen() { Refresh(); }
 
         public void Refresh()
         {
-            _jobs = Manager.Get.JobStack.FullStack<ManagerJob_Forestry>();
+            _jobs = manager.JobStack.FullStack<ManagerJob_Forestry>();
 
             // makes sure the list of possible areas is up-to-date with the area in the game.
-            foreach ( var job in _jobs )
+            foreach ( ManagerJob_Forestry job in _jobs )
                 job.UpdateClearAreas();
         }
 
         #endregion Methods
+
+        public ManagerTab_Forestry( Manager manager ) : base( manager ) { _selected = new ManagerJob_Forestry( manager ); }
     }
 }

@@ -1,12 +1,10 @@
-﻿// Manager/TriggerThreshold.cs
-//
-// Copyright Karel Kroeze, 2015.
-//
-// Created 2015-11-04 19:25
+﻿// // Karel Kroeze
+// // Trigger_Threshold.cs
+// // 2016-12-09
 
-using RimWorld;
 using System;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -14,15 +12,26 @@ namespace FluffyManager
 {
     public class Trigger_Threshold : Trigger
     {
+        #region Enums
+
+        public enum Ops
+        {
+            LowerThan,
+            Equals,
+            HigherThan
+        }
+
+        #endregion Enums
+
         #region Fields
 
-        public static int DefaultCount             = 500;
+        public static int DefaultCount = 500;
         public static int DefaultMaxUpperThreshold = 3000;
-        public int        Count;
-        public int        MaxUpperThreshold;
-        public Ops        Op;
+        public int Count;
+        public int MaxUpperThreshold;
+        public Ops Op;
         public Zone_Stockpile stockpile;
-        public ThingFilter    ThresholdFilter;
+        public ThingFilter ThresholdFilter;
 
         private string _stockpile_scribe;
 
@@ -30,7 +39,7 @@ namespace FluffyManager
 
         #region Constructors
 
-        public Trigger_Threshold( ManagerJob_Production job )
+        public Trigger_Threshold( ManagerJob_Production job ) : base( job.manager )
         {
             Op = Ops.LowerThan;
             MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
@@ -48,7 +57,7 @@ namespace FluffyManager
             }
         }
 
-        public Trigger_Threshold( ManagerJob_Hunting job )
+        public Trigger_Threshold( ManagerJob_Hunting job ) : base( job.manager )
         {
             Op = Ops.LowerThan;
             MaxUpperThreshold = DefaultMaxUpperThreshold;
@@ -58,7 +67,7 @@ namespace FluffyManager
             ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
         }
 
-        public Trigger_Threshold( ManagerJob_Forestry job )
+        public Trigger_Threshold( ManagerJob_Forestry job ) : base( job.manager )
         {
             Op = Ops.LowerThan;
             MaxUpperThreshold = DefaultMaxUpperThreshold;
@@ -68,7 +77,7 @@ namespace FluffyManager
             ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
         }
 
-        public Trigger_Threshold( ManagerJob_Foraging job )
+        public Trigger_Threshold( ManagerJob_Foraging job ) : base( job.manager )
         {
             Op = Ops.LowerThan;
             MaxUpperThreshold = DefaultMaxUpperThreshold;
@@ -79,34 +88,20 @@ namespace FluffyManager
 
         #endregion Constructors
 
-        #region Enums
-
-        public enum Ops
-        {
-            LowerThan,
-            Equals,
-            HigherThan
-        }
-
-        #endregion Enums
-
         #region Properties
 
-        public int CurCount
-        {
-            get { return Utilities.CountProducts( ThresholdFilter, stockpile ); }
-        }
+        public int CurCount => manager.map.CountProducts( ThresholdFilter, stockpile );
 
         public WindowTriggerThresholdDetails DetailsWindow
         {
             get
             {
-                WindowTriggerThresholdDetails window = new WindowTriggerThresholdDetails
-                {
-                    Trigger = this,
-                    closeOnClickedOutside = true,
-                    draggable = true
-                };
+                var window = new WindowTriggerThresholdDetails
+                             {
+                                 Trigger = this,
+                                 closeOnClickedOutside = true,
+                                 draggable = true
+                             };
                 return window;
             }
         }
@@ -171,7 +166,7 @@ namespace FluffyManager
         public override void DrawProgressBar( Rect rect, bool active )
         {
             // bar always goes a little beyond the actual target
-            int max = Math.Max( (int)( Count * 1.2f ), CurCount );
+            int max = Math.Max( (int) ( Count * 1.2f ), CurCount );
 
             // draw a box for the bar
             GUI.color = Color.gray;
@@ -187,8 +182,8 @@ namespace FluffyManager
             // draw the bar
             // if the job is active and pending, make the bar blueish green - otherwise white.
             Texture2D barTex = active
-                ? Resources.BarBackgroundActiveTexture
-                : Resources.BarBackgroundInactiveTexture;
+                                   ? Resources.BarBackgroundActiveTexture
+                                   : Resources.BarBackgroundInactiveTexture;
             GUI.DrawTexture( barRect, barTex );
 
             // draw a mark at the treshold
@@ -197,10 +192,11 @@ namespace FluffyManager
             TooltipHandler.TipRegion( rect, StatusTooltip );
         }
 
-        public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false, string label = null, string tooltip = null )
+        public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false,
+                                                string label = null, string tooltip = null )
         {
             // target threshold
-            Rect thresholdLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
+            var thresholdLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
             if ( alt )
             {
                 Widgets.DrawAltRect( thresholdLabelRect );
@@ -219,7 +215,8 @@ namespace FluffyManager
             Utilities.Label( thresholdLabelRect, label, tooltip );
 
             // add a little icon to mark interactivity
-            Rect searchIconRect = new Rect( thresholdLabelRect.xMax - Utilities.Margin - entryHeight, cur.y, entryHeight, entryHeight );
+            var searchIconRect = new Rect( thresholdLabelRect.xMax - Utilities.Margin - entryHeight, cur.y, entryHeight,
+                                           entryHeight );
             if ( searchIconRect.height > Utilities.SmallIconSize )
             {
                 // center it.
@@ -233,12 +230,12 @@ namespace FluffyManager
                 Find.WindowStack.Add( DetailsWindow );
             }
 
-            Rect thresholdRect = new Rect( cur.x, cur.y, width, Utilities.SliderHeight );
+            var thresholdRect = new Rect( cur.x, cur.y, width, Utilities.SliderHeight );
             if ( alt )
             {
                 Widgets.DrawAltRect( thresholdRect );
             }
-            Count = (int)GUI.HorizontalSlider( thresholdRect, Count, 0, MaxUpperThreshold );
+            Count = (int) GUI.HorizontalSlider( thresholdRect, Count, 0, MaxUpperThreshold );
             cur.y += Utilities.SliderHeight;
         }
 
@@ -257,7 +254,11 @@ namespace FluffyManager
             Scribe_Values.LookValue( ref _stockpile_scribe, "Stockpile", "null" );
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
             {
-                stockpile = Find.ZoneManager.AllZones.Where( z => z is Zone_Stockpile && z.label == _stockpile_scribe ).FirstOrDefault() as Zone_Stockpile;
+                stockpile =
+                    manager.map.zoneManager.AllZones.FirstOrDefault(
+                                                                    z =>
+                                                                    z is Zone_Stockpile && z.label == _stockpile_scribe )
+                    as Zone_Stockpile;
             }
         }
 

@@ -1,29 +1,31 @@
-﻿// Manager/ManagerTab_Hunting.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-05 22:20
+﻿// // Karel Kroeze
+// // ManagerTab_Hunting.cs
+// // 2016-12-09
 
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
-using Resources = FluffyManager.Resources;
 
 namespace FluffyManager
 {
     internal class ManagerTab_Hunting : ManagerTab
     {
-        private static float              _entryHeight           = 30f;
-        private static ManagerJob_Hunting _selected              = new ManagerJob_Hunting();
-        private Vector2                   _animalsScrollPosition = Vector2.zero;
-        private Vector2                   _button                = new Vector2( 200f, 40f );
-        private float                     _leftRowHeight         = 9999f;
-        private float                     _margin                = Utilities.Margin;
-        private Vector2                   _scrollPosition        = Vector2.zero;
-        private float                     _topAreaHeight         = 30f;
-        public List<ManagerJob_Hunting>   Jobs;
+        private static float _entryHeight = 30f;
+        private ManagerJob_Hunting _selected;
+        private Vector2 _animalsScrollPosition = Vector2.zero;
+        private Vector2 _button = new Vector2( 200f, 40f );
+        private float _leftRowHeight = 9999f;
+        private float _margin = Utilities.Margin;
+        private Vector2 _scrollPosition = Vector2.zero;
+        private float _topAreaHeight = 30f;
+        public List<ManagerJob_Hunting> Jobs;
+
+        public ManagerTab_Hunting( Manager manager ) : base( manager )
+        {
+            _selected = new ManagerJob_Hunting( manager );
+        }
 
         public override Texture2D Icon
         {
@@ -43,7 +45,7 @@ namespace FluffyManager
         public override ManagerJob Selected
         {
             get { return _selected; }
-            set { _selected = (ManagerJob_Hunting)value; }
+            set { _selected = (ManagerJob_Hunting) value; }
         }
 
         public void DoContent( Rect rect )
@@ -55,15 +57,15 @@ namespace FluffyManager
             // some variables
             float width = rect.width;
             float height = rect.height - _topAreaHeight - _button.y - _margin;
-            int cols = 2;
+            var cols = 2;
             float colWidth = width / cols - _margin;
-            List<Rect> colRects = new List<Rect>();
-            List<Rect> colTitleRects = new List<Rect>();
-            Rect buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - _margin,
-                                        _button.y - _margin );
+            var colRects = new List<Rect>();
+            var colTitleRects = new List<Rect>();
+            var buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - _margin,
+                                       _button.y - _margin );
 
             // set up rects
-            for ( int j = 0; j < cols; j++ )
+            for ( var j = 0; j < cols; j++ )
             {
                 colRects.Add( new Rect( j * colWidth + j * _margin + _margin / 2, _topAreaHeight, colWidth, height ) );
                 colTitleRects.Add( new Rect( j * colWidth + j * _margin + _margin / 2, 0f, colWidth, _topAreaHeight ) );
@@ -87,39 +89,35 @@ namespace FluffyManager
             int corpseCount = _selected.GetMeatInCorpses();
             int designatedCount = _selected.GetMeatInDesignations();
             int targetCount = _selected.Trigger.Count;
-            
+
             _selected.Trigger.DrawTriggerConfig( ref cur, colWidth, _entryHeight, true,
-                                                 "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount, targetCount ),
-                                                 "FMH.TargetCountTooltip".Translate( currentCount, corpseCount, designatedCount, targetCount ) );
+                                                 "FMH.TargetCount".Translate( currentCount, corpseCount, designatedCount,
+                                                                              targetCount ),
+                                                 "FMH.TargetCountTooltip".Translate( currentCount, corpseCount,
+                                                                                     designatedCount, targetCount ) );
 
             // allow human meat (2)
-            Rect humanMeatRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
+            var humanMeatRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Utilities.DrawToggle( humanMeatRect, "FMH.AllowHumanMeat".Translate(),
                                   _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.HumanMeat ),
-                                  delegate
-                                  {
-                                      _selected.AllowHumanLikeMeat( true );
-                                  },
-                                  delegate
-                                  {
-                                      _selected.AllowHumanLikeMeat( false );
-                                  } );
+                                  delegate { _selected.AllowHumanLikeMeat( true ); },
+                                  delegate { _selected.AllowHumanLikeMeat( false ); } );
             cur.y += _entryHeight;
 
             // unforbid corpses (3)
-            Rect ufCorpseRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
+            var ufCorpseRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Widgets.DrawAltRect( ufCorpseRect );
             Utilities.DrawToggle( ufCorpseRect, "FMH.UnforbidCorpses".Translate(), ref _selected.UnforbidCorpses );
             cur.y += _entryHeight;
 
             // hunting grounds (4)
-            Rect huntingGroundsTitleRect = new Rect( cur.x, cur.y, colWidth - 2 * _margin, _entryHeight );
+            var huntingGroundsTitleRect = new Rect( cur.x, cur.y, colWidth - 2 * _margin, _entryHeight );
             Utilities.Label( huntingGroundsTitleRect, "FMH.HuntingGrounds".Translate(), anchor: TextAnchor.MiddleLeft,
                              lrMargin: _margin );
             cur.y += _entryHeight;
 
-            Rect huntingGroundsRect = new Rect( cur.x + _margin, cur.y, colWidth - 2 * _margin, _entryHeight );
-            AreaAllowedGUI.DoAllowedAreaSelectors( huntingGroundsRect, ref _selected.HuntingGrounds,
+            var huntingGroundsRect = new Rect( cur.x + _margin, cur.y, colWidth - 2 * _margin, _entryHeight );
+            AreaAllowedGUI.DoAllowedAreaSelectors( huntingGroundsRect, ref _selected.HuntingGrounds, manager,
                                                    AllowedAreaMode.Humanlike );
             cur.y += _entryHeight;
 
@@ -134,7 +132,7 @@ namespace FluffyManager
             cur = Vector2.zero;
 
             Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
-            Rect viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedAnimals.Count * _entryHeight );
+            var viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedAnimals.Count * _entryHeight );
             if ( viewRect.height > outRect.height )
             {
                 viewRect.width -= 16f;
@@ -144,35 +142,44 @@ namespace FluffyManager
             Widgets.BeginScrollView( outRect, ref _animalsScrollPosition, viewRect );
 
             // list of keys in allowed animals list (all animals in biome, static)
-            List<PawnKindDef> PawnKinds = new List<PawnKindDef>( _selected.AllowedAnimals.Keys );
+            var PawnKinds = new List<PawnKindDef>( _selected.AllowedAnimals.Keys );
 
             // toggle all
-            Rect toggleAllRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
+            var toggleAllRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Widgets.DrawAltRect( toggleAllRect );
             Dictionary<PawnKindDef, bool>.ValueCollection test = _selected.AllowedAnimals.Values;
             Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
                                   _selected.AllowedAnimals.Values.All( v => v ), delegate
-                                  {
-                                      foreach ( PawnKindDef def in PawnKinds )
-                                      {
-                                          _selected.AllowedAnimals[def] = true;
-                                      }
-                                  }, delegate
-                                  {
-                                      foreach ( PawnKindDef def in PawnKinds )
-                                      {
-                                          _selected.AllowedAnimals[def] = false;
-                                      }
-                                  } );
+                                                                                     {
+                                                                                         foreach (
+                                                                                             PawnKindDef def in
+                                                                                                 PawnKinds )
+                                                                                         {
+                                                                                             _selected.AllowedAnimals[
+                                                                                                                      def
+                                                                                                 ] = true;
+                                                                                         }
+                                                                                     }, delegate
+                                                                                            {
+                                                                                                foreach (
+                                                                                                    PawnKindDef def in
+                                                                                                        PawnKinds )
+                                                                                                {
+                                                                                                    _selected
+                                                                                                        .AllowedAnimals[
+                                                                                                                        def
+                                                                                                        ] = false;
+                                                                                                }
+                                                                                            } );
 
             cur.y += _entryHeight;
 
             // toggle for each animal
-            int i = 1;
+            var i = 1;
 
             foreach ( PawnKindDef kind in PawnKinds )
             {
-                Rect toggleRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
+                var toggleRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
 
                 // highlight alternate rows
                 if ( i++ % 2 == 0 )
@@ -201,7 +208,7 @@ namespace FluffyManager
                 {
                     // activate job, add it to the stack
                     _selected.Managed = true;
-                    Manager.Get.JobStack.Add( _selected );
+                    Manager.For( manager ).JobStack.Add( _selected );
 
                     // refresh source list
                     Refresh();
@@ -212,7 +219,7 @@ namespace FluffyManager
                 if ( Widgets.ButtonText( buttonRect, "FM.Delete".Translate() ) )
                 {
                     // inactivate job, remove from the stack.
-                    Manager.Get.JobStack.Delete( _selected );
+                    Manager.For( manager ).JobStack.Delete( _selected );
 
                     // remove content from UI
                     _selected = null;
@@ -232,7 +239,7 @@ namespace FluffyManager
 
             // content
             float height = _leftRowHeight;
-            Rect scrollView = new Rect( 0f, 0f, rect.width, height );
+            var scrollView = new Rect( 0f, 0f, rect.width, height );
             if ( height > rect.height )
             {
                 scrollView.width -= 16f;
@@ -243,11 +250,11 @@ namespace FluffyManager
 
             GUI.BeginGroup( scrollContent );
             Vector2 cur = Vector2.zero;
-            int i = 0;
+            var i = 0;
 
             foreach ( ManagerJob_Hunting job in Jobs )
             {
-                Rect row = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+                var row = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
                 if ( _selected == job )
                 {
@@ -261,7 +268,7 @@ namespace FluffyManager
 
                 Rect jobRect = row;
 
-                if ( ManagerTab_Overview.DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), job ) )
+                if ( ManagerTab_Overview.DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), manager, job ) )
                 {
                     Refresh();
                 }
@@ -277,7 +284,7 @@ namespace FluffyManager
             }
 
             // row for new job.
-            Rect newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+            var newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
             Widgets.DrawHighlightIfMouseover( newRect );
 
             if ( i++ % 2 == 1 )
@@ -291,7 +298,7 @@ namespace FluffyManager
 
             if ( Widgets.ButtonInvisible( newRect ) )
             {
-                Selected = new ManagerJob_Hunting();
+                Selected = new ManagerJob_Hunting( manager );
             }
 
             TooltipHandler.TipRegion( newRect, "FMH.NewHuntingJobTooltip".Translate() );
@@ -306,9 +313,9 @@ namespace FluffyManager
         public override void DoWindowContents( Rect canvas )
         {
             // set up rects
-            Rect leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
-            Rect contentCanvas = new Rect( leftRow.xMax + _margin, 0f, canvas.width - leftRow.width - _margin,
-                                           canvas.height );
+            var leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
+            var contentCanvas = new Rect( leftRow.xMax + _margin, 0f, canvas.width - leftRow.width - _margin,
+                                          canvas.height );
 
             // draw overview row
             DoLeftRow( leftRow );
@@ -320,14 +327,8 @@ namespace FluffyManager
             }
         }
 
-        public override void PreOpen()
-        {
-            Refresh();
-        }
+        public override void PreOpen() { Refresh(); }
 
-        public void Refresh()
-        {
-            Jobs = Manager.Get.JobStack.FullStack<ManagerJob_Hunting>();
-        }
+        public void Refresh() { Jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Hunting>(); }
     }
 }

@@ -1,15 +1,14 @@
-﻿// Manager/Utilities_Production.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-04 19:31
+﻿// // Karel Kroeze
+// // Utilities_Production.cs
+// // 2016-12-09
 
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
+using Enumerable = System.Linq.Enumerable;
 
 namespace FluffyManager
 {
@@ -25,8 +24,8 @@ namespace FluffyManager
         {
             Bill_Production copy;
             copy = bill is Bill_ProductionWithUft
-                ? new Bill_ProductionWithUft( bill.recipe )
-                : new Bill_Production( bill.recipe );
+                       ? new Bill_ProductionWithUft( bill.recipe )
+                       : new Bill_Production( bill.recipe );
 
             // copy relevant attributes, others are set by manager when assigning
             // uft specific things are irrelevant here, and set by core
@@ -62,27 +61,34 @@ namespace FluffyManager
                 if ( filterThingDefs?.Count() == 1 )
                 {
                     // only one thingdef in the filter, so get the first.
-                    ThingDef filterThingDef = filterThingDefs.First();
+                    ThingDef filterThingDef = Enumerable.First( filterThingDefs );
 
                     // the ingredient list of the managed recipe.
                     List<IngredientCount> ingredients = job.Bill.recipe.ingredients;
 
                     // get the total input count of any ingredients that allow our thingdef (probably 0 or 1, but who knows - could be a stuff + specific listing).
-                    float? recipeInput =
-                        ingredients?.Where( ing => ing.filter.AllowedThingDefs.Contains( filterThingDef ) )
-                                    .Select( ing => ing.CountRequiredOfFor( filterThingDef, job.Bill.recipe ) )
-                                    .Sum();
-
-                    // if this wasn't null or close to zero, set the reduction count per bill to this number.
-                    if ( recipeInput != null &&
-                         Math.Abs( recipeInput.Value ) > 1 )
+                    if ( ingredients != null )
                     {
-                        inputCount = recipeInput.Value;
+                        float? recipeInput =
+                            ( ingredients?.Where(
+                                                 ing =>
+                                                 ing
+                                                     .filter
+                                                     .AllowedThingDefs.Contains( filterThingDef ) ) ).Select( ing =>
+                                                                                                                        ing.CountRequiredOfFor( filterThingDef,
+                                                                                                                                                job.Bill.recipe ) ).Sum();
+
+                        // if this wasn't null or close to zero, set the reduction count per bill to this number.
+                        if ( recipeInput != null &&
+                             Math.Abs( recipeInput.Value ) > 1 )
+                        {
+                            inputCount = recipeInput.Value;
+                        }
                     }
                 }
 
                 // divide by negative reduction amount per bill to get a positive number of bills.
-                bills = Mathf.CeilToInt( diff / - inputCount );
+                bills = Mathf.CeilToInt( diff / -inputCount );
             }
             else
             {
@@ -91,14 +97,14 @@ namespace FluffyManager
             }
 
             // naive number of bills per worker (float)
-            float naive = bills / (float)n;
+            float naive = bills / (float) n;
 
             // round up or down to get a total that matches the desired total exactly
             if ( bills % n > workerIndex )
             {
-                return (int)Math.Floor( naive );
+                return (int) Math.Floor( naive );
             }
-            return (int)Math.Ceiling( naive );
+            return (int) Math.Ceiling( naive );
         }
 
         /// <summary>
@@ -106,15 +112,16 @@ namespace FluffyManager
         /// </summary>
         /// <param name="rd"></param>
         /// <returns></returns>
-        public static List<Building_WorkTable> CurrentRecipeUsers( this RecipeDef rd )
+        public static List<Building_WorkTable> CurrentRecipeUsers( this RecipeDef rd, Map map )
         {
             List<ThingDef> recipeUsers = rd.GetRecipeUsers();
-            List<Building_WorkTable> currentRecipeUsers = new List<Building_WorkTable>();
+            var currentRecipeUsers = new List<Building_WorkTable>();
 
             foreach ( ThingDef td in recipeUsers )
             {
                 currentRecipeUsers.AddRange(
-                    Find.ListerBuildings.AllBuildingsColonistOfDef( td ).Select( b => b as Building_WorkTable ) );
+                                            map.listerBuildings.AllBuildingsColonistOfDef( td )
+                                                .Select( b => b as Building_WorkTable ) );
             }
 
             return currentRecipeUsers;
@@ -128,7 +135,7 @@ namespace FluffyManager
         /// <returns></returns>
         public static List<ThingDef> GetRecipeUsers( this RecipeDef rd, bool includeNonBuilding = false )
         {
-            List<ThingDef> recipeUsers = new List<ThingDef>();
+            var recipeUsers = new List<ThingDef>();
 
             // probably redundant starting point, get recipeusers as defined in the recipe.
             if ( rd.recipeUsers != null )
@@ -138,13 +145,14 @@ namespace FluffyManager
 
             // fetch thingdefs which have recipes, and the recipes include ours.
             recipeUsers.AddRange(
-                DefDatabase<ThingDef>.AllDefsListForReading.Where( t => t.recipes != null && t.recipes.Contains( rd ) )
-                                     .ToList() );
+                                 Enumerable.ToList( Enumerable.Where( DefDatabase<ThingDef>.AllDefsListForReading,
+                                                                      t => t.recipes != null && t.recipes.Contains( rd ) ) ) );
             if ( !includeNonBuilding )
             {
-                recipeUsers = recipeUsers.Where( t => t.category == ThingCategory.Building ).ToList();
+                recipeUsers =
+                    Enumerable.ToList( Enumerable.Where( recipeUsers, t => t.category == ThingCategory.Building ) );
             }
-            return recipeUsers.Distinct().ToList();
+            return Enumerable.ToList( Enumerable.Distinct( recipeUsers ) );
         }
 
         /// <summary>
@@ -153,17 +161,17 @@ namespace FluffyManager
         /// <param name="rd"></param>
         /// <param name="built"></param>
         /// <returns></returns>
-        public static bool HasBuildingRecipeUser( this RecipeDef rd, bool built = false )
+        public static bool HasBuildingRecipeUser( this RecipeDef rd, Map map, bool built = false )
         {
             List<ThingDef> recipeUsers = GetRecipeUsers( rd );
             return
                 recipeUsers.Any(
-                    t =>
-                        ( t.category == ThingCategory.Building ) &&
-                        ( !built ||
-                          Find.ListerThings.ThingsInGroup( ThingRequestGroup.PotentialBillGiver )
-                              .Select( thing => thing.def )
-                              .Contains( t ) ) );
+                                t =>
+                                ( t.category == ThingCategory.Building ) &&
+                                ( !built ||
+                                  map.listerThings.ThingsInGroup( ThingRequestGroup.PotentialBillGiver )
+                                      .Select( thing => thing.def )
+                                      .Contains( t ) ) );
         }
     }
 }

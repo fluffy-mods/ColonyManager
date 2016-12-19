@@ -1,22 +1,18 @@
-﻿// Manager/ManagerTab.cs
-//
-// Copyright Karel Kroeze, 2015.
-//
-// Created 2015-11-04 19:23
+﻿// // Karel Kroeze
+// // ManagerTab.cs
+// // 2016-12-09
 
+using RimWorld;
 using UnityEngine;
 using Verse;
-using Resources = FluffyManager.Resources;
 
 namespace FluffyManager
 {
     public abstract class ManagerTab
     {
-        #region Fields
+        public Manager manager;
 
-        public float DefaultLeftRowSize = 300f;
-
-        #endregion Fields
+        public ManagerTab( Manager manager ) { this.manager = manager; }
 
         #region Enums
 
@@ -28,6 +24,12 @@ namespace FluffyManager
         }
 
         #endregion Enums
+
+        #region Fields
+
+        public float DefaultLeftRowSize = 300f;
+
+        #endregion Fields
 
         #region Properties
 
@@ -50,10 +52,7 @@ namespace FluffyManager
 
         public virtual bool Visible
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
         }
 
         #endregion Properties
@@ -62,25 +61,15 @@ namespace FluffyManager
 
         public abstract void DoWindowContents( Rect canvas );
 
-        public virtual void PostClose()
-        {
-        }
+        public virtual void PostClose() { }
 
-        public virtual void PostOpen()
-        {
-        }
+        public virtual void PostOpen() { }
 
-        public virtual void PreClose()
-        {
-        }
+        public virtual void PreClose() { }
 
-        public virtual void PreOpen()
-        {
-        }
+        public virtual void PreOpen() { }
 
-        public virtual void Tick()
-        {
-        }
+        public virtual void Tick() { }
 
         #endregion Methods
     }

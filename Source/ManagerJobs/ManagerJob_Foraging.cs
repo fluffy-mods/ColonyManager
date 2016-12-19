@@ -1,8 +1,11 @@
-﻿using RimWorld;
+﻿// // Karel Kroeze
+// // ManagerJob_Foraging.cs
+// // 2016-12-09
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -10,33 +13,24 @@ namespace FluffyManager
 {
     public class ManagerJob_Foraging : ManagerJob
     {
-        #region Fields
-
-        public Dictionary<ThingDef, bool>   AllowedPlants;
-        public Area                         ForagingArea;
-        public bool                         ForceFullyMature;
-        public History                      History;
-        public new Trigger_Threshold        Trigger;
-        private Utilities.CachedValue<int>  _cachedCurrentDesignatedCount = new Utilities.CachedValue<int>(0, 250);
-        private float                       _margin = Utilities.Margin;
-        private List<Designation>           Designations = new List<Designation>();
-
-        #endregion Fields
-
         #region Constructors
 
-        public ManagerJob_Foraging()
+        public ManagerJob_Foraging( Manager manager ) : base( manager )
         {
             // all plants that yield something, and it isn't wood.
-            AllowedPlants = Find.Map.Biome.AllWildPlants
-                                .Where( plant => plant.plant.harvestYield > 0 &&
-                                                 plant.plant.harvestedThingDef != null &&
-                                                 plant.plant.harvestTag != "Wood" )
-                                .ToDictionary( k => k, v => false );
+            AllowedPlants = manager.map.Biome.AllWildPlants
+                               .Where( plant => plant.plant.harvestYield > 0 &&
+                                                plant.plant.harvestedThingDef != null &&
+                                                plant.plant.harvestTag != "Wood" )
+                               .ToDictionary( k => k, v => false );
 
             // add cave world fauna
-            List<ThingDef> caveWorldFauna = DefDatabase<ThingDef>.AllDefsListForReading.Where( def => def.plant?.sowTags.Contains( "Fungiponics" ) ?? false ).ToList();
-            foreach ( var fungus in caveWorldFauna )
+            List<ThingDef> caveWorldFauna =
+                DefDatabase<ThingDef>.AllDefsListForReading.Where(
+                                                                  def =>
+                                                                  def.plant?.sowTags.Contains( "Fungiponics" ) ?? false )
+                                     .ToList();
+            foreach ( ThingDef fungus in caveWorldFauna )
             {
                 AllowedPlants.Add( fungus, false );
             }
@@ -44,16 +38,29 @@ namespace FluffyManager
             // populate the trigger field, count all harvested thingdefs from the allowed plant list
             Trigger = new Trigger_Threshold( this );
             Trigger.ThresholdFilter.SetDisallowAll();
-            foreach ( var plant in AllowedPlants.Keys )
+            foreach ( ThingDef plant in AllowedPlants.Keys )
             {
                 Trigger.ThresholdFilter.SetAllow( plant.plant.harvestedThingDef, true );
             }
 
             // create History tracker
-            History = new History( new[] { "stock", "designated" }, new[] { Color.white, Color.grey } );
+            History = new History( new[] {"stock", "designated"}, new[] {Color.white, Color.grey} );
         }
 
         #endregion Constructors
+
+        #region Fields
+
+        public Dictionary<ThingDef, bool> AllowedPlants;
+        public Area ForagingArea;
+        public bool ForceFullyMature;
+        public History History;
+        public new Trigger_Threshold Trigger;
+        private Utilities.CachedValue<int> _cachedCurrentDesignatedCount = new Utilities.CachedValue<int>( 0, 250 );
+        private float _margin = Utilities.Margin;
+        private List<Designation> Designations = new List<Designation>();
+
+        #endregion Fields
 
         #region Properties
 
@@ -63,14 +70,14 @@ namespace FluffyManager
         {
             get
             {
-                int count = 0;
+                var count = 0;
 
                 // see if we have a cached count
                 if ( _cachedCurrentDesignatedCount.TryGetValue( out count ) )
                     return count;
 
                 // fetch count
-                foreach ( var des in Designations )
+                foreach ( Designation des in Designations )
                 {
                     if ( !des.target.HasThing )
                         continue;
@@ -89,8 +96,11 @@ namespace FluffyManager
         }
 
         public override string Label => "FMG.Foraging".Translate();
-        public override ManagerTab Tab => Manager.Get.ManagerTabs.Find( tab => tab is ManagerTab_Foraging );
-        public override string[] Targets => AllowedPlants.Keys.Where( key => AllowedPlants[key] ).Select( plant => plant.LabelCap ).ToArray();
+        public override ManagerTab Tab => Manager.For( manager ).ManagerTabs.Find( tab => tab is ManagerTab_Foraging );
+
+        public override string[] Targets
+            => AllowedPlants.Keys.Where( key => AllowedPlants[key] ).Select( plant => plant.LabelCap ).ToArray();
+
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Growing;
 
         #endregion Properties
@@ -100,7 +110,7 @@ namespace FluffyManager
         public void AddRelevantGameDesignations()
         {
             // get list of game designations not managed by this job that could have been assigned by this job.
-            foreach ( Designation des in Find.DesignationManager.DesignationsOfDef( DesignationDefOf.HarvestPlant )
+            foreach ( Designation des in manager.map.designationManager.DesignationsOfDef( DesignationDefOf.HarvestPlant )
                                              .Except( Designations )
                                              .Where( des => IsValidForagingTarget( des.target ) ) )
             {
@@ -113,7 +123,7 @@ namespace FluffyManager
         /// </summary>
         public void CleanDeadDesignations()
         {
-            var _gameDesignations = Find.DesignationManager.DesignationsOfDef( DesignationDefOf.HarvestPlant );
+            var _gameDesignations = manager.map.designationManager.DesignationsOfDef( DesignationDefOf.HarvestPlant );
             Designations = Designations.Intersect( _gameDesignations ).ToList();
         }
 
@@ -161,10 +171,7 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public override void DrawOverviewDetails( Rect rect )
-        {
-            History.DrawPlot( rect, Trigger.Count );
-        }
+        public override void DrawOverviewDetails( Rect rect ) { History.DrawPlot( rect, Trigger.Count ); }
 
         public override void ExposeData()
         {
@@ -173,7 +180,8 @@ namespace FluffyManager
 
             // settings
             Scribe_References.LookReference( ref ForagingArea, "ForagingArea" );
-            Scribe_Collections.LookDictionary( ref AllowedPlants, "AllowedPlants", LookMode.DefReference, LookMode.Value );
+            // TODO: verify LookMode.Def is correct here.
+            Scribe_Collections.LookDictionary( ref AllowedPlants, "AllowedPlants", LookMode.Def, LookMode.Value );
             Scribe_Values.LookValue( ref ForceFullyMature, "ForceFullyMature", false );
 
             // trigger
@@ -186,15 +194,12 @@ namespace FluffyManager
             }
         }
 
-        public override void Tick()
-        {
-            History.Update( Trigger.CurCount, CurrentDesignatedCount );
-        }
+        public override void Tick() { History.Update( Trigger.CurCount, CurrentDesignatedCount ); }
 
         public override bool TryDoJob()
         {
             // keep track of work done
-            bool workDone = false;
+            var workDone = false;
 
             // clean up designations that were completed.
             CleanDeadDesignations();
@@ -209,11 +214,11 @@ namespace FluffyManager
             int count = Trigger.CurCount + CurrentDesignatedCount;
             if ( count < Trigger.Count )
             {
-                var targets = GetValidForagingTargetsSorted();
+                List<Plant> targets = GetValidForagingTargetsSorted();
 
-                for ( int i = 0; i < targets.Count && count < Trigger.Count; i++ )
+                for ( var i = 0; i < targets.Count && count < Trigger.Count; i++ )
                 {
-                    Designation des = new Designation( targets[i], DesignationDefOf.HarvestPlant );
+                    var des = new Designation( targets[i], DesignationDefOf.HarvestPlant );
                     count += targets[i].YieldNow();
                     AddDesignation( des );
                     workDone = true;
@@ -226,7 +231,7 @@ namespace FluffyManager
         private void AddDesignation( Designation des )
         {
             // add to game
-            Find.DesignationManager.AddDesignation( des );
+            manager.map.designationManager.AddDesignation( des );
 
             // add to internal list
             Designations.Add( des );
@@ -251,18 +256,18 @@ namespace FluffyManager
 
         private List<Plant> GetValidForagingTargetsSorted()
         {
-            IntVec3 position = Utilities.GetBaseCenter();
+            IntVec3 position = manager.map.GetBaseCenter();
 
-            return Find.ListerThings.AllThings
-                        .Where( t => IsValidForagingTarget( t ) )
+            return manager.map.listerThings.AllThings
+                       .Where( IsValidForagingTarget )
 
-                        // OrderBy defaults to ascending, switch sign on current yield to get descending
-                        .Select( p => p as Plant )
-                        .OrderBy( p => -p.YieldNow() / ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) )
-                        .ToList();
+                // OrderBy defaults to ascending, switch sign on current yield to get descending
+                       .Select( p => p as Plant )
+                       .OrderBy( p => -p.YieldNow() / ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) )
+                       .ToList();
         }
 
-        private bool IsValidForagingTarget( TargetInfo t )
+        private bool IsValidForagingTarget( LocalTargetInfo t )
         {
             return t.HasThing
                    && IsValidForagingTarget( t.Thing );
@@ -271,18 +276,20 @@ namespace FluffyManager
         private bool IsValidForagingTarget( Thing t )
         {
             return t is Plant
-                   && IsValidForagingTarget( (Plant)t );
+                   && IsValidForagingTarget( (Plant) t );
         }
 
         private bool IsValidForagingTarget( Plant p )
         {
+            // should be a plant, and be on the same map as this job
             return p.def.plant != null
+                   && p.Map == manager.map
 
                    // non-biome plants won't be on the list, also filters non-yield or wood plants
                    && AllowedPlants.ContainsKey( p.def )
                    && AllowedPlants[p.def]
                    && p.Spawned
-                   && Find.DesignationManager.DesignationOn( p ) == null
+                   && manager.map.designationManager.DesignationOn( p ) == null
 
                    // cut only mature plants, or non-mature that yield something right now.
                    && ( ( !ForceFullyMature && p.YieldNow() > 1 )
@@ -291,7 +298,9 @@ namespace FluffyManager
                    // limit to area of interest
                    && ( ForagingArea == null
                         || ForagingArea.ActiveCells.Contains( p.Position ) )
-                   && p.Position.CanReachColony();
+
+                   // can we reach it? ( can it reach us? )
+                   && manager.map.reachability.CanReachColony( p.Position );
         }
 
         #endregion Methods

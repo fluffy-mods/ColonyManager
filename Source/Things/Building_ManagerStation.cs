@@ -147,7 +147,7 @@ namespace FluffyManager
                 // primary colour
                 if ( tick % ManagerStation.Props.Speed == 0 )
                 {
-                    PrimaryColour = Manager.Get.DoWork() ? Color.green : Color.red;
+                    PrimaryColour = Manager.For( Map ).DoWork() ? Color.green : Color.red;
                 }
 
                 // blinking on primary
@@ -171,11 +171,11 @@ namespace FluffyManager
             if ( _glowDirty )
             {
                 // Update glow grid
-                Find.GlowGrid.MarkGlowGridDirty( Position );
+                Map.glowGrid.MarkGlowGridDirty( Position );
 
                 // the following two should not be necesarry, but for some reason do seem to be.
-                Find.MapDrawer.MapMeshDirty( Position, MapMeshFlag.GroundGlow );
-                Find.MapDrawer.MapMeshDirty( Position, MapMeshFlag.Things );
+                Map.mapDrawer.MapMeshDirty( Position, MapMeshFlag.GroundGlow );
+                Map.mapDrawer.MapMeshDirty( Position, MapMeshFlag.Things );
 
                 _glowDirty = false;
             }

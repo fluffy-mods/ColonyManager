@@ -22,14 +22,14 @@ namespace FluffyManager
             Current
         }
 
-        public static Vector2                     IngredientsScrollPosition = new Vector2( 0f, 0f );
-        public static Vector2                     LeftRowScrollPosition     = new Vector2( 0f, 0f );
-        public static SourceOptions               Source                    = SourceOptions.Available;
-        public static string                      SourceFilter              = "";
-        public static List<ManagerJob_Production> SourceList;
-        public static float                       SourceListHeight;
+        public Vector2                     IngredientsScrollPosition = new Vector2( 0f, 0f );
+        public Vector2                     LeftRowScrollPosition     = new Vector2( 0f, 0f );
+        public SourceOptions               Source                    = SourceOptions.Available;
+        public string                      SourceFilter              = "";
+        public List<ManagerJob_Production> SourceList;
+        public float                       SourceListHeight;
         private static float                      _leftRowEntryHeight       = Utilities.LargeListEntryHeight;
-        private static ManagerJob_Production      _selected;
+        private ManagerJob_Production      _selected;
         private static float                      _topAreaHeight            = 30f;
         private Vector2                           _button                   = new Vector2( 200f, 40f );
         private float                             _entryHeight              = 30f;
@@ -65,7 +65,7 @@ namespace FluffyManager
             }
         }
 
-        public static void Refresh()
+        public void Refresh()
         {
             SourceList = new List<ManagerJob_Production>();
 
@@ -73,13 +73,13 @@ namespace FluffyManager
             {
                 case SourceOptions.Available:
                     SourceList = ( from rd in DefDatabase<RecipeDef>.AllDefsListForReading
-                                   where rd.HasBuildingRecipeUser( true )
+                                   where rd.HasBuildingRecipeUser( manager, true )
                                    orderby rd.LabelCap
-                                   select new ManagerJob_Production( rd ) ).ToList();
+                                   select new ManagerJob_Production( manager, rd ) ).ToList();
                     break;
 
                 case SourceOptions.Current:
-                    SourceList = Manager.Get.JobStack.FullStack<ManagerJob_Production>();
+                    SourceList = manager.JobStack.FullStack<ManagerJob_Production>();
                     break;
             }
         }
@@ -119,7 +119,7 @@ namespace FluffyManager
                         if ( Widgets.ButtonText( buttonRect, "FM.Manage".Translate() ) )
                         {
                             _selected.Managed = true;
-                            Manager.Get.JobStack.Add( _selected );
+                            manager.JobStack.Add( _selected );
 
                             // refresh source list so that the next added job is not an exact copy.
                             Refresh();
@@ -127,7 +127,7 @@ namespace FluffyManager
                             if ( _selected._hasMeaningfulIngredientChoices &&
                                  _selected._createIngredientBills )
                             {
-                                Find.WindowStack.Add( new Dialog_CreateJobsForIngredients( _selected.Bill.recipe, _selected.Trigger.Count ) );
+                                Find.WindowStack.Add( new Dialog_CreateJobsForIngredients( manager, _selected.Bill.recipe, _selected.Trigger.Count ) );
                             }
 
                             Source = SourceOptions.Current;
@@ -345,7 +345,7 @@ namespace FluffyManager
             GUI.EndGroup(); // window
         }
 
-        private static string GetInfoText()
+        private string GetInfoText()
         {
             StringBuilder stringBuilder = new StringBuilder();
 
@@ -470,7 +470,7 @@ namespace FluffyManager
                 if ( Source == SourceOptions.Current )
                 {
                     if ( ManagerTab_Overview.DrawOrderButtons(
-                        new Rect( row.xMax - _leftRowEntryHeight, row.yMin, _leftRowEntryHeight, _leftRowEntryHeight ),
+                        new Rect( row.xMax - _leftRowEntryHeight, row.yMin, _leftRowEntryHeight, _leftRowEntryHeight ), manager,
                         current ) )
                     {
                         Refresh();
@@ -512,6 +512,9 @@ namespace FluffyManager
             base.PreOpen();
             Refresh();
             if (_selected != null && _selected.Managed) _selected.ForceRecacheOtherRecipe();
+        }
+
+        public ManagerTab_Production( Manager manager ) : base( manager ) {
         }
     }
 }

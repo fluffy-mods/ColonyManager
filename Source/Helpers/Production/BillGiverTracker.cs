@@ -1,13 +1,11 @@
-﻿// Manager/BillGiverTracker.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-04 19:30
+﻿// // Karel Kroeze
+// // BillGiverTracker.cs
+// // 2016-12-09
 
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -22,15 +20,25 @@ namespace FluffyManager
 
     public class BillGiverTracker : IExposable
     {
+        private readonly ManagerJob_Production _job;
+        public Manager manager;
         private bool _assignedBillGiversInitialized = true;
         private Dictionary<Bill_Production, Building_WorkTable> _assignedBills;
         private List<string> _assignedBillsScribeID;
         private List<string> _assignedWorkersScribeID;
-        private readonly ManagerJob_Production _job;
         public Area AreaRestriction;
         public AssignedBillGiverOptions BillGiverSelection = AssignedBillGiverOptions.All;
         public List<Building_WorkTable> SpecificBillGivers;
         public int UserBillGiverCount;
+
+        public BillGiverTracker( ManagerJob_Production job )
+        {
+            manager = job.manager;
+            Recipe = job.Bill.recipe;
+            _job = job;
+            _assignedBills = new Dictionary<Bill_Production, Building_WorkTable>();
+            SpecificBillGivers = new List<Building_WorkTable>();
+        }
 
         public List<string> AssignedBillsScribe
         {
@@ -64,7 +72,7 @@ namespace FluffyManager
         /// <summary>
         ///     Get workstations that can perform the current bill/recipe (nothwithstanding area/count restrictions etc).
         /// </summary>
-        public List<Building_WorkTable> PotentialBillGivers => Recipe.CurrentRecipeUsers();
+        public List<Building_WorkTable> PotentialBillGivers => Recipe.CurrentRecipeUsers( manager );
 
         /// <summary>
         ///     Get workstations that can perform the current bill/recipe, and meet selection criteria set by player.
@@ -74,7 +82,7 @@ namespace FluffyManager
         {
             get
             {
-                List<Building_WorkTable> list = Recipe.CurrentRecipeUsers();
+                List<Building_WorkTable> list = Recipe.CurrentRecipeUsers( manager );
 
                 switch ( BillGiverSelection )
                 {
@@ -124,22 +132,14 @@ namespace FluffyManager
         {
             get
             {
-                WindowBillGiverDetails window = new WindowBillGiverDetails
-                {
-                    Job = _job,
-                    closeOnClickedOutside = true,
-                    draggable = true
-                };
+                var window = new WindowBillGiverDetails
+                             {
+                                 Job = _job,
+                                 closeOnClickedOutside = true,
+                                 draggable = true
+                             };
                 return window;
             }
-        }
-
-        public BillGiverTracker( ManagerJob_Production job )
-        {
-            Recipe = job.Bill.recipe;
-            _job = job;
-            _assignedBills = new Dictionary<Bill_Production, Building_WorkTable>();
-            SpecificBillGivers = new List<Building_WorkTable>();
         }
 
         public void ExposeData()
@@ -155,7 +155,8 @@ namespace FluffyManager
             Scribe_References.LookReference( ref AreaRestriction, "AreaRestriction" );
             Scribe_Collections.LookList( ref _assignedBillsScribeID, "AssignedBills", LookMode.Value );
             Scribe_Collections.LookList( ref _assignedWorkersScribeID, "AssignedWorkers", LookMode.Value );
-            Scribe_Collections.LookList( ref SpecificBillGivers, "SpecificBillGivers", LookMode.MapReference );
+            // TODO: Validate ref
+            Scribe_Collections.LookList( ref SpecificBillGivers, "SpecificBillGivers", LookMode.Reference );
 
             // rather complicated post-load workaround to find buildings by unique ID, since the scribe won't do things the simple way.
             // i.e. scribing dictionary with reference keys and values does not appear to work.
@@ -168,9 +169,9 @@ namespace FluffyManager
 
         private void InitializeAssignedBillGivers()
         {
-            bool error = false;
+            var error = false;
             _assignedBills = new Dictionary<Bill_Production, Building_WorkTable>();
-            for ( int i = 0; i < _assignedBillsScribeID.Count; i++ )
+            for ( var i = 0; i < _assignedBillsScribeID.Count; i++ )
             {
 #if DEBUG_SCRIBE
                         Log.Message( "Trying to find " + _assignedWorkersScribeID[i] + " | " + _assignedBillsScribeID[i] );
@@ -182,10 +183,10 @@ namespace FluffyManager
 #endif
                 try
                 {
-                    Building_WorkTable worker = Recipe.CurrentRecipeUsers().DefaultIfEmpty( null )
+                    Building_WorkTable worker = Recipe.CurrentRecipeUsers( manager ).DefaultIfEmpty( null )
                                                       .FirstOrDefault(
-                                                          b =>
-                                                              b.GetUniqueLoadID() == _assignedWorkersScribeID[i] );
+                                                                      b =>
+                                                                      b.GetUniqueLoadID() == _assignedWorkersScribeID[i] );
                     Bill_Production bill = null;
                     if ( worker == null )
                     {
@@ -199,7 +200,7 @@ namespace FluffyManager
                     {
                         if ( current.GetUniqueLoadID() == _assignedBillsScribeID[i] )
                         {
-                            bill = (Bill_Production)current;
+                            bill = (Bill_Production) current;
                         }
                     }
                     if ( bill == null )
@@ -209,7 +210,7 @@ namespace FluffyManager
                     _assignedBills.Add( bill, worker );
                 }
 
-                // ReSharper disable once UnusedVariable
+                    // ReSharper disable once UnusedVariable
                 catch ( Exception e )
                 {
                     error = true;
@@ -236,7 +237,7 @@ namespace FluffyManager
             string assignedString = string.Join( "\n", AssignedBillGivers.Select( b => b.LabelCap ).ToArray() );
             string billgiverTooltip = "FMP.BillGiversTooltip".Translate( potentialString, selectedString, assignedString );
 
-            Rect billgiverLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
+            var billgiverLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
             if ( alt )
             {
                 Widgets.DrawAltRect( billgiverLabelRect );
@@ -254,8 +255,8 @@ namespace FluffyManager
             }
 
             // add a little icon to mark interactivity
-            Rect searchIconRect = new Rect( billgiverLabelRect.xMax - Utilities.Margin - entryHeight, cur.y, entryHeight,
-                                            entryHeight );
+            var searchIconRect = new Rect( billgiverLabelRect.xMax - Utilities.Margin - entryHeight, cur.y, entryHeight,
+                                           entryHeight );
             if ( searchIconRect.height > Utilities.SmallIconSize )
             {
                 // center it.

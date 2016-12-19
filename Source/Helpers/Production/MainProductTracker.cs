@@ -181,7 +181,7 @@ namespace FluffyManager
                              allowedThingDef.butcherProducts.Count > 0 )
                         {
                             // butcherproducts are defined, no problem.
-                            List<ThingCount> butcherProducts = allowedThingDef.butcherProducts;
+                            List<ThingCountClass> butcherProducts = allowedThingDef.butcherProducts;
                             if ( butcherProducts.Count == 0 )
                             {
                                 throw new Exception( "No butcherproducts defined: " + allowedThingDef.defName );
@@ -228,7 +228,7 @@ namespace FluffyManager
                             return;
                         }
 
-                        List<ThingCount> smeltingProducts = allowedThingDef.smeltProducts;
+                        List<ThingCountClass> smeltingProducts = allowedThingDef.smeltProducts;
                         if ( smeltingProducts.Count == 0 )
                         {
                             Clear();

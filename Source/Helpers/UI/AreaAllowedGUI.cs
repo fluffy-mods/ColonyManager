@@ -1,11 +1,9 @@
-﻿// Manager/AreaAllowedGUI.cs
-//
-// Copyright Karel Kroeze, 2015.
-//
-// Created 2015-11-04 19:28
+﻿// // Karel Kroeze
+// // AreaAllowedGUI.cs
+// // 2016-12-09
 
-using RimWorld;
 using System.Collections.Generic;
+using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -16,17 +14,23 @@ namespace FluffyManager
     {
         #region Methods
 
-        public static Area DoAllowedAreaSelectors( Rect rect, Area areaIn,
-                                                   AllowedAreaMode mode = AllowedAreaMode.Humanlike, float lrMargin = 0 )
+        public static Area DoAllowedAreaSelectors( Rect rect, 
+                                                   Area areaIn,
+                                                   Map map,
+                                                   AllowedAreaMode mode = AllowedAreaMode.Humanlike,
+                                                   float lrMargin = 0 )
         {
             Area areaIO = areaIn;
-            DoAllowedAreaSelectors( rect, ref areaIO, mode, lrMargin );
+            DoAllowedAreaSelectors( rect, ref areaIO, map, mode, lrMargin );
             return areaIO;
         }
 
         // RimWorld.AreaAllowedGUI
-        public static void DoAllowedAreaSelectors( Rect rect, ref Area area,
-                                                   AllowedAreaMode mode = AllowedAreaMode.Humanlike, float lrMargin = 0 )
+        public static void DoAllowedAreaSelectors( Rect rect, 
+                                                   ref Area area,
+                                                   Map map,
+                                                   AllowedAreaMode mode = AllowedAreaMode.Humanlike, 
+                                                   float lrMargin = 0 )
         {
             if ( lrMargin > 0 )
             {
@@ -34,9 +38,9 @@ namespace FluffyManager
                 rect.width -= lrMargin * 2;
             }
 
-            List<Area> allAreas = Find.AreaManager.AllAreas;
-            int areaCount = 1;
-            for ( int i = 0; i < allAreas.Count; i++ )
+            List<Area> allAreas = map.areaManager.AllAreas;
+            var areaCount = 1;
+            for ( var i = 0; i < allAreas.Count; i++ )
             {
                 if ( allAreas[i].AssignableAsAllowed( mode ) )
                 {
@@ -46,15 +50,15 @@ namespace FluffyManager
             float widthPerArea = rect.width / areaCount;
             Text.WordWrap = false;
             Text.Font = GameFont.Tiny;
-            Rect nullAreaRect = new Rect( rect.x, rect.y, widthPerArea, rect.height );
+            var nullAreaRect = new Rect( rect.x, rect.y, widthPerArea, rect.height );
             DoAreaSelector( nullAreaRect, ref area, null );
-            int areaIndex = 1;
-            for ( int j = 0; j < allAreas.Count; j++ )
+            var areaIndex = 1;
+            for ( var j = 0; j < allAreas.Count; j++ )
             {
                 if ( allAreas[j].AssignableAsAllowed( mode ) )
                 {
                     float xOffset = areaIndex * widthPerArea;
-                    Rect areaRect = new Rect( rect.x + xOffset, rect.y, widthPerArea, rect.height );
+                    var areaRect = new Rect( rect.x + xOffset, rect.y, widthPerArea, rect.height );
                     DoAreaSelector( areaRect, ref area, allAreas[j] );
                     areaIndex++;
                 }
@@ -74,16 +78,16 @@ namespace FluffyManager
             float widthPerArea = rect.width / areas.Count;
             Text.WordWrap = false;
             Text.Font = GameFont.Tiny;
-            Rect nullAreaRect = new Rect( rect.x, rect.y, widthPerArea, rect.height );
-            int areaIndex = 0;
+            var nullAreaRect = new Rect( rect.x, rect.y, widthPerArea, rect.height );
+            var areaIndex = 0;
 
             // need to use a 'clean' list of keys to iterate over when changing the dictionary values
-            List<Area> _areas = new List<Area>( areas.Keys );
+            var _areas = new List<Area>( areas.Keys );
 
             foreach ( Area area in _areas )
             {
                 float xOffset = areaIndex++ * widthPerArea;
-                Rect areaRect = new Rect( rect.x + xOffset, rect.y, widthPerArea, rect.height );
+                var areaRect = new Rect( rect.x + xOffset, rect.y, widthPerArea, rect.height );
                 areas[area] = DoAreaSelector( areaRect, area, areas[area] );
             }
 

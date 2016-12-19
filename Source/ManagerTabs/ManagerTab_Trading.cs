@@ -11,7 +11,7 @@ namespace FluffyManager
     public class ManagerTab_Trading : ManagerTab
     {
         private static float              _entryHeight           = 30f;
-        private static ManagerJob_Trading _selected              = new ManagerJob_Trading();
+        private ManagerJob_Trading _selected;
         private Vector2                   _button                = new Vector2( 200f, 40f );
         private float                     _leftRowHeight         = 9999f;
         private float                     _margin                = Utilities.Margin;
@@ -44,6 +44,11 @@ namespace FluffyManager
             {
                // TODO: DoContent( contentCanvas );
             }
+        }
+
+        public ManagerTab_Trading( Manager manager ) : base( manager )
+        {
+            _selected = new ManagerJob_Trading( manager );
         }
     }
 }
