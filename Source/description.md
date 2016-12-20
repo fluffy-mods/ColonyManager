@@ -5,7 +5,7 @@ Colony Manager allows you to make colonists do the more tedious parts of managin
 Adds a worktype, which is stored in the world, which means you need to start a new game after adding/removing this mod. 
 
 **BETA VERSION**
-This is the first release on A16, and alpha 16 is a biggy for anything that is even slightly related to mods. In theory, each map you're on should get it's own instance of the manager - circumventing any complications with multiple maps. This also means Manager jobs are NOT shared across multiple maps. In practice, there's so many changes that I'm pretty sure there's going to be a few odd bugs. Please, if you find any, report them{if('format' == steam) using the link on the bottom of the page}.
+This is the first release on A16, and alpha 16 is a biggy for anything that is even slightly related to mods. In theory, each map you're on should get it's own instance of the manager - circumventing any complications with multiple maps. This also means Manager jobs are NOT shared across multiple maps. In practice, there's so many changes that I'm pretty sure there's going to be a few odd bugs. Please, if you find any, report them [here](https://github.com/{mod.git_user}/{mod.git_repo}/issues).
 
 # Features
 **Production Jobs**
