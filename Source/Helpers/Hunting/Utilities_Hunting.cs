@@ -1,18 +1,17 @@
-﻿// Manager/Utilities_Hunting.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-13 23:33
+﻿// Karel Kroeze
+// Utilities_Hunting.cs
+// 2016-12-09
 
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace FluffyManager
 {
     public static class Utilities_Hunting
     {
-        public static ThingDef         HumanMeat = ThingDef.Named( "Human" ).race.meatDef;
-        public static ThingCategoryDef RawMeat   = DefDatabase<ThingCategoryDef>.GetNamed( "MeatRaw" );
+        public static ThingDef HumanMeat = ThingDef.Named( "Human" ).race.meatDef;
+        public static ThingCategoryDef RawMeat = DefDatabase<ThingCategoryDef>.GetNamed( "MeatRaw" );
 
         public static int EstimatedMeatCount( this Pawn p )
         {

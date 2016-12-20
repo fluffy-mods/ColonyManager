@@ -1,6 +1,6 @@
-﻿// // Karel Kroeze
-// // ManagerTab.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerTab.cs
+// 2016-12-09
 
 using RimWorld;
 using UnityEngine;
@@ -10,9 +10,24 @@ namespace FluffyManager
 {
     public abstract class ManagerTab
     {
+        #region Fields
+
+        public float DefaultLeftRowSize = 300f;
+
         public Manager manager;
 
-        public ManagerTab( Manager manager ) { this.manager = manager; }
+        #endregion Fields
+
+        #region Constructors
+
+        public ManagerTab( Manager manager )
+        {
+            this.manager = manager;
+        }
+
+        #endregion Constructors
+
+
 
         #region Enums
 
@@ -24,14 +39,6 @@ namespace FluffyManager
         }
 
         #endregion Enums
-
-        #region Fields
-
-        public float DefaultLeftRowSize = 300f;
-
-        #endregion Fields
-
-        #region Properties
 
         public virtual Texture2D Icon
         {
@@ -55,22 +62,26 @@ namespace FluffyManager
             get { return true; }
         }
 
-        #endregion Properties
-
-        #region Methods
-
         public abstract void DoWindowContents( Rect canvas );
 
-        public virtual void PostClose() { }
+        public virtual void PostClose()
+        {
+        }
 
-        public virtual void PostOpen() { }
+        public virtual void PostOpen()
+        {
+        }
 
-        public virtual void PreClose() { }
+        public virtual void PreClose()
+        {
+        }
 
-        public virtual void PreOpen() { }
+        public virtual void PreOpen()
+        {
+        }
 
-        public virtual void Tick() { }
-
-        #endregion Methods
+        public virtual void Tick()
+        {
+        }
     }
 }

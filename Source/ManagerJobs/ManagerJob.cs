@@ -1,41 +1,91 @@
-﻿// // Karel Kroeze
-// // ManagerJob.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerJob.cs
+// 2016-12-09
 
-using System.Text;
 using RimWorld;
+using System.Text;
 using UnityEngine;
 using Verse;
 
 namespace FluffyManager
 {
+    internal interface IManagerJob
+    {
+        #region Methods
+
+        bool TryDoJob();
+
+        #endregion Methods
+    }
+
     public abstract class ManagerJob : IManagerJob, IExposable
     {
+        #region Fields
+
         public static float LastUpdateRectWidth = 50f,
                             ProgressRectWidth = 10f,
                             StatusRectWidth = LastUpdateRectWidth + ProgressRectWidth;
 
-        public int ActionInterval = 3600; // should be 1 minute.
+        public int ActionInterval = 3600;
+
+        // should be 1 minute.
         public int LastAction;
 
         public Manager manager;
+
         public int Priority;
+
         public Trigger Trigger;
-        public ManagerJob() { } // scribe
-        public ManagerJob( Manager manager ) { this.manager = manager; }
-        public virtual bool Managed { get; set; }
+
+        #endregion Fields
+
+        #region Constructors
+
+        public ManagerJob( Manager manager )
+        {
+            this.manager = manager;
+        }
+
+        #endregion Constructors
+
+
+
+        #region Properties
+
+        public abstract bool Completed { get; }
         public virtual bool IsValid => true;
         public abstract string Label { get; }
+        public virtual bool Managed { get; set; }
 
         public virtual bool ShouldDoNow
             => Managed && !Suspended && !Completed && LastAction + ActionInterval < Find.TickManager.TicksGame;
 
+        public virtual SkillDef SkillDef { get; } = null;
         public virtual bool Suspended { get; set; } = false;
-        public abstract bool Completed { get; }
         public abstract ManagerTab Tab { get; }
         public abstract string[] Targets { get; }
-        public virtual SkillDef SkillDef { get; } = null;
         public abstract WorkTypeDef WorkTypeDef { get; }
+
+        #endregion Properties
+
+
+
+        #region Methods
+
+        public abstract void CleanUp();
+
+        public virtual void Delete( bool cleanup = true )
+        {
+            if ( cleanup )
+            {
+                CleanUp();
+            }
+            Manager.For( manager ).JobStack.Delete( this );
+        }
+
+        public abstract void DrawListEntry( Rect rect, bool overview = true, bool active = true );
+
+        public abstract void DrawOverviewDetails( Rect rect );
 
         public virtual void ExposeData()
         {
@@ -51,21 +101,9 @@ namespace FluffyManager
             }
         }
 
-        public abstract bool TryDoJob();
-        public abstract void CleanUp();
-
-        public virtual void Delete( bool cleanup = true )
+        public virtual void Tick()
         {
-            if ( cleanup )
-            {
-                CleanUp();
-            }
-            Manager.For( manager ).JobStack.Delete( this );
         }
-
-        public abstract void DrawListEntry( Rect rect, bool overview = true, bool active = true );
-        public abstract void DrawOverviewDetails( Rect rect );
-        public virtual void Tick() { }
 
         public override string ToString()
         {
@@ -78,11 +116,13 @@ namespace FluffyManager
             return s.ToString();
         }
 
-        public void Touch() { LastAction = Find.TickManager.TicksGame; }
-    }
+        public void Touch()
+        {
+            LastAction = Find.TickManager.TicksGame;
+        }
 
-    internal interface IManagerJob
-    {
-        bool TryDoJob();
+        public abstract bool TryDoJob();
+
+        #endregion Methods
     }
 }

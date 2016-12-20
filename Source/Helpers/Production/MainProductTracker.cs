@@ -1,12 +1,12 @@
-﻿// Manager/MainProductTracker.cs
-//
-// Copyright Karel Kroeze, 2015.
-//
-// Created 2015-11-04 19:30
+﻿// Karel Kroeze
+// MainProductTracker.cs
+// 2016-12-09
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace FluffyManager
@@ -21,11 +21,18 @@ namespace FluffyManager
             Unknown
         }
 
-        private ThingCategoryDef   _categoryDef;
-        private string             _label;
         private readonly RecipeDef _recipe;
-        private ThingDef           _thingDef;
-        public Types               Type = Types.Unknown;
+
+        private ThingCategoryDef _categoryDef;
+        private string _label;
+        private ThingDef _thingDef;
+        public Types Type = Types.Unknown;
+
+        public MainProductTracker( RecipeDef recipe )
+        {
+            _recipe = recipe;
+            Set();
+        }
 
         public ThingCategoryDef CategoryDef
         {
@@ -112,12 +119,6 @@ namespace FluffyManager
         /// </summary>
         public int Count { get; private set; } = 1;
 
-        public MainProductTracker( RecipeDef recipe )
-        {
-            _recipe = recipe;
-            Set();
-        }
-
         public void Clear()
         {
             Type = Types.Unknown;
@@ -158,6 +159,7 @@ namespace FluffyManager
                     {
                         throw new Exception( "AllowedThingDefs NULL" );
                     }
+
                     ThingDef allowedThingDef =
                         _recipe.fixedIngredientFilter.AllowedThingDefs.DefaultIfEmpty( null ).FirstOrDefault();
                     if ( allowedThingDef == null )

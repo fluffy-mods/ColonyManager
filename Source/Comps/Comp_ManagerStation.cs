@@ -1,9 +1,9 @@
-﻿// Manager/Comp_ManagerStation.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-04 19:30
+﻿// Karel Kroeze
+// Comp_ManagerStation.cs
+// 2016-12-09
 
+using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace FluffyManager

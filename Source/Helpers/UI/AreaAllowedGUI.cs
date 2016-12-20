@@ -1,9 +1,9 @@
-﻿// // Karel Kroeze
-// // AreaAllowedGUI.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// AreaAllowedGUI.cs
+// 2016-12-09
 
-using System.Collections.Generic;
 using RimWorld;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -14,7 +14,7 @@ namespace FluffyManager
     {
         #region Methods
 
-        public static Area DoAllowedAreaSelectors( Rect rect, 
+        public static Area DoAllowedAreaSelectors( Rect rect,
                                                    Area areaIn,
                                                    Map map,
                                                    AllowedAreaMode mode = AllowedAreaMode.Humanlike,
@@ -26,10 +26,10 @@ namespace FluffyManager
         }
 
         // RimWorld.AreaAllowedGUI
-        public static void DoAllowedAreaSelectors( Rect rect, 
+        public static void DoAllowedAreaSelectors( Rect rect,
                                                    ref Area area,
                                                    Map map,
-                                                   AllowedAreaMode mode = AllowedAreaMode.Humanlike, 
+                                                   AllowedAreaMode mode = AllowedAreaMode.Humanlike,
                                                    float lrMargin = 0 )
         {
             if ( lrMargin > 0 )
@@ -47,6 +47,7 @@ namespace FluffyManager
                     areaCount++;
                 }
             }
+
             float widthPerArea = rect.width / areaCount;
             Text.WordWrap = false;
             Text.Font = GameFont.Tiny;
@@ -63,6 +64,7 @@ namespace FluffyManager
                     areaIndex++;
                 }
             }
+
             Text.WordWrap = true;
             Text.Font = GameFont.Small;
         }
@@ -117,6 +119,7 @@ namespace FluffyManager
                     return !status;
                 }
             }
+
             TooltipHandler.TipRegion( rect, text );
             return status;
         }

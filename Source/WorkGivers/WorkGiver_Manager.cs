@@ -1,10 +1,10 @@
-﻿// // Karel Kroeze
-// // WorkGiver_Manager.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// WorkGiver_Manager.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.AI;

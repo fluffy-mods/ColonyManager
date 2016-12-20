@@ -1,19 +1,18 @@
-﻿using RimWorld;
-using System;
-using System.Linq;
+﻿// Karel Kroeze
+// ResearchWorkers.cs
+// 2016-12-09
+
+using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace FluffyManager
 {
     public static class ResearchWorkers
     {
-        #region Methods
-
         public static void UnlockPowerTab()
         {
             Manager._powerUnlocked = true;
         }
-
-        #endregion Methods
     }
 }

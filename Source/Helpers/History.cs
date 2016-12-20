@@ -1,16 +1,11 @@
-﻿// Manager/History.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-04 19:32
+﻿// Karel Kroeze
+// History.cs
+// 2016-12-09
 
 using RimWorld;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Security.Permissions;
 using UnityEngine;
 using Verse;
 
@@ -26,49 +21,54 @@ namespace FluffyManager
             Year
         }
 
-        public static Color DefaultLineColor              = Color.white;
-        private const int Breaks                          = 4;
-        private const int DashLength                      = 3;
-        private const float Margin                        = Utilities.Margin;
-        private const int Size                            = 100;
+        private const int Breaks = 4;
+        private const int DashLength = 3;
+        private const float Margin = Utilities.Margin;
+        private const int Size = 100;
 
-        // settings
-        public bool AllowTogglingLegend                   = true;
-        public bool DrawInlineLegend                      = true;
-        public bool DrawTargetLine                        = true;
-        public bool DrawOptions                           = true;
-        public string Suffix                              = String.Empty;
+        public static Color DefaultLineColor = Color.white;
 
-        // for detailed legend
-        public bool DrawIcons                             = true;
-        public bool DrawCounts                            = true;
-        public bool DrawInfoInBar                         = false;
-        public bool DrawMaxMarkers                        = false;
-        public bool MaxPerChapter                         = false;
-        
         // interval per period
         private static Dictionary<Period, int> _intervals = new Dictionary<Period, int>();
-        private static readonly float _yAxisMargin        = 40f;
-        public  static Period[] periods                   = (Period[])Enum.GetValues( typeof (Period) );
+
+        private static readonly float _yAxisMargin = 40f;
+        public static Period[] periods = (Period[]) Enum.GetValues( typeof( Period ) );
 
         // each chapter holds the history for all periods.
-        private List<Chapter> _chapters                   = new List<Chapter>();
-        private List<Chapter> _chaptersShown              = new List<Chapter>();
-        public Period periodShown                         = Period.Day;
+        private List<Chapter> _chapters = new List<Chapter>();
+
+        private List<Chapter> _chaptersShown = new List<Chapter>();
+
+        // settings
+        public bool AllowTogglingLegend = true;
+
+        public bool DrawCounts = true;
+
+        // for detailed legend
+        public bool DrawIcons = true;
+
+        public bool DrawInfoInBar;
+        public bool DrawInlineLegend = true;
+        public bool DrawMaxMarkers;
+        public bool DrawOptions = true;
+        public bool DrawTargetLine = true;
+        public bool MaxPerChapter;
+        public Period periodShown = Period.Day;
+        public string Suffix = String.Empty;
 
         // for scribe.
-        public History() {}
-        
+        public History() { }
+
         public History( string[] labels, Color[] colors = null )
         {
-#if DEBUG
+#if DEBUG_HISTORY
             Log.Message( "History created" + string.Join( ", ", labels ) );
 #endif
             // get range of colors if not set
-            if( colors == null )
+            if ( colors == null )
             {
                 // default to white for single line
-                if( labels.Length == 1 )
+                if ( labels.Length == 1 )
                 {
                     colors = new[] { Color.white };
                 }
@@ -81,7 +81,7 @@ namespace FluffyManager
             }
 
             // create a chapter for each label
-            for( int i = 0; i < labels.Length; i++ )
+            for ( var i = 0; i < labels.Length; i++ )
             {
                 _chapters.Add( new Chapter( labels[i], Size, colors[i % colors.Length] ) );
             }
@@ -89,14 +89,14 @@ namespace FluffyManager
             // show all by default
             _chaptersShown.AddRange( _chapters );
         }
-        
+
         public History( ThingCount[] thingCounts, Color[] colors = null )
         {
             // get range of colors if not set
-            if( colors == null )
+            if ( colors == null )
             {
                 // default to white for single line
-                if( thingCounts.Length == 1 )
+                if ( thingCounts.Length == 1 )
                 {
                     colors = new[] { Color.white };
                 }
@@ -109,9 +109,10 @@ namespace FluffyManager
             }
 
             // create a chapter for each label
-            for( int i = 0; i < thingCounts.Length; i++ )
+            for ( var i = 0; i < thingCounts.Length; i++ )
             {
-                _chapters.Add( new Chapter( new ThingCountClass( thingCounts[i].ThingDef, thingCounts[i].Count ), Size, colors[i % colors.Length] ) );
+                _chapters.Add( new Chapter( new ThingCountClass( thingCounts[i].ThingDef, thingCounts[i].Count ), Size,
+                                            colors[i % colors.Length] ) );
             }
 
             // show all by default
@@ -140,7 +141,7 @@ namespace FluffyManager
             {
                 // set chapters shown to the newly loaded chapters (instead of the default created empty chapters).
                 _chaptersShown.Clear();
-                _chaptersShown.AddRange(_chapters);
+                _chaptersShown.AddRange( _chapters );
             }
         }
 
@@ -154,15 +155,19 @@ namespace FluffyManager
                     case Period.Month:
                         ticks = GenDate.TicksPerMonth;
                         break;
+
                     case Period.Year:
                         ticks = GenDate.TicksPerYear;
                         break;
+
                     default:
                         ticks = GenDate.TicksPerDay;
                         break;
                 }
+
                 _intervals[period] = ticks / Size;
             }
+
             return _intervals[period];
         }
 
@@ -172,17 +177,18 @@ namespace FluffyManager
         /// <param name="x">input</param>
         /// <param name="precision">number of digits to preserve past the magnitude, should be equal to or greater than zero.</param>
         /// <returns></returns>
-        public int CeilToPrecision( float x, int precision = 1)
+        public int CeilToPrecision( float x, int precision = 1 )
         {
             int magnitude = Mathf.FloorToInt( Mathf.Log10( x ) );
             int unit = Mathf.FloorToInt( Mathf.Pow( 10, magnitude - precision ) );
-            return Mathf.CeilToInt(x / unit) * unit; 
+            return Mathf.CeilToInt( x / unit ) * unit;
         }
 
         public string FormatCount( float x, int unit = 1000, string[] suffixes = null )
         {
-            if ( suffixes == null ) suffixes = new[] { "", "k", "M", "G" };
-            int i = 0;
+            if ( suffixes == null )
+                suffixes = new[] { "", "k", "M", "G" };
+            var i = 0;
             while ( x > unit / 10 && i < suffixes.Length )
             {
                 x /= unit;
@@ -199,7 +205,7 @@ namespace FluffyManager
                 Log.Warning( "History updated with incorrect number of chapters" );
             }
 
-            for ( int i = 0; i < counts.Length; i++ )
+            for ( var i = 0; i < counts.Length; i++ )
             {
                 _chapters[i].Add( counts[i] );
             }
@@ -207,12 +213,12 @@ namespace FluffyManager
 
         public void UpdateThingCounts( params int[] counts )
         {
-            if( counts.Length != _chapters.Count )
+            if ( counts.Length != _chapters.Count )
             {
                 Log.Warning( "History updated with incorrect number of chapters" );
             }
 
-            for( int i = 0; i < counts.Length; i++ )
+            for ( var i = 0; i < counts.Length; i++ )
             {
                 _chapters[i].ThingCount.count = counts[i];
             }
@@ -220,25 +226,25 @@ namespace FluffyManager
 
         public void UpdateMax( params int[] maxes )
         {
-            if( maxes.Length != _chapters.Count )
+            if ( maxes.Length != _chapters.Count )
             {
                 Log.Warning( "History updated with incorrect number of chapters" );
             }
 
-            for( int i = 0; i < maxes.Length; i++ )
+            for ( var i = 0; i < maxes.Length; i++ )
             {
                 _chapters[i].TrueMax = maxes[i];
             }
         }
 
-        public void UpdateThingCountAndMax( int[] counts, int[] maxes)
+        public void UpdateThingCountAndMax( int[] counts, int[] maxes )
         {
-            if( maxes.Length != _chapters.Count || maxes.Length != _chapters.Count )
+            if ( maxes.Length != _chapters.Count || maxes.Length != _chapters.Count )
             {
                 Log.Warning( "History updated with incorrect number of chapters" );
             }
 
-            for( int i = 0; i < maxes.Length; i++ )
+            for ( var i = 0; i < maxes.Length; i++ )
             {
                 if ( _chapters[i].ThingCount.count != counts[i] )
                 {
@@ -248,31 +254,35 @@ namespace FluffyManager
             }
         }
 
-        public void DrawPlot( Rect rect, int target = 0, string label = "", bool positiveOnly = false, bool negativeOnly = false )
+        public void DrawPlot( Rect rect, int target = 0, string label = "", bool positiveOnly = false,
+                              bool negativeOnly = false )
         {
             // set sign
             int sign = negativeOnly ? -1 : 1;
 
             // subset chapters
-            List<Chapter> chapters = _chaptersShown.Where( chapter => !positiveOnly || chapter.pages[periodShown].Any( i => i > 0 ) )
-                               .Where( chapter => !negativeOnly || chapter.pages[periodShown].Any( i => i < 0 ) )
-                               .ToList();
+            List<Chapter> chapters =
+                _chaptersShown.Where( chapter => !positiveOnly || chapter.pages[periodShown].Any( i => i > 0 ) )
+                              .Where( chapter => !negativeOnly || chapter.pages[periodShown].Any( i => i < 0 ) )
+                              .ToList();
 
             // get out early if no chapters.
             if ( chapters.Count == 0 )
             {
-                GUI.DrawTexture( rect.ContractedBy(Utilities.Margin), Resources.SlightlyDarkBackground );
-                Utilities.Label( rect, "FM.HistoryNoChapters".Translate(), null, TextAnchor.MiddleCenter, color: Color.grey );
+                GUI.DrawTexture( rect.ContractedBy( Utilities.Margin ), Resources.SlightlyDarkBackground );
+                Utilities.Label( rect, "FM.HistoryNoChapters".Translate(), null, TextAnchor.MiddleCenter,
+                                 color: Color.grey );
                 return;
             }
-
 
             // stuff we need
             Rect plot = rect.ContractedBy( Utilities.Margin );
             plot.xMin += _yAxisMargin;
 
             // maximum of all chapters.
-            int max = CeilToPrecision( Math.Max( chapters.Select( c => c.Max( periodShown, !negativeOnly ) ).Max(), target ) * 1.2f );
+            int max =
+                CeilToPrecision( Math.Max( chapters.Select( c => c.Max( periodShown, !negativeOnly ) ).Max(), target ) *
+                                 1.2f );
 
             // size, and pixels per node.
             float w = plot.width;
@@ -295,15 +305,16 @@ namespace FluffyManager
             {
                 // very conveniently this is the position within the current group.
                 Vector2 pos = Event.current.mousePosition;
-                Vector2 upos = new Vector2(pos.x / wu, (plot.height - pos.y) / hu);
+                var upos = new Vector2( pos.x / wu, ( plot.height - pos.y ) / hu );
 
                 // get distances
-                float[] distances = chapters.Select( c => Math.Abs( c.ValueAt( periodShown, (int)upos.x, sign ) - upos.y ) ).ToArray();
-                
+                float[] distances =
+                    chapters.Select( c => Math.Abs( c.ValueAt( periodShown, (int)upos.x, sign ) - upos.y ) ).ToArray();
+
                 // get the minimum index
                 float min = int.MaxValue;
-                int minIndex = 0;
-                for ( int i = 0; i < distances.Count(); i++ )
+                var minIndex = 0;
+                for ( var i = 0; i < distances.Count(); i++ )
                 {
                     if ( distances[i] < min )
                     {
@@ -316,21 +327,24 @@ namespace FluffyManager
                 Chapter closest = chapters[minIndex];
 
                 // do minimum stuff.
-                Vector2 realpos = new Vector2( pos.x, plot.height - closest.ValueAt( periodShown, (int)upos.x, sign ) * hu );
-                Rect blipRect = new Rect(realpos.x - Utilities.SmallIconSize / 2f, realpos.y - Utilities.SmallIconSize / 2f, Utilities.SmallIconSize, Utilities.SmallIconSize );
+                var realpos = new Vector2( pos.x, plot.height - closest.ValueAt( periodShown, (int)upos.x, sign ) * hu );
+                var blipRect = new Rect( realpos.x - Utilities.SmallIconSize / 2f,
+                                         realpos.y - Utilities.SmallIconSize / 2f, Utilities.SmallIconSize,
+                                         Utilities.SmallIconSize );
                 GUI.color = closest.lineColor;
                 GUI.DrawTexture( blipRect, Resources.StageB );
                 GUI.color = DefaultLineColor;
 
                 // get orientation of tooltip
                 Vector2 tippos = realpos + new Vector2( Utilities.Margin, Utilities.Margin );
-                string tip = chapters[minIndex].label + ": " + FormatCount( chapters[minIndex].ValueAt( periodShown, (int)upos.x, sign ));
+                string tip = chapters[minIndex].label + ": " +
+                             FormatCount( chapters[minIndex].ValueAt( periodShown, (int)upos.x, sign ) );
                 Vector2 tipsize = Text.CalcSize( tip );
                 bool up = false, left = false;
                 if ( tippos.x + tipsize.x > plot.width )
                 {
                     left = true;
-                    tippos.x -= tipsize.x + 2 * + Utilities.Margin;
+                    tippos.x -= tipsize.x + 2 * +Utilities.Margin;
                 }
                 if ( tippos.y + tipsize.y > plot.height )
                 {
@@ -338,11 +352,14 @@ namespace FluffyManager
                     tippos.y -= tipsize.y + 2 * Utilities.Margin;
                 }
 
-                TextAnchor anchor = TextAnchor.UpperLeft;
-                if (up && left) anchor = TextAnchor.LowerRight;
-                if ( up && !left ) anchor = TextAnchor.LowerLeft;
-                if ( !up && left ) anchor = TextAnchor.UpperRight;
-                Rect tooltipRect = new Rect( tippos.x, tippos.y, tipsize.x, tipsize.y );
+                var anchor = TextAnchor.UpperLeft;
+                if ( up && left )
+                    anchor = TextAnchor.LowerRight;
+                if ( up && !left )
+                    anchor = TextAnchor.LowerLeft;
+                if ( !up && left )
+                    anchor = TextAnchor.UpperRight;
+                var tooltipRect = new Rect( tippos.x, tippos.y, tipsize.x, tipsize.y );
                 Utilities.Label( tooltipRect, tip, anchor: anchor, font: GameFont.Tiny );
             }
 
@@ -350,7 +367,7 @@ namespace FluffyManager
             if ( DrawTargetLine )
             {
                 GUI.color = Color.gray;
-                for ( int i = 0; i < plot.width / DashLength; i += 2 )
+                for ( var i = 0; i < plot.width / DashLength; i += 2 )
                 {
                     Widgets.DrawLineHorizontal( i * DashLength, plot.height - target * hu, DashLength );
                 }
@@ -360,19 +377,20 @@ namespace FluffyManager
             int lineCount = _chapters.Count;
             if ( AllowTogglingLegend && lineCount > 1 && DrawInlineLegend )
             {
-                float rowHeight = 20f;
-                float lineLength = 30f;
-                float labelWidth = 100f;
+                var rowHeight = 20f;
+                var lineLength = 30f;
+                var labelWidth = 100f;
 
                 Vector2 cur = Vector2.zero;
                 foreach ( Chapter chapter in _chapters )
                 {
                     GUI.color = chapter.lineColor;
-                    Widgets.DrawLineHorizontal(cur.x, cur.y + rowHeight / 2f, lineLength);
+                    Widgets.DrawLineHorizontal( cur.x, cur.y + rowHeight / 2f, lineLength );
                     cur.x += lineLength;
                     Utilities.Label( ref cur, labelWidth, rowHeight, chapter.label, font: GameFont.Tiny );
                     cur.x = 0f;
                 }
+
                 GUI.color = Color.white;
             }
 
@@ -384,11 +402,11 @@ namespace FluffyManager
             Text.Font = GameFont.Tiny;
 
             // draw ticks + labels
-            for ( int i = 1; i < Breaks + 1; i++ )
+            for ( var i = 1; i < Breaks + 1; i++ )
             {
                 Widgets.DrawLineHorizontal( _yAxisMargin + Margin / 2, plot.height - i * bu, Margin );
-                Rect labRect = new Rect( 0f, plot.height - i * bu - 4f, _yAxisMargin, 20f );
-                Widgets.Label( labRect, FormatCount(  i * bi ) );
+                var labRect = new Rect( 0f, plot.height - i * bu - 4f, _yAxisMargin, 20f );
+                Widgets.Label( labRect, FormatCount( i * bi ) );
             }
 
             Text.Font = GameFont.Small;
@@ -400,22 +418,24 @@ namespace FluffyManager
             // period / variables picker
             if ( DrawOptions )
             {
-                Rect switchRect = new Rect( rect.xMax - Utilities.SmallIconSize - Utilities.Margin,
-                                            rect.yMin + Utilities.Margin, Utilities.SmallIconSize,
-                                            Utilities.SmallIconSize );
+                var switchRect = new Rect( rect.xMax - Utilities.SmallIconSize - Utilities.Margin,
+                                           rect.yMin + Utilities.Margin, Utilities.SmallIconSize,
+                                           Utilities.SmallIconSize );
 
                 Widgets.DrawHighlightIfMouseover( switchRect );
                 if ( Widgets.ButtonImage( switchRect, Resources.Cog ) )
                 {
                     List<FloatMenuOption> options =
                         periods.Select(
-                            p =>
-                                new FloatMenuOption( "FM.HistoryPeriod".Translate() + ": " + p.ToString(),
-                                                     delegate { periodShown = p; } ) ).ToList();
+                                       p =>
+                                       new FloatMenuOption( "FM.HistoryPeriod".Translate() + ": " + p.ToString(),
+                                                            delegate
+                                                            { periodShown = p; } ) ).ToList();
                     if ( AllowTogglingLegend && _chapters.Count > 1 ) // add option to show/hide legend if appropriate.
                     {
                         options.Add( new FloatMenuOption( "FM.HistoryShowHideLegend".Translate(),
-                                                          delegate { DrawInlineLegend = !DrawInlineLegend; } ) );
+                                                          delegate
+                                                          { DrawInlineLegend = !DrawInlineLegend; } ) );
                     }
                     Find.WindowStack.Add( new FloatMenu( options ) );
                 }
@@ -424,7 +444,8 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public void DrawDetailedLegend( Rect canvas, ref Vector2 scrollPos, int? max, bool positiveOnly = false, bool negativeOnly = false )
+        public void DrawDetailedLegend( Rect canvas, ref Vector2 scrollPos, int? max, bool positiveOnly = false,
+                                        bool negativeOnly = false )
         {
             // set sign
             int sign = negativeOnly ? -1 : 1;
@@ -435,22 +456,23 @@ namespace FluffyManager
                 .OrderByDescending( chapter => chapter.Last( periodShown ) * sign ).ToList();
 
             // get out early if no chapters.
-            if( ChaptersOrdered.Count == 0 )
+            if ( ChaptersOrdered.Count == 0 )
             {
                 GUI.DrawTexture( canvas.ContractedBy( Utilities.Margin ), Resources.SlightlyDarkBackground );
-                Utilities.Label( canvas, "FM.HistoryNoChapters".Translate(), null, TextAnchor.MiddleCenter, color: Color.grey );
+                Utilities.Label( canvas, "FM.HistoryNoChapters".Translate(), null, TextAnchor.MiddleCenter,
+                                 color: Color.grey );
                 return;
             }
 
-            // max 
+            // max
             float _max = max ?? ( DrawMaxMarkers
-                                 ? ChaptersOrdered.Max( chapter => (int)chapter.TrueMax ) 
-                                 : ChaptersOrdered.FirstOrDefault()?.Last( periodShown ) * sign )
-                             ?? 0;
-            
+                                      ? ChaptersOrdered.Max( chapter => chapter.TrueMax )
+                                      : ChaptersOrdered.FirstOrDefault()?.Last( periodShown ) * sign )
+                         ?? 0;
+
             // cell height
-            float height = 30f;
-            float barHeight = 18f;
+            var height = 30f;
+            var barHeight = 18f;
 
             // n rows
             int n = ChaptersOrdered.Count;
@@ -464,20 +486,23 @@ namespace FluffyManager
                 canvas.width -= Utilities.Margin;
                 canvas.height -= 1f;
             }
-            Widgets.BeginScrollView( canvas, ref scrollPos, viewRect);
-            for ( int i = 0; i < n; i++ )
+            Widgets.BeginScrollView( canvas, ref scrollPos, viewRect );
+            for ( var i = 0; i < n; i++ )
             {
                 // set up rects
-                Rect row      = new Rect( 0f, height * i, viewRect.width, height );
-                Rect icon     = new Rect( Utilities.Margin, height * i, height, height ).ContractedBy( Utilities.Margin / 2f ); // icon is square, size defined by height.
-                Rect bar      = new Rect( Utilities.Margin + height, height * i, viewRect.width - height - Utilities.Margin, height );
+                var row = new Rect( 0f, height * i, viewRect.width, height );
+                Rect icon = new Rect( Utilities.Margin, height * i, height, height ).ContractedBy( Utilities.Margin / 2f );
+                // icon is square, size defined by height.
+                var bar = new Rect( Utilities.Margin + height, height * i, viewRect.width - height - Utilities.Margin,
+                                    height );
 
                 // if icons should not be drawn make the bar full size.
-                if (!DrawIcons) bar.xMin -= height + Utilities.Margin;
+                if ( !DrawIcons )
+                    bar.xMin -= height + Utilities.Margin;
 
                 // bar details.
-                Rect barBox   = bar.ContractedBy( ( height - barHeight ) / 2f );
-                Rect barFill  = barBox.ContractedBy( 2f );
+                Rect barBox = bar.ContractedBy( ( height - barHeight ) / 2f );
+                Rect barFill = barBox.ContractedBy( 2f );
                 float maxWidth = barFill.width;
                 if ( MaxPerChapter )
                 {
@@ -487,12 +512,12 @@ namespace FluffyManager
                 {
                     barFill.width *= ChaptersOrdered[i].Last( periodShown ) * sign / _max;
                 }
-                
+
                 GUI.BeginGroup( viewRect );
 
                 // if DrawIcons and a thing is set, draw the icon.
                 ThingDef thing = ChaptersOrdered[i].ThingCount.thingDef;
-                if( DrawIcons && thing != null )
+                if ( DrawIcons && thing != null )
                 {
                     // draw the icon in correct proportions
                     float proportion = GenUI.IconDrawScale( thing );
@@ -502,12 +527,12 @@ namespace FluffyManager
                     if ( DrawCounts )
                     {
                         Utilities.LabelOutline( icon, ChaptersOrdered[i].ThingCount.count.ToString(), null,
-                                         TextAnchor.UpperLeft, 0f, 0f, GameFont.Tiny, Color.white, Color.black );
+                                                TextAnchor.UpperLeft, 0f, 0f, GameFont.Tiny, Color.white, Color.black );
                     }
                 }
 
                 // if desired, draw ghost bar
-                if( DrawMaxMarkers )
+                if ( DrawMaxMarkers )
                 {
                     Rect ghostBarFill = barFill;
                     ghostBarFill.width = MaxPerChapter ? maxWidth : maxWidth * ( ChaptersOrdered[i].TrueMax / _max );
@@ -520,7 +545,7 @@ namespace FluffyManager
                 GUI.DrawTexture( barBox, Resources.SlightlyDarkBackground );
                 GUI.DrawTexture( barFill, ChaptersOrdered[i].Texture ); // coloured texture
                 GUI.DrawTexture( barFill, Resources.BarShader ); // slightly fancy overlay (emboss).
-                
+
                 // draw on bar info
                 if ( DrawInfoInBar )
                 {
@@ -540,16 +565,18 @@ namespace FluffyManager
                     // x offset
                     float xOffset = DrawIcons && thing != null ? height + Utilities.Margin * 2 : Utilities.Margin * 2;
 
-                    Utilities.LabelOutline( rowInfoRect, info, null, TextAnchor.MiddleLeft, xOffset, 0f, GameFont.Tiny, Color.white, Color.black );
+                    Utilities.LabelOutline( rowInfoRect, info, null, TextAnchor.MiddleLeft, xOffset, 0f, GameFont.Tiny,
+                                            Color.white, Color.black );
                 }
 
                 // are we currently showing this line?
                 bool shown = _chaptersShown.Contains( ChaptersOrdered[i] );
 
                 // tooltip on entire row
-                string tooltip = ChaptersOrdered[i].label + ": " + FormatCount( Mathf.Abs( ChaptersOrdered[i].Last( periodShown ) ) );
+                string tooltip = ChaptersOrdered[i].label + ": " +
+                                 FormatCount( Mathf.Abs( ChaptersOrdered[i].Last( periodShown ) ) );
                 tooltip += "FM.HistoryClickToEnable".Translate( shown ? "hide" : "show", ChaptersOrdered[i].label );
-                TooltipHandler.TipRegion( row, tooltip);
+                TooltipHandler.TipRegion( row, tooltip );
 
                 // handle input
                 if ( Widgets.ButtonInvisible( row ) )
@@ -564,7 +591,8 @@ namespace FluffyManager
                         {
                             _chaptersShown.Add( ChaptersOrdered[i] );
                         }
-                    } else if ( Event.current.button == 1 )
+                    }
+                    else if ( Event.current.button == 1 )
                     {
                         _chaptersShown.Clear();
                         _chaptersShown.Add( ChaptersOrdered[i] );
@@ -579,25 +607,26 @@ namespace FluffyManager
 
                 GUI.EndGroup();
             }
+
             Widgets.EndScrollView();
         }
-        
+
         public class Chapter : IExposable
         {
-            public Dictionary<Period, List<int>> pages                     = new Dictionary<Period, List<int>>();
-            public string                                 label            = String.Empty;
-            public Color                                  lineColor        = DefaultLineColor;
-            public Texture2D                              _texture;
-            public int                                    size             = Size;
-            public ThingCountClass                             ThingCount       = new ThingCountClass();
-            private int                                   _observedMax     = -1;
-            private int                                   _specificMax     = -1;
+            private int _observedMax = -1;
+            private int _specificMax = -1;
+            public Texture2D _texture;
+            public string label = String.Empty;
+            public Color lineColor = DefaultLineColor;
+            public Dictionary<Period, List<int>> pages = new Dictionary<Period, List<int>>();
+            public int size = Size;
+            public ThingCountClass ThingCount = new ThingCountClass();
 
             public Chapter()
             {
                 // empty for scribe.
                 // create a dictionary of histories, one for each period, initialize with a zero to avoid errors.
-                pages = periods.ToDictionary( k => k, v => new List<int>( new [] { 0 } ) );
+                pages = periods.ToDictionary( k => k, v => new List<int>( new[] { 0 } ) );
             }
 
             public Chapter( string label, int size, Color color ) : this()
@@ -609,8 +638,8 @@ namespace FluffyManager
 
             public Chapter( ThingCountClass thingCount, int size, Color color ) : this()
             {
-                this.label = thingCount.thingDef.LabelCap;
-                this.ThingCount = thingCount;
+                label = thingCount.thingDef.LabelCap;
+                ThingCount = thingCount;
                 this.size = size;
                 lineColor = color;
             }
@@ -627,20 +656,17 @@ namespace FluffyManager
                 }
             }
 
-            public bool Active( Period period )
+            public int TrueMax
             {
-                return pages[period].Any( v => v > 0 );
-            }
-
-            public int Last( Period period )
-            {
-                return pages[period].Last();
-            }
-
-            public int ValueAt( Period period, int x , int sign = 1)
-            {
-                if ( x < 0 || x >= pages[period].Count ) return -1;
-                return pages[period][x] * sign;
+                get
+                {
+                    return Mathf.Max( _observedMax, _specificMax, 1 );
+                }
+                set
+                {
+                    _observedMax = value != 0 ? value : Max( Period.Day );
+                    _specificMax = value;
+                }
             }
 
             public void ExposeData()
@@ -651,7 +677,7 @@ namespace FluffyManager
                 Scribe_Values.LookValue( ref ThingCount.count, "thingCount_count" );
                 Scribe_Defs.LookDef( ref ThingCount.thingDef, "thingCount_def" );
 
-                List<Period> periods = new List<Period>( pages.Keys );
+                var periods = new List<Period>( pages.Keys );
                 foreach ( Period period in periods )
                 {
                     List<int> values = pages[period];
@@ -665,14 +691,22 @@ namespace FluffyManager
                 }
             }
 
-            public int TrueMax
+            public bool Active( Period period )
             {
-                get { return Mathf.Max( _observedMax, _specificMax, 1 ); }
-                set
-                {
-                    _observedMax = value != 0 ? value : Max( Period.Day );
-                    _specificMax = value;
-                }
+                return pages[period].Any( v => v > 0 );
+            }
+
+            public int Last( Period period )
+            {
+                return pages[period].Last();
+            }
+
+            public int ValueAt( Period period, int x, int sign = 1 )
+            {
+                if ( x < 0 || x >= pages[period].Count )
+                    return -1;
+
+                return pages[period][x] * sign;
             }
 
             public void Add( int count )
@@ -683,7 +717,8 @@ namespace FluffyManager
                     if ( curTick % Interval( period ) == 0 )
                     {
                         pages[period].Add( count );
-                        if ( Mathf.Abs( count ) > _observedMax ) _observedMax = Mathf.Abs( count );
+                        if ( Mathf.Abs( count ) > _observedMax )
+                            _observedMax = Mathf.Abs( count );
 
                         // cull the list back down to size.
                         while ( pages[period].Count > Size )
@@ -701,13 +736,13 @@ namespace FluffyManager
 
             public void Plot( Period period, Rect canvas, float wu, float hu, int sign = 1 )
             {
-                if( pages[period].Count > 1 )
+                if ( pages[period].Count > 1 )
                 {
                     List<int> hist = pages[period];
-                    for( int i = 0; i < hist.Count - 1; i++ ) // line segments, so up till n-1
+                    for ( var i = 0; i < hist.Count - 1; i++ ) // line segments, so up till n-1
                     {
-                        Vector2 start = new Vector2( wu * i, canvas.height - hu * hist[i] * sign );
-                        Vector2 end = new Vector2( wu * ( i + 1 ), canvas.height - hu * hist[i + 1] * sign );
+                        var start = new Vector2( wu * i, canvas.height - hu * hist[i] * sign );
+                        var end = new Vector2( wu * ( i + 1 ), canvas.height - hu * hist[i + 1] * sign );
                         Widgets.DrawLine( start, end, lineColor, 1f );
                     }
                 }

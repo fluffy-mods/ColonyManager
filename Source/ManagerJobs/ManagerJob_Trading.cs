@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FluffyManager;
+﻿// Karel Kroeze
+// ManagerJob_Trading.cs
+// 2016-12-09
+
 using RimWorld;
+using System;
 using UnityEngine;
 using Verse;
 
@@ -11,30 +11,43 @@ namespace FluffyManager
 {
     public class ManagerJob_Trading : ManagerJob
     {
-        private string _label;
+        #region Fields
+
         private bool _completed;
+        private string _label;
         private ManagerTab _tab;
         private string[] _targets;
         private WorkTypeDef _workTypeDef;
 
-        public override string Label => "FMT.Trading".Translate();
+        #endregion Fields
+
+        #region Constructors
+
+        public ManagerJob_Trading( Manager manager ) : base( manager )
+        {
+        }
+
+        #endregion Constructors
+        
+        #region Properties
+
         public override bool Completed => false;
-        public override ManagerTab Tab => manager.ManagerTabs.Find( tab => tab is ManagerTab_Trading );
-        // TODO: string representation of filters.
-        public override string[] Targets => new [] {""};
-        public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Warden;
+        public override string Label => "FMT.Trading".Translate();
 
         // Trading jobs will never be managed in the sense that it requires a manager to interact.
         // It does require a trader to do things, but that's further down the line.
         public override bool Managed => false;
 
-        public ManagerJob_Trading( Manager manager ) : base( manager ) { }
+        public override ManagerTab Tab => manager.ManagerTabs.Find( tab => tab is ManagerTab_Trading );
+        // TODO: string representation of filters.
+        public override string[] Targets => new[] { "" };
+        public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Warden;
 
-        public override bool TryDoJob()
-        {
-            Log.Warning( "Manager tried doing job " + ToString() + ". Trading jobs should never be directly managed." );
-            return false;
-        }
+        #endregion Properties
+
+
+
+        #region Methods
 
         public override void CleanUp()
         {
@@ -50,5 +63,13 @@ namespace FluffyManager
         {
             throw new NotImplementedException();
         }
+
+        public override bool TryDoJob()
+        {
+            Log.Warning( "Manager tried doing job " + ToString() + ". Trading jobs should never be directly managed." );
+            return false;
+        }
+
+        #endregion Methods
     }
 }

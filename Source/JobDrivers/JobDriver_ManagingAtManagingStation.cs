@@ -1,12 +1,11 @@
-﻿// Manager/JobDriver_ManagingAtManagingStation.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-04 19:25
+﻿// Karel Kroeze
+// JobDriver_ManagingAtManagingStation.cs
+// 2016-12-09
 
 using RimWorld;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -25,19 +24,21 @@ namespace FluffyManager
 
         private Toil Manage( TargetIndex targetIndex )
         {
-            Building_ManagerStation station = CurJob.GetTarget( targetIndex ).Thing as Building_ManagerStation;
+            var station = CurJob.GetTarget( targetIndex ).Thing as Building_ManagerStation;
             if ( station == null )
             {
                 Log.Error( "Target of manager job was not a manager station. This should never happen." );
                 return null;
             }
-            Comp_ManagerStation comp = station.GetComp<Comp_ManagerStation>();
+
+            var comp = station.GetComp<Comp_ManagerStation>();
             if ( comp == null )
             {
                 Log.Error( "Target of manager job does not have manager station comp. This should never happen." );
                 return null;
             }
-            Toil toil = new Toil();
+
+            var toil = new Toil();
             toil.defaultDuration =
                 (int)( comp.Props.Speed * ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
 #if DEBUG_WORKGIVER
@@ -45,9 +46,11 @@ namespace FluffyManager
 #endif
             toil.defaultCompleteMode = ToilCompleteMode.Delay;
             toil.tickAction =
-                delegate { toil.actor.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Managing" ) ).Learn( 0.11f ); };
-            List<Action> finishers = new List<Action>();
-            finishers.Add( delegate { Manager.For( pawn.Map ).DoWork(); } );
+                delegate
+                { toil.actor.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Managing" ) ).Learn( 0.11f ); };
+            var finishers = new List<Action>();
+            finishers.Add( delegate
+            { Manager.For( pawn.Map ).TryDoWork(); } );
             toil.finishActions = finishers;
             return toil;
         }

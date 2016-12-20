@@ -1,10 +1,10 @@
-﻿// // Karel Kroeze
-// // ManagerTab_Foraging.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerTab_Foraging.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -15,32 +15,51 @@ namespace FluffyManager
         #region Fields
 
         private const float EntryHeight = 30f;
+
         private const float Margin = Utilities.Margin;
+
         private readonly float _topAreaHeight = 30f;
+
         private Vector2 _button = new Vector2( 200f, 40f );
+
         private Vector2 _contentScrollPosition = Vector2.zero;
+
         private List<ManagerJob_Foraging> _jobs;
+
         private float _leftRowHeight = 9999f;
+
         private Vector2 _scrollPosition = Vector2.zero;
+
         private ManagerJob_Foraging _selected;
 
         #endregion Fields
 
+        #region Constructors
+
+        public ManagerTab_Foraging( Manager manager ) : base( manager )
+        {
+            _selected = new ManagerJob_Foraging( manager );
+        }
+
+        #endregion Constructors
+
+
+
         #region Properties
 
         public override Texture2D Icon => Resources.IconForaging;
-
         public override IconAreas IconArea => IconAreas.Middle;
-
         public override string Label => "FMG.Foraging".Translate();
 
         public override ManagerJob Selected
         {
             get { return _selected; }
-            set { _selected = (ManagerJob_Foraging) value; }
+            set { _selected = (ManagerJob_Foraging)value; }
         }
 
         #endregion Properties
+
+
 
         #region Methods
 
@@ -107,7 +126,8 @@ namespace FluffyManager
 
             var foragingAreaRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( foragingAreaRect );
-            AreaAllowedGUI.DoAllowedAreaSelectors( foragingAreaRect, ref _selected.ForagingArea, manager, lrMargin: Margin );
+            AreaAllowedGUI.DoAllowedAreaSelectors( foragingAreaRect, ref _selected.ForagingArea, manager,
+                                                   lrMargin: Margin );
             cur.y += EntryHeight;
 
             GUI.EndGroup();
@@ -178,7 +198,8 @@ namespace FluffyManager
 
                 // draw the toggle
                 Utilities.DrawToggle( toggleRect, def.LabelCap, _selected.AllowedPlants[def],
-                                      delegate { _selected.AllowedPlants[def] = !_selected.AllowedPlants[def]; } );
+                                      delegate
+                                      { _selected.AllowedPlants[def] = !_selected.AllowedPlants[def]; } );
 
                 // update current position
                 cur.y += EntryHeight;
@@ -316,15 +337,16 @@ namespace FluffyManager
             }
         }
 
-        public override void PreOpen() { Refresh(); }
+        public override void PreOpen()
+        {
+            Refresh();
+        }
 
-        public void Refresh() { _jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Foraging>(); }
+        public void Refresh()
+        {
+            _jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Foraging>();
+        }
 
         #endregion Methods
-
-        public ManagerTab_Foraging( Manager manager ) : base( manager )
-        {
-            _selected = new ManagerJob_Foraging( manager );
-        }
     }
 }

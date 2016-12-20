@@ -1,11 +1,11 @@
-﻿// // Karel Kroeze
-// // ManagerJob_Hunting.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerJob_Hunting.cs
+// 2016-12-09
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -13,25 +13,6 @@ namespace FluffyManager
 {
     public class ManagerJob_Hunting : ManagerJob
     {
-        #region Constructors
-
-        public ManagerJob_Hunting( Manager manager ) : base( manager )
-        {
-            // populate the trigger field, set the root category to meats and allow all but human meat.
-            Trigger = new Trigger_Threshold( this );
-            Trigger.ThresholdFilter.SetDisallowAll();
-            Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
-            Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, false );
-
-            // populate the list of animals from the animals in the biome - allow all by default.
-            AllowedAnimals = manager.map.Biome.AllWildAnimals.ToDictionary( pk => pk, v => true );
-
-            History = new History( new[] {"stock", "corpses", "designated"},
-                                   new Color[] {Color.white, new Color( .7f, .7f, .7f ), new Color( .4f, .4f, .4f )} );
-        }
-
-        #endregion Constructors
-
         #region Fields
 
         public Dictionary<PawnKindDef, bool> AllowedAnimals = new Dictionary<PawnKindDef, bool>();
@@ -46,6 +27,27 @@ namespace FluffyManager
         private List<ThingDef> _humanLikeMeatDefs;
 
         #endregion Fields
+
+        #region Constructors
+
+        public ManagerJob_Hunting( Manager manager ) : base( manager )
+        {
+            // populate the trigger field, set the root category to meats and allow all but human meat.
+            Trigger = new Trigger_Threshold( this );
+            Trigger.ThresholdFilter.SetDisallowAll();
+            Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
+            Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, false );
+
+            // populate the list of animals from the animals in the biome - allow all by default.
+            AllowedAnimals = manager.map.Biome.AllWildAnimals.ToDictionary( pk => pk, v => true );
+
+            History = new History( new[] { "stock", "corpses", "designated" },
+                                   new[] { Color.white, new Color( .7f, .7f, .7f ), new Color( .4f, .4f, .4f ) } );
+        }
+
+        #endregion Constructors
+
+
 
         #region Properties
 
@@ -87,6 +89,7 @@ namespace FluffyManager
                         _humanLikeMeatDefs.Add( DefDatabase<ThingDef>.GetNamed( sourceDef.defName + "_Meat" ) );
                     }
                 }
+
                 return _humanLikeMeatDefs;
             }
         }
@@ -112,6 +115,8 @@ namespace FluffyManager
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Hunting;
 
         #endregion Properties
+
+
 
         #region Methods
 
@@ -180,28 +185,29 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public override void DrawOverviewDetails( Rect rect ) { History.DrawPlot( rect, Trigger.Count ); }
+        public override void DrawOverviewDetails( Rect rect )
+        {
+            History.DrawPlot( rect, Trigger.Count );
+        }
 
         public override void ExposeData()
         {
             // scribe base things
             base.ExposeData();
 
-            // settings
+            // references first, because of the stupid bug in CrossRefResolver.
             Scribe_References.LookReference( ref HuntingGrounds, "HuntingGrounds" );
-            // TODO: Verify def
-            Scribe_Collections.LookDictionary( ref AllowedAnimals, "AllowedAnimals", LookMode.Def,
-                                               LookMode.Value );
 
-            // human meat is saved in trigger's thingfilter.
+            // must be after references, because reasons.
+            Scribe_Deep.LookDeep( ref Trigger, "trigger", manager );
+
+            // settings, human meat is stored in the trigger's thingfilter.
+            Scribe_Collections.LookDictionary( ref AllowedAnimals, "AllowedAnimals", LookMode.Def, LookMode.Value );
             Scribe_Values.LookValue( ref UnforbidCorpses, "UnforbidCorpses", true );
 
-            // trigger
-            Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
-
+            // don't store history in import/export mode.
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
-                // scribe history
                 Scribe_Deep.LookDeep( ref History, "History" );
             }
         }
@@ -287,7 +293,10 @@ namespace FluffyManager
             return count;
         }
 
-        public override void Tick() { History.Update( Trigger.CurCount, GetMeatInCorpses(), GetMeatInDesignations() ); }
+        public override void Tick()
+        {
+            History.Update( Trigger.CurCount, GetMeatInCorpses(), GetMeatInDesignations() );
+        }
 
         public override bool TryDoJob()
         {
@@ -405,7 +414,7 @@ namespace FluffyManager
             // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
             List<Pawn> list = manager.map.mapPawns.AllPawns.Where( p => IsValidHuntingTarget( p ) )
 
-                // OrderBy defaults to ascending, switch sign on estimated meat count to get descending
+                                     // OrderBy defaults to ascending, switch sign on estimated meat count to get descending
                                      .OrderBy(
                                               p =>
                                               -p.EstimatedMeatCount() /
@@ -418,7 +427,7 @@ namespace FluffyManager
         {
             return t.HasThing
                    && t.Thing is Pawn
-                   && IsValidHuntingTarget( (Pawn) t.Thing );
+                   && IsValidHuntingTarget( (Pawn)t.Thing );
         }
 
         private bool IsValidHuntingTarget( Pawn p )

@@ -1,11 +1,12 @@
-﻿// Manager/AssemblyInfo.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-09-14 20:20
+﻿// Karel Kroeze
+// AssemblyInfo.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using UnityEngine;
+using Verse;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information

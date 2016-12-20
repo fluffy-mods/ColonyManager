@@ -1,10 +1,10 @@
-﻿// // Karel Kroeze
-// // Trigger_Threshold.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// Trigger_Threshold.cs
+// 2016-12-09
 
+using RimWorld;
 using System;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -12,32 +12,29 @@ namespace FluffyManager
 {
     public class Trigger_Threshold : Trigger
     {
-        #region Enums
-
-        public enum Ops
-        {
-            LowerThan,
-            Equals,
-            HigherThan
-        }
-
-        #endregion Enums
-
         #region Fields
 
         public static int DefaultCount = 500;
-        public static int DefaultMaxUpperThreshold = 3000;
-        public int Count;
-        public int MaxUpperThreshold;
-        public Ops Op;
-        public Zone_Stockpile stockpile;
-        public ThingFilter ThresholdFilter;
 
-        private string _stockpile_scribe;
+        public static int DefaultMaxUpperThreshold = 3000;
+
+        public int Count;
+
+        public int MaxUpperThreshold;
+
+        public Ops Op;
+
+        public Zone_Stockpile stockpile;
+
+        public ThingFilter ThresholdFilter;
 
         #endregion Fields
 
+        private string _stockpile_scribe;
+
         #region Constructors
+
+        public Trigger_Threshold( Manager manager ) : base( manager ) { }
 
         public Trigger_Threshold( ManagerJob_Production job ) : base( job.manager )
         {
@@ -88,7 +85,18 @@ namespace FluffyManager
 
         #endregion Constructors
 
-        #region Properties
+
+
+        #region Enums
+
+        public enum Ops
+        {
+            LowerThan,
+            Equals,
+            HigherThan
+        }
+
+        #endregion Enums
 
         public int CurCount => manager.map.CountProducts( ThresholdFilter, stockpile );
 
@@ -97,11 +105,11 @@ namespace FluffyManager
             get
             {
                 var window = new WindowTriggerThresholdDetails
-                             {
-                                 Trigger = this,
-                                 closeOnClickedOutside = true,
-                                 draggable = true
-                             };
+                {
+                    Trigger = this,
+                    closeOnClickedOutside = true,
+                    draggable = true
+                };
                 return window;
             }
         }
@@ -159,14 +167,10 @@ namespace FluffyManager
             get { return "FMP.ThresholdCount".Translate( CurCount, Count ); }
         }
 
-        #endregion Properties
-
-        #region Methods
-
         public override void DrawProgressBar( Rect rect, bool active )
         {
             // bar always goes a little beyond the actual target
-            int max = Math.Max( (int) ( Count * 1.2f ), CurCount );
+            int max = Math.Max( (int)( Count * 1.2f ), CurCount );
 
             // draw a box for the bar
             GUI.color = Color.gray;
@@ -235,12 +239,13 @@ namespace FluffyManager
             {
                 Widgets.DrawAltRect( thresholdRect );
             }
-            Count = (int) GUI.HorizontalSlider( thresholdRect, Count, 0, MaxUpperThreshold );
+            Count = (int)GUI.HorizontalSlider( thresholdRect, Count, 0, MaxUpperThreshold );
             cur.y += Utilities.SliderHeight;
         }
 
         public override void ExposeData()
         {
+            base.ExposeData();
             Scribe_Values.LookValue( ref Count, "Count" );
             Scribe_Values.LookValue( ref MaxUpperThreshold, "MaxUpperThreshold" );
             Scribe_Values.LookValue( ref Op, "Operator" );
@@ -267,7 +272,5 @@ namespace FluffyManager
             // TODO: Implement Trigger_Threshold.ToString()
             return "Trigger_Threshold.ToString() not implemented";
         }
-
-        #endregion Methods
     }
 }

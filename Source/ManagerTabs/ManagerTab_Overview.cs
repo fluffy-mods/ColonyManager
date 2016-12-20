@@ -1,10 +1,10 @@
-﻿// // Karel Kroeze
-// // ManagerTab_Overview.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerTab_Overview.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -12,24 +12,35 @@ namespace FluffyManager
 {
     internal class ManagerTab_Overview : ManagerTab
     {
+        #region Fields
+
         public const float Margin = Utilities.Margin,
                            OverviewWidthRatio = .6f,
                            RowHeight = Utilities.LargeListEntryHeight,
                            RowHeightPawnOverview = 30f,
                            IconSize = 30f;
 
+        public float OverviewHeight = 9999f;
         private Vector2 _overviewScrollPosition = Vector2.zero;
         private ManagerJob _selectedJob;
         private SkillDef _skillDef;
         private Vector2 _workersScrollPosition = Vector2.zero;
         private WorkTypeDef _workType;
-        public float OverviewHeight = 9999f;
         private List<Pawn> Workers = new List<Pawn>();
 
-        public List<ManagerJob> Jobs
+        #endregion Fields
+
+        #region Constructors
+
+        public ManagerTab_Overview( Manager manager ) : base( manager )
         {
-            get { return Manager.For( manager ).JobStack.FullStack(); }
         }
+
+        #endregion Constructors
+
+
+
+        #region Properties
 
         public override Texture2D Icon
         {
@@ -41,17 +52,31 @@ namespace FluffyManager
             get { return IconAreas.Left; }
         }
 
+        public List<ManagerJob> Jobs
+        {
+            get { return Manager.For( manager ).JobStack.FullStack(); }
+        }
+
         public override string Label { get; } = "FM.Overview".Translate();
 
         public override ManagerJob Selected
         {
-            get { return _selectedJob; }
+            get
+            {
+                return _selectedJob;
+            }
             set
             {
                 _selectedJob = value;
                 WorkTypeDef = _selectedJob?.WorkTypeDef ?? Utilities.WorkTypeDefOf_Managing;
                 SkillDef = _selectedJob?.SkillDef;
             }
+        }
+
+        private SkillDef SkillDef
+        {
+            get { return _skillDef; }
+            set { _skillDef = value; }
         }
 
         private WorkTypeDef WorkTypeDef
@@ -71,11 +96,11 @@ namespace FluffyManager
             }
         }
 
-        private SkillDef SkillDef
-        {
-            get { return _skillDef; }
-            set { _skillDef = value; }
-        }
+        #endregion Properties
+
+
+
+        #region Methods
 
         /// <summary>
         /// Draw a square group of ordering buttons for a job in rect.
@@ -88,7 +113,7 @@ namespace FluffyManager
         public static bool DrawOrderButtons<T>( Rect rect, Manager manager, T job ) where T : ManagerJob
         {
             var ret = false;
-            var jobStack = manager.JobStack;
+            JobStack jobStack = manager.JobStack;
 
             float width = rect.width / 2,
                   height = rect.height / 2;
@@ -176,125 +201,6 @@ namespace FluffyManager
             DrawPawnOverview( sideRectLower );
         }
 
-        private void RefreshWorkers()
-        {
-            IEnumerable<Pawn> temp =
-                manager.map.mapPawns.FreeColonistsSpawned.Where( pawn => !pawn.story.WorkTypeIsDisabled( WorkTypeDef ) );
-
-            // sort by either specific skill def or average over job - depending on which is known.
-            temp = SkillDef != null
-                       ? temp.OrderByDescending( pawn => pawn.skills.GetSkill( SkillDef ).Level )
-                       : temp.OrderByDescending( pawn => pawn.skills.AverageOfRelevantSkillsFor( WorkTypeDef ) );
-
-            Workers = temp.ToList();
-        }
-
-        public void DrawPawnOverview( Rect rect )
-        {
-            // table body viewport
-            var tableOutRect = new Rect( 0f, RowHeightPawnOverview, rect.width, rect.height - RowHeightPawnOverview );
-            var tableViewRect = new Rect( 0f, RowHeightPawnOverview, rect.width, Workers.Count * RowHeightPawnOverview );
-            if ( tableViewRect.height > tableOutRect.height )
-            {
-                tableViewRect.width -= 16f;
-            }
-
-            // column width
-            float colWidth = tableViewRect.width / 4 - Margin;
-
-            // column headers
-            var nameColumnHeaderRect = new Rect( colWidth * 0, 0f, colWidth, RowHeightPawnOverview );
-            var activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth * 2.5f, RowHeightPawnOverview );
-            var priorityColumnHeaderRect = new Rect( colWidth * 3.5f, 0f, colWidth * .5f, RowHeightPawnOverview );
-
-            // label for priority column
-            string workLabel = Find.PlaySettings.useWorkPriorities
-                                   ? "FM.Priority".Translate()
-                                   : "FM.Enabled".Translate();
-
-            // begin drawing
-            GUI.BeginGroup( rect );
-
-            // draw labels
-            Utilities.Label( nameColumnHeaderRect, WorkTypeDef.pawnLabel + "FM.PluralSuffix".Translate(), null,
-                             TextAnchor.LowerCenter );
-            Utilities.Label( activityColumnHeaderRect, "FM.Activity".Translate(), null, TextAnchor.LowerCenter );
-            Utilities.Label( priorityColumnHeaderRect, workLabel, null, TextAnchor.LowerCenter );
-
-            // begin scrolling area
-            Widgets.BeginScrollView( tableOutRect, ref _workersScrollPosition, tableViewRect );
-            GUI.BeginGroup( tableViewRect );
-
-            // draw pawn rows
-            Vector2 cur = Vector2.zero;
-            for ( var i = 0; i < Workers.Count; i++ )
-            {
-                var row = new Rect( cur.x, cur.y, tableViewRect.width, RowHeightPawnOverview );
-                if ( i % 2 == 0 )
-                {
-                    Widgets.DrawAltRect( row );
-                }
-                try
-                {
-                    DrawPawnOverviewRow( Workers[i], row );
-                }
-                catch // pawn death, etc.
-                {
-                    // rehresh the list and skip drawing untill the next GUI tick.
-                    RefreshWorkers();
-                    return;
-                }
-                cur.y += RowHeightPawnOverview;
-            }
-
-            // end scrolling area
-            GUI.EndGroup();
-            Widgets.EndScrollView();
-
-            // done!
-            GUI.EndGroup();
-        }
-
-        private void DrawPawnOverviewRow( Pawn pawn, Rect rect )
-        {
-            // column width
-            float colWidth = rect.width / 4 - Margin;
-
-            // cell rects
-            var nameRect = new Rect( colWidth * 0, rect.yMin, colWidth, RowHeightPawnOverview );
-            var activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2.5f, RowHeightPawnOverview );
-            var priorityRect = new Rect( colWidth * 3.5f, rect.yMin, colWidth * .5f, RowHeightPawnOverview );
-
-            // name
-            Widgets.DrawHighlightIfMouseover( nameRect );
-
-            // on click select and jump to location
-            if ( Widgets.ButtonInvisible( nameRect ) )
-            {
-                Find.MainTabsRoot.EscapeCurrentTab();
-                Find.CameraDriver.JumpTo( pawn.PositionHeld );
-                Find.Selector.ClearSelection();
-                if ( pawn.Spawned )
-                {
-                    Find.Selector.Select( pawn );
-                }
-            }
-            Utilities.Label( nameRect, pawn.NameStringShort, "FM.ClickToJumpTo".Translate( pawn.LabelCap ),
-                             TextAnchor.MiddleLeft, Margin );
-
-            // current activity (if curDriver != null)
-            string activityString = pawn.jobs.curDriver?.GetReport() ?? "FM.NoCurJob".Translate();
-            Utilities.Label( activityRect, activityString, pawn.jobs.curDriver?.GetReport(), TextAnchor.MiddleCenter,
-                             Margin, font: GameFont.Tiny );
-
-            // priority button
-            Rect priorityPosition = new Rect( 0f, 0f, 24f, 24f ).CenteredOnXIn( priorityRect )
-                                                                .CenteredOnYIn( priorityRect );
-            Text.Font = GameFont.Medium;
-            WidgetsWork.DrawWorkBoxFor( priorityPosition.xMin, priorityPosition.yMin, pawn, WorkTypeDef, false );
-            Text.Font = GameFont.Small;
-        }
-
         public void DrawOverview( Rect rect )
         {
             if ( Jobs.NullOrEmpty() )
@@ -365,12 +271,131 @@ namespace FluffyManager
             }
         }
 
-        #region Overrides of ManagerTab
+        public void DrawPawnOverview( Rect rect )
+        {
+            // table body viewport
+            var tableOutRect = new Rect( 0f, RowHeightPawnOverview, rect.width, rect.height - RowHeightPawnOverview );
+            var tableViewRect = new Rect( 0f, RowHeightPawnOverview, rect.width, Workers.Count * RowHeightPawnOverview );
+            if ( tableViewRect.height > tableOutRect.height )
+            {
+                tableViewRect.width -= 16f;
+            }
 
-        public override void PreOpen() { RefreshWorkers(); }
+            // column width
+            float colWidth = tableViewRect.width / 4 - Margin;
 
-        #endregion
+            // column headers
+            var nameColumnHeaderRect = new Rect( colWidth * 0, 0f, colWidth, RowHeightPawnOverview );
+            var activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth * 2.5f, RowHeightPawnOverview );
+            var priorityColumnHeaderRect = new Rect( colWidth * 3.5f, 0f, colWidth * .5f, RowHeightPawnOverview );
 
-        public ManagerTab_Overview( Manager manager ) : base( manager ) {}
+            // label for priority column
+            string workLabel = Find.PlaySettings.useWorkPriorities
+                                   ? "FM.Priority".Translate()
+                                   : "FM.Enabled".Translate();
+
+            // begin drawing
+            GUI.BeginGroup( rect );
+
+            // draw labels
+            Utilities.Label( nameColumnHeaderRect, WorkTypeDef.pawnLabel + "FM.PluralSuffix".Translate(), null,
+                             TextAnchor.LowerCenter );
+            Utilities.Label( activityColumnHeaderRect, "FM.Activity".Translate(), null, TextAnchor.LowerCenter );
+            Utilities.Label( priorityColumnHeaderRect, workLabel, null, TextAnchor.LowerCenter );
+
+            // begin scrolling area
+            Widgets.BeginScrollView( tableOutRect, ref _workersScrollPosition, tableViewRect );
+            GUI.BeginGroup( tableViewRect );
+
+            // draw pawn rows
+            Vector2 cur = Vector2.zero;
+            for ( var i = 0; i < Workers.Count; i++ )
+            {
+                var row = new Rect( cur.x, cur.y, tableViewRect.width, RowHeightPawnOverview );
+                if ( i % 2 == 0 )
+                {
+                    Widgets.DrawAltRect( row );
+                }
+                try
+                {
+                    DrawPawnOverviewRow( Workers[i], row );
+                }
+                catch // pawn death, etc.
+                {
+                    // rehresh the list and skip drawing untill the next GUI tick.
+                    RefreshWorkers();
+                    return;
+                }
+
+                cur.y += RowHeightPawnOverview;
+            }
+
+            // end scrolling area
+            GUI.EndGroup();
+            Widgets.EndScrollView();
+
+            // done!
+            GUI.EndGroup();
+        }
+
+        public override void PreOpen()
+        {
+            RefreshWorkers();
+        }
+
+        private void DrawPawnOverviewRow( Pawn pawn, Rect rect )
+        {
+            // column width
+            float colWidth = rect.width / 4 - Margin;
+
+            // cell rects
+            var nameRect = new Rect( colWidth * 0, rect.yMin, colWidth, RowHeightPawnOverview );
+            var activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2.5f, RowHeightPawnOverview );
+            var priorityRect = new Rect( colWidth * 3.5f, rect.yMin, colWidth * .5f, RowHeightPawnOverview );
+
+            // name
+            Widgets.DrawHighlightIfMouseover( nameRect );
+
+            // on click select and jump to location
+            if ( Widgets.ButtonInvisible( nameRect ) )
+            {
+                Find.MainTabsRoot.EscapeCurrentTab();
+                Find.CameraDriver.JumpTo( pawn.PositionHeld );
+                Find.Selector.ClearSelection();
+                if ( pawn.Spawned )
+                {
+                    Find.Selector.Select( pawn );
+                }
+            }
+            Utilities.Label( nameRect, pawn.NameStringShort, "FM.ClickToJumpTo".Translate( pawn.LabelCap ),
+                             TextAnchor.MiddleLeft, Margin );
+
+            // current activity (if curDriver != null)
+            string activityString = pawn.jobs.curDriver?.GetReport() ?? "FM.NoCurJob".Translate();
+            Utilities.Label( activityRect, activityString, pawn.jobs.curDriver?.GetReport(), TextAnchor.MiddleCenter,
+                             Margin, font: GameFont.Tiny );
+
+            // priority button
+            Rect priorityPosition = new Rect( 0f, 0f, 24f, 24f ).CenteredOnXIn( priorityRect )
+                                                                .CenteredOnYIn( priorityRect );
+            Text.Font = GameFont.Medium;
+            WidgetsWork.DrawWorkBoxFor( priorityPosition.xMin, priorityPosition.yMin, pawn, WorkTypeDef, false );
+            Text.Font = GameFont.Small;
+        }
+
+        private void RefreshWorkers()
+        {
+            IEnumerable<Pawn> temp =
+                manager.map.mapPawns.FreeColonistsSpawned.Where( pawn => !pawn.story.WorkTypeIsDisabled( WorkTypeDef ) );
+
+            // sort by either specific skill def or average over job - depending on which is known.
+            temp = SkillDef != null
+                       ? temp.OrderByDescending( pawn => pawn.skills.GetSkill( SkillDef ).Level )
+                       : temp.OrderByDescending( pawn => pawn.skills.AverageOfRelevantSkillsFor( WorkTypeDef ) );
+
+            Workers = temp.ToList();
+        }
+
+        #endregion Methods
     }
 }

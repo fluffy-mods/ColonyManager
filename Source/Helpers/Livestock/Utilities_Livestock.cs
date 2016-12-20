@@ -1,11 +1,11 @@
-﻿// // Karel Kroeze
-// // Utilities_Livestock.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// Utilities_Livestock.cs
+// 2016-12-09
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -145,6 +145,7 @@ namespace FluffyManager
         {
             if ( pawnKind == null )
                 return false;
+
             var ret = false;
             if ( _milkablePawnkind.ContainsKey( pawnKind ) )
             {
@@ -152,10 +153,12 @@ namespace FluffyManager
                 {
                     return ret;
                 }
+
                 ret = pawnKind.race.comps.OfType<CompProperties_Milkable>().Any( cp => cp.milkDef != null );
                 _milkablePawnkind[pawnKind].Update( ret );
                 return ret;
             }
+
             ret = pawnKind.race.comps.OfType<CompProperties_Milkable>().Any( cp => cp.milkDef != null );
             _milkablePawnkind.Add( pawnKind, new Utilities.CachedValue<bool>( ret, Int32.MaxValue ) );
             return ret;
@@ -170,10 +173,12 @@ namespace FluffyManager
                 {
                     return ret;
                 }
+
                 ret = pawn._milkable();
                 _milkablePawn[pawn].Update( ret );
                 return ret;
             }
+
             ret = pawn._milkable();
             _milkablePawn.Add( pawn, new Utilities.CachedValue<bool>( ret, 5000 ) );
             return ret;
@@ -187,13 +192,14 @@ namespace FluffyManager
             {
                 active = comp.GetPrivatePropertyValue( "Active" );
             }
-            return (bool) active;
+            return (bool)active;
         }
 
         public static bool Shearable( this PawnKindDef pawnKind )
         {
             if ( pawnKind == null )
                 return false;
+
             var ret = false;
             if ( _shearablePawnkind.ContainsKey( pawnKind ) )
             {
@@ -201,10 +207,12 @@ namespace FluffyManager
                 {
                     return ret;
                 }
+
                 ret = pawnKind.race.comps.OfType<CompProperties_Shearable>().Any( cp => cp.woolDef != null );
                 _shearablePawnkind[pawnKind].Update( ret );
                 return ret;
             }
+
             ret = pawnKind.race.comps.OfType<CompProperties_Shearable>().Any( cp => cp.woolDef != null );
             _shearablePawnkind.Add( pawnKind, new Utilities.CachedValue<bool>( ret, Int32.MaxValue ) );
             return ret;
@@ -219,10 +227,12 @@ namespace FluffyManager
                 {
                     return ret;
                 }
+
                 ret = pawn._shearable();
                 _shearablePawn[pawn].Update( ret );
                 return ret;
             }
+
             ret = pawn._shearable();
             _shearablePawn.Add( pawn, new Utilities.CachedValue<bool>( ret, 5000 ) );
             return ret;
@@ -236,7 +246,7 @@ namespace FluffyManager
             {
                 active = comp.GetPrivatePropertyValue( "Active" );
             }
-            return (bool) active;
+            return (bool)active;
         }
     }
 }

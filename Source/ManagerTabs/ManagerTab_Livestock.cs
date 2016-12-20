@@ -1,10 +1,10 @@
-﻿// // Karel Kroeze
-// // ManagerTab_Livestock.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerTab_Livestock.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -15,10 +15,15 @@ namespace FluffyManager
         #region Fields
 
         private float _actualHeight = 999f;
+
         private Vector2 _animalsScrollPosition = Vector2.zero;
+
         private List<PawnKindDef> _availablePawnKinds;
+
         private List<ManagerJob_Livestock> _currentJobs;
+
         private float _entryHeight = 30f;
+
         private float _listEntryHeight = Utilities.LargeListEntryHeight;
 
         // init with 5's if new job.
@@ -26,15 +31,28 @@ namespace FluffyManager
             Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => "5" );
 
         private bool _onCurrentTab;
+
         private Vector2 _scrollPosition = Vector2.zero;
+
         private PawnKindDef _selectedAvailable;
+
         private ManagerJob_Livestock _selectedCurrent;
+
         private float _smallIconSize = Utilities.SmallIconSize;
+
         private float _topAreaHeight = 30f;
 
         #endregion Fields
 
-        public ManagerTab_Livestock( Manager manager ) : base( manager ) { }
+        #region Constructors
+
+        public ManagerTab_Livestock( Manager manager ) : base( manager )
+        {
+        }
+
+        #endregion Constructors
+
+
 
         #region Properties
 
@@ -47,19 +65,24 @@ namespace FluffyManager
 
         public override ManagerJob Selected
         {
-            get { return _selectedCurrent; }
+            get
+            {
+                return _selectedCurrent;
+            }
             set
             {
                 // set tab to current if we're moving to an actual job.
                 // in either case, available selection can be cleared.
                 _onCurrentTab = value != null;
                 _selectedAvailable = null;
-                _selectedCurrent = (ManagerJob_Livestock) value;
+                _selectedCurrent = (ManagerJob_Livestock)value;
                 _newCounts = _selectedCurrent?.Trigger?.CountTargets.ToDictionary( k => k.Key, v => v.Value.ToString() );
             }
         }
 
         #endregion Properties
+
+
 
         #region Methods
 
@@ -73,7 +96,10 @@ namespace FluffyManager
             DoContent( contentCanvas );
         }
 
-        public override void PreOpen() { Refresh(); }
+        public override void PreOpen()
+        {
+            Refresh();
+        }
 
         private void DoContent( Rect rect )
         {
@@ -131,8 +157,8 @@ namespace FluffyManager
             // counts table
             var cols = 3;
             float fifth = optionsColumnRect.width / 5;
-            float[] widths = {fifth, fifth * 2, fifth * 2};
-            float[] heights = {_entryHeight / 3 * 2, _entryHeight, _entryHeight};
+            float[] widths = { fifth, fifth * 2, fifth * 2 };
+            float[] heights = { _entryHeight / 3 * 2, _entryHeight, _entryHeight };
 
             // set up a 3x3 table of rects
             var countRects = new Rect[cols, cols];
@@ -149,6 +175,7 @@ namespace FluffyManager
                     }
                 }
             }
+
             optionIndex++;
 
             // headers
@@ -207,28 +234,37 @@ namespace FluffyManager
 
                 // do the selectors
                 _selectedCurrent.RestrictArea[0] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 1],
-                                                                                          _selectedCurrent.RestrictArea[0],
+                                                                                          _selectedCurrent.RestrictArea[
+                                                                                                                        0
+                                                                                              ],
                                                                                           manager,
                                                                                           AllowedAreaMode.Animal,
                                                                                           Utilities.Margin );
                 _selectedCurrent.RestrictArea[1] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 1],
-                                                                                          _selectedCurrent.RestrictArea[1],
+                                                                                          _selectedCurrent.RestrictArea[
+                                                                                                                        1
+                                                                                              ],
                                                                                           manager,
                                                                                           AllowedAreaMode.Animal,
                                                                                           Utilities.Margin );
                 _selectedCurrent.RestrictArea[2] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 2],
-                                                                                          _selectedCurrent.RestrictArea[2],
+                                                                                          _selectedCurrent.RestrictArea[
+                                                                                                                        2
+                                                                                              ],
                                                                                           manager,
                                                                                           AllowedAreaMode.Animal,
                                                                                           Utilities.Margin );
                 _selectedCurrent.RestrictArea[3] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 2],
-                                                                                          _selectedCurrent.RestrictArea[3],
+                                                                                          _selectedCurrent.RestrictArea[
+                                                                                                                        3
+                                                                                              ],
                                                                                           manager,
                                                                                           AllowedAreaMode.Animal,
                                                                                           Utilities.Margin );
 
                 cur.y += 3 * _entryHeight;
             }
+
             optionIndex++;
 
             // train
@@ -372,6 +408,7 @@ namespace FluffyManager
                     Refresh();
                     return; // just skip to the next tick to avoid null reference errors.
                 }
+
                 TooltipHandler.TipRegion( buttonRect, "FMP.DeleteBillTooltip".Translate() );
             }
             else
@@ -580,6 +617,7 @@ namespace FluffyManager
                     GUI.DrawTexture( genderIconRect, Resources.UnkownIcon );
                     break;
             }
+
             TooltipHandler.TipRegion( genderRect, p.gender.GetLabel() );
             cur.x += colwidth;
 
@@ -725,8 +763,8 @@ namespace FluffyManager
             _availablePawnKinds = manager.map.Biome.AllWildAnimals.ToList();
             _availablePawnKinds.AddRange(
                                          manager.map.mapPawns.AllPawns
-                                            .Where( p => p.RaceProps.Animal )
-                                            .Select( p => p.kindDef ) );
+                                                .Where( p => p.RaceProps.Animal )
+                                                .Select( p => p.kindDef ) );
             _availablePawnKinds = _availablePawnKinds
 
                 // get distinct pawnkinds from the merges

@@ -1,11 +1,11 @@
-﻿// // Karel Kroeze
-// // Dialog_CreateJobsForIngredients.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// Dialog_CreateJobsForIngredients.cs
+// 2016-12-09
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -13,28 +13,43 @@ namespace FluffyManager
 {
     public class Dialog_CreateJobsForIngredients : Window
     {
+        #region Fields
+
         // TODO: use properties to cache all the DefDatabase<> calls.
         // ingredients are set by the recipe, and are given by a thingfilter and a count.
         // we create an ingredientSelector for each ingredient, which allows selecting an ingredient from the filter. (or sets it, if there's only one thingdef allowed).
         public static List<IngredientSelector> ingredients;
 
-        // UI settings.
-        private static float _entryHeight = 30f;
-        private float _finalListHeight = 9999f;
-        private static float _nestingOffset = 15f;
-        private static Vector2 _countFieldSize = new Vector2( 100f, 30f );
-        private Vector2 _scrollPosition = Vector2.zero;
         public Manager manager;
         public int targetCount;
         public RecipeDef targetRecipe;
+        private static Vector2 _countFieldSize = new Vector2( 100f, 30f );
+
+        // UI settings.
+        private static float _entryHeight = 30f;
+
+        private static float _nestingOffset = 15f;
+        private float _finalListHeight = 9999f;
+        private Vector2 _scrollPosition = Vector2.zero;
+
+        #endregion Fields
+
+        #region Constructors
 
         public Dialog_CreateJobsForIngredients( Manager manager, RecipeDef recipe, int count )
         {
             targetCount = count;
             targetRecipe = recipe;
-            ingredients = recipe.ingredients.Select( ic => new IngredientSelector( manager, ic, targetCount, recipe ) ).ToList();
+            ingredients =
+                recipe.ingredients.Select( ic => new IngredientSelector( manager, ic, targetCount, recipe ) ).ToList();
             this.manager = manager;
         }
+
+        #endregion Constructors
+
+
+
+        #region Methods
 
         /// <summary>
         /// Returns true if the recipe has prerequisite ingredients, and those ingredients can currently be crafted.
@@ -78,6 +93,7 @@ namespace FluffyManager
                 // each selector row draws it's own children recursively.
                 ingredient.DrawSelectorRow( ref cur, inRect.width, 0, Vector2.zero );
             }
+
             GUI.EndGroup();
             Widgets.EndScrollView();
             _finalListHeight = cur.y + _entryHeight;
@@ -90,24 +106,45 @@ namespace FluffyManager
                     ingredient.AddBills();
                 }
 
-                // we've probably added some bills, so refresh the tab. 
+                // we've probably added some bills, so refresh the tab.
                 manager.ManagerTabs.OfType<ManagerTab_Production>().FirstOrDefault()?.Refresh();
 
                 // close this window.
-                this.Close();
+                Close();
             }
         }
 
+        #endregion Methods
+
+
+
+        #region Classes
+
         public class IngredientSelector
         {
-            public List<ThingDef> allowedThingDefs; // the list of thingdefs allowed by the ingredient
-            public IngredientCount ingredient; // the vanilla ingredientcount of the parent recipe (filter + count)
+            #region Fields
+
+            public List<ThingDef> allowedThingDefs;
+
+            // the parent recipe itself.
+            // the manager instance we're doing this for.
+            // the list of thingdefs allowed by the ingredient
+            public IngredientCount ingredient;
+
+            // the vanilla ingredientcount of the parent recipe (filter + count)
+            public Manager manager;
+
             // the ingredient selector itself is an intermediate step, it links the target recipe with (one of multiple possible) prerequisite recipes.
             public RecipeSelector recipeSelector;
-            public int targetCount; // the number of ingredients required * sqrt(number of parent recipe crafts)
-            public RecipeDef targetRecipe; // the parent recipe itself.
-            public Manager manager; // the manager instance we're doing this for.
 
+            public int targetCount;
+
+            // the number of ingredients required * sqrt(number of parent recipe crafts)
+            public RecipeDef targetRecipe;
+
+            #endregion Fields
+
+            #region Constructors
 
             public IngredientSelector( Manager manager, IngredientCount ingredient, int count, RecipeDef targetRecipe )
             {
@@ -115,13 +152,68 @@ namespace FluffyManager
                 this.ingredient = ingredient;
                 this.targetRecipe = targetRecipe;
                 this.manager = manager;
-                targetCount = (int) Math.Sqrt( count ) * (int) ingredient.GetBaseCount();
+                targetCount = (int)Math.Sqrt( count ) * (int)ingredient.GetBaseCount();
                 allowedThingDefs = ingredient.filter.AllowedThingDefs.ToList();
 
                 // if there's only one allowed we don't need to manually choose.
                 if ( allowedThingDefs.Count == 1 )
                 {
                     recipeSelector = new RecipeSelector( manager, allowedThingDefs.First(), targetCount );
+                }
+            }
+
+            #endregion Constructors
+
+
+
+            #region Methods
+
+            public static bool HasRecipeChoices( Map map, IngredientSelector ingredient )
+            {
+                return ingredient.allowedThingDefs.Any( td => RecipeSelector.HasRecipe( map, td ) );
+            }
+
+            public void AddBills()
+            {
+                // only proceed if we selected an ingredient/thingdef (recipeSelector != null), and there is a recipe selected.
+                if ( recipeSelector?.selectedRecipe == null )
+                {
+                    return;
+                }
+
+                // try to get a job with our recipe
+                RecipeDef curRecipe = recipeSelector.selectedRecipe;
+                ManagerJob_Production curJob = manager.JobStack.FullStack<ManagerJob_Production>()
+                                                      .FirstOrDefault( job => job.Bill.recipe == curRecipe );
+
+                // if there is a job for the recipe, add our job's count - any settings beyond that are user responsibility.
+                if ( curJob != null && curJob.Trigger.Count < targetCount )
+                {
+                    curJob.Trigger.Count = targetCount;
+                    Messages.Message( "FMP.IncreasedThreshold".Translate( curRecipe.LabelCap, targetCount ),
+                                      MessageSound.Benefit );
+                }
+                // otherwise create a new job.
+                else
+                {
+                    curJob = new ManagerJob_Production( manager, curRecipe );
+                    // make sure the trigger is valid (everything else is user responsibility).
+                    if ( curJob.Trigger.IsValid )
+                    {
+                        curJob.Managed = true;
+                        manager.JobStack.Add( curJob );
+                        Messages.Message( "FMP.AddedJob".Translate( curRecipe.LabelCap ), MessageSound.Benefit );
+                    }
+                    else
+                    {
+                        Messages.Message( "FMP.CouldNotAddJob".Translate( curRecipe.LabelCap ), MessageSound.RejectInput );
+                    }
+                }
+
+                // finally, call this method on all of our children
+                foreach ( IngredientSelector child in recipeSelector.children )
+                {
+                    child.AddBills();
                 }
             }
 
@@ -184,7 +276,8 @@ namespace FluffyManager
                         if ( allowedThingDefs.Any( td => !RecipeSelector.HasRecipe( manager, td ) ) )
                         {
                             options.Add( new FloatMenuOption( "FMP.RawResource".Translate(),
-                                                              delegate { recipeSelector = null; } ) );
+                                                              delegate
+                                                              { recipeSelector = null; } ) );
                         }
                         Find.WindowStack.Add( new FloatMenu( options ) );
                     }
@@ -204,7 +297,7 @@ namespace FluffyManager
                      recipeSelector.selectedRecipe != null &&
                      recipeSelector.children != null )
                 {
-                    // For some reason just plain copying cur (or even the elements of cur) doesn't work (I'm quite possibly misunderstanding how this works) 
+                    // For some reason just plain copying cur (or even the elements of cur) doesn't work (I'm quite possibly misunderstanding how this works)
                     float x = cur.x;
                     float y = cur.y;
                     var pos = new Vector2( x, y );
@@ -215,66 +308,32 @@ namespace FluffyManager
                 }
             }
 
-            public static bool HasRecipeChoices( Map map, IngredientSelector ingredient )
-            {
-                return ingredient.allowedThingDefs.Any( td => RecipeSelector.HasRecipe( map, td ) );
-            }
-
-            public void AddBills()
-            {
-                // only proceed if we selected an ingredient/thingdef (recipeSelector != null), and there is a recipe selected.
-                if ( recipeSelector?.selectedRecipe == null )
-                {
-                    return;
-                }
-
-                // try to get a job with our recipe
-                RecipeDef curRecipe = recipeSelector.selectedRecipe;
-                ManagerJob_Production curJob = manager.JobStack.FullStack<ManagerJob_Production>()
-                                                      .FirstOrDefault( job => job.Bill.recipe == curRecipe );
-
-                // if there is a job for the recipe, add our job's count - any settings beyond that are user responsibility.
-                if ( curJob != null && curJob.Trigger.Count < targetCount )
-                {
-                    curJob.Trigger.Count = targetCount;
-                    Messages.Message( "FMP.IncreasedThreshold".Translate( curRecipe.LabelCap, targetCount ),
-                                      MessageSound.Benefit );
-                }
-                // otherwise create a new job.
-                else
-                {
-                    curJob = new ManagerJob_Production( manager, curRecipe );
-                    // make sure the trigger is valid (everything else is user responsibility).
-                    if ( curJob.Trigger.IsValid )
-                    {
-                        curJob.Managed = true;
-                        manager.JobStack.Add( curJob );
-                        Messages.Message( "FMP.AddedJob".Translate( curRecipe.LabelCap ), MessageSound.Benefit );
-                    }
-                    else
-                    {
-                        Messages.Message( "FMP.CouldNotAddJob".Translate( curRecipe.LabelCap ), MessageSound.RejectInput );
-                    }
-                }
-
-                // finally, call this method on all of our children
-                foreach ( IngredientSelector child in recipeSelector.children )
-                {
-                    child.AddBills();
-                }
-            }
+            #endregion Methods
         }
 
         public class RecipeSelector
         {
+            #region Fields
+
             public List<IngredientSelector> children;
-            public string newCount;
-            public int outCount;
-            public List<RecipeDef> recipes;
-            public RecipeDef selectedRecipe;
-            public ThingDef target;
-            public int targetCount;
+
             public Manager manager;
+
+            public string newCount;
+
+            public int outCount;
+
+            public List<RecipeDef> recipes;
+
+            public RecipeDef selectedRecipe;
+
+            public ThingDef target;
+
+            public int targetCount;
+
+            #endregion Fields
+
+            #region Constructors
 
             public RecipeSelector( Manager manager, ThingDef thingDef, int count )
             {
@@ -286,6 +345,12 @@ namespace FluffyManager
                 recipes = GetRecipesFor( manager, thingDef );
             }
 
+            #endregion Constructors
+
+
+
+            #region Methods
+
             public static List<RecipeDef> GetRecipesFor( Map map, ThingDef td, bool currentlyAvailable = true )
             {
                 return DefDatabase<RecipeDef>.AllDefsListForReading
@@ -296,14 +361,19 @@ namespace FluffyManager
                                              .ToList();
             }
 
-            public static bool HasRecipe( Map map, ThingDef thingDef ) { return GetRecipesFor( map, thingDef ).Count > 0; }
-
-            public void SelectRecipe( RecipeDef recipe )
+            public static bool HasRecipe( Map map, ThingDef thingDef )
             {
-                selectedRecipe = recipe;
-                newCount = targetCount.ToString();
-                children =
-                    recipe?.ingredients.Select( ic => new IngredientSelector( manager, ic, targetCount, recipe ) ).ToList();
+                return GetRecipesFor( map, thingDef ).Count > 0;
+            }
+
+            public void DrawCountField( Rect rect )
+            {
+                if ( !int.TryParse( newCount, out outCount ) )
+                {
+                    GUI.color = Color.red;
+                }
+                newCount = Widgets.TextField( rect, newCount );
+                GUI.color = Color.white;
             }
 
             public void DrawRecipeSelector( Rect rect )
@@ -347,23 +417,28 @@ namespace FluffyManager
                                         rd.LabelCap + " (" +
                                         string.Join( ", ", rd.GetRecipeUsers().Select( td => td.LabelCap ).ToArray() ) +
                                         ")",
-                                        delegate { SelectRecipe( rd ); } ) ).ToList();
+                                        delegate
+                                        { SelectRecipe( rd ); } ) ).ToList();
                         options.Add( new FloatMenuOption( "FMP.DoNotUseRecipe".Translate(),
-                                                          delegate { SelectRecipe( null ); } ) );
+                                                          delegate
+                                                          { SelectRecipe( null ); } ) );
                         Find.WindowStack.Add( new FloatMenu( options ) );
                     }
                 }
             }
 
-            public void DrawCountField( Rect rect )
+            public void SelectRecipe( RecipeDef recipe )
             {
-                if ( !int.TryParse( newCount, out outCount ) )
-                {
-                    GUI.color = Color.red;
-                }
-                newCount = Widgets.TextField( rect, newCount );
-                GUI.color = Color.white;
+                selectedRecipe = recipe;
+                newCount = targetCount.ToString();
+                children =
+                    recipe?.ingredients.Select( ic => new IngredientSelector( manager, ic, targetCount, recipe ) )
+                           .ToList();
             }
+
+            #endregion Methods
         }
+
+        #endregion Classes
     }
 }

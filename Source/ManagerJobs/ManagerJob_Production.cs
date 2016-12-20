@@ -1,11 +1,11 @@
-﻿// // Karel Kroeze
-// // ManagerJob_Production.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerJob_Production.cs
+// 2016-12-09
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -56,6 +56,7 @@ namespace FluffyManager
             {
                 if ( Bill?.recipe == null )
                     return false;
+
                 return true;
             }
         }
@@ -133,6 +134,7 @@ namespace FluffyManager
                         }
                     }
                 }
+
                 return _workTypeDef;
             }
         }
@@ -142,9 +144,12 @@ namespace FluffyManager
             get { return Bill.recipe.workSkill; }
         }
 
-        public ManagerJob_Production()
+        public ManagerJob_Production( Manager manager ) : base( manager )
         {
             // for scribe loading
+            if ( Scribe.mode == LoadSaveMode.Inactive )
+                Log.Error(
+                          "Scribe constructor called on ManagerJob_Production while not scribing. This should never happen!" );
         }
 
         public ManagerJob_Production( Manager manager, RecipeDef recipe ) : base( manager )
@@ -155,10 +160,13 @@ namespace FluffyManager
             Trigger = new Trigger_Threshold( this );
             BillGivers = new BillGiverTracker( this );
 
-            History = new History( new[] {Trigger.ThresholdFilter.Summary} );
+            History = new History( new[] { Trigger.ThresholdFilter.Summary } );
         }
 
-        public void ForceRecacheOtherRecipe() { _timeSinceLastOtherRecipeCheck = _recacheThreshold; }
+        public void ForceRecacheOtherRecipe()
+        {
+            _timeSinceLastOtherRecipeCheck = _recacheThreshold;
+        }
 
         public bool OtherRecipeAvailable()
         {
@@ -356,6 +364,14 @@ namespace FluffyManager
             base.ExposeData();
 
             Scribe_Deep.LookDeep( ref Bill, "Bill" );
+
+            // init main product, required by trigger.
+            if ( MainProduct == null )
+            {
+                MainProduct = new MainProductTracker( Bill.recipe );
+            }
+
+            Scribe_Deep.LookDeep( ref Trigger, "trigger", manager );
             Scribe_Values.LookValue( ref _hasMeaningfulIngredientChoices, "hasMeaningFulIngredientChoices", false );
             Scribe_Values.LookValue( ref _createIngredientBills, "createIngredientBills", true );
 
@@ -369,14 +385,6 @@ namespace FluffyManager
                 BillGivers = new BillGiverTracker( this );
             }
             Scribe_Values.LookValue( ref restrictToMaxSkill, "maxSkill", false );
-
-            // init main product, required by trigger.
-            if ( MainProduct == null )
-            {
-                MainProduct = new MainProductTracker( Bill.recipe );
-            }
-
-            Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
 
             // scribe history in normal load/save only.
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
@@ -661,7 +669,10 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public override void DrawOverviewDetails( Rect rect ) { History.DrawPlot( rect, Trigger.Count ); }
+        public override void DrawOverviewDetails( Rect rect )
+        {
+            History.DrawPlot( rect, Trigger.Count );
+        }
 
         public override void Tick()
         {
@@ -670,9 +681,11 @@ namespace FluffyManager
                 if ( restrictToMaxSkill )
                 {
                     int highestSkill = manager.map.mapPawns.FreeColonistsSpawned.Max(
-                                                                             pawn =>
-                                                                             pawn.skills.GetSkill( Bill.recipe.workSkill )
-                                                                                 .Level );
+                                                                                     pawn =>
+                                                                                     pawn.skills.GetSkill(
+                                                                                                          Bill.recipe
+                                                                                                              .workSkill )
+                                                                                         .Level );
                     Bill.allowedSkillRange = new IntRange( highestSkill, highestSkill );
                 }
             }

@@ -1,10 +1,10 @@
-﻿// // Karel Kroeze
-// // Manager.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// Manager.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -20,30 +20,37 @@ namespace FluffyManager
 
         public static Modes LoadSaveMode = Modes.Normal;
         public static bool HelpShown;
+
+        internal static bool _powerUnlocked = false;
         private List<ManagerTab> _managerTabsLeft;
         private List<ManagerTab> _managerTabsMiddle;
         private List<ManagerTab> _managerTabsRight;
-        private bool _powerTabAdded = false;
-
-        internal static bool _powerUnlocked = false;
+        private bool _powerTabAdded;
         private JobStack _stack;
+        private int id = -1;
 
         public List<ManagerTab> ManagerTabs;
 
         public Manager( Map map ) : base( map )
         {
-            _stack = new JobStack();
+            _stack = new JobStack( this );
             ManagerTabs = new List<ManagerTab>
-        {
-            new ManagerTab_Overview( this ),
-            new ManagerTab_Production( this ),
-            new ManagerTab_ImportExport( this ),
-            new ManagerTab_Hunting( this ),
-            new ManagerTab_Forestry( this ),
-            new ManagerTab_Livestock( this ),
-            new ManagerTab_Foraging( this )
-            // Power is added by Manager.UnlockPowerTab() after the appropriate research is done.
-        };
+                          {
+                              new ManagerTab_Overview( this ),
+                              new ManagerTab_Production( this ),
+                              new ManagerTab_ImportExport( this ),
+                              new ManagerTab_Hunting( this ),
+                              new ManagerTab_Forestry( this ),
+                              new ManagerTab_Livestock( this ),
+                              new ManagerTab_Foraging( this )
+                              // Power is added by Manager.UnlockPowerTab() after the appropriate research is done.
+                          };
+
+            // if not created in SavingLoading, give yourself the ID of the map you were constructed on.
+            if ( Scribe.mode == Verse.LoadSaveMode.Inactive )
+            {
+                id = map.uniqueID;
+            }
         }
 
         public List<ManagerTab> ManagerTabsLeft
@@ -85,7 +92,9 @@ namespace FluffyManager
             }
         }
 
-        public JobStack JobStack => _stack ?? ( _stack = new JobStack() );
+        public JobStack JobStack => _stack ?? ( _stack = new JobStack( this ) );
+
+        public string GetUniqueLoadID() { return "ColonyManager_" + id; }
 
         public void RefreshTabs()
         {
@@ -104,7 +113,10 @@ namespace FluffyManager
             }
         }
 
-        public static implicit operator Map( Manager manager ) { return manager.map; }
+        public static implicit operator Map( Manager manager )
+        {
+            return manager.map;
+        }
 
         // copypasta from AutoEquip.
         public static Manager For( Map map )
@@ -122,25 +134,29 @@ namespace FluffyManager
         {
             base.ExposeData();
             // TODO: migrate HelpShown to HugsLib invisible setting.
+            Scribe_Values.LookValue( ref id, "id", -1, true );
             Scribe_Values.LookValue( ref HelpShown, "HelpShown", false );
-            Scribe_Deep.LookDeep( ref _stack, "JobStack" );
+            Scribe_Deep.LookDeep( ref _stack, "JobStack", this );
 
             foreach ( ManagerTab tab in ManagerTabs )
             {
                 var exposableTab = tab as IExposable;
                 if ( exposableTab != null )
                 {
-                    Scribe_Deep.LookDeep( ref exposableTab, tab.Label );
+                    Scribe_Deep.LookDeep( ref exposableTab, tab.Label, this );
                 }
             }
 
             if ( _stack == null )
             {
-                _stack = new JobStack();
+                _stack = new JobStack( this );
             }
         }
 
-        public bool DoWork() { return JobStack.TryDoNextJob(); }
+        public bool TryDoWork()
+        {
+            return JobStack.TryDoNextJob();
+        }
 
         public override void MapComponentTick()
         {
@@ -197,7 +213,5 @@ namespace FluffyManager
                 job.Touch();
             }
         }
-
-        public string GetUniqueLoadID() { return "Manager_" + map.GetUniqueLoadID(); }
     }
 }

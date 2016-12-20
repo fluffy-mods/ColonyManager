@@ -1,9 +1,8 @@
-﻿// Manager/ManagerTab_ImportExport.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-05 10:49
+﻿// Karel Kroeze
+// ManagerTab_ImportExport.cs
+// 2016-12-09
 
+using HugsLib.Utils;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -11,28 +10,51 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using HugsLib.Utils;
 using UnityEngine;
 using Verse;
-using Resources = FluffyManager.Resources;
 
 namespace FluffyManager
 {
     internal class ManagerTab_ImportExport : ManagerTab
     {
+        #region Fields
+
         private string _folder = "";
+
         private float _iconSize = 24f;
+
         private List<Pair<string, int>> _jobCounts;
-        private JobStack _jobStackIO = new JobStack();
+
+        private JobStack _jobStackIO;
+
         private float _loadAreaRatio = .6f;
+
         private float _margin = Utilities.Margin;
+
         private float _rowHeight = 30f;
+
         private string _saveExtension = ".rwm";
+
         private List<SaveFileInfo> _saveFiles;
+
         private string _saveName = "";
+
         private string _saveNameBase = "ManagerSave_";
 
-        public ManagerTab_ImportExport( Manager manager ) : base( manager ) { }
+        #endregion Fields
+
+        #region Constructors
+
+        public ManagerTab_ImportExport( Manager manager ) : base( manager )
+        {
+            _jobStackIO = new JobStack( manager );
+        }
+
+        #endregion Constructors
+
+
+
+        #region Properties
 
         public override Texture2D Icon
         {
@@ -53,14 +75,20 @@ namespace FluffyManager
         {
             // not used.
             get { return null; }
-            set {  }
+            set { }
         }
+
+        #endregion Properties
+
+
+
+        #region Methods
 
         public override void DoWindowContents( Rect canvas )
         {
-            Rect loadRect = new Rect( 0f, 0f, ( canvas.width - _margin ) * _loadAreaRatio, canvas.height );
-            Rect saveRect = new Rect( loadRect.xMax + _margin, 0f, canvas.width - _margin - loadRect.width,
-                                      canvas.height );
+            var loadRect = new Rect( 0f, 0f, ( canvas.width - _margin ) * _loadAreaRatio, canvas.height );
+            var saveRect = new Rect( loadRect.xMax + _margin, 0f, canvas.width - _margin - loadRect.width,
+                                     canvas.height );
             Widgets.DrawMenuSection( loadRect );
             Widgets.DrawMenuSection( saveRect );
 
@@ -95,13 +123,14 @@ namespace FluffyManager
         private string DefaultSaveName()
         {
             // keep adding 1 until we have a new name.
-            int i = 1;
+            var i = 1;
             string name = _saveNameBase + i;
             while ( SaveExists( name ) )
             {
                 i++;
                 name = _saveNameBase + i;
             }
+
             return name;
         }
 
@@ -118,6 +147,7 @@ namespace FluffyManager
                     GenUI.ErrorDialog( "ProblemSavingFile".Translate( ex.ToString() ) );
                     throw;
                 }
+
                 ScribeMetaHeaderUtility.WriteMetaHeader();
 
                 _jobStackIO = Manager.For( manager ).JobStack;
@@ -157,7 +187,7 @@ namespace FluffyManager
                 Manager.For( manager ).NewJobStack( _jobStackIO );
 
                 // remove invalid jobs
-                int invalid = 0;
+                var invalid = 0;
                 foreach ( ManagerJob job in Manager.For( manager ).JobStack.FullStack() )
                 {
                     if ( !job.IsValid )
@@ -196,9 +226,9 @@ namespace FluffyManager
             Rect nameRect = rect.AtZero();
             nameRect.width -= 200f + _iconSize + 4 * _margin;
             nameRect.xMin += _margin;
-            Rect timeRect = new Rect( nameRect.xMax + _margin, 0f, 100f, rect.height );
-            Rect buttonRect = new Rect( timeRect.xMax + _margin, 1f, 100f, rect.height - 2f );
-            Rect deleteRect = new Rect( buttonRect.xMax + _margin, ( rect.height - _iconSize ) / 2, _iconSize, _iconSize );
+            var timeRect = new Rect( nameRect.xMax + _margin, 0f, 100f, rect.height );
+            var buttonRect = new Rect( timeRect.xMax + _margin, 1f, 100f, rect.height - 2f );
+            var deleteRect = new Rect( buttonRect.xMax + _margin, ( rect.height - _iconSize ) / 2, _iconSize, _iconSize );
 
             // name
             Text.Anchor = TextAnchor.MiddleLeft;
@@ -221,10 +251,14 @@ namespace FluffyManager
             if ( Widgets.ButtonImage( deleteRect, Resources.DeleteX ) )
             {
                 Find.WindowStack.Add( new Dialog_Confirm( "ConfirmDelete".Translate( file.FileInfo.Name ), delegate
-                {
-                    file.FileInfo.Delete();
-                    Refresh();
-                }, true ) );
+                                                                                                               {
+                                                                                                                   file
+                                                                                                                       .FileInfo
+                                                                                                                       .Delete
+                                                                                                                       ();
+                                                                                                                   Refresh
+                                                                                                                       ();
+                                                                                                               }, true ) );
             }
 
             GUI.EndGroup();
@@ -248,10 +282,10 @@ namespace FluffyManager
                 try
                 {
                     // TODO: Scrollable
-                    int i = 1;
+                    var i = 1;
                     foreach ( SaveFileInfo file in _saveFiles )
                     {
-                        Rect row = new Rect( 0f, cur.y, rect.width, _rowHeight );
+                        var row = new Rect( 0f, cur.y, rect.width, _rowHeight );
                         if ( i++ % 2 == 0 )
                         {
                             Widgets.DrawAltRect( row );
@@ -270,12 +304,12 @@ namespace FluffyManager
 
         private void DrawSaveSection( Rect rect )
         {
-            Rect infoRect = new Rect( rect.ContractedBy( _margin ) );
+            var infoRect = new Rect( rect.ContractedBy( _margin ) );
             infoRect.height -= 30f + _margin;
-            Rect nameRect = new Rect( rect.xMin + _margin, infoRect.yMax, ( rect.width - 3 * _margin ) / 2, 30f );
-            Rect buttonRect = new Rect( nameRect.xMax + _margin, infoRect.yMax, nameRect.width, 30f );
+            var nameRect = new Rect( rect.xMin + _margin, infoRect.yMax, ( rect.width - 3 * _margin ) / 2, 30f );
+            var buttonRect = new Rect( nameRect.xMax + _margin, infoRect.yMax, nameRect.width, 30f );
 
-            StringBuilder info = new StringBuilder();
+            var info = new StringBuilder();
             info.AppendLine( "FM.CurrentJobs".Translate() );
             foreach ( Pair<string, int> jobCount in _jobCounts )
             {
@@ -314,7 +348,7 @@ namespace FluffyManager
 
         private List<SaveFileInfo> GetSavedFilesList()
         {
-            DirectoryInfo directoryInfo = new DirectoryInfo( _folder );
+            var directoryInfo = new DirectoryInfo( _folder );
 
             // raw files
             IOrderedEnumerable<FileInfo> files = from f in directoryInfo.GetFiles()
@@ -323,7 +357,7 @@ namespace FluffyManager
                                                  select f;
 
             // convert to RW save files - mostly for the headers
-            List<SaveFileInfo> saves = new List<SaveFileInfo>();
+            var saves = new List<SaveFileInfo>();
             foreach ( FileInfo current in files )
             {
                 try
@@ -342,9 +376,9 @@ namespace FluffyManager
         private string GetSaveLocation()
         {
             // Get method "FolderUnderSaveData" from GenFilePaths, which is private (NonPublic) and static.
-            MethodInfo Folder = typeof (GenFilePaths).GetMethod( "FolderUnderSaveData",
-                                                                 BindingFlags.NonPublic |
-                                                                 BindingFlags.Static );
+            MethodInfo Folder = typeof( GenFilePaths ).GetMethod( "FolderUnderSaveData",
+                                                                  BindingFlags.NonPublic |
+                                                                  BindingFlags.Static );
             if ( Folder == null )
             {
                 throw new Exception( "FolderUnderSaveData [reflection] is null" );
@@ -365,7 +399,8 @@ namespace FluffyManager
             if ( SaveExists( name ) )
             {
                 Find.WindowStack.Add( new Dialog_Confirm( "FM.ConfirmOverwrite".Translate( name ),
-                                                          delegate { DoExport( name ); }, true ) );
+                                                          delegate
+                                                          { DoExport( name ); }, true ) );
             }
             else
             {
@@ -378,5 +413,7 @@ namespace FluffyManager
             // TODO some basic checks?
             DoImport( file );
         }
+
+        #endregion Methods
     }
 }

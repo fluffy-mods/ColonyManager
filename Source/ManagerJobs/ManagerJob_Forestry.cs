@@ -1,11 +1,11 @@
-﻿// // Karel Kroeze
-// // ManagerJob_Forestry.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerJob_Forestry.cs
+// 2016-12-09
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -13,6 +13,24 @@ namespace FluffyManager
 {
     public class ManagerJob_Forestry : ManagerJob
     {
+        #region Fields
+
+        public static bool ClearWindCells = true;
+        public Dictionary<ThingDef, bool> AllowedTrees;
+        public bool AllowSaplings;
+        public Dictionary<Area, bool> ClearAreas = new Dictionary<Area, bool>();
+        public List<Designation> Designations = new List<Designation>();
+        public History History;
+        public Area LoggingArea;
+        public new Trigger_Threshold Trigger;
+        private static WorkTypeDef PlantCutting = DefDatabase<WorkTypeDef>.GetNamed( "PlantCutting" );
+        private readonly float _margin = Utilities.Margin;
+        private List<bool> _clearAreas_allowed;
+        private List<Area> _clearAreas_areas;
+        private Utilities.CachedValue<int> _designatedWoodCachedValue = new Utilities.CachedValue<int>();
+
+        #endregion Fields
+
         #region Constructors
 
         public ManagerJob_Forestry( Manager manager ) : base( manager )
@@ -26,36 +44,21 @@ namespace FluffyManager
             // A tree is defined as any plant that yields wood or has a wood harvesting tag.
             AllowedTrees =
                 manager.map.Biome.AllWildPlants.Where(
-                                              pd =>
-                                              pd.plant.harvestTag == "Wood" ||
-                                              pd.plant.harvestedThingDef == Utilities_Forestry.Wood )
-                    // add harvesttag to allow non-wood yielding woody plants.
-                   .ToDictionary( pk => pk, v => true );
+                                                      pd =>
+                                                      pd.plant.harvestTag == "Wood" ||
+                                                      pd.plant.harvestedThingDef == Utilities_Forestry.Wood )
+                       // add harvesttag to allow non-wood yielding woody plants.
+                       .ToDictionary( pk => pk, v => true );
 
             // initialize clearAreas list with current areas
             UpdateClearAreas();
 
-            History = new History( new[] {"stock", "designated"}, new[] {Color.white, Color.grey} );
+            History = new History( new[] { "stock", "designated" }, new[] { Color.white, Color.grey } );
         }
 
         #endregion Constructors
 
-        #region Fields
 
-        public static bool ClearWindCells = true;
-        public Dictionary<ThingDef, bool> AllowedTrees;
-        public bool AllowSaplings;
-        public Dictionary<Area, bool> ClearAreas = new Dictionary<Area, bool>();
-        public List<Designation> Designations = new List<Designation>();
-        public History History;
-        public Area LoggingArea;
-        public new Trigger_Threshold Trigger;
-        private readonly float _margin = Utilities.Margin;
-        private List<bool> _clearAreas_allowed;
-        private List<Area> _clearAreas_areas;
-        private Utilities.CachedValue<int> _designatedWoodCachedValue = new Utilities.CachedValue<int>();
-
-        #endregion Fields
 
         #region Properties
 
@@ -82,41 +85,20 @@ namespace FluffyManager
             }
         }
 
-        private static WorkTypeDef PlantCutting = DefDatabase<Verse.WorkTypeDef>.GetNamed( "PlantCutting" );
         public override WorkTypeDef WorkTypeDef => PlantCutting;
 
         #endregion Properties
 
+
+
         #region Methods
 
-        public void DoClearAreaDesignations( IEnumerable<IntVec3> cells, bool allPlants = false )
-        {
-            foreach ( IntVec3 cell in cells )
-            {
-                // confirm there is a plant here that it is a tree and that it has no current designation
-                Plant plant = cell.GetPlant( manager );
-                var zone = manager.map.zoneManager.ZoneAt( cell ) as IPlantToGrowSettable;
-
-                if ( plant != null && ( // there is a plant here
-                                          ( zone == null && ( plant.def.plant.IsTree || allPlants ) ) ||
-                                          // this is not a growing zone, and the plant is a tree or we're cutting everything
-                                          ( allPlants && zone?.GetPlantDefToGrow() != plant.def )
-                                      // this is a growing zone, and the plant is not the plant set to grow in this zone
-                                      ) &&
-                                     // there's not yet a designation on this plant
-                                     manager.map.designationManager.AllDesignationsOn( plant ).ToList().NullOrEmpty() )
-                {
-                    manager.map.designationManager.AddDesignation( new Designation( plant, DesignationDefOf.CutPlant ) );
-                }
-            }
-        }
-        
         public void AddRelevantGameDesignations()
         {
             // get list of game designations not managed by this job that could have been assigned by this job.
             foreach ( Designation des in manager.map.designationManager.DesignationsOfDef( DesignationDefOf.CutPlant )
-                                             .Except( Designations )
-                                             .Where( des => IsValidForestryTarget( des.target ) ) )
+                                                .Except( Designations )
+                                                .Where( des => IsValidForestryTarget( des.target ) ) )
             {
                 AddDesignation( des );
             }
@@ -146,6 +128,28 @@ namespace FluffyManager
 
             // clear the list completely
             Designations.Clear();
+        }
+
+        public void DoClearAreaDesignations( IEnumerable<IntVec3> cells, bool allPlants = false )
+        {
+            foreach ( IntVec3 cell in cells )
+            {
+                // confirm there is a plant here that it is a tree and that it has no current designation
+                Plant plant = cell.GetPlant( manager );
+                var zone = manager.map.zoneManager.ZoneAt( cell ) as IPlantToGrowSettable;
+
+                if ( plant != null && ( // there is a plant here
+                                          ( zone == null && ( plant.def.plant.IsTree || allPlants ) ) ||
+                                          // this is not a growing zone, and the plant is a tree or we're cutting everything
+                                          ( allPlants && zone?.GetPlantDefToGrow() != plant.def )
+                                      // this is a growing zone, and the plant is not the plant set to grow in this zone
+                                      ) &&
+                     // there's not yet a designation on this plant
+                     manager.map.designationManager.AllDesignationsOn( plant ).ToList().NullOrEmpty() )
+                {
+                    manager.map.designationManager.AddDesignation( new Designation( plant, DesignationDefOf.CutPlant ) );
+                }
+            }
         }
 
         public override void DrawListEntry( Rect rect, bool overview = true, bool active = true )
@@ -179,16 +183,19 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public override void DrawOverviewDetails( Rect rect ) { History.DrawPlot( rect, Trigger.Count ); }
+        public override void DrawOverviewDetails( Rect rect )
+        {
+            History.DrawPlot( rect, Trigger.Count );
+        }
 
         public override void ExposeData()
         {
             // scribe base things
             base.ExposeData();
 
-            // settings
+            // settings, references first!
             Scribe_References.LookReference( ref LoggingArea, "LoggingArea" );
-            // TODO: Verify LookMode.Def
+            Scribe_Deep.LookDeep( ref Trigger, "trigger", manager );
             Scribe_Collections.LookDictionary( ref AllowedTrees, "AllowedTrees", LookMode.Def, LookMode.Value );
             Scribe_Values.LookValue( ref AllowSaplings, "AllowSaplings", false );
             Scribe_Values.LookValue( ref ClearWindCells, "ClearWindCells", true );
@@ -219,9 +226,6 @@ namespace FluffyManager
                         ClearAreas.Add( _clearAreas_areas[i], _clearAreas_allowed[i] );
                 }
             }
-
-            // trigger
-            Scribe_Deep.LookDeep( ref Trigger, "Trigger", this );
 
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
@@ -256,7 +260,10 @@ namespace FluffyManager
             return count;
         }
 
-        public override void Tick() { History.Update( Trigger.CurCount, GetWoodInDesignations() ); }
+        public override void Tick()
+        {
+            History.Update( Trigger.CurCount, GetWoodInDesignations() );
+        }
 
         public override bool TryDoJob()
         {
@@ -309,14 +316,16 @@ namespace FluffyManager
             // init list of areas
             if ( ClearAreas == null || ClearAreas.Count == 0 )
                 ClearAreas =
-                    manager.map.areaManager.AllAreas.Where( area => area.AssignableAsAllowed( AllowedAreaMode.Humanlike ) )
-                        .ToDictionary( a => a, v => false );
+                    manager.map.areaManager.AllAreas.Where(
+                                                           area => area.AssignableAsAllowed( AllowedAreaMode.Humanlike ) )
+                           .ToDictionary( a => a, v => false );
             else
             {
                 // iterate over areas, add new areas.
                 foreach (
                     Area area in
-                        manager.map.areaManager.AllAreas.Where( a => a.AssignableAsAllowed( AllowedAreaMode.Humanlike ) ) )
+                        manager.map.areaManager.AllAreas.Where( a => a.AssignableAsAllowed( AllowedAreaMode.Humanlike ) )
+                    )
                 {
                     if ( !ClearAreas.ContainsKey( area ) )
                         ClearAreas.Add( area, false );
@@ -332,17 +341,6 @@ namespace FluffyManager
                     }
                 }
             }
-        }
-
-        private List<IntVec3> GetWindCells()
-        {
-            return manager.map.listerBuildings
-                       .allBuildingsColonist
-                       .Where( b => b.GetComp<CompPowerPlantWind>() != null )
-                       .SelectMany( turbine => WindTurbineUtility.CalculateWindCells( turbine.Position,
-                                                                                      turbine.Rotation,
-                                                                                      turbine.RotatedSize ) )
-                       .ToList();
         }
 
         private void AddDesignation( Designation des )
@@ -395,16 +393,30 @@ namespace FluffyManager
             // get a list of trees that are not designated in the logging grounds and are reachable, sorted by yield / distance * 2
             List<Plant> list = manager.map.listerThings.AllThings.Where( IsValidForestryTarget )
 
-                // OrderBy defaults to ascending, switch sign on current yield to get descending
-                                   .Select( p => p as Plant )
-                                   .OrderBy( p => -p.YieldNow() /
-                                            ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) )
-                                   .ToList();
+                                      // OrderBy defaults to ascending, switch sign on current yield to get descending
+                                      .Select( p => p as Plant )
+                                      .OrderBy( p => -p.YieldNow() /
+                                                     ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) )
+                                      .ToList();
 
             return list;
         }
 
-        private bool IsInWindTurbineArea( IntVec3 position ) { return GetWindCells().Contains( position ); }
+        private List<IntVec3> GetWindCells()
+        {
+            return manager.map.listerBuildings
+                          .allBuildingsColonist
+                          .Where( b => b.GetComp<CompPowerPlantWind>() != null )
+                          .SelectMany( turbine => WindTurbineUtility.CalculateWindCells( turbine.Position,
+                                                                                         turbine.Rotation,
+                                                                                         turbine.RotatedSize ) )
+                          .ToList();
+        }
+
+        private bool IsInWindTurbineArea( IntVec3 position )
+        {
+            return GetWindCells().Contains( position );
+        }
 
         private bool IsValidForestryTarget( LocalTargetInfo t )
         {
@@ -415,7 +427,7 @@ namespace FluffyManager
         private bool IsValidForestryTarget( Thing t )
         {
             return t is Plant
-                   && IsValidForestryTarget( (Plant) t );
+                   && IsValidForestryTarget( (Plant)t );
         }
 
         private bool IsValidForestryTarget( Plant p )

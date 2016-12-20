@@ -1,11 +1,11 @@
-﻿// // Karel Kroeze
-// // ManagerTab_Power.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerTab_Power.cs
+// 2016-12-09
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -13,6 +13,28 @@ namespace FluffyManager
 {
     public class ManagerTab_Power : ManagerTab, IExposable
     {
+        #region Fields
+
+        private List<List<CompPowerBattery>> _batteries;
+
+        private List<ThingDef> _batteryDefs;
+
+        private Vector2 _consumptionScrollPos = Vector2.zero;
+
+        private Vector2 _overallScrollPos = Vector2.zero;
+
+        private Vector2 _productionScrollPos = Vector2.zero;
+
+        private List<ThingDef> _traderDefs;
+
+        private List<List<CompPowerTrader>> _traders;
+
+        private History overallHistory;
+
+        private History tradingHistory;
+
+        #endregion Fields
+
         #region Constructors
 
         public ManagerTab_Power( Manager manager ) : base( manager )
@@ -41,34 +63,22 @@ namespace FluffyManager
                     DrawMaxMarkers = true
                 };
 
-            overallHistory = new History( new[] {"Production", "Consumption", "Batteries"} )
-                             {
-                                 DrawOptions = false,
-                                 DrawInlineLegend = false,
-                                 Suffix = "W",
-                                 DrawIcons = false,
-                                 DrawCounts = false,
-                                 DrawInfoInBar = true,
-                                 DrawMaxMarkers = true,
-                                 MaxPerChapter = true
-                             };
+            overallHistory = new History( new[] { "Production", "Consumption", "Batteries" } )
+            {
+                DrawOptions = false,
+                DrawInlineLegend = false,
+                Suffix = "W",
+                DrawIcons = false,
+                DrawCounts = false,
+                DrawInfoInBar = true,
+                DrawMaxMarkers = true,
+                MaxPerChapter = true
+            };
         }
 
         #endregion Constructors
 
-        #region Fields
 
-        private List<List<CompPowerBattery>> _batteries;
-        private List<ThingDef> _batteryDefs;
-        private Vector2 _consumptionScrollPos = Vector2.zero;
-        private Vector2 _overallScrollPos = Vector2.zero;
-        private Vector2 _productionScrollPos = Vector2.zero;
-        private List<ThingDef> _traderDefs;
-        private List<List<CompPowerTrader>> _traders;
-        private History overallHistory;
-        private History tradingHistory;
-
-        #endregion Fields
 
         #region Properties
 
@@ -97,6 +107,8 @@ namespace FluffyManager
         }
 
         #endregion Properties
+
+
 
         #region Methods
 
@@ -149,7 +161,6 @@ namespace FluffyManager
             if ( Find.TickManager.TicksGame % 2000 == 0 )
             {
                 Log.Message( string.Join( ", ", _traderDefs.Select( d => d.LabelCap ).ToArray() ) );
-
 
                 // get all existing comps for all building defs that have power related comps (in essence, get all powertraders)
                 RefreshCompLists();
@@ -234,6 +245,7 @@ namespace FluffyManager
                                                                                            period;
                                                                                    } ) );
                 }
+
                 Find.WindowStack.Add( new FloatMenu( periodOptions ) );
             }
         }
@@ -261,13 +273,13 @@ namespace FluffyManager
 
         private int[] GetCurrentBatteries()
         {
-            return _batteries.Select( list => (int) list.Sum( battery => battery.StoredEnergy ) ).ToArray();
+            return _batteries.Select( list => (int)list.Sum( battery => battery.StoredEnergy ) ).ToArray();
         }
 
         private int[] GetCurrentTrade()
         {
             return
-                _traders.Select( list => (int) list.Sum( trader => trader.PowerOn ? trader.PowerOutput : 0f ) )
+                _traders.Select( list => (int)list.Sum( trader => trader.PowerOn ? trader.PowerOutput : 0f ) )
                         .ToArray();
         }
 

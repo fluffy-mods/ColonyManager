@@ -1,18 +1,32 @@
-﻿// Manager/CompProperties_ManagerStation.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-04 19:30
+﻿// Karel Kroeze
+// CompProperties_ManagerStation.cs
+// 2016-12-09
 
+using RimWorld;
 using System;
+using UnityEngine;
 using Verse;
 
 namespace FluffyManager
 {
     public class CompProperties_ManagerStation : CompProperties
     {
+        #region Fields
+
         public int Speed = 250;
-        public CompProperties_ManagerStation() {}
-        public CompProperties_ManagerStation( Type compClass ) : base( compClass ) {}
+
+        #endregion Fields
+
+        #region Constructors
+
+        public CompProperties_ManagerStation()
+        {
+        }
+
+        public CompProperties_ManagerStation( Type compClass ) : base( compClass )
+        {
+        }
+
+        #endregion Constructors
     }
 }

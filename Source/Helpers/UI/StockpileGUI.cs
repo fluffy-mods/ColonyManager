@@ -1,12 +1,10 @@
-﻿// Manager/StockpileGUI.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-26 00:25
+﻿// Karel Kroeze
+// StockpileGUI.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -15,7 +13,15 @@ namespace FluffyManager
 {
     public class StockpileGUI
     {
-        private static List<Texture2D> textures; 
+        #region Fields
+
+        private static List<Texture2D> textures;
+
+        #endregion Fields
+
+
+
+        #region Methods
 
         // RimWorld.AreaAllowedGUI
         public static void DoStockpileSelectors( Rect rect, ref Zone_Stockpile stockpile, Map map )
@@ -33,16 +39,17 @@ namespace FluffyManager
             float widthPerCell = rect.width / areaCount;
             Text.WordWrap = false;
             Text.Font = GameFont.Tiny;
-            Rect nullAreaRect = new Rect( rect.x, rect.y, widthPerCell, rect.height );
+            var nullAreaRect = new Rect( rect.x, rect.y, widthPerCell, rect.height );
             DoZoneSelector( nullAreaRect, ref stockpile, null, BaseContent.GreyTex );
-            int areaIndex = 1;
-            for( int j = 0; j < allStockpiles.Count; j++ )
+            var areaIndex = 1;
+            for ( var j = 0; j < allStockpiles.Count; j++ )
             {
                 float xOffset = areaIndex * widthPerCell;
-                Rect stockpileRect = new Rect( rect.x + xOffset, rect.y, widthPerCell, rect.height );
+                var stockpileRect = new Rect( rect.x + xOffset, rect.y, widthPerCell, rect.height );
                 DoZoneSelector( stockpileRect, ref stockpile, allStockpiles[j], textures[j] );
                 areaIndex++;
             }
+
             Text.WordWrap = true;
             Text.Font = GameFont.Small;
         }
@@ -55,12 +62,14 @@ namespace FluffyManager
                 {
                     Texture2D.DestroyImmediate( tex );
                 }
+
                 textures.Clear();
             }
             else
             {
                 textures = new List<Texture2D>();
             }
+
             foreach ( Zone_Stockpile zone in zones )
             {
                 textures.Add( SolidColorMaterials.NewSolidColorTexture( zone.color ) );
@@ -68,7 +77,8 @@ namespace FluffyManager
         }
 
         // RimWorld.AreaAllowedGUI
-        private static void DoZoneSelector( Rect rect, ref Zone_Stockpile zoneAllowed, Zone_Stockpile zone, Texture2D tex)
+        private static void DoZoneSelector( Rect rect, ref Zone_Stockpile zoneAllowed, Zone_Stockpile zone,
+                                            Texture2D tex )
         {
             rect = rect.ContractedBy( 1f );
             GUI.DrawTexture( rect, tex );
@@ -78,18 +88,18 @@ namespace FluffyManager
             innerRect.xMin += 3f;
             innerRect.yMin += 2f;
             Widgets.Label( innerRect, label );
-            if( zoneAllowed == zone )
+            if ( zoneAllowed == zone )
             {
                 Widgets.DrawBox( rect, 2 );
             }
-            if( Mouse.IsOver( rect ) )
+            if ( Mouse.IsOver( rect ) )
             {
-                if( zone != null )
+                if ( zone != null )
                 {
                     if ( zone.AllSlotCellsList() != null && zone.AllSlotCellsList().Count > 0 )
                         Find.CameraDriver.JumpTo( zone.AllSlotCellsList().FirstOrDefault() );
                 }
-                if( Input.GetMouseButton( 0 ) &&
+                if ( Input.GetMouseButton( 0 ) &&
                      zoneAllowed != zone )
                 {
                     zoneAllowed = zone;
@@ -99,5 +109,7 @@ namespace FluffyManager
             TooltipHandler.TipRegion( rect, label );
             Text.Anchor = TextAnchor.UpperLeft;
         }
+
+        #endregion Methods
     }
 }

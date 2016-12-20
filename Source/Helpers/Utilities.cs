@@ -1,12 +1,12 @@
-﻿// // Karel Kroeze
-// // Utilities.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// Utilities.cs
+// 2016-12-09
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -39,7 +39,6 @@ namespace FluffyManager
             return inner;
         }
 
-
         public static bool HasCompOrChildCompOf( this ThingDef def, Type compType )
         {
             for ( var index = 0; index < def.comps.Count; ++index )
@@ -47,6 +46,7 @@ namespace FluffyManager
                 if ( compType.IsAssignableFrom( def.comps[index].compClass ) )
                     return true;
             }
+
             return false;
         }
 
@@ -70,6 +70,7 @@ namespace FluffyManager
                 {
                     position += homeCells[i];
                 }
+
                 position.x /= homeCells.Count;
                 position.y /= homeCells.Count;
                 position.z /= homeCells.Count;
@@ -183,7 +184,7 @@ namespace FluffyManager
                 FilterCountCache filterCountCache = CountCache[mapStockpileFilter];
                 if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 && // less than 250 ticks ago
                      Find.TickManager.TicksGame > filterCountCache.TimeSet )
-                    // cache is not from future (switching games without restarting could cause this).
+                // cache is not from future (switching games without restarting could cause this).
                 {
                     count = filterCountCache.Cache;
                     return true;
@@ -221,6 +222,7 @@ namespace FluffyManager
             {
                 return count;
             }
+
             var key = new MapStockpileFilter( map, filter, stockpile );
             if ( TryGetCached( key, out count ) )
             {
@@ -265,6 +267,7 @@ namespace FluffyManager
                                 continue;
                             }
                         }
+
                         if ( filter.AllowedHitPointsPercents.IncludesEpsilon( t.HitPoints ) )
                         {
                             continue;
@@ -289,6 +292,7 @@ namespace FluffyManager
                     CountCache.Add( key, new FilterCountCache( count ) );
                 }
             }
+
             return count;
         }
 
@@ -316,6 +320,7 @@ namespace FluffyManager
                     TooltipHandler.TipRegion( stampRect, "FM.JobCompletedTooltip".Translate() );
                     return;
                 }
+
                 if ( job.Suspended )
                 {
                     // allow activating the job from here.
@@ -334,6 +339,7 @@ namespace FluffyManager
                     return;
                 }
             }
+
             if ( trigger == null )
             {
                 Log.Message( "Trigger NULL" );
@@ -428,7 +434,7 @@ namespace FluffyManager
                 }
                 else
                 {
-                    @on();
+                    on();
                 }
             }
         }
@@ -468,6 +474,7 @@ namespace FluffyManager
             {
                 return false;
             }
+
             return test == value;
         }
 
@@ -482,7 +489,7 @@ namespace FluffyManager
                                          float tbMargin, GameFont font, Color textColour, Color outlineColour )
         {
             // horribly inefficient way of getting an outline to show - draw 4 background coloured labels with a 1px offset, then draw the foreground on top.
-            int[] offsets = {-1, 0, 1};
+            int[] offsets = { -1, 0, 1 };
 
             foreach ( int xOffset in offsets )
                 foreach ( int yOffset in offsets )
@@ -531,7 +538,7 @@ namespace FluffyManager
             public int timeSet;
             public int updateInterval;
 
-            public CachedValue( T value = default ( T ), int updateInterval = 250 )
+            public CachedValue( T value = default( T ), int updateInterval = 250 )
             {
                 this.updateInterval = updateInterval;
                 _cached = _default = value;
@@ -545,6 +552,7 @@ namespace FluffyManager
                     value = _cached;
                     return true;
                 }
+
                 value = _default;
                 return false;
             }

@@ -1,10 +1,10 @@
-﻿// // Karel Kroeze
-// // Trigger_PawnKind.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// Trigger_PawnKind.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -12,20 +12,24 @@ namespace FluffyManager
 {
     public class Trigger_PawnKind : Trigger
     {
-        #region Constructors
-
-        public Trigger_PawnKind( Manager manager ) : base( manager ) { CountTargets = Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => 5 ); }
-
-        #endregion Constructors
-
         #region Fields
 
         public Dictionary<Utilities_Livestock.AgeAndSex, int> CountTargets;
         public PawnKindDef pawnKind;
-
         private Utilities.CachedValue<bool> _state = new Utilities.CachedValue<bool>();
 
         #endregion Fields
+
+        #region Constructors
+
+        public Trigger_PawnKind( Manager manager ) : base( manager )
+        {
+            CountTargets = Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => 5 );
+        }
+
+        #endregion Constructors
+
+
 
         #region Properties
 
@@ -33,7 +37,9 @@ namespace FluffyManager
         {
             get
             {
-                return Utilities_Livestock.AgeSexArray.Select( ageSex => pawnKind.GetTame( manager, ageSex ).Count ).ToArray();
+                return
+                    Utilities_Livestock.AgeSexArray.Select( ageSex => pawnKind.GetTame( manager, ageSex ).Count )
+                                       .ToArray();
             }
         }
 
@@ -56,7 +62,8 @@ namespace FluffyManager
                     state =
                         Utilities_Livestock.AgeSexArray.All(
                                                             ageSex =>
-                                                            CountTargets[ageSex] == pawnKind.GetTame( manager, ageSex ).Count ) &&
+                                                            CountTargets[ageSex] ==
+                                                            pawnKind.GetTame( manager, ageSex ).Count ) &&
                         AllTrainingWantedSet();
                     _state.Update( state );
                 }
@@ -78,6 +85,8 @@ namespace FluffyManager
 
         #endregion Properties
 
+
+
         #region Methods
 
         public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false,
@@ -87,6 +96,7 @@ namespace FluffyManager
 
         public override void ExposeData()
         {
+            base.ExposeData();
             Scribe_Collections.LookDictionary( ref CountTargets, "Targets", LookMode.Value, LookMode.Value );
             Scribe_Defs.LookDef( ref pawnKind, "PawnKind" );
         }

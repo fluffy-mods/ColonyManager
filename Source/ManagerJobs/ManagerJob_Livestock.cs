@@ -1,10 +1,10 @@
-﻿// // Karel Kroeze
-// // ManagerJob_Livestock.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerJob_Livestock.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -41,7 +41,7 @@ namespace FluffyManager
             // set areas for restriction and taming to unrestricted
             TameArea = null;
             RestrictToArea = false;
-            RestrictArea = Utilities_Livestock.AgeSexArray.Select( k => (Area) null ).ToList();
+            RestrictArea = Utilities_Livestock.AgeSexArray.Select( k => (Area)null ).ToList();
 
             // set defaults for boolean options
             TryTameMore = false;
@@ -76,9 +76,19 @@ namespace FluffyManager
             get
             {
                 return Utilities_Livestock.AgeSexArray
-                    .Select( ageSex => ( "FMP." + ageSex.ToString() + "Count" ).Translate( Trigger.pawnKind.GetTame( manager, ageSex ).Count,
-                                                                                           Trigger.CountTargets[ageSex] ) )
-                    .ToArray();
+                                          .Select(
+                                                  ageSex =>
+                                                  ( "FMP." + ageSex.ToString() + "Count" ).Translate(
+                                                                                                     Trigger.pawnKind
+                                                                                                            .GetTame(
+                                                                                                                     manager,
+                                                                                                                     ageSex )
+                                                                                                            .Count,
+                                                                                                     Trigger
+                                                                                                         .CountTargets[
+                                                                                                                       ageSex
+                                                                                                         ] ) )
+                                          .ToArray();
             }
         }
 
@@ -103,15 +113,15 @@ namespace FluffyManager
         {
             base.ExposeData();
 
+            // settings, references first!
+            Scribe_References.LookReference( ref TameArea, "TameArea" );
+            Scribe_Collections.LookList( ref RestrictArea, "AreaRestrictions", LookMode.Reference );
+            Scribe_Deep.LookDeep( ref Trigger, "trigger", manager );
+            Scribe_Deep.LookDeep( ref Training, "Training" );
             Scribe_Values.LookValue( ref ButcherExcess, "ButcherExcess", true );
             Scribe_Values.LookValue( ref ButcherTrained, "ButcherTrained", false );
             Scribe_Values.LookValue( ref RestrictToArea, "RestrictToArea", false );
-            //TODO: Verify
-            Scribe_Collections.LookList( ref RestrictArea, "AreaRestrictions", LookMode.Reference );
-            Scribe_References.LookReference( ref TameArea, "TameArea" );
             Scribe_Values.LookValue( ref TryTameMore, "TryTameMore", false );
-            Scribe_Deep.LookDeep( ref Training, "Training" );
-            Scribe_Deep.LookDeep( ref Trigger, "Trigger" );
 
             // our current designations
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
@@ -119,10 +129,10 @@ namespace FluffyManager
                 // populate with all designations.
                 Designations.AddRange(
                                       manager.map.designationManager.DesignationsOfDef( DesignationDefOf.Slaughter )
-                                          .Where( des => ( (Pawn) des.target.Thing ).kindDef == Trigger.pawnKind ) );
+                                             .Where( des => ( (Pawn)des.target.Thing ).kindDef == Trigger.pawnKind ) );
                 Designations.AddRange(
                                       manager.map.designationManager.DesignationsOfDef( DesignationDefOf.Tame )
-                                          .Where( des => ( (Pawn) des.target.Thing ).kindDef == Trigger.pawnKind ) );
+                                             .Where( des => ( (Pawn)des.target.Thing ).kindDef == Trigger.pawnKind ) );
             }
 
             // this is an array of strings as the first (and only) parameter - make sure it doesn't get cast to array of objects for multiple parameters.
@@ -182,7 +192,7 @@ namespace FluffyManager
             return Designations.Where( des => des.def == def
                                               && des.target.HasThing
                                               && des.target.Thing is Pawn
-                                              && ( (Pawn) des.target.Thing ).PawnIsOfAgeSex( ageSex ) )
+                                              && ( (Pawn)des.target.Thing ).PawnIsOfAgeSex( ageSex ) )
                                .ToList();
         }
 
@@ -349,7 +359,8 @@ namespace FluffyManager
                                                 .Where(
                                                        p =>
                                                        manager.map.designationManager.DesignationOn( p,
-                                                                                              DesignationDefOf.Slaughter ) ==
+                                                                                                     DesignationDefOf
+                                                                                                         .Slaughter ) ==
                                                        null
                                                        && ButcherTrained ||
                                                        !p.training.IsCompleted( TrainableDefOf.Obedience ) )
@@ -395,6 +406,7 @@ namespace FluffyManager
             {
                 des.Delete();
             }
+
             Designations.Clear();
         }
 
@@ -418,6 +430,7 @@ namespace FluffyManager
             {
                 text += Trigger.pawnKind.GetTame( manager, ageSex ).Count + "/" + Trigger.CountTargets[ageSex] + ", ";
             }
+
             text += Trigger.pawnKind.GetWild( manager ).Count + "</i>";
             string tooltip = Trigger.StatusTooltip;
 
@@ -435,9 +448,15 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public override void DrawOverviewDetails( Rect rect ) { _history.DrawPlot( rect ); }
+        public override void DrawOverviewDetails( Rect rect )
+        {
+            _history.DrawPlot( rect );
+        }
 
-        public override void Tick() { _history.Update( Trigger.Counts ); }
+        public override void Tick()
+        {
+            _history.Update( Trigger.Counts );
+        }
 
         public AcceptanceReport CanBeTrained( PawnKindDef pawnKind, TrainableDef td, out bool visible )
         {
@@ -458,33 +477,38 @@ namespace FluffyManager
                 {
                     if ( td.MatchesTag( pawnKind.RaceProps.trainableTags[index] ) )
                     {
-                        if ( pawnKind.RaceProps.baseBodySize < (double) td.minBodySize )
+                        if ( pawnKind.RaceProps.baseBodySize < (double)td.minBodySize )
                         {
                             visible = true;
-                            return new AcceptanceReport( "CannotTrainTooSmall".Translate( (object) pawnKind.LabelCap ) );
+                            return new AcceptanceReport( "CannotTrainTooSmall".Translate( (object)pawnKind.LabelCap ) );
                         }
+
                         visible = true;
                         return true;
                     }
                 }
             }
+
             if ( !td.defaultTrainable )
             {
                 visible = false;
                 return false;
             }
-            if ( pawnKind.RaceProps.baseBodySize < (double) td.minBodySize )
+
+            if ( pawnKind.RaceProps.baseBodySize < (double)td.minBodySize )
             {
                 visible = true;
-                return new AcceptanceReport( "CannotTrainTooSmall".Translate( (object) pawnKind.LabelCap ) );
+                return new AcceptanceReport( "CannotTrainTooSmall".Translate( (object)pawnKind.LabelCap ) );
             }
+
             if ( pawnKind.RaceProps.trainableIntelligence < td.requiredTrainableIntelligence )
             {
                 visible = true;
                 return
                     new AcceptanceReport(
-                        "CannotTrainNotSmartEnough".Translate( (object) td.requiredTrainableIntelligence ) );
+                        "CannotTrainNotSmartEnough".Translate( (object)td.requiredTrainableIntelligence ) );
             }
+
             visible = true;
             return true;
         }
@@ -517,15 +541,16 @@ namespace FluffyManager
                     Utilities.Label( cell, keys[i].LabelCap, report.Reason, font: GameFont.Tiny, color: Color.grey );
                 }
             }
+
             GUI.EndGroup();
         }
 
         public class TrainingTracker : IExposable
         {
             public DefMap<TrainableDef, bool> TrainingTargets = new DefMap<TrainableDef, bool>();
-            public bool TrainYoung = false;
+            public bool TrainYoung;
 
-            public bool this[ TrainableDef index ]
+            public bool this[TrainableDef index]
             {
                 get { return TrainingTargets[index]; }
                 set { SetWantedRecursive( index, value ); }
@@ -540,6 +565,7 @@ namespace FluffyManager
                         if ( TrainingTargets[def] )
                             return true;
                     }
+
                     return false;
                 }
             }

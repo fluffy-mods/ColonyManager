@@ -1,11 +1,11 @@
-﻿// // Karel Kroeze
-// // BillGiverTracker.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// BillGiverTracker.cs
+// 2016-12-09
 
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -21,13 +21,13 @@ namespace FluffyManager
     public class BillGiverTracker : IExposable
     {
         private readonly ManagerJob_Production _job;
-        public Manager manager;
         private bool _assignedBillGiversInitialized = true;
         private Dictionary<Bill_Production, Building_WorkTable> _assignedBills;
         private List<string> _assignedBillsScribeID;
         private List<string> _assignedWorkersScribeID;
         public Area AreaRestriction;
         public AssignedBillGiverOptions BillGiverSelection = AssignedBillGiverOptions.All;
+        public Manager manager;
         public List<Building_WorkTable> SpecificBillGivers;
         public int UserBillGiverCount;
 
@@ -133,11 +133,11 @@ namespace FluffyManager
             get
             {
                 var window = new WindowBillGiverDetails
-                             {
-                                 Job = _job,
-                                 closeOnClickedOutside = true,
-                                 draggable = true
-                             };
+                {
+                    Job = _job,
+                    closeOnClickedOutside = true,
+                    draggable = true
+                };
                 return window;
             }
         }
@@ -196,21 +196,24 @@ namespace FluffyManager
                     {
                         throw new Exception( "Billstack not initialized" );
                     }
+
                     foreach ( Bill current in worker.billStack )
                     {
                         if ( current.GetUniqueLoadID() == _assignedBillsScribeID[i] )
                         {
-                            bill = (Bill_Production) current;
+                            bill = (Bill_Production)current;
                         }
                     }
+
                     if ( bill == null )
                     {
                         throw new Exception( "Bill not found" );
                     }
+
                     _assignedBills.Add( bill, worker );
                 }
 
-                    // ReSharper disable once UnusedVariable
+                // ReSharper disable once UnusedVariable
                 catch ( Exception e )
                 {
                     error = true;

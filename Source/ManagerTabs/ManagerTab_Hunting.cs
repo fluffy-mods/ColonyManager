@@ -1,10 +1,10 @@
-﻿// // Karel Kroeze
-// // ManagerTab_Hunting.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerTab_Hunting.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -13,13 +13,14 @@ namespace FluffyManager
     internal class ManagerTab_Hunting : ManagerTab
     {
         private static float _entryHeight = 30f;
-        private ManagerJob_Hunting _selected;
         private Vector2 _animalsScrollPosition = Vector2.zero;
         private Vector2 _button = new Vector2( 200f, 40f );
         private float _leftRowHeight = 9999f;
         private float _margin = Utilities.Margin;
         private Vector2 _scrollPosition = Vector2.zero;
+        private ManagerJob_Hunting _selected;
         private float _topAreaHeight = 30f;
+
         public List<ManagerJob_Hunting> Jobs;
 
         public ManagerTab_Hunting( Manager manager ) : base( manager )
@@ -45,7 +46,7 @@ namespace FluffyManager
         public override ManagerJob Selected
         {
             get { return _selected; }
-            set { _selected = (ManagerJob_Hunting) value; }
+            set { _selected = (ManagerJob_Hunting)value; }
         }
 
         public void DoContent( Rect rect )
@@ -100,8 +101,10 @@ namespace FluffyManager
             var humanMeatRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Utilities.DrawToggle( humanMeatRect, "FMH.AllowHumanMeat".Translate(),
                                   _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.HumanMeat ),
-                                  delegate { _selected.AllowHumanLikeMeat( true ); },
-                                  delegate { _selected.AllowHumanLikeMeat( false ); } );
+                                  delegate
+                                  { _selected.AllowHumanLikeMeat( true ); },
+                                  delegate
+                                  { _selected.AllowHumanLikeMeat( false ); } );
             cur.y += _entryHeight;
 
             // unforbid corpses (3)
@@ -189,7 +192,8 @@ namespace FluffyManager
 
                 // draw the toggle
                 Utilities.DrawToggle( toggleRect, kind.LabelCap, _selected.AllowedAnimals[kind],
-                                      delegate { _selected.AllowedAnimals[kind] = !_selected.AllowedAnimals[kind]; } );
+                                      delegate
+                                      { _selected.AllowedAnimals[kind] = !_selected.AllowedAnimals[kind]; } );
 
                 // update current position
                 cur.y += _entryHeight;
@@ -327,8 +331,14 @@ namespace FluffyManager
             }
         }
 
-        public override void PreOpen() { Refresh(); }
+        public override void PreOpen()
+        {
+            Refresh();
+        }
 
-        public void Refresh() { Jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Hunting>(); }
+        public void Refresh()
+        {
+            Jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Hunting>();
+        }
     }
 }

@@ -1,10 +1,10 @@
-﻿// // Karel Kroeze
-// // ManagerTab_Forestry.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// ManagerTab_Forestry.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -15,16 +15,35 @@ namespace FluffyManager
         #region Fields
 
         private const float EntryHeight = 30f;
+
         private const float Margin = Utilities.Margin;
-        private ManagerJob_Forestry _selected;
+
         private readonly float _topAreaHeight = 30f;
+
         private Vector2 _button = new Vector2( 200f, 40f );
+
         private Vector2 _contentScrollPosition = Vector2.zero;
+
         private List<ManagerJob_Forestry> _jobs;
+
         private float _leftRowHeight = 9999f;
+
         private Vector2 _scrollPosition = Vector2.zero;
 
+        private ManagerJob_Forestry _selected;
+
         #endregion Fields
+
+        #region Constructors
+
+        public ManagerTab_Forestry( Manager manager ) : base( manager )
+        {
+            _selected = new ManagerJob_Forestry( manager );
+        }
+
+        #endregion Constructors
+
+
 
         #region Properties
 
@@ -43,10 +62,12 @@ namespace FluffyManager
         public override ManagerJob Selected
         {
             get { return _selected; }
-            set { _selected = (ManagerJob_Forestry) value; }
+            set { _selected = (ManagerJob_Forestry)value; }
         }
 
         #endregion Properties
+
+
 
         #region Methods
 
@@ -200,7 +221,8 @@ namespace FluffyManager
 
                 // draw the toggle
                 Utilities.DrawToggle( toggleRect, def.LabelCap, _selected.AllowedTrees[def],
-                                      delegate { _selected.AllowedTrees[def] = !_selected.AllowedTrees[def]; } );
+                                      delegate
+                                      { _selected.AllowedTrees[def] = !_selected.AllowedTrees[def]; } );
 
                 // update current position
                 cur.y += EntryHeight;
@@ -338,9 +360,15 @@ namespace FluffyManager
             }
         }
 
-        public override void PostClose() { Refresh(); }
+        public override void PostClose()
+        {
+            Refresh();
+        }
 
-        public override void PreOpen() { Refresh(); }
+        public override void PreOpen()
+        {
+            Refresh();
+        }
 
         public void Refresh()
         {
@@ -352,7 +380,5 @@ namespace FluffyManager
         }
 
         #endregion Methods
-
-        public ManagerTab_Forestry( Manager manager ) : base( manager ) { _selected = new ManagerJob_Forestry( manager ); }
     }
 }

@@ -1,8 +1,6 @@
-﻿// Manager/Building_ManagerStation.cs
-//
-// Copyright Karel Kroeze, 2015.
-//
-// Created 2015-11-04 19:30
+﻿// Karel Kroeze
+// Building_ManagerStation.cs
+// 2016-12-09
 
 using RimWorld;
 using UnityEngine;
@@ -21,14 +19,23 @@ namespace FluffyManager
         };
 
         private bool _glowDirty;
+
         private CompGlower _glower;
+
         private bool _graphicDirty;
+
         private Comp_ManagerStation _managerStation;
+
         private bool _powered;
+
         private CompPowerTrader _powerTrader;
+
         private Color _primaryBlinkerColour = Color.black;
+
         private Color _primaryColor = Color.black;
+
         private Color _secondaryColor = Color.black;
+
         private int _secondaryColourIndex;
 
         #endregion Fields
@@ -43,9 +50,12 @@ namespace FluffyManager
 
         #endregion Constructors
 
+
+
         #region Properties
 
         public override Color DrawColor => PrimaryColourBlinker;
+
         public override Color DrawColorTwo => SecondaryColour;
 
         public CompGlower Glower
@@ -60,7 +70,10 @@ namespace FluffyManager
 
         public bool Powered
         {
-            get { return _powered; }
+            get
+            {
+                return _powered;
+            }
             set
             {
                 _powered = value;
@@ -77,11 +90,14 @@ namespace FluffyManager
 
         public Color PrimaryColour
         {
-            get { return _primaryColor; }
+            get
+            {
+                return _primaryColor;
+            }
             set
             {
-                ColorInt newColour = new ColorInt( (int)( value.r * 255 ), (int)( value.g * 255 ),
-                                                   (int)( value.b * 255 ), 0 );
+                var newColour = new ColorInt( (int)( value.r * 255 ), (int)( value.g * 255 ),
+                                              (int)( value.b * 255 ), 0 );
                 Glower.Props.glowColor = newColour;
                 _primaryColor = value;
                 _glowDirty = true;
@@ -90,7 +106,10 @@ namespace FluffyManager
 
         public Color PrimaryColourBlinker
         {
-            get { return _primaryBlinkerColour; }
+            get
+            {
+                return _primaryBlinkerColour;
+            }
             set
             {
                 _primaryBlinkerColour = value;
@@ -100,7 +119,10 @@ namespace FluffyManager
 
         public Color SecondaryColour
         {
-            get { return _secondaryColor; }
+            get
+            {
+                return _secondaryColor;
+            }
             set
             {
                 _secondaryColor = value;
@@ -110,7 +132,10 @@ namespace FluffyManager
 
         public int SecondaryColourIndex
         {
-            get { return _secondaryColourIndex; }
+            get
+            {
+                return _secondaryColourIndex;
+            }
             set
             {
                 _secondaryColourIndex = value;
@@ -119,6 +144,8 @@ namespace FluffyManager
         }
 
         #endregion Properties
+
+
 
         #region Methods
 
@@ -147,7 +174,7 @@ namespace FluffyManager
                 // primary colour
                 if ( tick % ManagerStation.Props.Speed == 0 )
                 {
-                    PrimaryColour = Manager.For( Map ).DoWork() ? Color.green : Color.red;
+                    PrimaryColour = Manager.For( Map ).TryDoWork() ? Color.green : Color.red;
                 }
 
                 // blinking on primary

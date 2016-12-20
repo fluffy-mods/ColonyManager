@@ -1,6 +1,6 @@
-﻿// // Karel Kroeze
-// // UIThingFilterSearchable.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// UIThingFilterSearchable.cs
+// 2016-12-09
 
 using RimWorld;
 using UnityEngine;
@@ -10,7 +10,15 @@ namespace FluffyManager
 {
     public class ThingFilterUI
     {
+        #region Fields
+
         private float viewHeight;
+
+        #endregion Fields
+
+
+
+        #region Methods
 
         public void DoThingFilterConfigWindow( Rect canvas, ref Vector2 scrollPosition, ThingFilter filter,
                                                ThingFilter parentFilter = null, int openMask = 1,
@@ -89,6 +97,7 @@ namespace FluffyManager
             {
                 return;
             }
+
             var rect = new Rect( 20f, y, width - 20f, 26f );
             FloatRange allowedHitPointsPercents = filter.AllowedHitPointsPercents;
             Widgets.FloatRange( rect, 1, ref allowedHitPointsPercents, 0f, 1f, "HitPoints", ToStringStyle.PercentZero );
@@ -104,6 +113,7 @@ namespace FluffyManager
             {
                 return;
             }
+
             var rect = new Rect( 20f, y, width - 20f, 26f );
             QualityRange allowedQualityLevels = filter.AllowedQualityLevels;
             Widgets.QualityRange( rect, 2, ref allowedQualityLevels );
@@ -112,5 +122,7 @@ namespace FluffyManager
             y += 5f;
             Text.Font = GameFont.Small;
         }
+
+        #endregion Methods
     }
 }

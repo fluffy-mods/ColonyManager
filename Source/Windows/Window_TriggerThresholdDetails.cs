@@ -1,9 +1,8 @@
-﻿// Manager/Window_TriggerThresholdDetails.cs
-// 
-// Copyright Karel Kroeze, 2015.
-// 
-// Created 2015-11-04 19:29
+﻿// Karel Kroeze
+// Window_TriggerThresholdDetails.cs
+// 2016-12-09
 
+using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -12,19 +11,36 @@ namespace FluffyManager
 {
     public class WindowTriggerThresholdDetails : Window
     {
+        #region Fields
+
         public Vector2 FilterScrollPosition = Vector2.zero;
         public string Input;
         public Trigger_Threshold Trigger;
+        private ThingFilterUI filterUI = new ThingFilterUI();
+
+        #endregion Fields
+
+
+
+        #region Properties
+
         public override Vector2 InitialSize => new Vector2( 300f, 500 );
-        ThingFilterUI filterUI = new ThingFilterUI();
+
+        #endregion Properties
+
+
+
+        #region Methods
 
         public override void DoWindowContents( Rect inRect )
         {
             // set up rects
-            Rect filterRect = new Rect( inRect.ContractedBy( 6f ) );
-            filterRect.height -= 2 * (Utilities.ListEntryHeight + Utilities.Margin);
-            Rect zoneRect = new Rect(filterRect.xMin, filterRect.yMax + Utilities.Margin, filterRect.width, Utilities.ListEntryHeight);
-            Rect buttonRect = new Rect( filterRect.xMin, zoneRect.yMax + Utilities.Margin, ( filterRect.width - Utilities.Margin ) / 2f, Utilities.ListEntryHeight );
+            var filterRect = new Rect( inRect.ContractedBy( 6f ) );
+            filterRect.height -= 2 * ( Utilities.ListEntryHeight + Utilities.Margin );
+            var zoneRect = new Rect( filterRect.xMin, filterRect.yMax + Utilities.Margin, filterRect.width,
+                                     Utilities.ListEntryHeight );
+            var buttonRect = new Rect( filterRect.xMin, zoneRect.yMax + Utilities.Margin,
+                                       ( filterRect.width - Utilities.Margin ) / 2f, Utilities.ListEntryHeight );
 
             // draw thingfilter
             filterUI.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter );
@@ -35,15 +51,16 @@ namespace FluffyManager
             // draw operator button
             if ( Widgets.ButtonText( buttonRect, Trigger.OpString ) )
             {
-                List<FloatMenuOption> list = new List<FloatMenuOption>
-                {
-                    new FloatMenuOption( "Lower than", delegate { Trigger.Op = Trigger_Threshold.Ops.LowerThan; } ),
-                    new FloatMenuOption( "Equal to", delegate { Trigger.Op = Trigger_Threshold.Ops.Equals; } ),
-                    new FloatMenuOption( "Greater than", delegate { Trigger.Op = Trigger_Threshold.Ops.HigherThan; } )
-                };
+                var list = new List<FloatMenuOption>
+                           {
+                               new FloatMenuOption( "Lower than",
+                                                    delegate { Trigger.Op = Trigger_Threshold.Ops.LowerThan; } ),
+                               new FloatMenuOption( "Equal to", delegate { Trigger.Op = Trigger_Threshold.Ops.Equals; } ),
+                               new FloatMenuOption( "Greater than",
+                                                    delegate { Trigger.Op = Trigger_Threshold.Ops.HigherThan; } )
+                           };
                 Find.WindowStack.Add( new FloatMenu( list ) );
             }
-            
 
             // move operator button canvas for count input
             buttonRect.x = buttonRect.xMax + Utilities.Margin;
@@ -81,5 +98,7 @@ namespace FluffyManager
             base.PreOpen();
             Input = Trigger.Count.ToString();
         }
+
+        #endregion Methods
     }
 }

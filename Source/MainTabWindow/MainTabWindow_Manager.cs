@@ -1,6 +1,6 @@
-﻿// // Karel Kroeze
-// // MainTabWindow_Manager.cs
-// // 2016-12-09
+﻿// Karel Kroeze
+// MainTabWindow_Manager.cs
+// 2016-12-09
 
 using RimWorld;
 using UnityEngine;
@@ -10,7 +10,11 @@ namespace FluffyManager
 {
     internal class MainTabWindow_Manager : MainTabWindow
     {
-        #region Constructors
+        public static ManagerTab CurrentTab;
+
+        private static float _iconSize = 30f;
+
+        private static float _margin = Utilities.Margin;
 
         public MainTabWindow_Manager()
         {
@@ -20,18 +24,7 @@ namespace FluffyManager
             }
         }
 
-        #endregion Constructors
-
-        #region Fields
-
-        public static ManagerTab CurrentTab;
         public static ManagerTab DefaultTab => Manager.For( Find.VisibleMap ).ManagerTabs[0];
-        private static float _iconSize = 30f;
-        private static float _margin = Utilities.Margin;
-
-        #endregion Fields
-
-        #region Methods
 
         public static void GoTo( ManagerTab tab, ManagerJob job = null )
         {
@@ -56,12 +49,17 @@ namespace FluffyManager
             Text.Font = GameFont.Small;
 
             // three areas of icons for tabs, left middle and right.
-            var leftIcons = new Rect( 0f, 0f, _margin + Manager.For( Find.VisibleMap ).ManagerTabsLeft.Count * ( _iconSize + _margin ),
+            var leftIcons = new Rect( 0f, 0f,
+                                      _margin +
+                                      Manager.For( Find.VisibleMap ).ManagerTabsLeft.Count * ( _iconSize + _margin ),
                                       _iconSize );
             var middleIcons = new Rect( 0f, 0f,
-                                        _margin + Manager.For( Find.VisibleMap ).ManagerTabsMiddle.Count * ( _iconSize + _margin ),
+                                        _margin +
+                                        Manager.For( Find.VisibleMap ).ManagerTabsMiddle.Count * ( _iconSize + _margin ),
                                         _iconSize );
-            var rightIcons = new Rect( 0f, 0f, _margin + Manager.For( Find.VisibleMap ).ManagerTabsRight.Count * ( _iconSize + _margin ),
+            var rightIcons = new Rect( 0f, 0f,
+                                       _margin +
+                                       Manager.For( Find.VisibleMap ).ManagerTabsRight.Count * ( _iconSize + _margin ),
                                        _iconSize );
 
             // finetune rects
@@ -77,6 +75,7 @@ namespace FluffyManager
                 DrawTabIcon( iconRect, tab );
                 cur.x += _iconSize + _margin;
             }
+
             GUI.EndGroup();
 
             // middle icons (the bulk of icons)
@@ -88,6 +87,7 @@ namespace FluffyManager
                 DrawTabIcon( iconRect, tab );
                 cur.x += _iconSize + _margin;
             }
+
             GUI.EndGroup();
 
             // right icons (probably only import/export, possbile settings?)
@@ -99,6 +99,7 @@ namespace FluffyManager
                 DrawTabIcon( iconRect, tab );
                 cur.x += _iconSize + _margin;
             }
+
             GUI.EndGroup();
 
             // delegate actual content to the specific manager.
@@ -163,7 +164,5 @@ namespace FluffyManager
                 CurrentTab = DefaultTab;
             CurrentTab.PreOpen();
         }
-
-        #endregion Methods
     }
 }
