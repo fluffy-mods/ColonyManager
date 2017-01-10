@@ -1,7 +1,7 @@
 Colony Manager allows you to make colonists do the more tedious parts of managing a colony. Set up production chains from raw resources to finished products, and your managers will make sure you're never out of vital resources again*. 
 
 # Important
-**Requires a new save game. **
+**Requires a new save game.**
 Adds a worktype, which is stored in the world, which means you need to start a new game after adding/removing this mod. 
 
 **BETA VERSION**
@@ -14,7 +14,7 @@ This is the first release on A16, and alpha 16 is a biggy for anything that is e
 - Select which workstations bills should be assigned to by area and/or count, or select specific workstations. 
 - Quickly add jobs for ingredients in complex production chains 
 
-**Hunting jobs **
+**Hunting jobs**
 - Set a target for meat, and never worry about designating hunting manually again! 
 - Set an area to clear of all predators - keep your home area safe! 
 
