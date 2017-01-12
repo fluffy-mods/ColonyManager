@@ -21,6 +21,7 @@
   <FM.OrderDown>Decrease job priority</FM.OrderDown>
   <FM.OrderTop>Maximum priority</FM.OrderTop>
   <FM.OrderBottom>Minimum priority</FM.OrderBottom>
+  <multiple>[multiple]</multiple>
 
   <!-- History graphs -->
   <FM.HistoryPeriod>Period</FM.HistoryPeriod>

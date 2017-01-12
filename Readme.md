@@ -52,9 +52,9 @@ Should work perfectly fine with other mods that add bills, assuming they do noth
 Skills display on the colonist info pane gets cut off. This is an issue with the vanilla interface I'm not willing to change (it has too many possible conflicts). 
 
 # Contributors
-KapTaiN KaVerN	Minifiable research benches
-Moumix3	Research tweaks
-duduluu	Chinese translation
+ - KapTaiN KaVerN:	Minifiable research benches
+ - Moumix3:	Research tweaks
+ - duduluu:	Chinese translation
 
 # Think you found a bug? 
 Please read [this guide](http://steamcommunity.com/sharedfiles/filedetails/?id=725234314) before creating a bug report,

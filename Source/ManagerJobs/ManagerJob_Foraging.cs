@@ -153,7 +153,6 @@ namespace FluffyManager
         public override void DrawListEntry( Rect rect, bool overview = true, bool active = true )
         {
             // (detailButton) | name | (bar | last update)/(stamp) -> handled in Utilities.DrawStatusForListEntry
-            int shownTargets = overview ? 4 : 3; // there's more space on the overview
 
             // set up rects
             Rect labelRect = new Rect( _margin, _margin, rect.width -
@@ -162,16 +161,18 @@ namespace FluffyManager
                  statusRect = new Rect( labelRect.xMax + _margin, _margin, StatusRectWidth, rect.height - 2 * _margin );
 
             // create label string
-            string text = Label + "\n<i>" +
-                          ( Targets.Length < shownTargets ? string.Join( ", ", Targets ) : "<multiple>" )
-                          + "</i>";
-            string tooltip = string.Join( ", ", Targets );
+            string text = Label + "\n";
+            string subtext = string.Join( ", ", Targets );
+            if ( subtext.Fits( labelRect ) )
+                text += subtext.Italic();
+            else
+                text += "multiple".Translate().Italic();
 
             // do the drawing
             GUI.BeginGroup( rect );
 
             // draw label
-            Utilities.Label( labelRect, text, tooltip, TextAnchor.MiddleLeft, _margin );
+            Utilities.Label( labelRect, text, subtext, TextAnchor.MiddleLeft, _margin );
 
             // if the bill has a manager job, give some more info.
             if ( active )
