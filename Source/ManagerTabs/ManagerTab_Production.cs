@@ -528,7 +528,7 @@ namespace FluffyManager
             {
                 case SourceOptions.Available:
                     SourceList = ( from rd in DefDatabase<RecipeDef>.AllDefsListForReading
-                                   where rd.HasBuildingRecipeUser( manager, true )
+                                   where rd.AvailableNow && rd.HasBuildingRecipeUser( manager, true )
                                    orderby rd.LabelCap
                                    select new ManagerJob_Production( manager, rd ) ).ToList();
                     break;
