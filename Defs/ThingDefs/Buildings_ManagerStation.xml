@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ThingDefs>
 
-
-
 	<ThingDef Name="BuildingBase" Abstract="True">
 		<category>Building</category>
 		<soundImpactDefault>BulletImpactMetal</soundImpactDefault>
@@ -44,7 +42,7 @@
 		<fillPercent>0.5</fillPercent>
 		<useHitPoints>True</useHitPoints>
 		<statBases>
-			<WorkToMake>2000</WorkToMake>
+			<WorkToBuild>2000</WorkToBuild>
 			<MaxHitPoints>180</MaxHitPoints>
 			<Flammability>1.0</Flammability>
 		</statBases>
@@ -88,7 +86,7 @@
 		<fillPercent>0.5</fillPercent>
 		<useHitPoints>True</useHitPoints>
 		<statBases>
-			<WorkToMake>3000</WorkToMake>
+			<WorkToBuild>3000</WorkToBuild>
 			<MaxHitPoints>180</MaxHitPoints>
 			<Flammability>1.0</Flammability>
 		</statBases>
@@ -137,7 +135,7 @@
 		<fillPercent>1</fillPercent>
 		<useHitPoints>True</useHitPoints>
 		<statBases>
-			<WorkToMake>5000</WorkToMake>
+			<WorkToBuild>5000</WorkToBuild>
 			<MaxHitPoints>100</MaxHitPoints>
 			<Flammability>0.5</Flammability>
 		</statBases>
