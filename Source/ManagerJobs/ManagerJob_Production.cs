@@ -436,11 +436,10 @@ namespace FluffyManager
 #endif
                     var billPresent = false;
 
-                    // loop over workstations
+                    // loop over billstack to see if our bill is set.
                     if ( worker.BillStack != null &&
                          worker.BillStack.Count > 0 )
                     {
-                        // loop over billstack to see if our bill is set.
                         foreach ( Bill t in worker.BillStack )
                         {
                             var thatBill = t as Bill_Production;

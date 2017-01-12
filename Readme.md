@@ -67,4 +67,4 @@ All current and past versions of this mod can be downloaded from [GitHub](https:
 This mod is licensed under the Creative Commons [by-nc-sa 4.0 Int](http://creativecommons.org/licenses/by-nc-sa/4.0/) license.
 
 # Version
-This is version v0.16.1.2
+This is version v0.16.1.3

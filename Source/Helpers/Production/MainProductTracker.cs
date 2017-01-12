@@ -197,17 +197,15 @@ namespace FluffyManager
                         }
 
                         // still not defined, see if we can catch corpses.
-                        if ( allowedThingDef.defName.Contains( "Corpse" ) &&
-                             !allowedThingDef.defName.Contains( "Mechanoid" ) )
+                        if ( allowedThingDef.ingestible?.sourceDef?.race?.fleshType != FleshType.Mechanoid )
                         {
                             // meat for non-mech corpses
                             Clear();
                             _categoryDef = ThingCategoryDef.Named( "MeatRaw" );
                             Type = Types.Category;
-                            Count = 50;
+                            Count = (int)(( allowedThingDef.ingestible?.sourceDef?.race?.baseBodySize ?? 1) * 50);
                         }
-                        else if ( allowedThingDef.defName.Contains( "Corpse" ) &&
-                                  allowedThingDef.defName.Contains( "Mechanoid" ) )
+                        else if ( allowedThingDef.ingestible?.sourceDef?.race?.fleshType == FleshType.Mechanoid )
                         {
                             // plasteel for mech corpses
                             Clear();
