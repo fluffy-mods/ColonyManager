@@ -57,6 +57,9 @@ namespace FluffyManager
                 if ( Bill?.recipe == null )
                     return false;
 
+                if ( !Bill.recipe.HasBuildingRecipeUser( manager, true ) || !Bill.recipe.AvailableNow )
+                    return false;
+
                 return true;
             }
         }

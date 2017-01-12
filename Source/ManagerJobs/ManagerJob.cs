@@ -77,10 +77,8 @@ namespace FluffyManager
         public virtual void Delete( bool cleanup = true )
         {
             if ( cleanup )
-            {
                 CleanUp();
-            }
-            Manager.For( manager ).JobStack.Delete( this );
+            Manager.For( manager ).JobStack.Delete( this, false );
         }
 
         public abstract void DrawListEntry( Rect rect, bool overview = true, bool active = true );

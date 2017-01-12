@@ -210,6 +210,7 @@ namespace FluffyManager
             // touch new jobs in inappropriate places (reset timing so they are properly performed)
             foreach ( ManagerJob job in _stack.FullStack() )
             {
+                job.manager = this;
                 job.Touch();
             }
         }

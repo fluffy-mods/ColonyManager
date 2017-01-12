@@ -31,9 +31,7 @@ namespace FluffyManager
         }
 
         #endregion Constructors
-
-
-
+        
         #region Properties
 
         /// <summary>
@@ -108,17 +106,15 @@ namespace FluffyManager
         /// Cleanup job, delete from stack and update priorities.
         /// </summary>
         /// <param name="job"></param>
-        public void Delete( ManagerJob job )
+        public void Delete( ManagerJob job, bool cleanup = true )
         {
-            job.CleanUp();
+            if (cleanup)
+                job.CleanUp();
             _stack.Remove( job );
             CleanPriorities();
         }
 
-        public void ExposeData()
-        {
-            Scribe_Collections.LookList( ref _stack, "JobStack", LookMode.Deep, manager );
-        }
+        public void ExposeData() { Scribe_Collections.LookList( ref _stack, "JobStack", LookMode.Deep, manager ); }
 
         /// <summary>
         ///     Jobs of type T in jobstack, in order of priority
