@@ -135,17 +135,29 @@ namespace FluffyManager
             foreach ( IntVec3 cell in cells )
             {
                 // confirm there is a plant here that it is a tree and that it has no current designation
-                Plant plant = cell.GetPlant( manager );
+                Plant plant = cell.GetPlant( manager.map );
+
+                // try to get a growing zone here
                 var zone = manager.map.zoneManager.ZoneAt( cell ) as IPlantToGrowSettable;
 
-                if ( plant != null && ( // there is a plant here
-                                          ( zone == null && ( plant.def.plant.IsTree || allPlants ) ) ||
-                                          // this is not a growing zone, and the plant is a tree or we're cutting everything
-                                          ( allPlants && zone?.GetPlantDefToGrow() != plant.def )
-                                      // this is a growing zone, and the plant is not the plant set to grow in this zone
-                                      ) &&
-                     // there's not yet a designation on this plant
-                     manager.map.designationManager.AllDesignationsOn( plant ).ToList().NullOrEmpty() )
+                // try to get a Building_PlantGrower here
+                var pot = manager.map.thingGrid.ThingsListAt( cell ).FirstOrDefault( t => t is Building_PlantGrower );
+
+                if ( 
+                    // there is a plant here
+                    plant != null
+
+                    // AND it's not yet been designated for anything
+                    && manager.map.designationManager.AllDesignationsOn( plant ).ToList().NullOrEmpty()
+
+                    // AND the plant is not in a pot
+                    && pot == null
+                    
+                    // AND this is not a growing zone, and the plant is a tree or we're cutting everything
+                    && ( ( zone == null && ( plant.def.plant.IsTree || allPlants ) )
+
+                    // OR this is a growing zone, and the plant is not the plant set to grow in this zone
+                    || ( allPlants && zone?.GetPlantDefToGrow() != plant.def ) ) )
                 {
                     manager.map.designationManager.AddDesignation( new Designation( plant, DesignationDefOf.CutPlant ) );
                 }
