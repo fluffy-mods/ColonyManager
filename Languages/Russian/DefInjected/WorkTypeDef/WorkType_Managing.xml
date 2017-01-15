@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <Managing.labelShort>Управление</Managing.labelShort>
+  <Managing.pawnLabel>Управляющий</Managing.pawnLabel>
+  <Managing.gerundLabel>Управление</Managing.gerundLabel>
+  <Managing.description>Управляющие назначают задачи и управляют колонией.</Managing.description>
+  <Managing.verb>Управляет на</Managing.verb>
+
+
+</LanguageData>

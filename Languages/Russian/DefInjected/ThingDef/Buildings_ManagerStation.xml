@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <!-- Work tables -->
+
+  <FM_BasicManagerStation.label>Простой стол управляющего</FM_BasicManagerStation.label>
+  <FM_BasicManagerStation.description>Простой стол со всем необходимым, чтобы управляющий мог выполнять свою работу.</FM_BasicManagerStation.description>
+
+  <FM_ManagerStation.label>Стол управляющего</FM_ManagerStation.label>
+  <FM_ManagerStation.description>Стол с компьютером и всем необходимым, чтобы управляющий мог выполнять свою работу эффективно.</FM_ManagerStation.description>
+
+  <FM_AIManager.label>ИИ-управляющий</FM_AIManager.label>
+  <FM_AIManager.description>Суперкомпьютер, способный самостоятельно управлять колонией. Утверждения, что в ИИ встроена подпрограмма злобного психопата, - это враки. Мы обещаем!</FM_AIManager.description>
+
+
+</LanguageData>
