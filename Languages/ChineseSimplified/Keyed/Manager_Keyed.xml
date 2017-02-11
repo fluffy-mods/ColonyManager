@@ -21,6 +21,7 @@
   <FM.OrderDown>降低工作优先级</FM.OrderDown>
   <FM.OrderTop>最高优先级</FM.OrderTop>
   <FM.OrderBottom>最低优先级</FM.OrderBottom>
+  <multiple>[multiple]</multiple>
 
   <!-- History graphs -->
   <FM.HistoryPeriod>时间段</FM.HistoryPeriod>
