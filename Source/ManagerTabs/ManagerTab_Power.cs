@@ -160,7 +160,9 @@ namespace FluffyManager
             // once in a while, update the list of comps, and history thingcounts + theoretical maxes (where known).
             if ( Find.TickManager.TicksGame % 2000 == 0 )
             {
+#if DEBUG_POWER
                 Log.Message( string.Join( ", ", _traderDefs.Select( d => d.LabelCap ).ToArray() ) );
+#endif
 
                 // get all existing comps for all building defs that have power related comps (in essence, get all powertraders)
                 RefreshCompLists();
@@ -306,6 +308,6 @@ namespace FluffyManager
                 .ToList();
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }

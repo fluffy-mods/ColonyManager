@@ -55,6 +55,7 @@ Skills display on the colonist info pane gets cut off. This is an issue with the
  - KapTaiN KaVerN:	Minifiable research benches
  - Moumix3:	Research tweaks
  - duduluu:	Chinese translation
+ - Kirill:	
 
 # Think you found a bug? 
 Please read [this guide](http://steamcommunity.com/sharedfiles/filedetails/?id=725234314) before creating a bug report,
@@ -67,4 +68,4 @@ All current and past versions of this mod can be downloaded from [GitHub](https:
 This mod is licensed under the Creative Commons [by-nc-sa 4.0 Int](http://creativecommons.org/licenses/by-nc-sa/4.0/) license.
 
 # Version
-This is version v0.16.1.4
+This is version v0.16.1.5
