@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+ <ManagingSoftware.label>logiciel de gestion basique</ManagingSoftware.label>
+        <ManagingSoftware.description>
+Développe un logiciel basique pour la gestion coloniale. Permet de construire des bureaux de gestionnaire avec ordinateur, pré-installé - garantie sans bugs.
+        </ManagingSoftware.description>
+      
+        <AdvancedManagingSoftware.label>logiciel de gestion avancé</AdvancedManagingSoftware.label>
+        <AdvancedManagingSoftware.description>Développe un logiciel de gestion coloniale avancé. Les progrès en IA et en "conscience" des ordinateurs permettent la construction d'un Superordinateur de Conscience Coloniale, préinstallé avec le 'FluffyOS'™. Quelques colons ont signalé que des portes s'ouvraient et se fermaient, des systèmes de climatisation se détraquaient, et que la fonderie électrique s'était soudainement mise à tourner. Cependant, le fabricant garantie que le FluffyOS™ n'est pas programmé pour tuer les colons.</AdvancedManagingSoftware.description>
+        
+        <PowerManagement.label>gestion de l'énergie</PowerManagement.label>
+        <PowerManagement.description>Crée un logiciel de gestion pour contrôler l'utilisation de l'énergie de la colonie.
+        </PowerManagement.description>
+</LanguageData>

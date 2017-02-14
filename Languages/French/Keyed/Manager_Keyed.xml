@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+  <!-- Main Manager Tab -->
+  <FM.Manager>Gestion</FM.Manager>
+  <FM.Details>Détails</FM.Details>
+  <FM.Manage>Gérer!</FM.Manage>
+  <FM.Delete>Supprimer</FM.Delete>
+  <FM.All>Tout</FM.All>
+
+  <!-- Help and alert messages for the lexically challenged. -->
+  <FM.HelpTitle>Gestionnaire de Colonie V2</FM.HelpTitle>
+  <FM.HelpMessage>Bienvenue sur le Gestionnaire de Colonie V2!\n\nLa gestion de colonie vous permet de désigner des cibles de production, de chasse, de foresterie et de gestion du bétail. Vous pouvez paramètrer chacune de ces catégories de diverses façons, par le biais des icones en haut de la fenêtre. \n\nDès qu'une tâche de travail est désignée, un colon avec le métier de gestionnaire passera occasionellement en revue les tâches et les stocks de la colonie au bureau de gestion, et mettra à jour les désignations et la quantité à produire. \n\nPour que le mod fonctionne, vous avez besoin de deux choses : \n      - Un colon avec le travail de gestionnaire \n       - Un bureau de gestion. \n\n Bonne gestion!</FM.HelpMessage>
+  <FM.AlertNoTableLabel>Nécessite le bureau de gestionnaire</FM.AlertNoTableLabel>
+  <FM.AlertNoTable>Les cibles de tâches sont établies, mais il n'y a pas de bureau de gestionnaire disponible</FM.AlertNoTable>
+  <FM.AlertNoManagerLabel>Nécessite un colon gestionnaire</FM.AlertNoManagerLabel>
+  <FM.AlertNoManager>Les cibles de gestion sont établies, mais il n'y a aucun colon ayant le travail de gestionnaire.</FM.AlertNoManager>
+
+  <!-- Common -->
+  <FM.LastUpdateTooltip>Ce travail a été mis a jour il y a {0}.</FM.LastUpdateTooltip>
+  <FM.OrderUp>Augmenter la priorité de travail</FM.OrderUp>
+  <FM.OrderDown>Diminuer la priorité de travail</FM.OrderDown>
+  <FM.OrderTop>Priorité maximale</FM.OrderTop>
+  <FM.OrderBottom>Priorité minimale</FM.OrderBottom>
+
+  <!-- History graphs -->
+  <FM.HistoryPeriod>Période</FM.HistoryPeriod>
+  <FM.HistoryShowHideLegend>Montrer/Cacher la légende</FM.HistoryShowHideLegend>
+  <FM.HistoryClickToEnable>\n\nCliquer pour {0} {1} en action.\nCliquer droit pour montrer seulement {1}.</FM.HistoryClickToEnable>
+  <FM.HistoryNoChapters>Rien à montrer!</FM.HistoryNoChapters>
+
+  <!-- Power Tab (E for energy) -->
+  <FME.PeriodShown>Période: {0}</FME.PeriodShown>
+  <FME.PeriodShownTooltip>Montre actuellement la production et la consommation électrique depuis les derniers {0}.\n\nCliquer pour changer la période.</FME.PeriodShownTooltip>
+  <FME.Power>Energie</FME.Power>
+  
+  <!-- Overview Tab -->
+  <FM.Overview>Aperçu</FM.Overview>
+  <FM.NoJobs>Pas de travail établi.</FM.NoJobs>
+  <FM.Activity>Activité actuelle</FM.Activity>
+  <FM.Enabled>Travail</FM.Enabled>
+  <FM.Priority>Travail</FM.Priority>
+  <FM.ClickToJumpTo>Cliquer pour se rendre sur {0}</FM.ClickToJumpTo>
+  <FM.JobCompletedTooltip>Le seuil de travail a été atteint.</FM.JobCompletedTooltip>
+  <FM.JobSuspendedTooltip>Le travail a été suspendu.\n\nCliquer pour rétablir.</FM.JobSuspendedTooltip>
+  <FM.PluralSuffix>s</FM.PluralSuffix>
+  
+  <!--Import/Export Tab-->
+  <FM.ImportExport>Importer &amp; Exporter</FM.ImportExport>
+  <FM.CurrentJobs>Travaux actuels:</FM.CurrentJobs>
+  <FM.Export>Exporter</FM.Export>
+  <FM.ConfirmOverwrite>{0} existe.\n\nÊtes vous sûr de vouloir écraser?</FM.ConfirmOverwrite>
+  <FM.JobsExported>{0} travaux exportés</FM.JobsExported>
+  <FM.JobsImported>{0} travaux importés</FM.JobsImported>
+  <FM.InvalidJobsDeleted>{0} travaux invalides supprimés</FM.InvalidJobsDeleted>
+  <FM.Import>Importer</FM.Import>
+  <FM.NoSaves>Pas d'exportations trouvées.</FM.NoSaves>
+
+  <!-- Hunting Tab -->
+  <FMH.Hunting>Chasse</FMH.Hunting>
+  <FMH.NewHuntingJob>Nouvelle tâche</FMH.NewHuntingJob>
+  <FMH.NewHuntingJobTooltip>Créer un nouveau travail de chasse</FMH.NewHuntingJobTooltip>
+  <FMH.AllowHumanMeat>Autoriser la viande humaine</FMH.AllowHumanMeat>
+  <FMH.UnforbidCorpses>Autoriser cadavres</FMH.UnforbidCorpses>
+  <FMH.HuntingGrounds>Autorise la chasse dans:</FMH.HuntingGrounds>
+  <FMH.Options>Options</FMH.Options>
+  <FMH.Animals>Animaux autorisés</FMH.Animals>
+  <FMH.TargetCount>Quantité ciblée: {0}+{1}+{2}/{3}</FMH.TargetCount>
+  <FMH.TargetCountTooltip>Cible: {3}\n{0} dans la zone de stockage\n{1} en direction de la boucherie\n{2} attendu par les désignations actuelles.</FMH.TargetCountTooltip>
+
+  <!-- Forestry Tab -->
+  <FMF.Forestry>Foresterie</FMF.Forestry>
+  <FMF.NewForestryJob>Nouvelle tâche</FMF.NewForestryJob>
+  <FMF.NewForestryJobTooltip>Créer un nouveau travail de foresterie</FMF.NewForestryJobTooltip>
+  <FMF.Options>Options</FMF.Options>
+  <FMF.Trees>Arbres autorisés</FMF.Trees>
+  <FMF.ClearWindCells>Déblayer l'espace des éoliennes</FMF.ClearWindCells>
+  <FMF.AllowSaplings>Autorisé la coupe des arbres immatures</FMF.AllowSaplings>
+  <FMF.LoggingArea>Autoriser l'exploitation du bois dans:</FMF.LoggingArea>
+  <FMF.TargetCount>Quantité ciblée: {0}+{1}/{2}</FMF.TargetCount>
+  <FMF.TargetCountTooltip>Cible: {2}\n{0} dans la zone de stockage\n{1} attendu par les désignations actuelles.</FMF.TargetCountTooltip>
+  <FMF.ClearAreas>Déblayer les zones:</FMF.ClearAreas>
+
+  <!-- Foraging (Gathering) tab -->
+  <FMG.Foraging>Cueillette</FMG.Foraging>
+  <FMG.NewForagingJob>Nouvelle tâche</FMG.NewForagingJob>
+  <FMG.NewForagingJobTooltip>Créer un nouveau travail de cueillette</FMG.NewForagingJobTooltip>
+  <FMG.Options>Options</FMG.Options>
+  <FMG.TargetCount>Quantité ciblée: {0}+{1}/{2}</FMG.TargetCount>
+  <FMG.TargetCountTooltip>Cible: {2}\n{0} dans la zone de stockage\n{1} attendu par les désignations actuelles.</FMG.TargetCountTooltip>
+  <FMG.ForceMature>Seulement les plantes totalement mûres</FMG.ForceMature>
+  <FMG.ForagingArea>Autoriser la cueillette dans:</FMG.ForagingArea>
+  <FMG.Plants>Plantes autorisées</FMG.Plants>
+
+
+  <!-- Production Tab -->
+  <!-- Miscelaneous -->
+  <FMP.Production>Production</FMP.Production>
+  <FMP.ManageBillTooltip>Assigner cette tâche pour qu'elle soit gérée par votre gestionnaire.</FMP.ManageBillTooltip>
+  <FMP.DeleteBillTooltip>Arrêter de gérer cette tâche, et supprimer les tâches suspendue</FMP.DeleteBillTooltip>
+  <FMP.FilterDesc>Tapez quelques lettres pour filtrer la liste</FMP.FilterDesc>
+  <FMP.ClearFilterDesc>Réinitialiser le filtre actuel</FMP.ClearFilterDesc>
+  <FMP.MainProduct>Produit principal: {0} x{1}</FMP.MainProduct>
+  <FMP.NoThreshold>Pas de seuil</FMP.NoThreshold>
+  <FMP.NoThresholdTooltip>Pas de seuil fixé</FMP.NoThresholdTooltip>
+  <FMP.SnapToHighestSkill>Restreindre au plus expérimenté des colons</FMP.SnapToHighestSkill>
+  <FMP.Options>Options</FMP.Options>
+  <FMP.Bill>Tâche</FMP.Bill>
+  <FMP.Recipe>Recette</FMP.Recipe>
+  <FMP.AllowedIngredients>Ressources autorisées:</FMP.AllowedIngredients>
+  <FMP.PrioritizeManual>Prioriser les tâches établies manuellement</FMP.PrioritizeManual>
+  <FMP.OtherRecipeAvailable>Autres recettes disponible</FMP.OtherRecipeAvailable>
+  <FMP.OtherRecipeAvailableTooltip>D'autres recettes produisant le même produit sont disponible.\nCliquer pour changer cette tâche en une autre recette.</FMP.OtherRecipeAvailableTooltip>
+
+  <!-- Thresholds -->
+  <FMP.ThresholdCount>Seuil: {0}/{1}</FMP.ThresholdCount>
+  <FMP.ThresholdCountTooltip>Cliquer pour ouvrir les détails du seuil.\n\nCible: {1}\nEn production: {0}</FMP.ThresholdCountTooltip>
+  <FMP.ThresholdDetails>Détails du seuil</FMP.ThresholdDetails>
+
+  <!-- BillGivers -->
+  <FMP.BillGiversCount>Atelier de travail ({0}/{1}/{2})</FMP.BillGiversCount>
+  <FMP.BillGiversTooltip>Cliquer pour changer le donneur de tâches.\n\nDisponible:\n{0}\n\nSelectionné:\n{1}\n\nAssigné:\n{2}</FMP.BillGiversTooltip>
+  <FMP.BillGiversDetails>Sélectionner poste de travail</FMP.BillGiversDetails>
+
+  <!-- BillGiversDetailsWindow -->
+  <FMP.AllWorkstations>Tous les postes de travail</FMP.AllWorkstations>
+  <FMP.AllWorkstationsTooltip>Donner la possibilité au gestionnaire d'assigner cette tâche à tous les postes de travail possibles</FMP.AllWorkstationsTooltip>
+  <FMP.ByAreaAndCount>Par zone / total</FMP.ByAreaAndCount>
+  <FMP.ByAreaAndCountTooltip>Donner la possibilité au gestionnaire d'assigner cette tâche à un nombre spécifique de postes de travail, dans une zone spécifique</FMP.ByAreaAndCountTooltip>
+  <FMP.AllowedAreas>Zone:</FMP.AllowedAreas>
+  <FMP.AllowedWorkstationCount>Max:</FMP.AllowedWorkstationCount>
+  <FMP.SpecificWorkstations>Choisir poste de travail</FMP.SpecificWorkstations>
+  <FMP.SpecificWorkstationsTooltip>Donner la possibilité au gestionnaire d'assigner cette tâche à des postes de travails spécifiques.</FMP.SpecificWorkstationsTooltip>
+
+  <!-- Tab headers -->
+  <FMP.Current>Actuel</FMP.Current>
+  <FMP.Available>Possible</FMP.Available>
+
+  <!-- Recursive job creator -->
+  <FMP.IngredientDialogTitle>Créer des tâches pour les ressources</FMP.IngredientDialogTitle>
+  <FMP.SelectRecipe>Sélectionner...</FMP.SelectRecipe>
+  <FMP.SelectRecipeTooltip>Cliquer pour sélectionner la recette pour {0}</FMP.SelectRecipeTooltip>
+  <FMP.SelectRecipeTooltipSelected>\n\nLa recette actuelle nécessite:</FMP.SelectRecipeTooltipSelected>
+  <FMP.DoNotUseRecipe>(aucun)</FMP.DoNotUseRecipe>
+  <FMP.SelectIngredient>Sélectionner...</FMP.SelectIngredient>
+  <FMP.SelectIngredientTooltip>Cliquer pour sélectionner une ressource pour {0} (nécessite {1})</FMP.SelectIngredientTooltip>
+  <FMP.IngredientCount>\n{0} ({1})</FMP.IngredientCount>
+  <FMP.RawResource>(ressource brut)</FMP.RawResource>
+  <FMP.RawResourceTooltip>{0} est une ressource brut (pas de recette avec une sortie fixée pour {0} trouvée)</FMP.RawResourceTooltip>
+  <FMP.AddIngredientBills>Créer Tâches</FMP.AddIngredientBills>
+  <FMP.IncreasedThreshold>Seuil augmenté pour {0} à {1}.</FMP.IncreasedThreshold>
+  <FMP.AddedJob>Créer tâche {0}.</FMP.AddedJob>
+  <FMP.CouldNotAddJob>Echec de la création de tâche {0}.</FMP.CouldNotAddJob>
+
+  <!-- Livestock tab -->
+  <FML.Livestock>Bétail</FML.Livestock>
+  <FML.TargetCounts>Quantité ciblée</FML.TargetCounts>
+  <FML.Adult>Adulte</FML.Adult>
+  <FML.Juvenile>Juvenile</FML.Juvenile>
+  <FML.Training>Entrainement</FML.Training>
+  <FML.RestrictToArea>Restreindre les animaux à la zone?</FML.RestrictToArea>
+  <FML.ButcherExcess>Excés de bêtes à l'abattoir</FML.ButcherExcess>
+  <FML.ButcherTrained>Excés de bêtes entrainées à l'abattoir</FML.ButcherTrained>
+  <FML.TameMore>Auto-designé des animaux à l'apprivoisement</FML.TameMore>
+  <FML.TameArea>Apprivoisement possible en:</FML.TameArea>
+  <FML.Animals>Animaux</FML.Animals>
+  <FML.ListEntryTooltip>{0}s:\n{1}/{5} femelles adulte \n{2}/{6} mâles adulte\n{3}/{7} femelles juvenile\n{4}/{8} mâles juvenile</FML.ListEntryTooltip>
+  <FML.TameWildCount>{0} apprivoisé, {1} dans la nature.</FML.TameWildCount>
+  <FML.Tame>apprivoisé</FML.Tame>
+  <FML.Wild>sauvage</FML.Wild>
+  <FML.NoAnimals>pas d'animaux {0}</FML.NoAnimals>
+  <FML.GenderHeader>Genre</FML.GenderHeader>
+  <FML.AgeHeader>Age (étape de la vie)</FML.AgeHeader>
+  <FML.MeatHeader>Quantité de viande attendue quand dépecée</FML.MeatHeader>
+  <FML.MilkHeader>Progresssion jusqu'à la traite suivante</FML.MilkHeader>
+  <FML.WoolHeader>Progresssion jusqu'à la tonte suivante</FML.WoolHeader>
+  <FML.Yields>rendement {0} x{1}</FML.Yields>
+  <FML.TrainYoung>Entrainer les jeunes animaux</FML.TrainYoung>
+
+</LanguageData>
