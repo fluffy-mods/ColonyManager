@@ -8,11 +8,15 @@ using Verse;
 
 namespace FluffyManager
 {
-    public static class ResearchWorkers
+    public class UnlockPowerTab: ResearchMod
     {
-        public static void UnlockPowerTab()
+        #region Overrides of ResearchMod
+
+        public override void Apply()
         {
             Manager._powerUnlocked = true;
         }
+
+        #endregion
     }
 }

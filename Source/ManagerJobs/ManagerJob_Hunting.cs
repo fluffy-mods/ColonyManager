@@ -135,7 +135,7 @@ namespace FluffyManager
         {
             // get the intersection of bills in the game and bills in our list.
             List<Designation> GameDesignations =
-                manager.map.designationManager.DesignationsOfDef( DesignationDefOf.Hunt ).ToList();
+                manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Hunt ).ToList();
             Designations = Designations.Intersect( GameDesignations ).ToList();
         }
 
@@ -198,19 +198,19 @@ namespace FluffyManager
             base.ExposeData();
 
             // references first, because of the stupid bug in CrossRefResolver.
-            Scribe_References.LookReference( ref HuntingGrounds, "HuntingGrounds" );
+            Scribe_References.Look( ref HuntingGrounds, "HuntingGrounds" );
 
             // must be after references, because reasons.
-            Scribe_Deep.LookDeep( ref Trigger, "trigger", manager );
+            Scribe_Deep.Look( ref Trigger, "trigger", manager );
 
             // settings, human meat is stored in the trigger's thingfilter.
-            Scribe_Collections.LookDictionary( ref AllowedAnimals, "AllowedAnimals", LookMode.Def, LookMode.Value );
-            Scribe_Values.LookValue( ref UnforbidCorpses, "UnforbidCorpses", true );
+            Scribe_Collections.Look( ref AllowedAnimals, "AllowedAnimals", LookMode.Def, LookMode.Value );
+            Scribe_Values.Look( ref UnforbidCorpses, "UnforbidCorpses", true );
 
             // don't store history in import/export mode.
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
-                Scribe_Deep.LookDeep( ref History, "History" );
+                Scribe_Deep.Look( ref History, "History" );
             }
         }
 
@@ -275,7 +275,7 @@ namespace FluffyManager
             }
 
             // designated animals
-            foreach ( Designation des in manager.map.designationManager.DesignationsOfDef( DesignationDefOf.Hunt ) )
+            foreach ( Designation des in manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Hunt ) )
             {
                 // make sure target is a pawn, is an animal, is not forbidden and somebody can reach it.
                 // note: could be rolled into a fancy LINQ chain, but this is probably clearer.
@@ -360,7 +360,7 @@ namespace FluffyManager
         {
             foreach (
                 Designation des in
-                    manager.map.designationManager.DesignationsOfDef( DesignationDefOf.Hunt )
+                    manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Hunt )
                            .Except( Designations )
                            .Where( des => IsValidHuntingTarget( des.target ) ) )
             {

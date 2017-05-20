@@ -19,8 +19,6 @@ namespace FluffyManager
 
         #endregion Fields
 
-
-
         #region Methods
 
         public static void SetLit( this CompGlower glower, bool lit = true )

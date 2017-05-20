@@ -36,23 +36,23 @@ namespace FluffyManager
 
         public Trigger_Threshold( Manager manager ) : base( manager ) { }
 
-        public Trigger_Threshold( ManagerJob_Production job ) : base( job.manager )
-        {
-            Op = Ops.LowerThan;
-            MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
-            // TODO: Better way of setting sensible defaults?
-            Count = MaxUpperThreshold / 20;
-            ThresholdFilter = new ThingFilter();
-            ThresholdFilter.SetDisallowAll();
-            if ( job.MainProduct.ThingDef != null )
-            {
-                ThresholdFilter.SetAllow( job.MainProduct.ThingDef, true );
-            }
-            if ( job.MainProduct.CategoryDef != null )
-            {
-                ThresholdFilter.SetAllow( job.MainProduct.CategoryDef, true );
-            }
-        }
+        //public Trigger_Threshold( ManagerJob_Production job ) : base( job.manager )
+        //{
+        //    Op = Ops.LowerThan;
+        //    MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
+        //    // TODO: Better way of setting sensible defaults?
+        //    Count = MaxUpperThreshold / 20;
+        //    ThresholdFilter = new ThingFilter();
+        //    ThresholdFilter.SetDisallowAll();
+        //    if ( job.MainProduct.ThingDef != null )
+        //    {
+        //        ThresholdFilter.SetAllow( job.MainProduct.ThingDef, true );
+        //    }
+        //    if ( job.MainProduct.CategoryDef != null )
+        //    {
+        //        ThresholdFilter.SetAllow( job.MainProduct.CategoryDef, true );
+        //    }
+        //}
 
         public Trigger_Threshold( ManagerJob_Hunting job ) : base( job.manager )
         {
@@ -246,17 +246,17 @@ namespace FluffyManager
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Values.LookValue( ref Count, "Count" );
-            Scribe_Values.LookValue( ref MaxUpperThreshold, "MaxUpperThreshold" );
-            Scribe_Values.LookValue( ref Op, "Operator" );
-            Scribe_Deep.LookDeep( ref ThresholdFilter, "ThresholdFilter" );
+            Scribe_Values.Look( ref Count, "Count" );
+            Scribe_Values.Look( ref MaxUpperThreshold, "MaxUpperThreshold" );
+            Scribe_Values.Look( ref Op, "Operator" );
+            Scribe_Deep.Look( ref ThresholdFilter, "ThresholdFilter" );
 
             // stockpile needs special treatment - is not referenceable.
             if ( Scribe.mode == LoadSaveMode.Saving )
             {
                 _stockpile_scribe = stockpile?.ToString() ?? "null";
             }
-            Scribe_Values.LookValue( ref _stockpile_scribe, "Stockpile", "null" );
+            Scribe_Values.Look( ref _stockpile_scribe, "Stockpile", "null" );
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
             {
                 stockpile =

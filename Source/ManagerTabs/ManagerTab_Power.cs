@@ -137,8 +137,8 @@ namespace FluffyManager
 
         public void ExposeData()
         {
-            Scribe_Deep.LookDeep( ref tradingHistory, "tradingHistory" );
-            Scribe_Deep.LookDeep( ref overallHistory, "overallHistory" );
+            Scribe_Deep.Look( ref tradingHistory, "tradingHistory" );
+            Scribe_Deep.Look( ref overallHistory, "overallHistory" );
         }
 
         public override void PreOpen()

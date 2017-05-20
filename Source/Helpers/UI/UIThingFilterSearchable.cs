@@ -70,7 +70,8 @@ namespace FluffyManager
 
             // main listing
             var listingRect = new Rect( 0f, curY, viewRect.width, 9999f );
-            var listingTreeThingFilter = new Listing_TreeThingFilter( listingRect, filter, parentFilter, null, null );
+            var listingTreeThingFilter = new Listing_TreeThingFilter( filter, parentFilter, null, null, null );
+            listingTreeThingFilter.Begin( listingRect );
             TreeNode_ThingCategory node = ThingCategoryNodeDatabase.RootNode;
             if ( parentFilter != null )
             {

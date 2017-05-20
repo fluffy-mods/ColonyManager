@@ -114,29 +114,29 @@ namespace FluffyManager
             base.ExposeData();
 
             // settings, references first!
-            Scribe_References.LookReference( ref TameArea, "TameArea" );
-            Scribe_Collections.LookList( ref RestrictArea, "AreaRestrictions", LookMode.Reference );
-            Scribe_Deep.LookDeep( ref Trigger, "trigger", manager );
-            Scribe_Deep.LookDeep( ref Training, "Training" );
-            Scribe_Values.LookValue( ref ButcherExcess, "ButcherExcess", true );
-            Scribe_Values.LookValue( ref ButcherTrained, "ButcherTrained", false );
-            Scribe_Values.LookValue( ref RestrictToArea, "RestrictToArea", false );
-            Scribe_Values.LookValue( ref TryTameMore, "TryTameMore", false );
+            Scribe_References.Look( ref TameArea, "TameArea" );
+            Scribe_Collections.Look( ref RestrictArea, "AreaRestrictions", LookMode.Reference );
+            Scribe_Deep.Look( ref Trigger, "trigger", manager );
+            Scribe_Deep.Look( ref Training, "Training" );
+            Scribe_Values.Look( ref ButcherExcess, "ButcherExcess", true );
+            Scribe_Values.Look( ref ButcherTrained, "ButcherTrained", false );
+            Scribe_Values.Look( ref RestrictToArea, "RestrictToArea", false );
+            Scribe_Values.Look( ref TryTameMore, "TryTameMore", false );
 
             // our current designations
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
             {
                 // populate with all designations.
                 Designations.AddRange(
-                                      manager.map.designationManager.DesignationsOfDef( DesignationDefOf.Slaughter )
+                                      manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Slaughter )
                                              .Where( des => ( (Pawn)des.target.Thing ).kindDef == Trigger.pawnKind ) );
                 Designations.AddRange(
-                                      manager.map.designationManager.DesignationsOfDef( DesignationDefOf.Tame )
+                                      manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Tame )
                                              .Where( des => ( (Pawn)des.target.Thing ).kindDef == Trigger.pawnKind ) );
             }
 
             // this is an array of strings as the first (and only) parameter - make sure it doesn't get cast to array of objects for multiple parameters.
-            Scribe_Deep.LookDeep( ref _history, "History" );
+            Scribe_Deep.Look( ref _history, "History" );
         }
 
         public override bool TryDoJob()
@@ -501,7 +501,7 @@ namespace FluffyManager
                 return new AcceptanceReport( "CannotTrainTooSmall".Translate( (object)pawnKind.LabelCap ) );
             }
 
-            if ( pawnKind.RaceProps.trainableIntelligence < td.requiredTrainableIntelligence )
+            if ( pawnKind.RaceProps.TrainableIntelligence.intelligenceOrder < td.requiredTrainableIntelligence.intelligenceOrder )
             {
                 visible = true;
                 return
@@ -582,8 +582,8 @@ namespace FluffyManager
 
             public void ExposeData()
             {
-                Scribe_Values.LookValue( ref TrainYoung, "TrainYoung", false );
-                Scribe_Deep.LookDeep( ref TrainingTargets, "TrainingTargets" );
+                Scribe_Values.Look( ref TrainYoung, "TrainYoung", false );
+                Scribe_Deep.Look( ref TrainingTargets, "TrainingTargets" );
             }
 
             private void SetWantedRecursive( TrainableDef td, bool wanted )

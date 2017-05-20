@@ -37,8 +37,8 @@ namespace FluffyManager
             ManagerTabs = new List<ManagerTab>
                           {
                               new ManagerTab_Overview( this ),
-                              new ManagerTab_Production( this ),
-                              new ManagerTab_ImportExport( this ),
+                              //new ManagerTab_Production( this ),
+                              //new ManagerTab_ImportExport( this ),
                               new ManagerTab_Hunting( this ),
                               new ManagerTab_Forestry( this ),
                               new ManagerTab_Livestock( this ),
@@ -134,16 +134,16 @@ namespace FluffyManager
         {
             base.ExposeData();
             // TODO: migrate HelpShown to HugsLib invisible setting.
-            Scribe_Values.LookValue( ref id, "id", -1, true );
-            Scribe_Values.LookValue( ref HelpShown, "HelpShown", false );
-            Scribe_Deep.LookDeep( ref _stack, "JobStack", this );
+            Scribe_Values.Look( ref id, "id", -1, true );
+            Scribe_Values.Look( ref HelpShown, "HelpShown", false );
+            Scribe_Deep.Look( ref _stack, "JobStack", this );
 
             foreach ( ManagerTab tab in ManagerTabs )
             {
                 var exposableTab = tab as IExposable;
                 if ( exposableTab != null )
                 {
-                    Scribe_Deep.LookDeep( ref exposableTab, tab.Label, this );
+                    Scribe_Deep.Look( ref exposableTab, tab.Label, this );
                 }
             }
 

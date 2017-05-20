@@ -22,8 +22,8 @@ namespace FluffyManager
         {
             get { return ThingRequest.ForGroup( ThingRequestGroup.PotentialBillGiver ); }
         }
-
-        public override bool HasJobOnThing( Pawn pawn, Thing t )
+        
+        public override bool HasJobOnThing( Pawn pawn, Thing t, bool forced )
         {
 #if DEBUG_WORKGIVER
             Log.Message( "Checking " + t.LabelCap + " for job." );
@@ -53,7 +53,7 @@ namespace FluffyManager
                 return false;
             }
 
-            if ( !pawn.CanReserveAndReach( t, PathEndMode, Danger.Some ) )
+            if ( !pawn.CanReserveAndReach( t, PathEndMode, Danger.Some, ignoreOtherReservations: forced ) )
             {
                 return false;
             }
@@ -73,7 +73,7 @@ namespace FluffyManager
             return false;
         }
 
-        public override Job JobOnThing( Pawn pawn, Thing t )
+        public override Job JobOnThing( Pawn pawn, Thing t, bool forced )
         {
             return new Job( DefDatabase<JobDef>.GetNamed( "ManagingAtManagingStation" ), t as Building_ManagerStation );
         }

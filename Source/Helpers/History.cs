@@ -122,19 +122,19 @@ namespace FluffyManager
         public void ExposeData()
         {
             // settings
-            Scribe_Values.LookValue( ref AllowTogglingLegend, "AllowToggingLegend", true );
-            Scribe_Values.LookValue( ref DrawInlineLegend, "ShowLegend", true );
-            Scribe_Values.LookValue( ref DrawTargetLine, "DrawTargetLine", true );
-            Scribe_Values.LookValue( ref DrawOptions, "DrawOptions", true );
-            Scribe_Values.LookValue( ref Suffix, "Suffix", "" );
-            Scribe_Values.LookValue( ref DrawIcons, "DrawIcons", true );
-            Scribe_Values.LookValue( ref DrawCounts, "DrawCounts", true );
-            Scribe_Values.LookValue( ref DrawInfoInBar, "DrawInfoInBar", false );
-            Scribe_Values.LookValue( ref DrawMaxMarkers, "DrawMaxMarkers", true );
-            Scribe_Values.LookValue( ref MaxPerChapter, "MaxPerChapter", false );
+            Scribe_Values.Look( ref AllowTogglingLegend, "AllowToggingLegend", true );
+            Scribe_Values.Look( ref DrawInlineLegend, "ShowLegend", true );
+            Scribe_Values.Look( ref DrawTargetLine, "DrawTargetLine", true );
+            Scribe_Values.Look( ref DrawOptions, "DrawOptions", true );
+            Scribe_Values.Look( ref Suffix, "Suffix", "" );
+            Scribe_Values.Look( ref DrawIcons, "DrawIcons", true );
+            Scribe_Values.Look( ref DrawCounts, "DrawCounts", true );
+            Scribe_Values.Look( ref DrawInfoInBar, "DrawInfoInBar", false );
+            Scribe_Values.Look( ref DrawMaxMarkers, "DrawMaxMarkers", true );
+            Scribe_Values.Look( ref MaxPerChapter, "MaxPerChapter", false );
 
             // history chapters
-            Scribe_Collections.LookList( ref _chapters, "Chapters", LookMode.Deep );
+            Scribe_Collections.Look( ref _chapters, "Chapters", LookMode.Deep );
 
             // some post load tweaks
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
@@ -153,7 +153,7 @@ namespace FluffyManager
                 switch ( period )
                 {
                     case Period.Month:
-                        ticks = GenDate.TicksPerMonth;
+                        ticks = GenDate.TicksPerTwelfth;
                         break;
 
                     case Period.Year:
@@ -671,11 +671,11 @@ namespace FluffyManager
 
             public void ExposeData()
             {
-                Scribe_Values.LookValue( ref label, "label" );
-                Scribe_Values.LookValue( ref size, "size", 100 );
-                Scribe_Values.LookValue( ref lineColor, "color", Color.white );
-                Scribe_Values.LookValue( ref ThingCount.count, "thingCount_count" );
-                Scribe_Defs.LookDef( ref ThingCount.thingDef, "thingCount_def" );
+                Scribe_Values.Look( ref label, "label" );
+                Scribe_Values.Look( ref size, "size", 100 );
+                Scribe_Values.Look( ref lineColor, "color", Color.white );
+                Scribe_Values.Look( ref ThingCount.count, "thingCount_count" );
+                Scribe_Defs.Look( ref ThingCount.thingDef, "thingCount_def" );
 
                 var periods = new List<Period>( pages.Keys );
                 foreach ( Period period in periods )

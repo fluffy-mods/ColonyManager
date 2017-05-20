@@ -43,9 +43,7 @@ Advancements in AI and colony-aware computers allow the building of Colony Aware
             <li>ManagingSoftware</li>
         </prerequisites>
         <researchMods>
-          <li>
-            <specialAction>FluffyManager.ResearchWorkers.UnlockPowerTab</specialAction>
-          </li>
+          <li Class="FluffyManager.UnlockPowerTab" />
         </researchMods>
     </ResearchProjectDef>
 </ResearchProjectDefs>

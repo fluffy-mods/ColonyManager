@@ -29,7 +29,7 @@ namespace FluffyManager
 
         public virtual void ExposeData()
         {
-            Scribe_References.LookReference( ref manager, "manager" );
+            Scribe_References.Look( ref manager, "manager" );
         }
     }
 }

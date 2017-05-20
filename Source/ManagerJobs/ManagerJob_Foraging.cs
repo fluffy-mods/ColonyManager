@@ -118,7 +118,7 @@ namespace FluffyManager
         {
             // get list of game designations not managed by this job that could have been assigned by this job.
             foreach (
-                Designation des in manager.map.designationManager.DesignationsOfDef( DesignationDefOf.HarvestPlant )
+                Designation des in manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.HarvestPlant )
                                           .Except( Designations )
                                           .Where( des => IsValidForagingTarget( des.target ) ) )
             {
@@ -132,7 +132,7 @@ namespace FluffyManager
         public void CleanDeadDesignations()
         {
             IEnumerable<Designation> _gameDesignations =
-                manager.map.designationManager.DesignationsOfDef( DesignationDefOf.HarvestPlant );
+                manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.HarvestPlant );
             Designations = Designations.Intersect( _gameDesignations ).ToList();
         }
 
@@ -193,15 +193,15 @@ namespace FluffyManager
             base.ExposeData();
 
             // settings, references first!
-            Scribe_References.LookReference( ref ForagingArea, "ForagingArea" );
-            Scribe_Deep.LookDeep( ref Trigger, "trigger", manager );
-            Scribe_Collections.LookDictionary( ref AllowedPlants, "AllowedPlants", LookMode.Def, LookMode.Value );
-            Scribe_Values.LookValue( ref ForceFullyMature, "ForceFullyMature", false );
+            Scribe_References.Look( ref ForagingArea, "ForagingArea" );
+            Scribe_Deep.Look( ref Trigger, "trigger", manager );
+            Scribe_Collections.Look( ref AllowedPlants, "AllowedPlants", LookMode.Def, LookMode.Value );
+            Scribe_Values.Look( ref ForceFullyMature, "ForceFullyMature", false );
 
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
                 // scribe history
-                Scribe_Deep.LookDeep( ref History, "History" );
+                Scribe_Deep.Look( ref History, "History" );
             }
         }
 

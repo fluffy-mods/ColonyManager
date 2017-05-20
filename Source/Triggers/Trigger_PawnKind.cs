@@ -97,8 +97,8 @@ namespace FluffyManager
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Collections.LookDictionary( ref CountTargets, "Targets", LookMode.Value, LookMode.Value );
-            Scribe_Defs.LookDef( ref pawnKind, "PawnKind" );
+            Scribe_Collections.Look( ref CountTargets, "Targets", LookMode.Value, LookMode.Value );
+            Scribe_Defs.Look( ref pawnKind, "PawnKind" );
         }
 
         private bool AllTrainingWantedSet()

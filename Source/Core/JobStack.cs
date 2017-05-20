@@ -114,7 +114,7 @@ namespace FluffyManager
             CleanPriorities();
         }
 
-        public void ExposeData() { Scribe_Collections.LookList( ref _stack, "JobStack", LookMode.Deep, manager ); }
+        public void ExposeData() { Scribe_Collections.Look( ref _stack, "JobStack", LookMode.Deep, manager ); }
 
         /// <summary>
         ///     Jobs of type T in jobstack, in order of priority

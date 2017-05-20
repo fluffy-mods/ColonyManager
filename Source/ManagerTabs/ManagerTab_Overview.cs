@@ -360,7 +360,7 @@ namespace FluffyManager
             if ( Widgets.ButtonInvisible( nameRect ) )
             {
                 Find.MainTabsRoot.EscapeCurrentTab();
-                Find.CameraDriver.JumpTo( pawn.PositionHeld );
+                CameraJumper.TryJump( pawn.PositionHeld, pawn.Map );
                 Find.Selector.ClearSelection();
                 if ( pawn.Spawned )
                 {

@@ -87,10 +87,10 @@ namespace FluffyManager
 
         public virtual void ExposeData()
         {
-            Scribe_References.LookReference( ref manager, "manager" );
-            Scribe_Values.LookValue( ref ActionInterval, "ActionInterval" );
-            Scribe_Values.LookValue( ref LastAction, "LastAction" );
-            Scribe_Values.LookValue( ref Priority, "Priority" );
+            Scribe_References.Look( ref manager, "manager" );
+            Scribe_Values.Look( ref ActionInterval, "ActionInterval" );
+            Scribe_Values.Look( ref LastAction, "LastAction" );
+            Scribe_Values.Look( ref Priority, "Priority" );
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit || Manager.LoadSaveMode == Manager.Modes.ImportExport )
             {

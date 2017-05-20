@@ -96,7 +96,7 @@ namespace FluffyManager
         public void AddRelevantGameDesignations()
         {
             // get list of game designations not managed by this job that could have been assigned by this job.
-            foreach ( Designation des in manager.map.designationManager.DesignationsOfDef( DesignationDefOf.CutPlant )
+            foreach ( Designation des in manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.CutPlant )
                                                 .Except( Designations )
                                                 .Where( des => IsValidForestryTarget( des.target ) ) )
             {
@@ -110,8 +110,7 @@ namespace FluffyManager
         public void CleanDesignations()
         {
             // get the intersection of bills in the game and bills in our list.
-            List<Designation> gameDesignations =
-                manager.map.designationManager.DesignationsOfDef( DesignationDefOf.HarvestPlant ).ToList();
+            List<Designation> gameDesignations = manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.HarvestPlant ).ToList();
             Designations = Designations.Intersect( gameDesignations ).ToList();
         }
 
@@ -208,11 +207,11 @@ namespace FluffyManager
             base.ExposeData();
 
             // settings, references first!
-            Scribe_References.LookReference( ref LoggingArea, "LoggingArea" );
-            Scribe_Deep.LookDeep( ref Trigger, "trigger", manager );
-            Scribe_Collections.LookDictionary( ref AllowedTrees, "AllowedTrees", LookMode.Def, LookMode.Value );
-            Scribe_Values.LookValue( ref AllowSaplings, "AllowSaplings", false );
-            Scribe_Values.LookValue( ref ClearWindCells, "ClearWindCells", true );
+            Scribe_References.Look( ref LoggingArea, "LoggingArea" );
+            Scribe_Deep.Look( ref Trigger, "trigger", manager );
+            Scribe_Collections.Look( ref AllowedTrees, "AllowedTrees", LookMode.Def, LookMode.Value );
+            Scribe_Values.Look( ref AllowSaplings, "AllowSaplings", false );
+            Scribe_Values.Look( ref ClearWindCells, "ClearWindCells", true );
 
             // clearing areas list
             if ( Scribe.mode == LoadSaveMode.Saving )
@@ -227,8 +226,8 @@ namespace FluffyManager
 
             // scribe that stuff
             // TODO: Verify LookMode Ref
-            Scribe_Collections.LookList( ref _clearAreas_areas, "ClearAreas_areas", LookMode.Reference );
-            Scribe_Collections.LookList( ref _clearAreas_allowed, "ClearAreas_allowed", LookMode.Value );
+            Scribe_Collections.Look( ref _clearAreas_areas, "ClearAreas_areas", LookMode.Reference );
+            Scribe_Collections.Look( ref _clearAreas_allowed, "ClearAreas_allowed", LookMode.Value );
 
             // initialize areas dict from scribe helpers
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
@@ -244,7 +243,7 @@ namespace FluffyManager
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
             {
                 // scribe history
-                Scribe_Deep.LookDeep( ref History, "History" );
+                Scribe_Deep.Look( ref History, "History" );
             }
         }
 

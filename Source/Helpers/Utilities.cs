@@ -510,7 +510,7 @@ namespace FluffyManager
             {
                 text = String.Join( ":", values.ConvertAll( i => i.ToString() ).ToArray() );
             }
-            Scribe_Values.LookValue( ref text, label );
+            Scribe_Values.Look( ref text, label );
             if ( Scribe.mode == LoadSaveMode.LoadingVars )
             {
                 values = text.Split( ":".ToCharArray() ).ToList().ConvertAll( int.Parse );

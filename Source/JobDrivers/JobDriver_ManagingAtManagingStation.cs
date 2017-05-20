@@ -47,7 +47,7 @@ namespace FluffyManager
             toil.defaultCompleteMode = ToilCompleteMode.Delay;
             toil.tickAction =
                 delegate
-                { toil.actor.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Managing" ) ).Learn( 0.11f ); };
+                { toil.actor.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Intellectual" ) ).Learn( 0.11f ); };
             var finishers = new List<Action>();
             finishers.Add( delegate
             { Manager.For( pawn.Map ).TryDoWork(); } );

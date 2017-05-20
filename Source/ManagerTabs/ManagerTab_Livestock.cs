@@ -575,7 +575,7 @@ namespace FluffyManager
             {
                 // move camera and select
                 Find.MainTabsRoot.EscapeCurrentTab();
-                Find.CameraDriver.JumpTo( p.PositionHeld );
+                CameraJumper.TryJump( p.PositionHeld, p.Map );
                 Find.Selector.ClearSelection();
                 if ( p.Spawned )
                 {
