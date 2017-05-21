@@ -377,6 +377,14 @@ namespace FluffyManager
             // makes sure the list of possible areas is up-to-date with the area in the game.
             foreach ( ManagerJob_Forestry job in _jobs )
                 job.UpdateClearAreas();
+
+
+            // update plant options
+            foreach (var job in _jobs)
+            {
+                job.RefreshAllowedTrees();
+            }
+            _selected?.RefreshAllowedTrees();
         }
 
         #endregion Methods

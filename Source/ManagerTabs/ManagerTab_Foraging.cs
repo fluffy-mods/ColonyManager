@@ -345,6 +345,13 @@ namespace FluffyManager
         public void Refresh()
         {
             _jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Foraging>();
+
+            // update plant options
+            foreach (var job in _jobs)
+            {
+                job.RefreshAllowedPlants();
+            }
+            _selected?.RefreshAllowedPlants( true );
         }
 
         #endregion Methods

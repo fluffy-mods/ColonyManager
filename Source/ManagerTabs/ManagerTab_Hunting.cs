@@ -339,6 +339,13 @@ namespace FluffyManager
         public void Refresh()
         {
             Jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Hunting>();
+
+            // update pawnkind options
+            foreach ( ManagerJob_Hunting job in Jobs )
+            {
+                job.RefreshAllowedAnimals();
+            }
+            _selected?.RefreshAllowedAnimals();
         }
     }
 }

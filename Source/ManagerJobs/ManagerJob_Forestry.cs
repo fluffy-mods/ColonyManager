@@ -16,7 +16,7 @@ namespace FluffyManager
         #region Fields
 
         public static bool ClearWindCells = true;
-        public Dictionary<ThingDef, bool> AllowedTrees;
+        public Dictionary<ThingDef, bool> AllowedTrees = new Dictionary<ThingDef, bool>();
         public bool AllowSaplings;
         public Dictionary<Area, bool> ClearAreas = new Dictionary<Area, bool>();
         public List<Designation> Designations = new List<Designation>();
@@ -40,20 +40,16 @@ namespace FluffyManager
             Trigger.ThresholdFilter.SetDisallowAll();
             Trigger.ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
 
-            // populate the list of trees from the plants in the biome - allow all by default.
-            // A tree is defined as any plant that yields wood or has a wood harvesting tag.
-            AllowedTrees =
-                manager.map.Biome.AllWildPlants.Where(
-                                                      pd =>
-                                                      pd.plant.harvestTag == "Wood" ||
-                                                      pd.plant.harvestedThingDef == Utilities_Forestry.Wood )
-                       // add harvesttag to allow non-wood yielding woody plants.
-                       .ToDictionary( pk => pk, v => true );
-
             // initialize clearAreas list with current areas
             UpdateClearAreas();
 
             History = new History( new[] { "stock", "designated" }, new[] { Color.white, Color.grey } );
+
+
+            // init stuff if we're not loading
+            // todo: please, please refactor this into something less clumsy!
+            if (Scribe.mode == LoadSaveMode.Inactive)
+                RefreshAllowedTrees();
         }
 
         #endregion Constructors
@@ -464,5 +460,22 @@ namespace FluffyManager
         }
 
         #endregion Methods
+
+        public void RefreshAllowedTrees()
+        {
+            // A tree is defined as any plant that yields wood or has a wood harvesting tag.
+            var options = manager.map.Biome.AllWildPlants.Where(
+                                                                pd =>
+                                                                    pd.plant.harvestTag == "Wood" ||
+                                                                    pd.plant.harvestedThingDef ==
+                                                                    Utilities_Forestry.Wood );
+
+            foreach ( ThingDef tree in options )
+            {
+                if (!AllowedTrees.ContainsKey( tree ))
+                    AllowedTrees.Add( tree, false );
+            }
+
+        }
     }
 }

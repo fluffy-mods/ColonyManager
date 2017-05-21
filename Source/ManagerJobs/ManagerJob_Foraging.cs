@@ -15,7 +15,7 @@ namespace FluffyManager
     {
         #region Fields
 
-        public Dictionary<ThingDef, bool> AllowedPlants;
+        public Dictionary<ThingDef, bool> AllowedPlants = new Dictionary<ThingDef, bool>();
         public Area ForagingArea;
         public bool ForceFullyMature;
         public History History;
@@ -32,34 +32,16 @@ namespace FluffyManager
 
         public ManagerJob_Foraging( Manager manager ) : base( manager )
         {
-            // all plants that yield something, and it isn't wood.
-            AllowedPlants = manager.map.Biome.AllWildPlants
-                                   .Where( plant => plant.plant.harvestYield > 0 &&
-                                                    plant.plant.harvestedThingDef != null &&
-                                                    plant.plant.harvestTag != "Wood" )
-                                   .ToDictionary( k => k, v => false );
-
-            // add cave world fauna
-            List<ThingDef> caveWorldFauna =
-                DefDatabase<ThingDef>.AllDefsListForReading.Where(
-                                                                  def =>
-                                                                  def.plant?.sowTags.Contains( "Fungiponics" ) ?? false )
-                                     .ToList();
-            foreach ( ThingDef fungus in caveWorldFauna )
-            {
-                AllowedPlants.Add( fungus, false );
-            }
-
             // populate the trigger field, count all harvested thingdefs from the allowed plant list
             Trigger = new Trigger_Threshold( this );
-            Trigger.ThresholdFilter.SetDisallowAll();
-            foreach ( ThingDef plant in AllowedPlants.Keys )
-            {
-                Trigger.ThresholdFilter.SetAllow( plant.plant.harvestedThingDef, true );
-            }
 
             // create History tracker
             History = new History( new[] { "stock", "designated" }, new[] { Color.white, Color.grey } );
+
+            // init stuff if we're not loading
+            // todo: please, please refactor this into something less clumsy!
+            if (Scribe.mode == LoadSaveMode.Inactive)
+                RefreshAllowedPlants();
         }
 
         #endregion Constructors
@@ -317,6 +299,37 @@ namespace FluffyManager
                    && manager.map.reachability.CanReachColony( p.Position );
         }
 
+
+
         #endregion Methods
+
+        public void RefreshAllowedPlants( bool firstTime = false )
+        {
+            // all plants that yield something, and it isn't wood.
+            var options = manager.map.Biome.AllWildPlants
+                                 .Where( plant => plant.plant.harvestYield > 0 &&
+                                                  plant.plant.harvestedThingDef != null &&
+                                                  plant.plant.harvestTag != "Wood" )
+                                // Caveworld Fauna
+                                 .Concat( DefDatabase<ThingDef>
+                                              .AllDefsListForReading
+                                              .Where( def => def.plant?.sowTags.Contains( "Fungiponics" ) ?? false ) )
+                                 .Distinct();
+
+            foreach ( ThingDef plant in options )
+            {
+                if (!AllowedPlants.ContainsKey( plant) )
+                    AllowedPlants.Add( plant, false );
+            }
+
+            if ( firstTime )
+            {
+                Trigger.ThresholdFilter.SetDisallowAll();
+                foreach ( ThingDef plant in AllowedPlants.Keys )
+                {
+                    Trigger.ThresholdFilter.SetAllow( plant.plant.harvestedThingDef, true );
+                }
+            }
+        }
     }
 }
