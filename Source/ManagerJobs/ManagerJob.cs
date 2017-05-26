@@ -26,7 +26,13 @@ namespace FluffyManager
                             ProgressRectWidth = 10f,
                             StatusRectWidth = LastUpdateRectWidth + ProgressRectWidth;
 
-        public int ActionInterval = 3600;
+        private int _actionInterval = Settings.DefaultUpdateInterval;
+
+        public virtual int ActionInterval
+        {
+            get { return _actionInterval; }
+            set { _actionInterval = value; }
+        }
 
         // should be 1 minute.
         public int LastAction;
@@ -88,7 +94,7 @@ namespace FluffyManager
         public virtual void ExposeData()
         {
             Scribe_References.Look( ref manager, "manager" );
-            Scribe_Values.Look( ref ActionInterval, "ActionInterval" );
+            Scribe_Values.Look( ref _actionInterval, "ActionInterval" );
             Scribe_Values.Look( ref LastAction, "LastAction" );
             Scribe_Values.Look( ref Priority, "Priority" );
 

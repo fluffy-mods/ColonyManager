@@ -16,12 +16,20 @@
   <FM.AlertNoManager>Manager targets are set, but no pawn has the managing job enabled</FM.AlertNoManager>
 
   <!-- Common -->
-  <FM.LastUpdateTooltip>This job was last updated {0} ago.</FM.LastUpdateTooltip>
+  <FM.LastUpdateTooltip>This job was last updated {0} ago, and is scheduled to be updated every {1}.\n\nClick to change update interval.</FM.LastUpdateTooltip>
   <FM.OrderUp>Increase job priority</FM.OrderUp>
   <FM.OrderDown>Decrease job priority</FM.OrderDown>
   <FM.OrderTop>Maximum priority</FM.OrderTop>
   <FM.OrderBottom>Minimum priority</FM.OrderBottom>
   <multiple>[multiple]</multiple>
+
+  <!-- time periods for update interval -->
+  <FM.DefaultUpdateInterval>Default update interval</FM.DefaultUpdateInterval>
+  <FM.Hourly>Every hour</FM.Hourly>
+  <FM.MultiHourly>Every {0} hours</FM.MultiHourly>
+  <FM.Daily>Daily</FM.Daily>
+  <FM.Monthly>Monthly</FM.Monthly>
+  <FM.Yearly>Yearly</FM.Yearly>
 
   <!-- History graphs -->
   <FM.HistoryPeriod>Period</FM.HistoryPeriod>

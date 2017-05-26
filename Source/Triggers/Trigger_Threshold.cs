@@ -35,25 +35,7 @@ namespace FluffyManager
         #region Constructors
 
         public Trigger_Threshold( Manager manager ) : base( manager ) { }
-
-        //public Trigger_Threshold( ManagerJob_Production job ) : base( job.manager )
-        //{
-        //    Op = Ops.LowerThan;
-        //    MaxUpperThreshold = job.MainProduct.MaxUpperThreshold;
-        //    // TODO: Better way of setting sensible defaults?
-        //    Count = MaxUpperThreshold / 20;
-        //    ThresholdFilter = new ThingFilter();
-        //    ThresholdFilter.SetDisallowAll();
-        //    if ( job.MainProduct.ThingDef != null )
-        //    {
-        //        ThresholdFilter.SetAllow( job.MainProduct.ThingDef, true );
-        //    }
-        //    if ( job.MainProduct.CategoryDef != null )
-        //    {
-        //        ThresholdFilter.SetAllow( job.MainProduct.CategoryDef, true );
-        //    }
-        //}
-
+        
         public Trigger_Threshold( ManagerJob_Hunting job ) : base( job.manager )
         {
             Op = Ops.LowerThan;

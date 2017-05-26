@@ -23,6 +23,7 @@ namespace FluffyManager
         public static Dictionary<MapStockpileFilter, FilterCountCache> CountCache =
             new Dictionary<MapStockpileFilter, FilterCountCache>();
 
+        public static Dictionary<string, int> updateIntervalOptions = new Dictionary<string, int>();
         public static float LargeIconSize = 32f;
         public static float ListEntryHeight = 30f;
         public static float MediumIconSize = 24f;
@@ -30,6 +31,17 @@ namespace FluffyManager
         public static float TitleHeight = 50f;
         public static float TopAreaHeight = 30f;
         public static WorkTypeDef WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
+
+        static Utilities()
+        {
+            updateIntervalOptions.Add( "FM.Hourly".Translate(), GenDate.TicksPerHour );
+            updateIntervalOptions.Add( "FM.MultiHourly".Translate( 2 ), GenDate.TicksPerHour * 2 );
+            updateIntervalOptions.Add( "FM.MultiHourly".Translate( 4 ), GenDate.TicksPerHour * 4 );
+            updateIntervalOptions.Add( "FM.MultiHourly".Translate( 8 ), GenDate.TicksPerHour * 8 );
+            updateIntervalOptions.Add( "FM.Daily".Translate(), GenDate.TicksPerDay );
+            updateIntervalOptions.Add( "FM.Monthly".Translate(), GenDate.TicksPerTwelfth );
+            updateIntervalOptions.Add( "FM.Yearly".Translate(), GenDate.TicksPerYear );
+        }
 
         public static Rect CenteredIn( this Rect inner, Rect outer, float x = 0f, float y = 0f )
         {
@@ -358,14 +370,43 @@ namespace FluffyManager
 
             // draw time since last action
             Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label( lastUpdateRect, ( Find.TickManager.TicksGame - job.LastAction ).TimeString() );
+            var lastUpdate = (Find.TickManager.TicksGame - job.LastAction);
+
+            // set color by how timely we've been
+            if ( lastUpdate < job.ActionInterval )
+                GUI.color = Color.green;
+            if ( lastUpdate > job.ActionInterval )
+                GUI.color = Color.white;
+            if ( lastUpdate > job.ActionInterval * 2 )
+                GUI.color = Color.red;
+            
+            Widgets.Label( lastUpdateRect, lastUpdate.TimeString() );
+            GUI.color = Color.white;
 
             // set tooltips
             TooltipHandler.TipRegion( progressRect, trigger.StatusTooltip );
             TooltipHandler.TipRegion( lastUpdateRect,
-                                      "FM.LastUpdateTooltip".Translate(
-                                                                       ( Find.TickManager.TicksGame - job.LastAction )
-                                                                           .TimeString() ) );
+                                      "FM.LastUpdateTooltip".Translate( 
+                                          lastUpdate.TimeString(),
+                                          job.ActionInterval.TimeString() ) );
+
+            Widgets.DrawHighlightIfMouseover( lastUpdateRect );
+            if ( Widgets.ButtonInvisible( lastUpdateRect ) )
+            {
+                var options = new List<FloatMenuOption>();
+                foreach ( KeyValuePair<string, int> period in updateIntervalOptions )
+                {
+                    var label = period.Key;
+                    var time = period.Value;
+                    options.Add( new FloatMenuOption( label, delegate
+                                                                      {
+                                                                          job.ActionInterval = time;
+                                                                      }
+                                                    ) );
+                }
+
+                Find.WindowStack.Add( new FloatMenu( options ) );
+            }
 
             GUI.EndGroup();
         }
