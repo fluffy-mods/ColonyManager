@@ -16,6 +16,8 @@ namespace FluffyManager
         private History _history;
         public bool ButcherExcess;
         public bool ButcherTrained;
+        public bool ButcherPregnant;
+        public bool ButcherBonded;
         private List<Designation> Designations;
         public List<Area> RestrictArea;
         public bool RestrictToArea;
@@ -47,6 +49,8 @@ namespace FluffyManager
             TryTameMore = false;
             ButcherExcess = true;
             ButcherTrained = false;
+            ButcherPregnant = false;
+            ButcherBonded = false;
         }
 
         public ManagerJob_Livestock( PawnKindDef pawnKindDef, Manager manager ) : this( manager ) // set defaults
@@ -119,7 +123,9 @@ namespace FluffyManager
             Scribe_Deep.Look( ref Trigger, "trigger", manager );
             Scribe_Deep.Look( ref Training, "Training" );
             Scribe_Values.Look( ref ButcherExcess, "ButcherExcess", true );
-            Scribe_Values.Look( ref ButcherTrained, "ButcherTrained", false );
+            Scribe_Values.Look(ref ButcherTrained, "ButcherTrained", false);
+            Scribe_Values.Look(ref ButcherPregnant, "ButcherPregnant", false);
+            Scribe_Values.Look(ref ButcherBonded, "ButcherBonded", false);
             Scribe_Values.Look( ref RestrictToArea, "RestrictToArea", false );
             Scribe_Values.Look( ref TryTameMore, "TryTameMore", false );
 
@@ -357,13 +363,10 @@ namespace FluffyManager
                     // get list of animals in correct sort order.
                     List<Pawn> animals = Trigger.pawnKind.GetTame( manager, ageSex )
                                                 .Where(
-                                                       p =>
-                                                       manager.map.designationManager.DesignationOn( p,
-                                                                                                     DesignationDefOf
-                                                                                                         .Slaughter ) ==
-                                                       null
-                                                       && ButcherTrained ||
-                                                       !p.training.IsCompleted( TrainableDefOf.Obedience ) )
+                                                       p => manager.map.designationManager.DesignationOn( p, DesignationDefOf.Slaughter ) == null
+                                                       && ButcherTrained || !p.training.IsCompleted( TrainableDefOf.Obedience )
+                                                       && ButcherPregnant || !p.VisiblyPregnant() 
+                                                       && ButcherBonded || !p.BondedWithColonist())
                                                 .OrderBy(
                                                          p => ( oldestFirst ? -1 : 1 ) * p.ageTracker.AgeBiologicalTicks )
                                                 .ToList();

@@ -162,6 +162,8 @@
   <FML.RestrictToArea>Restrict animals to area?</FML.RestrictToArea>
   <FML.ButcherExcess>Butcher excess livestock</FML.ButcherExcess>
   <FML.ButcherTrained>Butcher trained excess livestock</FML.ButcherTrained>
+  <FML.ButcherPregnant>Butcher pregnant excess livestock</FML.ButcherPregnant>
+  <FML.ButcherBonded>Butcher bonded excess livestock</FML.ButcherBonded>
   <FML.TameMore>Auto-designate animals to be tamed</FML.TameMore>
   <FML.TameArea>Allow taming in:</FML.TameArea>
   <FML.Animals>Animals</FML.Animals>

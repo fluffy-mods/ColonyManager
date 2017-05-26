@@ -302,6 +302,20 @@ namespace FluffyManager
                                   ref _selectedCurrent.ButcherTrained );
             cur.y += _entryHeight;
 
+            var butcherPregnantRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
+            if (optionIndex++ % 2 == 0)
+                Widgets.DrawAltRect(butcherPregnantRect);
+            Utilities.DrawToggle(butcherPregnantRect, "FML.ButcherPregnant".Translate(),
+                                  ref _selectedCurrent.ButcherPregnant);
+            cur.y += _entryHeight;
+
+            var butcherBondedRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
+            if (optionIndex++ % 2 == 0)
+                Widgets.DrawAltRect(butcherBondedRect);
+            Utilities.DrawToggle(butcherBondedRect, "FML.ButcherBonded".Translate(),
+                                  ref _selectedCurrent.ButcherBonded);
+            cur.y += _entryHeight;
+
             // try tame more?
             var tameMoreRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
             cur.y += _entryHeight;

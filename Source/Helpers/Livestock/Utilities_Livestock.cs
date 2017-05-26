@@ -164,6 +164,16 @@ namespace FluffyManager
             return ret;
         }
 
+        public static bool VisiblyPregnant( this Pawn pawn )
+        {
+            return pawn?.health.hediffSet.GetHediffs<Hediff_Pregnant>().Any( hp => hp.Visible ) ?? false;
+        }
+
+        public static bool BondedWithColonist( this Pawn pawn )
+        {
+            return pawn?.relations?.GetFirstDirectRelationPawn( PawnRelationDefOf.Bond, p => p.IsColonist ) != null;
+        }
+
         public static bool Milkable( this Pawn pawn )
         {
             var ret = false;
