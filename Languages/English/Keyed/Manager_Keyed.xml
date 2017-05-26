@@ -179,5 +179,7 @@
   <FML.WoolHeader>Progress till next shearing</FML.WoolHeader>
   <FML.Yields>yields {0} x{1}</FML.Yields>
   <FML.TrainYoung>Train young animals</FML.TrainYoung>
+  <FML.SendToSlaughterArea>Restrict animals designated for slaughter</FML.SendToSlaughterArea>
+  <FML.SlaughterArea>Slaughter area</FML.SlaughterArea>
 
 </LanguageData>

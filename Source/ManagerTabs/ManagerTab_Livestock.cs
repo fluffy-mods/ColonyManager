@@ -315,6 +315,30 @@ namespace FluffyManager
             Utilities.DrawToggle(butcherBondedRect, "FML.ButcherBonded".Translate(),
                                   ref _selectedCurrent.ButcherBonded);
             cur.y += _entryHeight;
+            
+            var sendToSlaughterAreaRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
+            if (optionIndex++ % 2 == 0)
+                Widgets.DrawAltRect(sendToSlaughterAreaRect);
+            Utilities.DrawToggle(sendToSlaughterAreaRect, "FML.SendToSlaughterArea".Translate(),
+                                  ref _selectedCurrent.SendToSlaughterArea);
+            cur.y += _entryHeight;
+
+            if ( _selectedCurrent.SendToSlaughterArea )
+            {
+                var slaughterAreaLabelRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
+                Widgets.Label( slaughterAreaLabelRect, "FML.SlaughterArea".Translate() );
+                cur.y += _entryHeight;
+
+                var slaughterAreaRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
+                AreaAllowedGUI.DoAllowedAreaSelectors(slaughterAreaRect, ref _selectedCurrent.SlaughterArea, manager, AllowedAreaMode.Animal, Utilities.Margin );
+                cur.y += _entryHeight;
+
+                if ( optionIndex++ % 2 == 0 )
+                {
+                    Widgets.DrawAltRect(slaughterAreaLabelRect);
+                    Widgets.DrawAltRect(sendToSlaughterAreaRect);
+                }
+            }
 
             // try tame more?
             var tameMoreRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );

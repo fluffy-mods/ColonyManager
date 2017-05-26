@@ -22,6 +22,8 @@ namespace FluffyManager
         public List<Area> RestrictArea;
         public bool RestrictToArea;
         public Area TameArea;
+        public bool SendToSlaughterArea;
+        public Area SlaughterArea;
         public TrainingTracker Training;
         public new Trigger_PawnKind Trigger;
         public bool TryTameMore;
@@ -44,6 +46,10 @@ namespace FluffyManager
             TameArea = null;
             RestrictToArea = false;
             RestrictArea = Utilities_Livestock.AgeSexArray.Select( k => (Area)null ).ToList();
+
+            // set up sending animals designated for slaughter to an area (freezer)
+            SendToSlaughterArea = false;
+            SlaughterArea = null;
 
             // set defaults for boolean options
             TryTameMore = false;
@@ -119,6 +125,7 @@ namespace FluffyManager
 
             // settings, references first!
             Scribe_References.Look( ref TameArea, "TameArea" );
+            Scribe_References.Look( ref SlaughterArea, "SlaughterArea" );
             Scribe_Collections.Look( ref RestrictArea, "AreaRestrictions", LookMode.Reference );
             Scribe_Deep.Look( ref Trigger, "trigger", manager );
             Scribe_Deep.Look( ref Training, "Training" );
@@ -127,6 +134,7 @@ namespace FluffyManager
             Scribe_Values.Look(ref ButcherPregnant, "ButcherPregnant", false);
             Scribe_Values.Look(ref ButcherBonded, "ButcherBonded", false);
             Scribe_Values.Look( ref RestrictToArea, "RestrictToArea", false );
+            Scribe_Values.Look( ref SendToSlaughterArea, "SendToSlaughterArea", false );
             Scribe_Values.Look( ref TryTameMore, "TryTameMore", false );
 
             // our current designations
@@ -160,11 +168,11 @@ namespace FluffyManager
             // it deliberately won't add new designations made manually.
             Designations = Designations.Intersect( manager.map.designationManager.allDesignations ).ToList();
 
-            // area restrictions
-            DoAreaRestrictions( ref actionTaken );
-
             // handle butchery
             DoButcherJobs( ref actionTaken );
+
+            // area restrictions
+            DoAreaRestrictions( ref actionTaken );
 
             // handle training
             DoTrainingJobs( ref actionTaken );
@@ -183,7 +191,8 @@ namespace FluffyManager
                 {
                     foreach ( Pawn p in Trigger.pawnKind.GetTame( manager, Utilities_Livestock.AgeSexArray[i] ) )
                     {
-                        if ( p.playerSettings.AreaRestriction != RestrictArea[i] )
+                        if ( p.playerSettings.AreaRestriction != RestrictArea[i] &&
+                            ( !SendToSlaughterArea || manager.map.designationManager.DesignationOn( p, DesignationDefOf.Slaughter ) == null ) )
                         {
                             actionTaken = true;
                             p.playerSettings.AreaRestriction = RestrictArea[i];
@@ -214,8 +223,9 @@ namespace FluffyManager
             }
 
             // else, remove one from the game as well as our managed list. (delete last - this should be the youngest/oldest).
-            Designations.Remove( currentDesignations.Last() );
-            currentDesignations.Last().Delete();
+            var designation = currentDesignations.Last();
+            Designations.Remove(designation);
+            designation.Delete();
             return true;
         }
 
@@ -226,6 +236,8 @@ namespace FluffyManager
             Designations.Add( des );
             manager.map.designationManager.AddDesignation( des );
         }
+
+
 
         internal void DoTrainingJobs( ref bool actionTaken, bool assign = true )
         {
@@ -364,9 +376,9 @@ namespace FluffyManager
                     List<Pawn> animals = Trigger.pawnKind.GetTame( manager, ageSex )
                                                 .Where(
                                                        p => manager.map.designationManager.DesignationOn( p, DesignationDefOf.Slaughter ) == null
-                                                       && ButcherTrained || !p.training.IsCompleted( TrainableDefOf.Obedience )
-                                                       && ButcherPregnant || !p.VisiblyPregnant() 
-                                                       && ButcherBonded || !p.BondedWithColonist())
+                                                       && ( ButcherTrained || !p.training.IsCompleted( TrainableDefOf.Obedience ) )
+                                                       && ( ButcherPregnant || !p.VisiblyPregnant() )
+                                                       && ( ButcherBonded || !p.BondedWithColonist() ) )
                                                 .OrderBy(
                                                          p => ( oldestFirst ? -1 : 1 ) * p.ageTracker.AgeBiologicalTicks )
                                                 .ToList();
@@ -381,12 +393,15 @@ namespace FluffyManager
                         Log.Message( "Butchering " + animals[i].GetUniqueLoadID() );
 #endif
                         AddDesignation( animals[i], DesignationDefOf.Slaughter );
+
+                        // if needed, restrict to SlaughterArea.
+                        if ( SendToSlaughterArea && SlaughterArea != null )
+                            animals[i].playerSettings.AreaRestriction = SlaughterArea;
                     }
                 }
 
                 // remove extra designations
-                while ( surplus < 0 )
-                {
+                while ( surplus < 0) { 
                     if ( TryRemoveDesignation( ageSex, DesignationDefOf.Slaughter ) )
                     {
 #if DEBUG_LIFESTOCK
