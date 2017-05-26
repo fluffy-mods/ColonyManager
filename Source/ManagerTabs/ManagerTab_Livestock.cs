@@ -290,42 +290,44 @@ namespace FluffyManager
 
             // butchery stuff
             var butcherExcessRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
-            if ( optionIndex++ % 2 == 0 )
+            if ( optionIndex % 2 == 0 )
                 Widgets.DrawAltRect( butcherExcessRect );
             Utilities.DrawToggle( butcherExcessRect, "FML.ButcherExcess".Translate(), ref _selectedCurrent.ButcherExcess );
             cur.y += _entryHeight;
 
-            var butcherTrainedRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
-            if ( optionIndex++ % 2 == 0 )
-                Widgets.DrawAltRect( butcherTrainedRect );
-            Utilities.DrawToggle( butcherTrainedRect, "FML.ButcherTrained".Translate(),
-                                  ref _selectedCurrent.ButcherTrained );
-            cur.y += _entryHeight;
+            if ( _selectedCurrent.ButcherExcess )
+            {
+                var butcherOptionsRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
+                if (optionIndex % 2 == 0)
+                    Widgets.DrawAltRect(butcherOptionsRect);
+                var usableWidth = optionsColumnRect.width - Utilities.Margin * 2f;
+                var butcherOptionRect = new Rect( cur.x + Utilities.Margin, cur.y, usableWidth / 3f, _entryHeight );
 
-            var butcherPregnantRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
-            if (optionIndex++ % 2 == 0)
-                Widgets.DrawAltRect(butcherPregnantRect);
-            Utilities.DrawToggle(butcherPregnantRect, "FML.ButcherPregnant".Translate(),
-                                  ref _selectedCurrent.ButcherPregnant);
-            cur.y += _entryHeight;
+                Utilities.DrawToggle(butcherOptionRect, "FML.ButcherTrained".Translate(),
+                                      ref _selectedCurrent.ButcherTrained, 16f, 0f, GameFont.Tiny );
+                butcherOptionRect.x += usableWidth / 3f;
 
-            var butcherBondedRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
-            if (optionIndex++ % 2 == 0)
-                Widgets.DrawAltRect(butcherBondedRect);
-            Utilities.DrawToggle(butcherBondedRect, "FML.ButcherBonded".Translate(),
-                                  ref _selectedCurrent.ButcherBonded);
-            cur.y += _entryHeight;
+                Utilities.DrawToggle(butcherOptionRect, "FML.ButcherPregnant".Translate(),
+                                      ref _selectedCurrent.ButcherPregnant, 16f, 0f, GameFont.Tiny );
+                butcherOptionRect.x += usableWidth / 3f;
+
+                Utilities.DrawToggle(butcherOptionRect, "FML.ButcherBonded".Translate(),
+                                      ref _selectedCurrent.ButcherBonded, 16f, 0f, GameFont.Tiny );
+
+                cur.y += _entryHeight;
+            }
+            optionIndex++;
             
             var sendToSlaughterAreaRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
-            if (optionIndex++ % 2 == 0)
+            if (optionIndex % 2 == 0)
                 Widgets.DrawAltRect(sendToSlaughterAreaRect);
             Utilities.DrawToggle(sendToSlaughterAreaRect, "FML.SendToSlaughterArea".Translate(),
-                                  ref _selectedCurrent.SendToSlaughterArea);
+                                  ref _selectedCurrent.SendToSlaughterArea );
             cur.y += _entryHeight;
 
             if ( _selectedCurrent.SendToSlaughterArea )
             {
-                var slaughterAreaLabelRect = new Rect(cur.x, cur.y, optionsColumnRect.width, _entryHeight);
+                var slaughterAreaLabelRect = new Rect(cur.x + Utilities.Margin, cur.y, optionsColumnRect.width, _entryHeight);
                 Widgets.Label( slaughterAreaLabelRect, "FML.SlaughterArea".Translate() );
                 cur.y += _entryHeight;
 
@@ -333,12 +335,13 @@ namespace FluffyManager
                 AreaAllowedGUI.DoAllowedAreaSelectors(slaughterAreaRect, ref _selectedCurrent.SlaughterArea, manager, AllowedAreaMode.Animal, Utilities.Margin );
                 cur.y += _entryHeight;
 
-                if ( optionIndex++ % 2 == 0 )
+                if ( optionIndex % 2 == 0 )
                 {
                     Widgets.DrawAltRect(slaughterAreaLabelRect);
                     Widgets.DrawAltRect(sendToSlaughterAreaRect);
                 }
             }
+            optionIndex++;
 
             // try tame more?
             var tameMoreRect = new Rect( cur.x, cur.y, optionsColumnRect.width, _entryHeight );
