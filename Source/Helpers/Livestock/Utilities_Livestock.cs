@@ -76,11 +76,8 @@ namespace FluffyManager
 
             // is it up to date?
             if ( cacheExists &&
-                 _allCache[key].TryGetValue( out cached ) &&
-                 cached != null )
-            {
+                 _allCache[key].TryGetValue( out cached ) && cached != null )
                 return cached;
-            }
 
             // if not, get a new list.
             cached = map.mapPawns.AllPawns
@@ -90,9 +87,7 @@ namespace FluffyManager
 
             // update if key exists
             if ( cacheExists )
-            {
                 _allCache[key].Update( cached );
-            }
 
             // else add it
             else

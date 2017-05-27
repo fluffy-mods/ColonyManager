@@ -119,6 +119,11 @@ namespace FluffyManager
             _chaptersShown.AddRange( _chapters );
         }
 
+        public bool IsRelevantTick
+        {
+            get { return periods.Any(p => Find.TickManager.TicksGame % Interval(p) == 0); }
+        }
+
         public void ExposeData()
         {
             // settings
@@ -708,7 +713,7 @@ namespace FluffyManager
 
                 return pages[period][x] * sign;
             }
-
+            
             public void Add( int count )
             {
                 int curTick = Find.TickManager.TicksGame;

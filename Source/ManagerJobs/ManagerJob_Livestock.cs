@@ -473,7 +473,8 @@ namespace FluffyManager
 
         public override void Tick()
         {
-            _history.Update( Trigger.Counts );
+            if( _history.IsRelevantTick )
+                _history.Update( Trigger.Counts );
         }
 
         public AcceptanceReport CanBeTrained( PawnKindDef pawnKind, TrainableDef td, out bool visible )

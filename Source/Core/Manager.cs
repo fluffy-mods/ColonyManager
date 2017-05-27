@@ -185,15 +185,14 @@ namespace FluffyManager
 
         private void DoGlobalWork()
         {
-            // priority settings on worktables.
-            DeepProfiler.Start( "Global work for production manager" );
-            // TODO: Fix global work for production jobs.
-            // ManagerJob_Production.GlobalWork();
-            DeepProfiler.End();
-
             // clear turbine cells.
+#if DEBUG_GLOBAL_WORK
             DeepProfiler.Start( "Global work for forestry manager" );
+#endif
+            // todo; move turbine clearing back here.
+#if DEBUG_GLOBAL_WORK
             DeepProfiler.End();
+#endif
         }
 
         internal void NewJobStack( JobStack jobstack )
