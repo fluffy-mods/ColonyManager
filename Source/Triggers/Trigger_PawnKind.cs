@@ -37,9 +37,8 @@ namespace FluffyManager
         {
             get
             {
-                return
-                    Utilities_Livestock.AgeSexArray.Select( ageSex => pawnKind.GetTame( manager, ageSex ).Count )
-                                       .ToArray();
+                // todo; figure out why this is excuciatingly slow.
+                return Utilities_Livestock.AgeSexArray.Select( ageSex => pawnKind.GetTame( manager, ageSex ).Count ).ToArray();
             }
         }
 
