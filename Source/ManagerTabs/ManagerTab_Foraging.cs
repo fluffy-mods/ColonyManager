@@ -348,10 +348,10 @@ namespace FluffyManager
 
             // update plant options
             foreach (var job in _jobs)
-            {
                 job.RefreshAllowedPlants();
-            }
-            _selected?.RefreshAllowedPlants( true );
+
+            // update selected ( also update thingfilter _only_ if the job is not managed yet )
+            _selected?.RefreshAllowedPlants( !_selected.Managed );
         }
 
         #endregion Methods

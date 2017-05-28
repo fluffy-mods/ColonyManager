@@ -342,9 +342,7 @@ namespace FluffyManager
 
             // update pawnkind options
             foreach ( ManagerJob_Hunting job in Jobs )
-            {
                 job.RefreshAllowedAnimals();
-            }
             _selected?.RefreshAllowedAnimals();
         }
     }

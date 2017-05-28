@@ -381,9 +381,9 @@ namespace FluffyManager
 
             // update plant options
             foreach (var job in _jobs)
-            {
                 job.RefreshAllowedTrees();
-            }
+            
+            // also for selected job
             _selected?.RefreshAllowedTrees();
         }
 

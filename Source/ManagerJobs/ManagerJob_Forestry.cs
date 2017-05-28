@@ -475,7 +475,6 @@ namespace FluffyManager
                 if (!AllowedTrees.ContainsKey( tree ))
                     AllowedTrees.Add( tree, false );
             }
-
         }
     }
 }
