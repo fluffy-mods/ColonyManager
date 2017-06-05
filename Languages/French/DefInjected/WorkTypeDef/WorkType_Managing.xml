@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+		<Managing.labelShort>Gestionnaire</Managing.labelShort>
+		<Managing.pawnLabel>Gestionnaire</Managing.pawnLabel>
+		<Managing.gerundLabel>Gestion</Managing.gerundLabel>
+		<Managing.description>Les gestionnaires assignent des tâches et des ordres à votre colonie.</Managing.description>
+		<Managing.verb>Gestion au</Managing.verb>
+		
+</LanguageData>

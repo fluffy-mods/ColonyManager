@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <ManagingSoftware.label>Базовое ПО управляющего</ManagingSoftware.label>
+  <ManagingSoftware.description>
+Разработка базового программного обеспечения для управления колонией. 
+
+Позволяет строить стол управляющего с компьютером, на которой предустановлено отлаженное ПО для управления.
+  </ManagingSoftware.description>
+
+  <AdvancedManagingSoftware.label>Продвинутое ПО управляющего</AdvancedManagingSoftware.label>
+  <AdvancedManagingSoftware.description>
+Разработка продвинутого программного обеспечения для управления колонией. 
+
+Достижения в области ИИ и компьютерных технологий позволяют строить суперкомпьютеры с предустановленной операционной системой FluffyOS. Некоторые колонисты сообщают о произвольных открытиях и закрытиях дверей, выходе из строя систем кондиционирования воздуха и внезапных включениях электрических плавилень. Тем не менее, производитель гарантирует(ТМ), что FluffyOS не запрограммирована убивать колонистов.
+  </AdvancedManagingSoftware.description>
+
+  <PowerManagement.label>Управление электропитанием</PowerManagement.label>
+  <PowerManagement.description>Разработка ПО для мониторинга энергопотребления.</PowerManagement.description>
+
+
+</LanguageData>

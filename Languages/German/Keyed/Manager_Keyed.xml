@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+  <!-- Main Manager Tab -->
+  <FM.Manager>Manager</FM.Manager>
+  <FM.Details>Details</FM.Details>
+  <FM.Manage>Manage!</FM.Manage>
+  <FM.Delete>Lösche</FM.Delete>
+  <FM.All>Alles</FM.All>
+
+  <!-- Help and alert messages for the lexically challenged. -->
+  <FM.HelpTitle>Colony Manager V2</FM.HelpTitle>
+  <FM.HelpMessage>Willkommen im Colony Manager V2!\n\nDer Colony Manager erlaubt dir Aufträge für Produktion, Jagd, Försterei und Tierpflege zu erstellen. Jeder dieser Aufträge kann durch die etlichen Managerfenster, wie durch andere nützliche Fenster gesetzt werden. \n\nWenn du einen Befehl aufgibst, wird ein Kollonist mit ausgewählten Managerberuf sich der Sache annehmen. Er überwacht Lager an seinem Managertisch und erstellt und bearbeitete Aufträge.\n\nUm die Mod zu nutzen brauchst du zwei Dinge: einen Kollonist mit ausgewählten Managerjob.\n Und einen Managertisch.\n\nHappy hunting!Fröhliche Jagd!</FM.HelpMessage>
+  <FM.AlertNoTableLabel>Managertisch fehlt</FM.AlertNoTableLabel>
+  <FM.AlertNoTable>Manageraufträge sind angeordnet, aber der Managertisch fehlt</FM.AlertNoTable>
+  <FM.AlertNoManagerLabel>Kein Manager gesetzt</FM.AlertNoManagerLabel>
+  <FM.AlertNoManager>Manageraufträge sind angeordnet, aber niemand ist Manager</FM.AlertNoManager>
+
+  <!-- Common -->
+  <FM.LastUpdateTooltip>Dieser Auftrag wurde zuletzt vor {0} erneuert.</FM.LastUpdateTooltip>
+  <FM.OrderUp>Erhöhe Auftragswichtigkeit</FM.OrderUp>
+  <FM.OrderDown>Senke Auftragswichtigkeit</FM.OrderDown>
+  <FM.OrderTop>Maximale Auftragswichtigkeit</FM.OrderTop>
+  <FM.OrderBottom>Minimale Auftragswichtigkeit</FM.OrderBottom>
+  <multiple>[multiple]</multiple>
+
+  <!-- History graphs -->
+  <FM.HistoryPeriod>Periode</FM.HistoryPeriod>
+  <FM.HistoryShowHideLegend>Öffne/Schließe Legende</FM.HistoryShowHideLegend>
+  <FM.HistoryClickToEnable>\n\nClick für {0} {1} in Geschichte.\nRight Klick nur für {1}.</FM.HistoryClickToEnable>
+  <FM.HistoryNoChapters>Nichts zu sehen!</FM.HistoryNoChapters>
+
+  <!-- Power Tab (E for energy) -->
+  <FME.PeriodShown>Periode: {0}</FME.PeriodShown>
+  <FME.PeriodShownTooltip>Zeigt Energiegewinn- und verbrauch {0}.\n\nClick um Periode zu ändern.</FME.PeriodShownTooltip>
+  <FME.Power>Energie</FME.Power>
+  
+  <!-- Overview Tab -->
+  <FM.Overview>Übersicht</FM.Overview>
+  <FM.NoJobs>Keine Aufträge geplant.</FM.NoJobs>
+  <FM.Activity>Momentane Aktivität</FM.Activity>
+  <FM.Enabled>Arbeit</FM.Enabled>
+  <FM.Priority>Arbeit</FM.Priority>
+  <FM.ClickToJumpTo>Klick umzu {0} zu springen</FM.ClickToJumpTo>
+  <FM.JobCompletedTooltip>Auftragslimit erreicht.</FM.JobCompletedTooltip>
+  <FM.JobSuspendedTooltip>Auftrag wurde gesperrt.\n\nClick um zu entsperren.</FM.JobSuspendedTooltip>
+  <FM.PluralSuffix>s</FM.PluralSuffix>
+  
+  <!--Import/Export Tab-->
+  <FM.ImportExport>Importieren &amp; Exportieren</FM.ImportExport>
+  <FM.CurrentJobs>Momentane Aufträge:</FM.CurrentJobs>
+  <FM.Export>Exportieren</FM.Export>
+  <FM.ConfirmOverwrite>{0} existiert.\n\nWillst du wirklioch überschreiben?</FM.ConfirmOverwrite>
+  <FM.JobsExported>{0} Aufträge exportiert</FM.JobsExported>
+  <FM.JobsImported>{0} Aufträge importiert</FM.JobsImported>
+  <FM.InvalidJobsDeleted>{0} ungültige Aufträge gelöscht</FM.InvalidJobsDeleted>
+  <FM.Import>Importiere</FM.Import>
+  <FM.NoSaves>Keine Exporte (Speicherstände) gefunden.</FM.NoSaves>
+
+  <!-- Hunting Tab -->
+  <FMH.Hunting>Jagen</FMH.Hunting>
+  <FMH.NewHuntingJob>Neuer Auftrag</FMH.NewHuntingJob>
+  <FMH.NewHuntingJobTooltip>Erstelle einen neuen Jagdauftrag</FMH.NewHuntingJobTooltip>
+  <FMH.AllowHumanMeat>Erlaube Menschenfleisch</FMH.AllowHumanMeat>
+  <FMH.UnforbidCorpses>Erlaube Leichen</FMH.UnforbidCorpses>
+  <FMH.HuntingGrounds>Erlaube Jagd in:</FMH.HuntingGrounds>
+  <FMH.Options>Optionen</FMH.Options>
+  <FMH.Animals>Erlaubte Tiere</FMH.Animals>
+  <FMH.TargetCount>Zielanzahl: {0}+{1}+{2}/{3}</FMH.TargetCount>
+  <FMH.TargetCountTooltip>Ziel: {3}\n{0} im Lager\n{1} nach dem schlachten erwartet\n{2} mit Ausnahme von momentanen Bestimmungen.</FMH.TargetCountTooltip>
+
+  <!-- Forestry Tab -->
+  <FMF.Forestry>Försterei</FMF.Forestry>
+  <FMF.NewForestryJob>Neuer Auftrag</FMF.NewForestryJob>
+  <FMF.NewForestryJobTooltip>Erstelle neuen Forstauftrag</FMF.NewForestryJobTooltip>
+  <FMF.Options>Optionen</FMF.Options>
+  <FMF.Trees>Erlaube Bäume</FMF.Trees>
+  <FMF.ClearWindCells>Räume Windturbinenflächen</FMF.ClearWindCells>
+  <FMF.AllowSaplings>Erlaube das fällen von nicht ausgewachsenen Bäumen</FMF.AllowSaplings>
+  <FMF.LoggingArea>Erlaube Rodung in:</FMF.LoggingArea>
+  <FMF.TargetCount>Zielanzahl: {0}+{1}/{2}</FMF.TargetCount>
+  <FMF.TargetCountTooltip>Ziel: {2}\n{0} im Lager\n{1} mit Ausnahme von momentanen Bestimmungen.</FMF.TargetCountTooltip>
+  <FMF.ClearAreas>Säubere Gebiet von sämtlicher Vegetation:</FMF.ClearAreas>
+
+  <!-- Foraging (Gathering) tab -->
+  <FMG.Foraging>Sammeln</FMG.Foraging>
+  <FMG.NewForagingJob>Neuer Auftrag</FMG.NewForagingJob>
+  <FMG.NewForagingJobTooltip>Erstelle neuen Sammlerauftrag</FMG.NewForagingJobTooltip>
+  <FMG.Options>Optionen</FMG.Options>
+  <FMG.TargetCount>Zielanzahl: {0}+{1}/{2}</FMG.TargetCount>
+  <FMG.TargetCountTooltip>Ziel: {2}\n{0}  im Lager\n{1} mit Ausnahme von momentanen Bestimmungen.</FMG.TargetCountTooltip>
+  <FMG.ForceMature>Nur komplett ausgewachsene Pflanzen</FMG.ForceMature>
+  <FMG.ForagingArea>Erlaube sammeln in:</FMG.ForagingArea>
+  <FMG.Plants>Erlaube Pflanzen</FMG.Plants>
+
+
+  <!-- Production Tab -->
+  <!-- Miscelaneous -->
+  <FMP.Production>Produktion</FMP.Production>
+  <FMP.ManageBillTooltip>Weise diese Vorlage einem Manager zum arbeiten zu.</FMP.ManageBillTooltip>
+  <FMP.DeleteBillTooltip>Stoppe managing dieser Vorlage und leere ausstehende Vorlagen</FMP.DeleteBillTooltip>
+  <FMP.FilterDesc>Tippe einige Buchstaben um die Liste zu filtern</FMP.FilterDesc>
+  <FMP.ClearFilterDesc>Leere momentanen Filter</FMP.ClearFilterDesc>
+  <FMP.MainProduct>Hauptprodukt: {0} x{1}</FMP.MainProduct>
+  <FMP.NoThreshold>Keine Grenzschwelle</FMP.NoThreshold>
+  <FMP.NoThresholdTooltip>Keine Grenzschwelle gesetzt</FMP.NoThresholdTooltip>
+  <FMP.SnapToHighestSkill>Auf fähigste(n) Kollonisten beschränken</FMP.SnapToHighestSkill>
+  <FMP.Options>Optionen</FMP.Options>
+  <FMP.Bill>Vorlage</FMP.Bill>
+  <FMP.Recipe>Rezept</FMP.Recipe>
+  <FMP.AllowedIngredients>Erlaube Zutaten:</FMP.AllowedIngredients>
+  <FMP.AllowedSkillRange>Erlaube Fähigkeitsspanne:</FMP.AllowedSkillRange>
+  <FMP.PrioritizeManual>Bevorzuge manuelle Vorlagen</FMP.PrioritizeManual>
+  <FMP.OtherRecipeAvailable>Andere Rezepte vorhanden</FMP.OtherRecipeAvailable>
+  <FMP.OtherRecipeAvailableTooltip>Andere Rezepte, welche dasselbe Produkt erschafft sind vorhanden.\nKlicke um die Vorlage zur anderen Vorlage zu ändern.</FMP.OtherRecipeAvailableTooltip>
+
+  <!-- Thresholds -->
+  <FMP.ThresholdCount>Grenzschwelle: {0}/{1}</FMP.ThresholdCount>
+  <FMP.ThresholdCountTooltip>Klicke um Grenzschwellendetails zu öffnen.\n\nTarget: {1}\nIn produktion: {0}</FMP.ThresholdCountTooltip>
+  <FMP.ThresholdDetails>Grenzschwellendetails</FMP.ThresholdDetails>
+
+  <!-- BillGivers -->
+  <FMP.BillGiversCount>Arbeitsstation ({0}/{1}/{2})</FMP.BillGiversCount>
+  <FMP.BillGiversTooltip>Klicke um ausgewählte Auftraggeber zu ändern.\n\nVorhanden:\n{0}\n\nAusgewählt:\n{1}\n\nBeauftragt:\n{2}</FMP.BillGiversTooltip>
+  <FMP.BillGiversDetails>Wähle Arbeitsstation</FMP.BillGiversDetails>
+
+  <!-- BillGiversDetailsWindow -->
+  <FMP.AllWorkstations>Alle Arbeitsstationen</FMP.AllWorkstations>
+  <FMP.AllWorkstationsTooltip>Wähle den Manager um diesen Auftrag auf alle möglichen Arbeitsstationen zu übertragen</FMP.AllWorkstationsTooltip>
+  <FMP.ByAreaAndCount>Nach Gebiet / Anzahl</FMP.ByAreaAndCount>
+  <FMP.ByAreaAndCountTooltip>Wähle den Manager um diesen Auftrag auf eine bestimmte Arbeitsstation, in einem bestimmten Gebiet zu übertragen</FMP.ByAreaAndCountTooltip>
+  <FMP.AllowedAreas>Gebiet:</FMP.AllowedAreas>
+  <FMP.AllowedWorkstationCount>Max:</FMP.AllowedWorkstationCount>
+  <FMP.SpecificWorkstations>Setze Arbeitsstation</FMP.SpecificWorkstations>
+  <FMP.SpecificWorkstationsTooltip>Wähle den Manager um diesen Auftrag auf bestimmte Arbeitsstationen zu übertragen.</FMP.SpecificWorkstationsTooltip>
+
+  <!-- Tab headers -->
+  <FMP.Current>Momentan</FMP.Current>
+  <FMP.Available>Verfügbar</FMP.Available>
+
+  <!-- Recursive job creator -->
+  <FMP.IngredientDialogTitle>Erstelle Aufträge für Rohstoffe</FMP.IngredientDialogTitle>
+  <FMP.SelectRecipe>Wähle...</FMP.SelectRecipe>
+  <FMP.SelectRecipeTooltip>Klicke um Rezept für {0} auszuwählen</FMP.SelectRecipeTooltip>
+  <FMP.SelectRecipeTooltipSelected>\n\nMomentanes Rezept erfordert:</FMP.SelectRecipeTooltipSelected>
+  <FMP.DoNotUseRecipe>(nichts)</FMP.DoNotUseRecipe>
+  <FMP.SelectIngredient>Wähle...</FMP.SelectIngredient>
+  <FMP.SelectIngredientTooltip>Klicke um Rohstoff für {0} auszuwählen (benötigt {1})</FMP.SelectIngredientTooltip>
+  <FMP.IngredientCount>\n{0} ({1})</FMP.IngredientCount>
+  <FMP.RawResource>(roher Rohstoff)</FMP.RawResource>
+  <FMP.RawResourceTooltip>{0} ist ein roher Rohstoff (kein Rezept mit festgelegter Leistung für {0} gefunden)</FMP.RawResourceTooltip>
+  <FMP.AddIngredientBills>Erstelle Auftrag</FMP.AddIngredientBills>
+  <FMP.IncreasedThreshold>Erhöhe Grenzschwelle für {0} um {1}.</FMP.IncreasedThreshold>
+  <FMP.AddedJob>Auftag erstellt {0}.</FMP.AddedJob>
+  <FMP.CouldNotAddJob>Auftrag erstellen fehlgeschlagen {0}.</FMP.CouldNotAddJob>
+
+  <!-- Livestock tab -->
+  <FML.Livestock>Viehbestand</FML.Livestock>
+  <FML.TargetCounts>Zielanzahl</FML.TargetCounts>
+  <FML.Adult>Erwachsen</FML.Adult>
+  <FML.Juvenile>Jugendlich</FML.Juvenile>
+  <FML.Training>Training</FML.Training>
+  <FML.RestrictToArea>Tiere auf Gebiet beschränken?</FML.RestrictToArea>
+  <FML.ButcherExcess>Überschüßigen Viehbestand schlachten</FML.ButcherExcess>
+  <FML.ButcherTrained>Überschüßigen trainierten Viehbestand schlachten</FML.ButcherTrained>
+  <FML.TameMore>Tiere zum automatischen Zähmen zuorndnen</FML.TameMore>
+  <FML.TameArea>Erlaube Zähmen in:</FML.TameArea>
+  <FML.Animals>Tiere</FML.Animals>
+  <FML.ListEntryTooltip>{0}s:\n{1}/{5} erwachsene Weibchen\n{2}/{6} erwachsene Männchen\n{3}/{7} jugendliche Weibchen\n{4}/{8} jugendliche Männchen</FML.ListEntryTooltip>
+  <FML.TameWildCount>{0} gezämht, {1} in Wildbahn.</FML.TameWildCount>
+  <FML.Tame>zähmen</FML.Tame>
+  <FML.Wild>Wildbahn</FML.Wild>
+  <FML.NoAnimals>keine {0} Tiere</FML.NoAnimals>
+  <FML.GenderHeader>Geschlecht</FML.GenderHeader>
+  <FML.AgeHeader>Alter (Lebensabschnitt)</FML.AgeHeader>
+  <FML.MeatHeader>Erwartete Fleischmenge, wenn geschlachtet</FML.MeatHeader>
+  <FML.MilkHeader>Fortschritt bis zum nächsten melken</FML.MilkHeader>
+  <FML.WoolHeader>Fortschritt bis zum nächsten scheren</FML.WoolHeader>
+  <FML.Yields>Gewinne {0} x{1}</FML.Yields>
+  <FML.TrainYoung>Trainiere junges Tier</FML.TrainYoung>
+
+</LanguageData>

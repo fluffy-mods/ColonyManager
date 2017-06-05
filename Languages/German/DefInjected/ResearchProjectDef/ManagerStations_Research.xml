@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+ <ManagingSoftware.label>Einfache Managing Software</ManagingSoftware.label>
+        <ManagingSoftware.description>Entwickle eine einfache Managing Software für das Koloniemanagement. Erlaubt das Bauen von Managertischen, ausgeliefert mit eingebauten PC samt garantiert bugfreier(tm) Software!
+		</ManagingSoftware.description>
+      
+        <AdvancedManagingSoftware.label>Verbesserte Managing Software</AdvancedManagingSoftware.label>
+        <AdvancedManagingSoftware.description>Entwickle eine verbesserte Managing Software für das Koloniemanagement. Fortschritte in KI und koloniebewusster Computer, erlaubt die Konstruktion eines koloniebewussten Supercomputers, mit vorinstallierter 'FluffyOS'™. Es gibt Berichte über das Öffnen und Schließen von Türen, über seltsame Verhalten von Lüftersystemen und elektrischen Schmelzern, die sich plötzlich anschalten....Nichtdestotrotz garantiert der Hersteller, dass FluffyOS™ niemals versuchen wird sie zu töten... </AdvancedManagingSoftware.description>
+        
+        <PowerManagement.label>Energiemanagment</PowerManagement.label>
+        <PowerManagement.description>Entwickle ein Programm zur Überwachung des Stromhaushaltes der Kolonie.
+        </PowerManagement.description>
+</LanguageData>

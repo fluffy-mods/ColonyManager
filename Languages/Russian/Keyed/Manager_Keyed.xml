@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+  <!-- Main Manager Tab -->
+  <FM.Manager>Менеджер</FM.Manager>
+  <FM.Details>Детали</FM.Details>
+  <FM.Manage>Назначить!</FM.Manage>
+  <FM.Delete>Удалить</FM.Delete>
+  <FM.All>Все</FM.All>
+
+  <!-- Help and alert messages for the lexically challenged. -->
+  <FM.HelpTitle>Менеджер Колонии V2</FM.HelpTitle>
+  <FM.HelpMessage>Добро пожаловать в Менеджер Колонии V2!\n\nМенеджер Колонии позволяет устанавливать цели для производства, охоты, лесозаготовки и животноводства. Эти задачи настраиваются на различных экранах и доступны посредством кнопок вверху экрана, также есть другие удобные экраны. \n\nКогда вы настраиваете задачу, поселенец с навыком управляющего будет время от времени пересматривать задания других колонистов и проверять ваши склады посредством стола управляющего, и изменять выполняемые задания в соответствии с потребностями.\n\nДля работы мода нужны две вещи:\n    - Поселенец с навыком управляющего.\n    - Стол управляющего.\n\nУдачной охоты!</FM.HelpMessage>
+  <FM.AlertNoTableLabel>Нужен стол управляющего</FM.AlertNoTableLabel>
+  <FM.AlertNoTable>Задачи установлены, но нет доступного стола управляющего</FM.AlertNoTable>
+  <FM.AlertNoManagerLabel>Нужен управляющий</FM.AlertNoManagerLabel>
+  <FM.AlertNoManager>Задачи установлены, но колонистов-управляющих нет</FM.AlertNoManager>
+
+  <!-- Common -->
+  <FM.LastUpdateTooltip>Эта задача последний раз обновлялась {0} назад.</FM.LastUpdateTooltip>
+  <FM.OrderUp>Повысить приоритет</FM.OrderUp>
+  <FM.OrderDown>Понизить приоритет</FM.OrderDown>
+  <FM.OrderTop>Макс. приоритет</FM.OrderTop>
+  <FM.OrderBottom>Мин. приоритет</FM.OrderBottom>
+   <multiple>[multiple]</multiple>
+
+  <!-- History graphs -->
+  <FM.HistoryPeriod>Период</FM.HistoryPeriod>
+  <FM.HistoryShowHideLegend>Показать/скрыть легенду</FM.HistoryShowHideLegend>
+  <FM.HistoryClickToEnable>\n\nКликни {0} {1} в графике.\nПравый клик - показать только {1}.</FM.HistoryClickToEnable>
+  <FM.HistoryNoChapters>Нечего отображать!</FM.HistoryNoChapters>
+
+  <!-- Power Tab (E for energy) -->
+  <FME.PeriodShown>Период: {0}</FME.PeriodShown>
+  <FME.PeriodShownTooltip>Показано производство и потребление энергии за последние {0}.\n\nКликни для изменения периода.</FME.PeriodShownTooltip>
+  <FME.Power>Энергия</FME.Power>
+  
+  <!-- Overview Tab -->
+  <FM.Overview>Обзор</FM.Overview>
+  <FM.NoJobs>Нет задач.</FM.NoJobs>
+  <FM.Activity>Текущая активность</FM.Activity>
+  <FM.Enabled>Работа</FM.Enabled>
+  <FM.Priority>Работа</FM.Priority>
+  <FM.ClickToJumpTo>Кликни, чтобы перейти к{0}</FM.ClickToJumpTo>
+  <FM.JobCompletedTooltip>Достигнут предел выполнения.</FM.JobCompletedTooltip>
+  <FM.JobSuspendedTooltip>Работа приостановлена.\n\nКликни для возобновления.</FM.JobSuspendedTooltip>
+  <FM.PluralSuffix></FM.PluralSuffix>
+  
+  <!--Import/Export Tab-->
+  <FM.ImportExport>Импорт &amp; Экспорт</FM.ImportExport>
+  <FM.CurrentJobs>Текущие задания:</FM.CurrentJobs>
+  <FM.Export>Экспорт</FM.Export>
+  <FM.ConfirmOverwrite>{0} существует.\n\nХочешь переписать?</FM.ConfirmOverwrite>
+  <FM.JobsExported>{0} работ эспортировано</FM.JobsExported>
+  <FM.JobsImported>{0} работ импортировано</FM.JobsImported>
+  <FM.InvalidJobsDeleted>{0} некорректных работ удалено</FM.InvalidJobsDeleted>
+  <FM.Import>Импорт</FM.Import>
+  <FM.NoSaves>Не нахожу экспортированных.</FM.NoSaves>
+
+  <!-- Hunting Tab -->
+  <FMH.Hunting>Охота</FMH.Hunting>
+  <FMH.NewHuntingJob>Новая задача</FMH.NewHuntingJob>
+  <FMH.NewHuntingJobTooltip>Добавить новое задание по охоте</FMH.NewHuntingJobTooltip>
+  <FMH.AllowHumanMeat>В т.ч. человечина</FMH.AllowHumanMeat>
+  <FMH.UnforbidCorpses>Разрешить подбирать  трупы</FMH.UnforbidCorpses>
+  <FMH.HuntingGrounds>Разрешить охоту в:</FMH.HuntingGrounds>
+  <FMH.Options>Опции</FMH.Options>
+  <FMH.Animals>Разрешенные животные</FMH.Animals>
+  <FMH.TargetCount>Целевое значение: {0}+{1}+{2}/{3}</FMH.TargetCount>
+  <FMH.TargetCountTooltip>Цель: {3}\n{0} на складе\n{1} ожидается с разделки\n{2} ожидается от текущих задач.</FMH.TargetCountTooltip>
+
+  <!-- Forestry Tab -->
+  <FMF.Forestry>Лесозаготовка</FMF.Forestry>
+  <FMF.NewForestryJob>Новое задание</FMF.NewForestryJob>
+  <FMF.NewForestryJobTooltip>Добавить новое задание по заготовке</FMF.NewForestryJobTooltip>
+  <FMF.Options>Опции</FMF.Options>
+  <FMF.Trees>Разрешенные деревья</FMF.Trees>
+  <FMF.ClearWindCells>Очищать рабочую зону ветряков</FMF.ClearWindCells>
+  <FMF.AllowSaplings>Разрешить рубку молодых деревьев</FMF.AllowSaplings>
+  <FMF.LoggingArea>Разрешить лесозаготовку в:</FMF.LoggingArea>
+  <FMF.TargetCount>Целевое значение: {0}+{1}/{2}</FMF.TargetCount>
+  <FMF.TargetCountTooltip>Цель: {2}\n{0} на складе\n{1} ожидается от текущих задач.</FMF.TargetCountTooltip>
+  <FMF.ClearAreas>Очистка территории ото всей растительности:</FMF.ClearAreas>
+
+  <!-- Foraging (Gathering) tab -->
+  <FMG.Foraging>Собирательство</FMG.Foraging>
+  <FMG.NewForagingJob>Новое задание</FMG.NewForagingJob>
+  <FMG.NewForagingJobTooltip>Добавить новое задание по собирательству</FMG.NewForagingJobTooltip>
+  <FMG.Options>Опции</FMG.Options>
+  <FMG.TargetCount>Целевое значение: {0}+{1}/{2}</FMG.TargetCount>
+  <FMG.TargetCountTooltip>Цель: {2}\n{0} на складе\n{1} ожидается от текущих задач.</FMG.TargetCountTooltip>
+  <FMG.ForceMature>Только созревшие растения</FMG.ForceMature>
+  <FMG.ForagingArea>Разрешить собирательство в:</FMG.ForagingArea>
+  <FMG.Plants>Разрешенные растения</FMG.Plants>
+
+
+  <!-- Production Tab -->
+  <!-- Miscelaneous -->
+  <FMP.Production>Производство</FMP.Production>
+  <FMP.ManageBillTooltip>Это задание будет контролироваться управляющим(-и).</FMP.ManageBillTooltip>
+  <FMP.DeleteBillTooltip>Прекратить контролировать это задание и отменить связанные поручения</FMP.DeleteBillTooltip>
+  <FMP.FilterDesc>Начни печатать, чтобы фильтровать</FMP.FilterDesc>
+  <FMP.ClearFilterDesc>Очистить фильтр</FMP.ClearFilterDesc>
+  <FMP.MainProduct>Основной продукт: {0} x{1}</FMP.MainProduct>
+  <FMP.NoThreshold>Бесконечно</FMP.NoThreshold>
+  <FMP.NoThresholdTooltip>Предел не установлен</FMP.NoThresholdTooltip>
+  <FMP.SnapToHighestSkill>Приравнять к скиллу лучшего специалиста</FMP.SnapToHighestSkill>
+  <FMP.Options>Опции</FMP.Options>
+  <FMP.Bill>Поручение</FMP.Bill>
+  <FMP.Recipe>Рецепт</FMP.Recipe>
+  <FMP.AllowedIngredients>Доступные ингредиенты:</FMP.AllowedIngredients>
+  <FMP.AllowedSkillRange>Допустимый диапазон опытности:</FMP.AllowedSkillRange>
+  <FMP.PrioritizeManual>Приоритет - поручениям, данным вручную</FMP.PrioritizeManual>
+  <FMP.OtherRecipeAvailable>Другие доступные рецепты</FMP.OtherRecipeAvailable>
+  <FMP.OtherRecipeAvailableTooltip>Доустпны другие рецепты этого продукта.\nКликни для изменения рецепта.</FMP.OtherRecipeAvailableTooltip>
+
+  <!-- Thresholds -->
+  <FMP.ThresholdCount>Производить до: {0}/{1}</FMP.ThresholdCount>
+  <FMP.ThresholdCountTooltip>Кликни, чтобы открыть свойства предела.\n\nЦель: {1}\nВ производстве: {0}</FMP.ThresholdCountTooltip>
+  <FMP.ThresholdDetails>Свойства предела</FMP.ThresholdDetails>
+
+  <!-- BillGivers -->
+  <FMP.BillGiversCount>Рабочие места ({0}/{1}/{2})</FMP.BillGiversCount>
+  <FMP.BillGiversTooltip>Кликни для изменения выбранных назначателей.\n\nДоступные:\n{0}\n\nВыбран:\n{1}\n\nНазначен:\n{2}</FMP.BillGiversTooltip>
+  <FMP.BillGiversDetails>Выбери рабочее место</FMP.BillGiversDetails>
+
+  <!-- BillGiversDetailsWindow -->
+  <FMP.AllWorkstations>Все раб.места</FMP.AllWorkstations>
+  <FMP.AllWorkstationsTooltip>Определи управляющего, чтобы разрешить назначение этого поручения всем доступным раб.местам</FMP.AllWorkstationsTooltip>
+  <FMP.ByAreaAndCount>По зоне / количеству</FMP.ByAreaAndCount>
+  <FMP.ByAreaAndCountTooltip>Определи управляющего, чтобы разрешить назначение этого поручения определенному количеству раб.мест, в определенной зоне</FMP.ByAreaAndCountTooltip>
+  <FMP.AllowedAreas>Зона:</FMP.AllowedAreas>
+  <FMP.AllowedWorkstationCount>Макс:</FMP.AllowedWorkstationCount>
+  <FMP.SpecificWorkstations>Определить раб.место</FMP.SpecificWorkstations>
+  <FMP.SpecificWorkstationsTooltip>Определи управляющего, чтобы разрешить назначение этого поручения определенным раб.местам.</FMP.SpecificWorkstationsTooltip>
+
+  <!-- Tab headers -->
+  <FMP.Current>Текущий</FMP.Current>
+  <FMP.Available>Доступны</FMP.Available>
+
+  <!-- Recursive job creator -->
+  <FMP.IngredientDialogTitle>Добавить задачи для ингредиентов</FMP.IngredientDialogTitle>
+  <FMP.SelectRecipe>Выбрать...</FMP.SelectRecipe>
+  <FMP.SelectRecipeTooltip>Кликни для выбора рецепта для {0}</FMP.SelectRecipeTooltip>
+  <FMP.SelectRecipeTooltipSelected>\n\nДля рецепта нужно:</FMP.SelectRecipeTooltipSelected>
+  <FMP.DoNotUseRecipe>(ничего)</FMP.DoNotUseRecipe>
+  <FMP.SelectIngredient>Выбрать...</FMP.SelectIngredient>
+  <FMP.SelectIngredientTooltip>Кликни для выбора ингредиента для {0} (нужно {1})</FMP.SelectIngredientTooltip>
+  <FMP.IngredientCount>\n{0} ({1})</FMP.IngredientCount>
+  <FMP.RawResource>(сырье)</FMP.RawResource>
+  <FMP.RawResourceTooltip>{0} - это сырье (не найдено рецептов для {0})</FMP.RawResourceTooltip>
+  <FMP.AddIngredientBills>Добавить задания</FMP.AddIngredientBills>
+  <FMP.IncreasedThreshold>Целевое значение для {0} увеличено до {1}.</FMP.IncreasedThreshold>
+  <FMP.AddedJob>Добавлено задание: {0}.</FMP.AddedJob>
+  <FMP.CouldNotAddJob>Не получилось добавить задание: {0}.</FMP.CouldNotAddJob>
+
+  <!-- Livestock tab -->
+  <FML.Livestock>Животноводство</FML.Livestock>
+  <FML.TargetCounts>Целевое значение</FML.TargetCounts>
+  <FML.Adult>Взрослый</FML.Adult>
+  <FML.Juvenile>Молодой</FML.Juvenile>
+  <FML.Training>Тренировка</FML.Training>
+  <FML.RestrictToArea>Назначить животным зону?</FML.RestrictToArea>
+  <FML.ButcherExcess>Забой излишков</FML.ButcherExcess>
+  <FML.ButcherTrained>Забой тренированных излишков</FML.ButcherTrained>
+  <FML.TameMore>Автоназначение приручения</FML.TameMore>
+  <FML.TameArea>Разрешить приручение в:</FML.TameArea>
+  <FML.Animals>Животные</FML.Animals>
+  <FML.ListEntryTooltip>{0}:\n{1}/{5} взрослые самки\n{2}/{6} взрослые самцы\n{3}/{7} молодые самки\n{4}/{8} молодые самцы</FML.ListEntryTooltip>
+  <FML.TameWildCount>{0} всего прирученных, {1} в дикой природе.</FML.TameWildCount>
+  <FML.Tame>приручать</FML.Tame>
+  <FML.Wild>дикие</FML.Wild>
+  <FML.NoAnimals>нет животных: {0}</FML.NoAnimals>
+  <FML.GenderHeader>Пол</FML.GenderHeader>
+  <FML.AgeHeader>Возраст</FML.AgeHeader>
+  <FML.MeatHeader>Ожидается мяса</FML.MeatHeader>
+  <FML.MilkHeader>До следующего доения</FML.MilkHeader>
+  <FML.WoolHeader>До следующей стрижки</FML.WoolHeader>
+  <FML.Yields>приносит {0} x{1}</FML.Yields>
+  <FML.TrainYoung>Тренировать молодняк</FML.TrainYoung>
+
+</LanguageData>

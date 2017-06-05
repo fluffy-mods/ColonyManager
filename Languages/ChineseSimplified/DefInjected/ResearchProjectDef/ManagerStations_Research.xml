@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <ManagingSoftware.label>基本管理软件</ManagingSoftware.label>
+  <ManagingSoftware.description>为殖民地管理开发基础软件。\n\n解锁建造带电脑的「管理办公桌」，配套的主机预装了「保证无BUG公司」出品的管理软件。
+        </ManagingSoftware.description>
+
+  <AdvancedManagingSoftware.label>高级管理软件</AdvancedManagingSoftware.label>
+  <AdvancedManagingSoftware.description>为殖民地管理开发高级的软件。\n\n解锁建造「AI管理者」。殖民地意识超级计算机预装了FluffyOS，具有完善的AI。有部分殖民者反应门会开开关关，空调系统乱套了，电熔炼器突然开启。无论如何，开发商「保证无BUG公司」绝对不是为了弄死殖民者而编写的FluffyOS。</AdvancedManagingSoftware.description>
+
+  <PowerManagement.label>电力管理</PowerManagement.label>
+  <PowerManagement.description>开发管理软件来监测殖民地的电力使用情况。
+        </PowerManagement.description>
+
+
+</LanguageData>

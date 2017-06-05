@@ -16,11 +16,20 @@
   <FM.AlertNoManager>Manager targets are set, but no pawn has the managing job enabled</FM.AlertNoManager>
 
   <!-- Common -->
-  <FM.LastUpdateTooltip>This job was last updated {0} ago.</FM.LastUpdateTooltip>
+  <FM.LastUpdateTooltip>This job was last updated {0} ago, and is scheduled to be updated every {1}.\n\nClick to change update interval.</FM.LastUpdateTooltip>
   <FM.OrderUp>Increase job priority</FM.OrderUp>
   <FM.OrderDown>Decrease job priority</FM.OrderDown>
   <FM.OrderTop>Maximum priority</FM.OrderTop>
   <FM.OrderBottom>Minimum priority</FM.OrderBottom>
+  <multiple>[multiple]</multiple>
+
+  <!-- time periods for update interval -->
+  <FM.DefaultUpdateInterval>Default update interval</FM.DefaultUpdateInterval>
+  <FM.Hourly>Every hour</FM.Hourly>
+  <FM.MultiHourly>Every {0} hours</FM.MultiHourly>
+  <FM.Daily>Daily</FM.Daily>
+  <FM.Monthly>Monthly</FM.Monthly>
+  <FM.Yearly>Yearly</FM.Yearly>
 
   <!-- History graphs -->
   <FM.HistoryPeriod>Period</FM.HistoryPeriod>
@@ -107,6 +116,7 @@
   <FMP.Bill>Bill</FMP.Bill>
   <FMP.Recipe>Recipe</FMP.Recipe>
   <FMP.AllowedIngredients>Allowed ingredients:</FMP.AllowedIngredients>
+  <FMP.AllowedSkillRange>Allowed skill range:</FMP.AllowedSkillRange>
   <FMP.PrioritizeManual>Prioritize manual bills</FMP.PrioritizeManual>
   <FMP.OtherRecipeAvailable>Other recipes available</FMP.OtherRecipeAvailable>
   <FMP.OtherRecipeAvailableTooltip>Other recipes producing the same product are available.\nClick to change this bill to another recipe.</FMP.OtherRecipeAvailableTooltip>
@@ -159,7 +169,9 @@
   <FML.Training>Training</FML.Training>
   <FML.RestrictToArea>Restrict animals to area?</FML.RestrictToArea>
   <FML.ButcherExcess>Butcher excess livestock</FML.ButcherExcess>
-  <FML.ButcherTrained>Butcher trained excess livestock</FML.ButcherTrained>
+  <FML.ButcherTrained>Trained</FML.ButcherTrained>
+  <FML.ButcherPregnant>Pregnant</FML.ButcherPregnant>
+  <FML.ButcherBonded>Bonded</FML.ButcherBonded>
   <FML.TameMore>Auto-designate animals to be tamed</FML.TameMore>
   <FML.TameArea>Allow taming in:</FML.TameArea>
   <FML.Animals>Animals</FML.Animals>
@@ -175,5 +187,7 @@
   <FML.WoolHeader>Progress till next shearing</FML.WoolHeader>
   <FML.Yields>yields {0} x{1}</FML.Yields>
   <FML.TrainYoung>Train young animals</FML.TrainYoung>
+  <FML.SendToSlaughterArea>Restrict animals designated for slaughter</FML.SendToSlaughterArea>
+  <FML.SlaughterArea>Slaughter area</FML.SlaughterArea>
 
 </LanguageData>

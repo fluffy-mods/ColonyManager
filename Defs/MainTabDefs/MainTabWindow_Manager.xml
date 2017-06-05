@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<MainTabDefs>
+<MainButtonDefs>
 
-  <MainTabDef>
+  <MainButtonDef>
     <defName>Fluffy_Manager</defName>
     <label>manager</label>
     <description>Choose which colonist does what kinds of work, and in what priority order.</description>
-    <windowClass>FluffyManager.MainTabWindow_Manager</windowClass>
+    <tabWindowClass>FluffyManager.MainTabWindow_Manager</tabWindowClass>
     <order>11</order>
-  </MainTabDef>
+  </MainButtonDef>
 
-</MainTabDefs>
+</MainButtonDefs>

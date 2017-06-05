@@ -13,15 +13,21 @@
     </statFactors>
     <skillNeedFactors>
       <li Class="SkillNeed_BaseBonus">
-        <skill>Managing</skill>
-        <baseFactor>0.5</baseFactor>
-        <bonusFactor>0.10</bonusFactor>
+        <skill>Intellectual</skill>
+        <baseFactor>0.3</baseFactor>
+        <bonusFactor>0.02</bonusFactor>
+      </li>
+      <li Class="SkillNeed_BaseBonus">
+        <skill>Social</skill>
+        <baseFactor>0.1</baseFactor>
+        <bonusFactor>0.04</bonusFactor>
       </li>
     </skillNeedFactors>
     <capacityFactors>
       <li>
         <capacity>Consciousness</capacity>
         <weight>1</weight>
+        <max>1.1</max>
       </li>
       <li>
         <capacity>Talking</capacity>
@@ -29,11 +35,11 @@
       </li>
       <li>
         <capacity>Manipulation</capacity>
-        <weight>0.5</weight>
+        <weight>0.2</weight>
       </li>
       <li>
         <capacity>Sight</capacity>
-        <weight>0.5</weight>
+        <weight>0.6</weight>
       </li>
     </capacityFactors>
   </StatDef>
