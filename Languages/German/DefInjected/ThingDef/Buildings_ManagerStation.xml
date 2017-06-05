@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+		<FM_BasicManagerStation.label>Einfacher Managertisch</FM_BasicManagerStation.label>
+		<FM_BasicManagerStation.Description>Ein einfacher Tisch, mitsamt allerhand Dinge, die man zum managen braucht.</FM_BasicManagerStation.Description>
+		
+		<FM_ManagerStation.label>Managertisch</FM_ManagerStation.label>
+		<FM_ManagerStation.Description>Ein Tisch, mitsamt allerhand Dinge, die man zum effizenten managen braucht.</FM_ManagerStation.Description>
+		
+		<FM_AIManager.label>Manager KI</FM_AIManager.label>
+		<FM_AIManager.Description>Ein gigantischer Supercomputer, der dazu in der Lage ist, die gesamte Kolonie zu managen. Gerüchte über bösartig-psychopathische Verhalten der Ki sind falsch. Das versprechen wir!</FM_AIManager.Description>
+		
+</LanguageData>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+		<Managing.labelShort>Managing</Managing.labelShort>
+		<Managing.pawnLabel>Manager</Managing.pawnLabel>
+		<Managing.gerundLabel>gemanaged</Managing.gerundLabel>
+		<Managing.description>Manager erteilen Kolonisten Arbeiten und Aufträge.</Managing.description>
+		<Managing.verb>Manage bei</Managing.verb>
+		
+</LanguageData>
