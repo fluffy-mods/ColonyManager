@@ -136,7 +136,7 @@ namespace FluffyManager
                 Plant plant = cell.GetPlant( map );
 
                 // if there is no plant, or there is already a designation here, bail out
-                if (plant == null || designationManager.AllDesignationsOn(plant).ToList().NullOrEmpty())
+                if (plant == null || !designationManager.AllDesignationsOn(plant).ToList().NullOrEmpty())
                     continue;
                 
                 // if the plant is not a tree, and allPlants is not set, bail.
