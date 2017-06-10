@@ -484,8 +484,8 @@ namespace FluffyManager
             // add animals that were not already in the list, disallow by default.
             foreach ( PawnKindDef pawnKind in manager.map.Biome.AllWildAnimals
                                                      .Concat( manager.map.mapPawns.AllPawns
-                                                                     .Where( p => p.RaceProps.Animal
-                                                                              && !p.Map.fogGrid.IsFogged( p.Position ) )
+                                                                     .Where( p => ( p.RaceProps?.Animal ?? false )
+                                                                              && !( manager.map.fogGrid?.IsFogged( p.Position ) ?? true ) )
                                                                      .Select( p => p.kindDef ) )
                                                      .Distinct()
                                                      .OrderBy( pk => pk.label ) )
