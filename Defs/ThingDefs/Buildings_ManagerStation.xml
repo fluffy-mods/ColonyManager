@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ThingDefs>
-
 	<ThingDef Name="BuildingBase" Abstract="True">
 		<category>Building</category>
 		<soundImpactDefault>BulletImpactMetal</soundImpactDefault>
@@ -11,17 +10,13 @@
 		<leaveResourcesWhenKilled>true</leaveResourcesWhenKilled>
 		<filthLeaving>BuildingRubble</filthLeaving>
 	</ThingDef>
-
 	<!-- ========================= Work tables ==========================-->
-
 	<ThingDef Name="BenchBase" ParentName="BuildingBase" Abstract="True">
 		<castEdgeShadows>true</castEdgeShadows>
 		<staticSunShadowHeight>0.20</staticSunShadowHeight>
 		<AltitudeLayer>Building</AltitudeLayer>
 		<minifiedDef>MinifiedFurniture</minifiedDef>
 	</ThingDef>
-
-
 	<ThingDef ParentName="BenchBase">
 		<DefName>FM_BasicManagerStation</DefName>
 		<label>basic manager desk</label>
@@ -58,10 +53,10 @@
 			<li Class="FluffyManager.CompProperties_ManagerStation">
 				<compClass>FluffyManager.Comp_ManagerStation</compClass>
 				<speed>1000</speed>
-			</li>     
+			</li>
+			<li Class="CompProperties_Forbiddable"/>
 		</comps>
 	</ThingDef>
-
 	<ThingDef ParentName="BenchBase">
 		<DefName>FM_ManagerStation</DefName>
 		<label>manager desk</label>
@@ -109,13 +104,13 @@
 			<li Class="FluffyManager.CompProperties_ManagerStation">
 				<compClass>FluffyManager.Comp_ManagerStation</compClass>
 				<speed>500</speed>
-			</li>     
+			</li>
+			<li Class="CompProperties_Forbiddable"/>
 		</comps>
 		<researchPrerequisites>
 			<li>ManagingSoftware</li>
 		</researchPrerequisites>
 	</ThingDef>
-
 	<ThingDef ParentName="BenchBase">
 		<DefName>FM_AIManager</DefName>
 		<label>AI manager</label>
@@ -155,16 +150,16 @@
 			<li Class="FluffyManager.CompProperties_ManagerStation">
 				<compClass>FluffyManager.Comp_ManagerStation</compClass>
 				<speed>250</speed>
-			</li>     
-			<li Class="CompProperties_Glower">
-		        <compClass>CompGlower</compClass>
-		        <glowRadius>3</glowRadius>
-		        <glowColor>(255,0,0,0)</glowColor>
 			</li>
+			<li Class="CompProperties_Glower">
+				<compClass>CompGlower</compClass>
+				<glowRadius>3</glowRadius>
+				<glowColor>(255,0,0,0)</glowColor>
+			</li>
+			<li Class="CompProperties_Forbiddable"/>
 		</comps>
 		<researchPrerequisites>
 			<li>AdvancedManagingSoftware</li>
 		</researchPrerequisites>
 	</ThingDef>
-
 </ThingDefs>
