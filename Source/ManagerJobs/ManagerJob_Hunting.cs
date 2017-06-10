@@ -487,7 +487,7 @@ namespace FluffyManager
             foreach ( PawnKindDef pawnKind in manager.map.Biome.AllWildAnimals
                                                                .Concat( manager.map.mapPawns.AllPawns
                                                                                .Where( p => p.RaceProps.Animal 
-                                                                                         && p.Map.fogGrid.IsFogged( p.Position ) )
+                                                                                         && !p.Map.fogGrid.IsFogged( p.Position ) )
                                                                                .Select( p => p.kindDef ) )
                                                                .Distinct() )
             {
