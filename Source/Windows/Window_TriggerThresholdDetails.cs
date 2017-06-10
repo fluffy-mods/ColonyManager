@@ -43,7 +43,7 @@ namespace FluffyManager
                                        ( filterRect.width - Utilities.Margin ) / 2f, Utilities.ListEntryHeight );
 
             // draw thingfilter
-            filterUI.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter );
+            filterUI.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter, Trigger.ParentFilter );
 
             // draw zone selector
             StockpileGUI.DoStockpileSelectors( zoneRect, ref Trigger.stockpile, Trigger.manager );

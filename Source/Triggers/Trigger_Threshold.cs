@@ -28,6 +28,8 @@ namespace FluffyManager
 
         public ThingFilter ThresholdFilter;
 
+        public ThingFilter ParentFilter;
+
         #endregion Fields
 
         private string _stockpile_scribe;
@@ -43,7 +45,11 @@ namespace FluffyManager
             Count = DefaultCount;
             ThresholdFilter = new ThingFilter();
             ThresholdFilter.SetDisallowAll();
-            ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
+
+            // limit selection to food only.
+            ParentFilter = new ThingFilter();
+            ParentFilter.SetDisallowAll();
+            ParentFilter.SetAllow( Utilities_Hunting.FoodRaw, true );
         }
 
         public Trigger_Threshold( ManagerJob_Forestry job ) : base( job.manager )

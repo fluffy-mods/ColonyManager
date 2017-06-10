@@ -68,7 +68,7 @@ namespace FluffyManager
             // populate the trigger field, set the root category to meats and allow all but human & insect meat.
             Trigger = new Trigger_Threshold( this );
             Trigger.ThresholdFilter.SetDisallowAll();
-            Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
+            Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.MeatRaw, true );
 
             // disallow humanlike
             foreach ( ThingDef def in HumanLikeMeatDefs )
@@ -173,9 +173,7 @@ namespace FluffyManager
 
             // cancel outstanding designation
             foreach ( Designation des in Designations )
-            {
                 des.Delete();
-            }
 
             // clear the list completely
             Designations.Clear();
