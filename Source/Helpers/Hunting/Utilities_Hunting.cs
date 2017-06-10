@@ -11,6 +11,7 @@ namespace FluffyManager
     public static class Utilities_Hunting
     {
         public static ThingDef HumanMeat = ThingDef.Named( "Human" ).race.meatDef;
+        public static ThingDef InsectMeat = ThingDef.Named( "Megaspider" ).race.meatDef;
         public static ThingCategoryDef RawMeat = DefDatabase<ThingCategoryDef>.GetNamed( "MeatRaw" );
 
         public static int EstimatedMeatCount( this Pawn p )
@@ -19,7 +20,7 @@ namespace FluffyManager
             return (int)( StatDefOf.MeatAmount.defaultBaseValue * p.BodySize );
         }
 
-        public static int GetMeatCount( this Corpse c )
+        public static int EstimatedMeatCount( this Corpse c )
         {
             return EstimatedMeatCount( c.InnerPawn );
         }

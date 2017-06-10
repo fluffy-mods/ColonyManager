@@ -26,17 +26,56 @@ namespace FluffyManager
         private Utilities.CachedValue<int> _designatedCachedValue = new Utilities.CachedValue<int>();
         private List<ThingDef> _humanLikeMeatDefs;
 
+        private bool _allowHumanLikeMeat;
+        public bool AllowHumanLikeMeat
+        {
+            get { return _allowHumanLikeMeat; }
+            set
+            {
+                // no change
+                if ( value == _allowHumanLikeMeat )
+                    return;
+
+                // update value and filter
+                _allowHumanLikeMeat = value;
+                foreach ( ThingDef def in HumanLikeMeatDefs )
+                    Trigger.ThresholdFilter.SetAllow( def, value );
+            }
+        }
+
+        private bool _allowInsectMeat;
+        public bool AllowInsectMeat
+        {
+            get { return _allowInsectMeat; }
+            set
+            {
+                // no change
+                if (value == _allowInsectMeat)
+                    return;
+
+                // update value and filter
+                _allowInsectMeat = value;
+                Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.InsectMeat, value );
+            }
+        }
+
         #endregion Fields
 
         #region Constructors
 
         public ManagerJob_Hunting( Manager manager ) : base( manager )
         {
-            // populate the trigger field, set the root category to meats and allow all but human meat.
+            // populate the trigger field, set the root category to meats and allow all but human & insect meat.
             Trigger = new Trigger_Threshold( this );
             Trigger.ThresholdFilter.SetDisallowAll();
             Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
-            Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, false );
+
+            // disallow humanlike
+            foreach ( ThingDef def in HumanLikeMeatDefs )
+                Trigger.ThresholdFilter.SetAllow( def, false );
+
+            // disallow insect
+            Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.InsectMeat, false );
             
             // start the history tracker;
             History = new History( new[] { "stock", "corpses", "designated" },
@@ -77,17 +116,14 @@ namespace FluffyManager
             {
                 if ( _humanLikeMeatDefs == null )
                 {
-                    List<ThingDef> humanLikeRaces =
-                        DefDatabase<ThingDef>.AllDefsListForReading.Where( def => def.category == ThingCategory.Pawn &&
-                                                                                  def.race.Humanlike &&
-                                                                                  def.race.IsFlesh )
+                    _humanLikeMeatDefs =
+                        DefDatabase<ThingDef>.AllDefsListForReading
+                                             .Where( def => def.category == ThingCategory.Pawn &&
+                                                            def.race.Humanlike &&
+                                                            def.race.IsFlesh )
+                                             .Select( pk => pk.race.meatDef )
+                                             .Distinct()
                                              .ToList();
-
-                    _humanLikeMeatDefs = new List<ThingDef>();
-                    foreach ( ThingDef sourceDef in humanLikeRaces )
-                    {
-                        _humanLikeMeatDefs.Add( DefDatabase<ThingDef>.GetNamed( sourceDef.defName + "_Meat" ) );
-                    }
                 }
 
                 return _humanLikeMeatDefs;
@@ -119,15 +155,6 @@ namespace FluffyManager
 
 
         #region Methods
-
-        public void AllowHumanLikeMeat( bool allow )
-        {
-            foreach ( ThingDef meatDef in HumanLikeMeatDefs )
-            {
-                Trigger.ThresholdFilter.SetAllow( meatDef, allow );
-            }
-        }
-
         /// <summary>
         /// Remove obsolete designations from the list.
         /// </summary>
@@ -203,9 +230,11 @@ namespace FluffyManager
             // must be after references, because reasons.
             Scribe_Deep.Look( ref Trigger, "trigger", manager );
 
-            // settings, human meat is stored in the trigger's thingfilter.
+            // settings
             Scribe_Collections.Look( ref AllowedAnimals, "AllowedAnimals", LookMode.Def, LookMode.Value );
             Scribe_Values.Look( ref UnforbidCorpses, "UnforbidCorpses", true );
+            Scribe_Values.Look( ref _allowHumanLikeMeat, "AllowHumanLikeMeat", false );
+            Scribe_Values.Look( ref _allowInsectMeat, "AllowInsectMeat", false );
 
             // don't store history in import/export mode.
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
@@ -253,7 +282,7 @@ namespace FluffyManager
 
                     if ( !buried && rottable?.Stage == RotStage.Fresh )
                     {
-                        count += corpse.GetMeatCount();
+                        count += corpse.EstimatedMeatCount();
                     }
                 }
             }

@@ -69,6 +69,7 @@
   <FMH.NewHuntingJob>New job</FMH.NewHuntingJob>
   <FMH.NewHuntingJobTooltip>Create a new hunting job</FMH.NewHuntingJobTooltip>
   <FMH.AllowHumanMeat>Count human meat</FMH.AllowHumanMeat>
+  <FMH.AllowInsectMeat>Count insect meat</FMH.AllowInsectMeat>
   <FMH.UnforbidCorpses>Unforbid corpses</FMH.UnforbidCorpses>
   <FMH.HuntingGrounds>Allow hunting in:</FMH.HuntingGrounds>
   <FMH.Options>Options</FMH.Options>

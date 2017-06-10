@@ -97,15 +97,19 @@ namespace FluffyManager
                                                  "FMH.TargetCountTooltip".Translate( currentCount, corpseCount,
                                                                                      designatedCount, targetCount ) );
 
-            // allow human meat (2)
+            // allow human & insect meat (2)
             var humanMeatRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Utilities.DrawToggle( humanMeatRect, "FMH.AllowHumanMeat".Translate(),
                                   _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.HumanMeat ),
-                                  delegate
-                                  { _selected.AllowHumanLikeMeat( true ); },
-                                  delegate
-                                  { _selected.AllowHumanLikeMeat( false ); } );
-            cur.y += _entryHeight;
+                                  () => _selected.AllowHumanLikeMeat = true,
+                                  () => _selected.AllowHumanLikeMeat = false );
+            var insectMeatRect = humanMeatRect;
+            insectMeatRect.y += _entryHeight;
+            Utilities.DrawToggle( insectMeatRect, "FMH.AllowInsectMeat".Translate(),
+                                  _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.InsectMeat ),
+                                  () => _selected.AllowInsectMeat = true,
+                                  () => _selected.AllowInsectMeat = false );
+            cur.y += _entryHeight * 2;
 
             // unforbid corpses (3)
             var ufCorpseRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
