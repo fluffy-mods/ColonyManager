@@ -13,24 +13,29 @@ namespace FluffyManager
 {
     internal class JobDriver_ManagingAtManagingStation : JobDriver
     {
+        private float workNeeded = 0;
+        private float workDone = 0;
+
         protected override IEnumerable<Toil> MakeNewToils()
         {
             yield return Toils_Reserve.Reserve( TargetIndex.A ).FailOnDespawnedOrForbiddenPlacedThings();
             yield return Toils_Goto.GotoThing( TargetIndex.A, PathEndMode.InteractionCell )
                                    .FailOnDespawnedOrForbiddenPlacedThings();
             yield return Manage( TargetIndex.A ).FailOnDespawnedOrForbiddenPlacedThings();
-            yield return DoWork();
             yield return Toils_Reserve.Release( TargetIndex.A );
         }
 
-        private Toil DoWork()
-        {
-            var toil = new Toil();
-            toil.defaultCompleteMode = ToilCompleteMode.Instant;
-            toil.AddFinishAction( () => Manager.For( pawn.Map ).TryDoWork() );
+        #region Overrides of JobDriver
 
-            return toil;
+        public override void ExposeData()
+        {
+            base.ExposeData();
+
+            Scribe_Values.Look( ref workNeeded, "WorkNeeded", 100 );
+            Scribe_Values.Look( ref workDone, "WorkDone", 0 );
         }
+
+        #endregion
 
         private Toil Manage( TargetIndex targetIndex )
         {
@@ -49,13 +54,33 @@ namespace FluffyManager
             }
 
             var toil = new Toil();
-            toil.defaultDuration =
-                (int)( comp.Props.Speed * ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
-#if DEBUG_WORKGIVER
-            Log.Message("Pawn stat: " + pawn.GetStatValue(StatDef.Named("ManagingSpeed")) + " (+0.5) Station speed: " + comp.Props.Speed + "Total time: " + toil.defaultDuration);
-#endif
-            toil.defaultCompleteMode = ToilCompleteMode.Delay;
-            toil.tickAction = () => toil.actor.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Intellectual" ) ).Learn( 0.11f );
+            toil.defaultCompleteMode = ToilCompleteMode.Never;
+            toil.initAction = () =>
+                                  {
+                                      workDone = 0;
+                                      workNeeded = (int)
+                                          ( comp.Props.Speed *
+                                            ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
+                                  };
+
+            toil.tickAction = () =>
+                                  {
+                                      // learn a bit
+                                      pawn.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Intellectual" ) )
+                                                 .Learn( 0.11f );
+
+                                      // update counter
+                                      workDone++;
+
+                                      // are we done yet?
+                                      if ( workDone > workNeeded )
+                                      {
+                                          Manager.For( pawn.Map ).TryDoWork();
+                                          ReadyForNextToil();
+                                      }
+                                  };
+
+            toil.WithProgressBar( TargetIndex.A, () => workDone / workNeeded );
             return toil;
         }
     }
