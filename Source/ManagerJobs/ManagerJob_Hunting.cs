@@ -38,12 +38,11 @@ namespace FluffyManager
             Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.RawMeat, true );
             Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.HumanMeat, false );
             
+            // start the history tracker;
             History = new History( new[] { "stock", "corpses", "designated" },
                                    new[] { Color.white, new Color( .7f, .7f, .7f ), new Color( .4f, .4f, .4f ) } );
-
-
+            
             // init stuff if we're not loading
-            // todo: please, please refactor this into something less clumsy!
             if (Scribe.mode == LoadSaveMode.Inactive)
                 RefreshAllowedAnimals();
         }
@@ -456,7 +455,12 @@ namespace FluffyManager
         public void RefreshAllowedAnimals()
         {
             // add animals that were not already in the list, disallow by default.
-            foreach ( PawnKindDef pawnKind in manager.map.Biome.AllWildAnimals.Concat( manager.map.mapPawns.AllPawns.Where( p => p.RaceProps.Animal ).Select( p => p.kindDef ) ).Distinct() )
+            foreach ( PawnKindDef pawnKind in manager.map.Biome.AllWildAnimals
+                                                               .Concat( manager.map.mapPawns.AllPawns
+                                                                               .Where( p => p.RaceProps.Animal 
+                                                                                         && p.Map.fogGrid.IsFogged( p.Position ) )
+                                                                               .Select( p => p.kindDef ) )
+                                                               .Distinct() )
             {
                 if (!AllowedAnimals.ContainsKey( pawnKind) )
                     AllowedAnimals.Add( pawnKind, false );
