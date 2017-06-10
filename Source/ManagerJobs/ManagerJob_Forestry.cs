@@ -127,35 +127,34 @@ namespace FluffyManager
 
         public void DoClearAreaDesignations( IEnumerable<IntVec3> cells, bool allPlants = false )
         {
+            var map = manager.map;
+            var designationManager = map.designationManager;
+
             foreach ( IntVec3 cell in cells )
             {
                 // confirm there is a plant here that it is a tree and that it has no current designation
-                Plant plant = cell.GetPlant( manager.map );
+                Plant plant = cell.GetPlant( map );
 
-                // try to get a growing zone here
-                var zone = manager.map.zoneManager.ZoneAt( cell ) as IPlantToGrowSettable;
+                // if there is no plant, or there is already a designation here, bail out
+                if (plant == null || designationManager.AllDesignationsOn(plant).ToList().NullOrEmpty())
+                    continue;
+                
+                // if the plant is not a tree, and allPlants is not set, bail.
+                if ( !( allPlants || plant.def.plant.IsTree ) )
+                    continue;
+                
+                // we don't cut stuff in growing zones
+                var zone = map.zoneManager.ZoneAt( cell ) as IPlantToGrowSettable;
+                if ( zone != null )
+                    continue;
 
-                // try to get a Building_PlantGrower here
-                var pot = manager.map.thingGrid.ThingsListAt( cell ).FirstOrDefault( t => t is Building_PlantGrower );
+                // nor in plant pots (or hydroponics)
+                var pot = map.thingGrid.ThingsListAt( cell ).FirstOrDefault( t => t is Building_PlantGrower );
+                if ( pot != null )
+                    continue;
 
-                if ( 
-                    // there is a plant here
-                    plant != null
-
-                    // AND it's not yet been designated for anything
-                    && manager.map.designationManager.AllDesignationsOn( plant ).ToList().NullOrEmpty()
-
-                    // AND the plant is not in a pot
-                    && pot == null
-                    
-                    // AND this is not a growing zone, and the plant is a tree or we're cutting everything
-                    && ( ( zone == null && ( plant.def.plant.IsTree || allPlants ) )
-
-                    // OR this is a growing zone, and the plant is not the plant set to grow in this zone
-                    || ( allPlants && zone?.GetPlantDefToGrow() != plant.def ) ) )
-                {
-                    manager.map.designationManager.AddDesignation( new Designation( plant, DesignationDefOf.CutPlant ) );
-                }
+                // there's no reason not to cut it down, so cut it down.
+                designationManager.AddDesignation( new Designation( plant, DesignationDefOf.CutPlant ) );
             }
         }
 
