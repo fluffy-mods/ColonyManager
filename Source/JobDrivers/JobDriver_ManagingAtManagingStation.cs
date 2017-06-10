@@ -19,7 +19,17 @@ namespace FluffyManager
             yield return Toils_Goto.GotoThing( TargetIndex.A, PathEndMode.InteractionCell )
                                    .FailOnDespawnedOrForbiddenPlacedThings();
             yield return Manage( TargetIndex.A ).FailOnDespawnedOrForbiddenPlacedThings();
+            yield return DoWork();
             yield return Toils_Reserve.Release( TargetIndex.A );
+        }
+
+        private Toil DoWork()
+        {
+            var toil = new Toil();
+            toil.defaultCompleteMode = ToilCompleteMode.Instant;
+            toil.AddFinishAction( () => Manager.For( pawn.Map ).TryDoWork() );
+
+            return toil;
         }
 
         private Toil Manage( TargetIndex targetIndex )
@@ -45,13 +55,7 @@ namespace FluffyManager
             Log.Message("Pawn stat: " + pawn.GetStatValue(StatDef.Named("ManagingSpeed")) + " (+0.5) Station speed: " + comp.Props.Speed + "Total time: " + toil.defaultDuration);
 #endif
             toil.defaultCompleteMode = ToilCompleteMode.Delay;
-            toil.tickAction =
-                delegate
-                { toil.actor.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Intellectual" ) ).Learn( 0.11f ); };
-            var finishers = new List<Action>();
-            finishers.Add( delegate
-            { Manager.For( pawn.Map ).TryDoWork(); } );
-            toil.finishActions = finishers;
+            toil.tickAction = () => toil.actor.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Intellectual" ) ).Learn( 0.11f );
             return toil;
         }
     }
