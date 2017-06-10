@@ -156,10 +156,11 @@ namespace FluffyManager
             //    Manager.For( Find.VisibleMap ).HelpShown = true;
             //}
 
+            // refresh tabs and unlock power if needed
             Manager.For( Find.VisibleMap ).RefreshTabs();
             Manager.For( Find.VisibleMap ).AddPowerTabIfUnlocked();
 
-            // don't show tabs for other maps
+            // make sure the currently open tab is for this map
             if ( CurrentTab.manager.map != Find.VisibleMap )
                 CurrentTab = DefaultTab;
             CurrentTab.PreOpen();

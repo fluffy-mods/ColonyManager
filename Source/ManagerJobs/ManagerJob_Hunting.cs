@@ -83,7 +83,7 @@ namespace FluffyManager
             
             // init stuff if we're not loading
             if (Scribe.mode == LoadSaveMode.Inactive)
-                RefreshAllowedAnimals();
+                UpdateAllowedAnimals();
         }
 
         #endregion Constructors
@@ -481,19 +481,26 @@ namespace FluffyManager
 
         #endregion Methods
 
-        public void RefreshAllowedAnimals()
+        public void UpdateAllowedAnimals()
         {
             // add animals that were not already in the list, disallow by default.
             foreach ( PawnKindDef pawnKind in manager.map.Biome.AllWildAnimals
-                                                               .Concat( manager.map.mapPawns.AllPawns
-                                                                               .Where( p => p.RaceProps.Animal 
-                                                                                         && !p.Map.fogGrid.IsFogged( p.Position ) )
-                                                                               .Select( p => p.kindDef ) )
-                                                               .Distinct() )
+                                                     .Concat( manager.map.mapPawns.AllPawns
+                                                                     .Where( p => p.RaceProps.Animal
+                                                                              && !p.Map.fogGrid.IsFogged( p.Position ) )
+                                                                     .Select( p => p.kindDef ) )
+                                                     .Distinct()
+                                                     .OrderBy( pk => pk.label ) )
             {
-                if (!AllowedAnimals.ContainsKey( pawnKind) )
+                if ( !AllowedAnimals.ContainsKey( pawnKind ) )
+                {
                     AllowedAnimals.Add( pawnKind, false );
+                }
             }
+
+            AllowedAnimals = AllowedAnimals
+                                .OrderBy( x => x.Key.label )
+                                .ToDictionary( k => k.Key, v => v.Value );
         }
     }
 }

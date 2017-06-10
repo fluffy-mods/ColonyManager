@@ -2,6 +2,7 @@
 // ManagerTab_Hunting.cs
 // 2016-12-09
 
+using System;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -148,56 +149,33 @@ namespace FluffyManager
             // start scrolling view
             Widgets.BeginScrollView( outRect, ref _animalsScrollPosition, viewRect );
 
-            // list of keys in allowed animals list (all animals in biome, static)
-            var PawnKinds = new List<PawnKindDef>( _selected.AllowedAnimals.Keys );
+            // list of keys in allowed animals list (all animals in biome + visible animals on map)
+            var pawnKinds = new List<PawnKindDef>( _selected.AllowedAnimals.Keys );
 
             // toggle all
             var toggleAllRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
             Widgets.DrawAltRect( toggleAllRect );
-            Dictionary<PawnKindDef, bool>.ValueCollection test = _selected.AllowedAnimals.Values;
             Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
-                                  _selected.AllowedAnimals.Values.All( v => v ), delegate
-                                                                                     {
-                                                                                         foreach (
-                                                                                             PawnKindDef def in
-                                                                                                 PawnKinds )
-                                                                                         {
-                                                                                             _selected.AllowedAnimals[
-                                                                                                                      def
-                                                                                                 ] = true;
-                                                                                         }
-                                                                                     }, delegate
-                                                                                            {
-                                                                                                foreach (
-                                                                                                    PawnKindDef def in
-                                                                                                        PawnKinds )
-                                                                                                {
-                                                                                                    _selected
-                                                                                                        .AllowedAnimals[
-                                                                                                                        def
-                                                                                                        ] = false;
-                                                                                                }
-                                                                                            } );
+                                  _selected.AllowedAnimals.Values.All( v => v ),
+                                  () => pawnKinds.ForEach( pk => _selected.AllowedAnimals[pk] = true ),
+                                  () => pawnKinds.ForEach( pk => _selected.AllowedAnimals[pk] = false ) );
 
             cur.y += _entryHeight;
 
             // toggle for each animal
             var i = 1;
 
-            foreach ( PawnKindDef kind in PawnKinds )
+            foreach ( PawnKindDef kind in pawnKinds )
             {
                 var toggleRect = new Rect( cur.x, cur.y, colWidth, _entryHeight );
 
                 // highlight alternate rows
                 if ( i++ % 2 == 0 )
-                {
                     Widgets.DrawAltRect( toggleRect );
-                }
 
                 // draw the toggle
                 Utilities.DrawToggle( toggleRect, kind.LabelCap, _selected.AllowedAnimals[kind],
-                                      delegate
-                                      { _selected.AllowedAnimals[kind] = !_selected.AllowedAnimals[kind]; } );
+                                      () => _selected.AllowedAnimals[kind] = !_selected.AllowedAnimals[kind] );
 
                 // update current position
                 cur.y += _entryHeight;
@@ -330,9 +308,7 @@ namespace FluffyManager
 
             // draw job interface if something is selected.
             if ( Selected != null )
-            {
                 DoContent( contentCanvas );
-            }
         }
 
         public override void PreOpen()
@@ -342,12 +318,13 @@ namespace FluffyManager
 
         public void Refresh()
         {
+            // upate our list of jobs
             Jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Hunting>();
 
             // update pawnkind options
             foreach ( ManagerJob_Hunting job in Jobs )
-                job.RefreshAllowedAnimals();
-            _selected?.RefreshAllowedAnimals();
+                job.UpdateAllowedAnimals();
+            _selected?.UpdateAllowedAnimals();
         }
     }
 }
