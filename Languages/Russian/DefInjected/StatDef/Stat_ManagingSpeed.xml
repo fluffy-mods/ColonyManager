@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
 
-  <ManagingSpeed.label>Управление скоростью</ManagingSpeed.label>
-  <ManagingSpeed.description>Коэффициент скорости, с которой этот житель может управлять.</ManagingSpeed.description>
+  <ManagingSpeed.label>Скорость менеджмента</ManagingSpeed.label>
+  <ManagingSpeed.description>Множитель скорости, с которой менеджер может эффективно управлять.</ManagingSpeed.description>
 
 
 </LanguageData>
