@@ -21,7 +21,15 @@
   <FM.OrderDown>降低工作优先级</FM.OrderDown>
   <FM.OrderTop>最高优先级</FM.OrderTop>
   <FM.OrderBottom>最低优先级</FM.OrderBottom>
-  <multiple>[multiple]</multiple>
+  <multiple>[多种]</multiple>
+
+  <!-- time periods for update interval -->
+  <FM.DefaultUpdateInterval>默认更新时间间隔</FM.DefaultUpdateInterval>
+  <FM.Hourly>每小时</FM.Hourly>
+  <FM.MultiHourly>每{0}小时</FM.MultiHourly>
+  <FM.Daily>每天</FM.Daily>
+  <FM.Monthly>每象</FM.Monthly>
+  <FM.Yearly>每年</FM.Yearly>
 
   <!-- History graphs -->
   <FM.HistoryPeriod>时间段</FM.HistoryPeriod>
@@ -61,6 +69,7 @@
   <FMH.NewHuntingJob>新建工作</FMH.NewHuntingJob>
   <FMH.NewHuntingJobTooltip>新建狩猎工作。</FMH.NewHuntingJobTooltip>
   <FMH.AllowHumanMeat>人肉计算在内</FMH.AllowHumanMeat>
+  <FMH.AllowInsectMeat>虫肉计算在内</FMH.AllowInsectMeat>
   <FMH.UnforbidCorpses>尸体解除禁止</FMH.UnforbidCorpses>
   <FMH.HuntingGrounds>允许狩猎于：</FMH.HuntingGrounds>
   <FMH.Options>选项</FMH.Options>
@@ -162,6 +171,8 @@
   <FML.RestrictToArea>限制动物到区域中？</FML.RestrictToArea>
   <FML.ButcherExcess>屠宰过剩的牲畜</FML.ButcherExcess>
   <FML.ButcherTrained>屠宰过剩的牲畜（已训练的）</FML.ButcherTrained>
+  <FML.ButcherPregnant>怀孕的</FML.ButcherPregnant>
+  <FML.ButcherBonded>牵绊的</FML.ButcherBonded>
   <FML.TameMore>自动标记驯服动物</FML.TameMore>
   <FML.TameArea>允许驯服于：</FML.TameArea>
   <FML.Animals>动物</FML.Animals>
@@ -177,5 +188,7 @@
   <FML.WoolHeader>到下次剪毛的进度</FML.WoolHeader>
   <FML.Yields>收获{0} x{1}</FML.Yields>
   <FML.TrainYoung>训练幼崽</FML.TrainYoung>
+  <FML.SendToSlaughterArea>限定为已标记为宰杀的动物</FML.SendToSlaughterArea>
+  <FML.SlaughterArea>宰杀区域</FML.SlaughterArea>
 
 </LanguageData>
