@@ -2,12 +2,12 @@
 <LanguageData>
 
 		<FM_BasicManagerStation.label>bureau de gestionnaire basique</FM_BasicManagerStation.label>
-		<FM_BasicManagerStation.Description>Une simple table avec toute la papeterie nécessaire au travail de gestionnaire.</FM_BasicManagerStation.Description>
+		<FM_BasicManagerStation.description>Une simple table avec toute la papeterie nécessaire au travail de gestionnaire.</FM_BasicManagerStation.description>
 		
 		<FM_ManagerStation.label>bureau de gestionnaire</FM_ManagerStation.label>
-		<FM_ManagerStation.Description>Un bureau avec un ordinateur et toute la papeterie permettant au gestionnaire de travailler efficacement.</FM_ManagerStation.Description>
+		<FM_ManagerStation.description>Un bureau avec un ordinateur et toute la papeterie permettant au gestionnaire de travailler efficacement.</FM_ManagerStation.description>
 		
 		<FM_AIManager.label>Gestion IA</FM_AIManager.label>
-		<FM_AIManager.Description>Un énorme superordinateur capable de gérer la colonie de façon autonome. Affirmer que l'ordinateur possède un sous-programme psychopatte malveillant est entièrement faux. Nous le promettons.</FM_AIManager.Description>
+		<FM_AIManager.description>Un énorme superordinateur capable de gérer la colonie de façon autonome. Affirmer que l'ordinateur possède un sous-programme psychopatte malveillant est entièrement faux. Nous le promettons.</FM_AIManager.description>
 		
 </LanguageData>

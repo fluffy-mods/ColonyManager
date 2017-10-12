@@ -13,7 +13,8 @@ namespace FluffyManager
     {
         #region Fields
 
-        public int Speed = 250;
+        private int speed = 250;
+        public int Speed => speed;
 
         #endregion Fields
 

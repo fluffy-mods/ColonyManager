@@ -2,12 +2,12 @@
 <LanguageData>
 
 		<FM_BasicManagerStation.label>Einfacher Managertisch</FM_BasicManagerStation.label>
-		<FM_BasicManagerStation.Description>Ein einfacher Tisch, mitsamt allerhand Dinge, die man zum managen braucht.</FM_BasicManagerStation.Description>
+		<FM_BasicManagerStation.description>Ein einfacher Tisch, mitsamt allerhand Dinge, die man zum managen braucht.</FM_BasicManagerStation.description>
 		
 		<FM_ManagerStation.label>Managertisch</FM_ManagerStation.label>
-		<FM_ManagerStation.Description>Ein Tisch, mitsamt allerhand Dinge, die man zum effizenten managen braucht.</FM_ManagerStation.Description>
+		<FM_ManagerStation.description>Ein Tisch, mitsamt allerhand Dinge, die man zum effizenten managen braucht.</FM_ManagerStation.description>
 		
 		<FM_AIManager.label>Manager KI</FM_AIManager.label>
-		<FM_AIManager.Description>Ein gigantischer Supercomputer, der dazu in der Lage ist, die gesamte Kolonie zu managen. Gerüchte über bösartig-psychopathische Verhalten der Ki sind falsch. Das versprechen wir!</FM_AIManager.Description>
+		<FM_AIManager.description>Ein gigantischer Supercomputer, der dazu in der Lage ist, die gesamte Kolonie zu managen. Gerüchte über bösartig-psychopathische Verhalten der Ki sind falsch. Das versprechen wir!</FM_AIManager.description>
 		
 </LanguageData>
