@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ResearchProjectDefs>
+<Defs>
 
     <ResearchProjectDef>
         <defName>ManagingSoftware</defName>
@@ -46,4 +46,4 @@ Advancements in AI and colony-aware computers allow the building of Colony Aware
           <li Class="FluffyManager.UnlockPowerTab" />
         </researchMods>
     </ResearchProjectDef>
-</ResearchProjectDefs>
+</Defs>

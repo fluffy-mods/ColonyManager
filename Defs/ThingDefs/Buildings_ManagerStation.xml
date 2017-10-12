@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ThingDefs>
+<Defs>
 	<ThingDef Name="BuildingBase" Abstract="True">
 		<category>Building</category>
 		<soundImpactDefault>BulletImpactMetal</soundImpactDefault>
@@ -162,4 +162,4 @@
 			<li>AdvancedManagingSoftware</li>
 		</researchPrerequisites>
 	</ThingDef>
-</ThingDefs>
+</Defs>
