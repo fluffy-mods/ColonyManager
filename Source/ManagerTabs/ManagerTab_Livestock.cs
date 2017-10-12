@@ -490,7 +490,8 @@ namespace FluffyManager
         private void DoLeftRow( Rect rect )
         {
             // background (minus top line so we can draw tabs.)
-            Widgets.DrawMenuSection( rect, false );
+            // TODO: A18; check if this lines up correctly with tabs.
+            Widgets.DrawMenuSection( rect );
 
             // tabs
             var tabs = new List<TabRecord>();

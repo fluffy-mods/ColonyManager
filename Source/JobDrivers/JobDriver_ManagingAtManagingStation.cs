@@ -3,9 +3,7 @@
 // 2016-12-09
 
 using RimWorld;
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -13,15 +11,21 @@ namespace FluffyManager
 {
     internal class JobDriver_ManagingAtManagingStation : JobDriver
     {
-        private float workNeeded = 0;
-        private float workDone = 0;
+        private float workNeeded;
+        private float workDone;
+
+        public override bool TryMakePreToilReservations()
+        {
+            return pawn.Reserve( job.targetA, job );
+        }
 
         protected override IEnumerable<Toil> MakeNewToils()
         {
-            yield return Toils_Reserve.Reserve( TargetIndex.A ).FailOnDespawnedOrForbiddenPlacedThings();
-            yield return Toils_Goto.GotoThing( TargetIndex.A, PathEndMode.InteractionCell )
-                                   .FailOnDespawnedOrForbiddenPlacedThings();
-            yield return Manage( TargetIndex.A ).FailOnDespawnedOrForbiddenPlacedThings();
+            // TODO: A18; check if this is still working as intended.
+            this.FailOnDespawnedNullOrForbidden( TargetIndex.A );
+            yield return Toils_Reserve.Reserve( TargetIndex.A );
+            yield return Toils_Goto.GotoThing( TargetIndex.A, PathEndMode.InteractionCell );
+            yield return Manage( TargetIndex.A );
             yield return Toils_Reserve.Release( TargetIndex.A );
         }
 
@@ -39,7 +43,8 @@ namespace FluffyManager
 
         private Toil Manage( TargetIndex targetIndex )
         {
-            var station = CurJob.GetTarget( targetIndex ).Thing as Building_ManagerStation;
+            // TODO: A18; check if this is still working as intended.
+            var station = pawn.jobs.curJob.GetTarget( targetIndex ).Thing as Building_ManagerStation;
             if ( station == null )
             {
                 Log.Error( "Target of manager job was not a manager station. This should never happen." );
