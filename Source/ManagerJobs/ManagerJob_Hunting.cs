@@ -104,9 +104,9 @@ namespace FluffyManager
                            .ConvertAll( thing => thing as Corpse );
                 return
                     corpses.Where(
-                                  thing =>
-                                  AllowedAnimals.ContainsKey( thing.InnerPawn.kindDef ) &&
-                                  AllowedAnimals[thing.InnerPawn.kindDef] ).ToList();
+                                  thing => thing?.InnerPawn != null &&
+                                           AllowedAnimals.ContainsKey( thing.InnerPawn.kindDef ) &&
+                                           AllowedAnimals[thing.InnerPawn.kindDef] ).ToList();
             }
         }
 
