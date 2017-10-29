@@ -56,7 +56,21 @@ namespace FluffyManager
             MeatIcon = ContentFinder<Texture2D>.Get( "UI/Icons/meat" ),
             UnkownIcon = ContentFinder<Texture2D>.Get( "UI/Icons/unknown" );
 
-        public static Texture2D[] LifeStages = {StageA, StageB, StageC};
+        //public static Texture2D[] LifeStages = {StageA, StageB, StageC};
+
+        public static Texture2D LifeStages( int lifeStageIndex )
+        {
+            switch ( lifeStageIndex )
+            {
+                case 0:
+                    return StageA;
+                case 1:
+                    return StageB;
+                case 2:
+                default:
+                    return StageC; // animals with > 3 lifestages just get the adult icon.
+            }
+        }
 
         #endregion Fields
     }

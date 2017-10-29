@@ -563,9 +563,9 @@ namespace FluffyManager
             Rect ageRectC = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect, _smallIconSize / 2 );
             Rect ageRectB = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect );
             Rect ageRectA = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect, -_smallIconSize / 2 );
-            GUI.DrawTexture( ageRectC, Resources.LifeStages[2] );
-            GUI.DrawTexture( ageRectB, Resources.LifeStages[1] );
-            GUI.DrawTexture( ageRectA, Resources.LifeStages[0] );
+            GUI.DrawTexture( ageRectC, Resources.LifeStages(2) );
+            GUI.DrawTexture( ageRectB, Resources.LifeStages(1) );
+            GUI.DrawTexture( ageRectA, Resources.LifeStages(0) );
             TooltipHandler.TipRegion( ageRect, "FML.AgeHeader".Translate() );
             cur.x += colwidth;
 
@@ -666,7 +666,7 @@ namespace FluffyManager
             // lifestage column
             var ageRect = new Rect( cur.x, cur.y, colwidth, size.y );
             Rect ageIconRect = new Rect( 0f, 0f, _smallIconSize, _smallIconSize ).CenteredIn( ageRect );
-            GUI.DrawTexture( ageIconRect, Resources.LifeStages[p.ageTracker.CurLifeStageIndex] );
+            GUI.DrawTexture( ageIconRect, Resources.LifeStages(p.ageTracker.CurLifeStageIndex) );
             TooltipHandler.TipRegion( ageRect, p.ageTracker.AgeTooltipString );
             cur.x += colwidth;
 
