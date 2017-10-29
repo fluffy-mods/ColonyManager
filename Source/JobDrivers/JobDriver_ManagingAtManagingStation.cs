@@ -21,12 +21,13 @@ namespace FluffyManager
 
         protected override IEnumerable<Toil> MakeNewToils()
         {
-            // TODO: A18; check if this is still working as intended.
             this.FailOnDespawnedNullOrForbidden( TargetIndex.A );
-            yield return Toils_Reserve.Reserve( TargetIndex.A );
             yield return Toils_Goto.GotoThing( TargetIndex.A, PathEndMode.InteractionCell );
-            yield return Manage( TargetIndex.A );
-            yield return Toils_Reserve.Release( TargetIndex.A );
+            var manage = Manage( TargetIndex.A );
+            yield return manage;
+            
+            // if made to by player, keep doing that untill we're out of jobs
+            yield return Toils_Jump.JumpIf( manage, () => GetActor().CurJob.playerForced && Manager.For(Map).JobStack.NextJob != null );
         }
 
         #region Overrides of JobDriver
@@ -43,11 +44,10 @@ namespace FluffyManager
 
         private Toil Manage( TargetIndex targetIndex )
         {
-            // TODO: A18; check if this is still working as intended.
-            var station = pawn.jobs.curJob.GetTarget( targetIndex ).Thing as Building_ManagerStation;
+            var station = GetActor().jobs.curJob.GetTarget( targetIndex ).Thing as Building_ManagerStation;
             if ( station == null )
             {
-                Log.Error( "Target of manager job was not a manager station. This should never happen." );
+                Log.Error( "Target of manager job was not a manager station." );
                 return null;
             }
 

@@ -230,9 +230,9 @@ namespace FluffyManager
 
             // settings, references first!
             Scribe_References.Look( ref LoggingArea, "LoggingArea" );
-            Scribe_Values.Look( ref type, "type", ForestryJobType.Logging );
             Scribe_Deep.Look( ref Trigger, "trigger", manager );
             Scribe_Collections.Look( ref AllowedTrees, "AllowedTrees", LookMode.Def, LookMode.Value );
+            Scribe_Values.Look( ref type, "type", ForestryJobType.Logging );
             Scribe_Values.Look( ref AllowSaplings, "AllowSaplings", false );
 
             // clearing areas list
@@ -310,7 +310,7 @@ namespace FluffyManager
             switch ( type )
             {
                     case ForestryJobType.Logging:
-                        TryDoLoggingJob( ref workDone );
+                        DoLoggingJob( ref workDone );
                         break;
                     case ForestryJobType.ClearWind:
                         DoClearAreaDesignations( GetWindCells(), false, ref workDone );
@@ -324,7 +324,7 @@ namespace FluffyManager
             return workDone;
         }
 
-        private void TryDoLoggingJob( ref bool workDone )
+        private void DoLoggingJob( ref bool workDone )
         {
             // remove designations not in zone.
             if (LoggingArea != null)
@@ -332,7 +332,7 @@ namespace FluffyManager
 
             // add external designations
             AddRelevantGameDesignations();
-
+            
             // get current lumber count
             int count = Trigger.CurCount + GetWoodInDesignations();
 
