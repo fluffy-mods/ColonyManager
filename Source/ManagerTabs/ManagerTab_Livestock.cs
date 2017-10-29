@@ -101,6 +101,8 @@ namespace FluffyManager
             Refresh();
         }
 
+        private Vector2 optionsScrollPosition = Vector2.zero;
+        private float optionsHeight = 1;
         private void DoContent( Rect rect )
         {
             // cop out if nothing is selected.
@@ -121,6 +123,14 @@ namespace FluffyManager
                                               _topAreaHeight,
                                               rect.width / 2 - Utilities.Margin,
                                               rect.height - _topAreaHeight - Utilities.Margin - Utilities.ButtonSize.y );
+
+            // actual options column may be taller than available space.
+            var optionsColumnViewRect = new Rect( optionsColumnRect ) { height = optionsHeight };
+
+            // if it is, narrow it a bit to make room for the scrollbar.
+            if ( optionsColumnViewRect.height > optionsColumnRect.height )
+                optionsColumnViewRect.width -= Utilities.ScrollbarWidth;
+
             var animalsRect = new Rect( optionsColumnRect.xMax + Utilities.Margin,
                                         _topAreaHeight,
                                         rect.width / 2 - Utilities.Margin,
@@ -130,6 +140,7 @@ namespace FluffyManager
                                                0f,
                                                optionsColumnRect.width,
                                                _topAreaHeight );
+
             var animalsColumnTitle = new Rect( animalsRect.xMin,
                                                0f,
                                                animalsRect.width,
@@ -146,7 +157,7 @@ namespace FluffyManager
                              anchor: TextAnchor.LowerLeft, lrMargin: Utilities.Margin * 2, font: GameFont.Tiny );
 
             // options
-            GUI.BeginGroup( optionsColumnRect );
+            Widgets.BeginScrollView( optionsColumnRect, ref optionsScrollPosition, optionsColumnViewRect );
             Vector2 cur = Vector2.zero;
             var optionIndex = 1;
 
@@ -378,7 +389,8 @@ namespace FluffyManager
             }
             optionIndex++;
 
-            GUI.EndGroup(); // options
+            GUI.EndScrollView(); // options
+            optionsHeight = cur.y;
 
             // Start animals list
             // get our pawnkind
@@ -388,7 +400,7 @@ namespace FluffyManager
                 Rect viewRect = animalsRect;
                 viewRect.height = _actualHeight;
                 if ( _actualHeight > animalsRect.height )
-                    viewRect.width -= 16f;
+                    viewRect.width -= Utilities.ScrollbarWidth;
 
                 Widgets.BeginScrollView( animalsRect, ref _animalsScrollPosition, viewRect );
                 GUI.BeginGroup( viewRect );
@@ -490,7 +502,6 @@ namespace FluffyManager
         private void DoLeftRow( Rect rect )
         {
             // background (minus top line so we can draw tabs.)
-            // TODO: A18; check if this lines up correctly with tabs.
             Widgets.DrawMenuSection( rect );
 
             // tabs
@@ -712,9 +723,7 @@ namespace FluffyManager
             // set sizes
             viewRect.height = _availablePawnKinds.Count * _listEntryHeight;
             if ( viewRect.height > outRect.height )
-            {
-                viewRect.width -= 16f;
-            }
+                viewRect.width -= Utilities.ScrollbarWidth;
 
             Widgets.BeginScrollView( outRect, ref _scrollPosition, viewRect );
             GUI.BeginGroup( viewRect );
@@ -759,9 +768,7 @@ namespace FluffyManager
             // set sizes
             viewRect.height = _currentJobs.Count * _listEntryHeight;
             if ( viewRect.height > outRect.height )
-            {
-                viewRect.width -= 16f;
-            }
+                viewRect.width -= Utilities.ScrollbarWidth;
 
             Widgets.BeginScrollView( outRect, ref _scrollPosition, viewRect );
             GUI.BeginGroup( viewRect );

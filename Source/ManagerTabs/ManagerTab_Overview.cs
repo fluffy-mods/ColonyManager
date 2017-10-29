@@ -217,9 +217,7 @@ namespace FluffyManager
                 Rect contentRect = viewRect.AtZero();
                 contentRect.height = OverviewHeight;
                 if ( OverviewHeight > viewRect.height )
-                {
-                    contentRect.width -= 16f;
-                }
+                    contentRect.width -= Utilities.ScrollbarWidth;
 
                 GUI.BeginGroup( viewRect );
                 Widgets.BeginScrollView( viewRect, ref _overviewScrollPosition, contentRect );
@@ -277,9 +275,7 @@ namespace FluffyManager
             var tableOutRect = new Rect( 0f, RowHeightPawnOverview, rect.width, rect.height - RowHeightPawnOverview );
             var tableViewRect = new Rect( 0f, RowHeightPawnOverview, rect.width, Workers.Count * RowHeightPawnOverview );
             if ( tableViewRect.height > tableOutRect.height )
-            {
-                tableViewRect.width -= 16f;
-            }
+                tableViewRect.width -= Utilities.ScrollbarWidth;
 
             // column width
             float colWidth = tableViewRect.width / 4 - Margin;

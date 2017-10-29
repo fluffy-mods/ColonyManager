@@ -17,6 +17,7 @@ namespace FluffyManager
         public const float LargeListEntryHeight = 50f;
         public const float Margin = 6f;
         public const float SliderHeight = 20f;
+        public const float ScrollbarWidth = 16f;
         public static float BottomButtonHeight = 50f;
         public static Vector2 ButtonSize = new Vector2( 200f, 40f );
 

@@ -142,9 +142,7 @@ namespace FluffyManager
             Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
             var viewRect = new Rect( 0f, 0f, outRect.width, ( _selected.AllowedAnimals.Count + 1 ) * _entryHeight ); // we also have an 'all' row...
             if ( viewRect.height > outRect.height )
-            {
-                viewRect.width -= 16f;
-            }
+                viewRect.width -= Utilities.ScrollbarWidth;
 
             // start scrolling view
             Widgets.BeginScrollView( outRect, ref _animalsScrollPosition, viewRect );
@@ -227,9 +225,7 @@ namespace FluffyManager
             float height = _leftRowHeight;
             var scrollView = new Rect( 0f, 0f, rect.width, height );
             if ( height > rect.height )
-            {
-                scrollView.width -= 16f;
-            }
+                scrollView.width -= Utilities.ScrollbarWidth;
 
             Widgets.BeginScrollView( rect, ref _scrollPosition, scrollView );
             Rect scrollContent = scrollView;

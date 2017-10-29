@@ -59,7 +59,7 @@ namespace FluffyManager
 
             // do list
             var curY = 2f;
-            var viewRect = new Rect( 0f, 0f, canvas.width - 16f, viewHeight );
+            var viewRect = new Rect( 0f, 0f, canvas.width - Utilities.ScrollbarWidth, viewHeight );
 
             // scrollview
             Widgets.BeginScrollView( canvas, ref scrollPosition, viewRect );
