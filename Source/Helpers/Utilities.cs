@@ -317,8 +317,7 @@ namespace FluffyManager
 
         public static void DrawStatusForListEntry<T>( this T job, Rect rect, Trigger trigger ) where T : ManagerJob
         {
-            if ( job.Completed ||
-                 job.Suspended )
+            if ( job.Completed || job.Suspended )
             {
                 // put a stamp on it
                 var stampRect = new Rect( 0f, 0f, MediumIconSize, MediumIconSize );

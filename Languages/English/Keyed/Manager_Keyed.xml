@@ -89,6 +89,10 @@
   <FMF.TargetCount>Target count: {0}+{1}/{2}</FMF.TargetCount>
   <FMF.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMF.TargetCountTooltip>
   <FMF.ClearAreas>Clear areas of all vegetation:</FMF.ClearAreas>
+  <FMF.JobType>Job type</FMF.JobType>
+  <FMF.JobType.ClearArea>Clear areas</FMF.JobType.ClearArea>
+  <FMF.JobType.ClearWind>Clear wind turbines</FMF.JobType.ClearWind>
+  <FMF.JobType.Logging>Wood logging</FMF.JobType.Logging>
 
   <!-- Foraging (Gathering) tab -->
   <FMG.Foraging>Foraging</FMG.Foraging>

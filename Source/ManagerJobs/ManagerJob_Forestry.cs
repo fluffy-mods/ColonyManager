@@ -13,9 +13,16 @@ namespace FluffyManager
 {
     public class ManagerJob_Forestry : ManagerJob
     {
+        public enum ForestryJobType
+        {
+            ClearArea,
+            ClearWind,
+            Logging
+        }
+
         #region Fields
 
-        public static bool ClearWindCells = true;
+        public ForestryJobType type = ForestryJobType.Logging;
         public Dictionary<ThingDef, bool> AllowedTrees = new Dictionary<ThingDef, bool>();
         public bool AllowSaplings;
         public Dictionary<Area, bool> ClearAreas = new Dictionary<Area, bool>();
@@ -60,12 +67,36 @@ namespace FluffyManager
 
         public override bool Completed
         {
-            get { return !Trigger.State; }
+            get
+            {
+                switch ( type )
+                {
+                    case ForestryJobType.Logging:
+                        return !Trigger.State;
+                    default:
+                        return false;
+                }
+            }
         }
 
         public override string Label
         {
             get { return "FMF.Forestry".Translate(); }
+        }
+
+        public string SubLabel( Rect rect )
+        {
+            switch ( type )
+                {
+                    case ForestryJobType.Logging:
+                        var sublabel = string.Join(", ", Targets);
+                        if (sublabel.Fits(rect))
+                            return sublabel.Italic();
+                        else
+                            return "multiple".Translate().Italic();
+                    default:
+                        return ( "FMF.JobType." + type ).Translate().Italic();
+            }
         }
 
         public override ManagerTab Tab
@@ -125,7 +156,7 @@ namespace FluffyManager
             Designations.Clear();
         }
 
-        public void DoClearAreaDesignations( IEnumerable<IntVec3> cells, bool allPlants = false )
+        public void DoClearAreaDesignations( IEnumerable<IntVec3> cells, bool allPlants, ref bool workDone )
         {
             var map = manager.map;
             var designationManager = map.designationManager;
@@ -155,6 +186,7 @@ namespace FluffyManager
 
                 // there's no reason not to cut it down, so cut it down.
                 designationManager.AddDesignation( new Designation( plant, DesignationDefOf.CutPlant ) );
+                workDone = true;
             }
         }
 
@@ -168,14 +200,10 @@ namespace FluffyManager
                                                          ( active ? StatusRectWidth + 4 * _margin : 2 * _margin ),
                                        rect.height - 2 * _margin ),
                  statusRect = new Rect( labelRect.xMax + _margin, _margin, StatusRectWidth, rect.height - 2 * _margin );
-
+            
             // create label string
-            string text = Label + "\n";
-            string subtext = string.Join( ", ", Targets );
-            if ( subtext.Fits( labelRect ) )
-                text += subtext.Italic();
-            else
-                text += "multiple".Translate().Italic();
+            string subtext = SubLabel( labelRect );
+            string text = Label + "\n" + subtext;
 
             // do the drawing
             GUI.BeginGroup( rect );
@@ -185,9 +213,8 @@ namespace FluffyManager
 
             // if the bill has a manager job, give some more info.
             if ( active )
-            {
                 this.DrawStatusForListEntry( statusRect, Trigger );
-            }
+            
             GUI.EndGroup();
         }
 
@@ -203,10 +230,10 @@ namespace FluffyManager
 
             // settings, references first!
             Scribe_References.Look( ref LoggingArea, "LoggingArea" );
+            Scribe_Values.Look( ref type, "type", ForestryJobType.Logging );
             Scribe_Deep.Look( ref Trigger, "trigger", manager );
             Scribe_Collections.Look( ref AllowedTrees, "AllowedTrees", LookMode.Def, LookMode.Value );
             Scribe_Values.Look( ref AllowSaplings, "AllowSaplings", false );
-            Scribe_Values.Look( ref ClearWindCells, "ClearWindCells", true );
 
             // clearing areas list
             if ( Scribe.mode == LoadSaveMode.Saving )
@@ -220,7 +247,6 @@ namespace FluffyManager
             }
 
             // scribe that stuff
-            // TODO: Verify LookMode Ref
             Scribe_Collections.Look( ref _clearAreas_areas, "ClearAreas_areas", LookMode.Reference );
             Scribe_Collections.Look( ref _clearAreas_allowed, "ClearAreas_allowed", LookMode.Value );
 
@@ -278,26 +304,31 @@ namespace FluffyManager
             // keep track if any actual work was done.
             var workDone = false;
 
-            // remove designations not in zone.
-            if ( LoggingArea != null )
-            {
-                CleanAreaDesignations();
-            }
-
-            // clear selected areas
-            if ( ClearAreas.Any() )
-            {
-                DoClearAreas();
-            }
-
-            // clear wind cells
-            if ( ClearWindCells )
-            {
-                DoClearAreaDesignations( GetWindCells() );
-            }
-
             // clean dead designations
             CleanDesignations();
+
+            switch ( type )
+            {
+                    case ForestryJobType.Logging:
+                        TryDoLoggingJob( ref workDone );
+                        break;
+                    case ForestryJobType.ClearWind:
+                        DoClearAreaDesignations( GetWindCells(), false, ref workDone );
+                        break;
+                    case ForestryJobType.ClearArea:
+                        if ( ClearAreas.Any() )
+                            DoClearAreas( ref workDone );
+                        break;
+            }
+            
+            return workDone;
+        }
+
+        private void TryDoLoggingJob( ref bool workDone )
+        {
+            // remove designations not in zone.
+            if (LoggingArea != null)
+                CleanAreaDesignations();
 
             // add external designations
             AddRelevantGameDesignations();
@@ -309,16 +340,14 @@ namespace FluffyManager
             List<Plant> trees = GetLoggableTreesSorted();
 
             // designate untill we're either out of trees or we have enough designated.
-            for ( var i = 0; i < trees.Count && count < Trigger.Count; i++ )
+            for (var i = 0; i < trees.Count && count < Trigger.Count; i++)
             {
                 workDone = true;
-                AddDesignation( trees[i], DesignationDefOf.HarvestPlant );
+                AddDesignation(trees[i], DesignationDefOf.HarvestPlant);
                 count += trees[i].YieldNow();
             }
-
-            return workDone;
         }
-
+        
         internal void UpdateClearAreas()
         {
             // init list of areas
@@ -374,23 +403,18 @@ namespace FluffyManager
             foreach ( Designation des in Designations )
             {
                 if ( !des.target.HasThing )
-                {
                     des.Delete();
-                }
-                else if ( !LoggingArea.ActiveCells.Contains( des.target.Thing.Position ) &&
-                          ( !IsInWindTurbineArea( des.target.Thing.Position ) || !ClearWindCells ) )
-                {
+                else if ( !LoggingArea.ActiveCells.Contains( des.target.Thing.Position ) )
                     des.Delete();
-                }
             }
         }
 
-        private void DoClearAreas()
+        private void DoClearAreas( ref bool workDone )
         {
             foreach ( KeyValuePair<Area, bool> area in ClearAreas )
             {
                 if ( area.Value )
-                    DoClearAreaDesignations( area.Key.ActiveCells, true );
+                    DoClearAreaDesignations( area.Key.ActiveCells, true, ref workDone );
             }
         }
 
@@ -451,10 +475,8 @@ namespace FluffyManager
                    && manager.map.designationManager.DesignationOn( p ) == null
 
                    // cut only mature trees, or saplings that yield something right now.
-                   && ( ( AllowSaplings && p.YieldNow() > 1 )
-                        || p.LifeStage == PlantLifeStage.Mature )
-                   && ( LoggingArea == null
-                        || LoggingArea.ActiveCells.Contains( p.Position ) )
+                   && ( ( AllowSaplings && p.YieldNow() > 1 ) || p.LifeStage == PlantLifeStage.Mature )
+                   && ( LoggingArea == null || LoggingArea.ActiveCells.Contains( p.Position ) )
                    && manager.map.reachability.CanReachColony( p.Position );
         }
 
@@ -466,8 +488,7 @@ namespace FluffyManager
             var options = manager.map.Biome.AllWildPlants.Where(
                                                                 pd =>
                                                                     pd.plant.harvestTag == "Wood" ||
-                                                                    pd.plant.harvestedThingDef ==
-                                                                    Utilities_Forestry.Wood );
+                                                                    pd.plant.harvestedThingDef == Utilities_Forestry.Wood );
 
             foreach ( ThingDef tree in options )
             {
