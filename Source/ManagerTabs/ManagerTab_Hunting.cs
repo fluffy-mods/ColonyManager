@@ -140,7 +140,7 @@ namespace FluffyManager
             cur = Vector2.zero;
 
             Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
-            var viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedAnimals.Count * _entryHeight );
+            var viewRect = new Rect( 0f, 0f, outRect.width, ( _selected.AllowedAnimals.Count + 1 ) * _entryHeight ); // we also have an 'all' row...
             if ( viewRect.height > outRect.height )
             {
                 viewRect.width -= 16f;
