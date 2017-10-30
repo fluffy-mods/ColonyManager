@@ -259,7 +259,7 @@ namespace FluffyManager
 
                           // OrderBy defaults to ascending, switch sign on current yield to get descending
                           .Select( p => p as Plant )
-                          .OrderBy( p => -p.YieldNow() / ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) )
+                          .OrderBy( p => -p.YieldNow() / position.DistanceToSquared( p.Position ) )
                           .ToList();
         }
 

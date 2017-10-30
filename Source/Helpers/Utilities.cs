@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 
 namespace FluffyManager
 {
@@ -51,7 +52,7 @@ namespace FluffyManager
             inner.y += y;
             return inner;
         }
-
+        
         public static bool HasCompOrChildCompOf( this ThingDef def, Type compType )
         {
             for ( var index = 0; index < def.comps.Count; ++index )
