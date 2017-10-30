@@ -34,12 +34,11 @@ namespace FluffyManager
             set { _actionInterval = value; }
         }
 
-        // should be 1 minute.
-        public int LastAction;
+        public int lastAction;
 
         public Manager manager;
 
-        public int Priority;
+        public int priority;
 
         public Trigger Trigger;
 
@@ -50,6 +49,7 @@ namespace FluffyManager
         public ManagerJob( Manager manager )
         {
             this.manager = manager;
+            Touch(); // set last updated to current time.
         }
 
         #endregion Constructors
@@ -63,8 +63,7 @@ namespace FluffyManager
         public abstract string Label { get; }
         public virtual bool Managed { get; set; }
 
-        public virtual bool ShouldDoNow
-            => Managed && !Suspended && !Completed && LastAction + ActionInterval < Find.TickManager.TicksGame;
+        public virtual bool ShouldDoNow => Managed && !Suspended && !Completed && lastAction + ActionInterval < Find.TickManager.TicksGame;
 
         public virtual SkillDef SkillDef { get; } = null;
         public virtual bool Suspended { get; set; } = false;
@@ -95,8 +94,8 @@ namespace FluffyManager
         {
             Scribe_References.Look( ref manager, "manager" );
             Scribe_Values.Look( ref _actionInterval, "ActionInterval" );
-            Scribe_Values.Look( ref LastAction, "LastAction" );
-            Scribe_Values.Look( ref Priority, "Priority" );
+            Scribe_Values.Look( ref lastAction, "lastAction" );
+            Scribe_Values.Look( ref priority, "priority" );
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit || Manager.LoadSaveMode == Manager.Modes.ImportExport )
             {
@@ -112,9 +111,9 @@ namespace FluffyManager
         public override string ToString()
         {
             var s = new StringBuilder();
-            s.AppendLine( "Priority: " + Priority );
+            s.AppendLine( "Priority: " + priority );
             s.AppendLine( "Active: " + Suspended );
-            s.AppendLine( "LastAction: " + LastAction );
+            s.AppendLine( "LastAction: " + lastAction );
             s.AppendLine( "Interval: " + ActionInterval );
             s.AppendLine( "GameTick: " + Find.TickManager.TicksGame );
             return s.ToString();
@@ -122,7 +121,7 @@ namespace FluffyManager
 
         public void Touch()
         {
-            LastAction = Find.TickManager.TicksGame;
+            lastAction = Find.TickManager.TicksGame;
         }
 
         public abstract bool TryDoJob();

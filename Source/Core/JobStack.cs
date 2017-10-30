@@ -39,7 +39,7 @@ namespace FluffyManager
         /// </summary>
         public List<ManagerJob> CurStack
         {
-            get { return _stack.Where( mj => mj.ShouldDoNow ).OrderBy( mj => mj.Priority ).ToList(); }
+            get { return _stack.Where( mj => mj.ShouldDoNow ).OrderBy( mj => mj.priority ).ToList(); }
         }
 
         /// <summary>
@@ -59,46 +59,46 @@ namespace FluffyManager
         /// <param name="job"></param>
         public void Add( ManagerJob job )
         {
-            job.Priority = _stack.Count + 1;
+            job.priority = _stack.Count + 1;
             _stack.Add( job );
         }
 
         public void BottomPriority( ManagerJob job )
         {
-            job.Priority = _stack.Count + 10;
+            job.priority = _stack.Count + 10;
             CleanPriorities();
         }
 
         public void BottomPriority<T>( T job ) where T : ManagerJob
         {
             // get list of priorities for this type.
-            List<T> jobsOfType = _stack.OfType<T>().OrderBy( j => j.Priority ).ToList();
-            List<int> priorities = jobsOfType.Select( j => j.Priority ).ToList();
+            List<T> jobsOfType = _stack.OfType<T>().OrderBy( j => j.priority ).ToList();
+            List<int> priorities = jobsOfType.Select( j => j.priority ).ToList();
 
             // make sure our job is on the bottom.
-            job.Priority = _stack.Count + 10;
+            job.priority = _stack.Count + 10;
 
             // re-sort
-            jobsOfType = jobsOfType.OrderBy( j => j.Priority ).ToList();
+            jobsOfType = jobsOfType.OrderBy( j => j.priority ).ToList();
 
             // fill in priorities, making sure we don't affect other types.
             for ( var i = 0; i < jobsOfType.Count; i++ )
             {
-                jobsOfType[i].Priority = priorities[i];
+                jobsOfType[i].priority = priorities[i];
             }
         }
 
         public void DecreasePriority( ManagerJob job )
         {
-            ManagerJob jobB = _stack.OrderBy( mj => mj.Priority ).First( mj => mj.Priority > job.Priority );
+            ManagerJob jobB = _stack.OrderBy( mj => mj.priority ).First( mj => mj.priority > job.priority );
             SwitchPriorities( job, jobB );
         }
 
         public void DecreasePriority<T>( T job ) where T : ManagerJob
         {
             ManagerJob jobB = _stack.OfType<T>()
-                                    .OrderBy( mj => mj.Priority )
-                                    .First( mj => mj.Priority > job.Priority );
+                                    .OrderBy( mj => mj.priority )
+                                    .First( mj => mj.priority > job.priority );
             SwitchPriorities( job, jobB );
         }
 
@@ -121,7 +121,7 @@ namespace FluffyManager
         /// </summary>
         public List<T> FullStack<T>() where T : ManagerJob
         {
-            return _stack.OrderBy( job => job.Priority ).OfType<T>().ToList();
+            return _stack.OrderBy( job => job.priority ).OfType<T>().ToList();
         }
 
         /// <summary>
@@ -129,51 +129,51 @@ namespace FluffyManager
         /// </summary>
         public List<ManagerJob> FullStack()
         {
-            return _stack.OrderBy( job => job.Priority ).ToList();
+            return _stack.OrderBy( job => job.priority ).ToList();
         }
 
         public void IncreasePriority( ManagerJob job )
         {
-            ManagerJob jobB = _stack.OrderByDescending( mj => mj.Priority ).First( mj => mj.Priority < job.Priority );
+            ManagerJob jobB = _stack.OrderByDescending( mj => mj.priority ).First( mj => mj.priority < job.priority );
             SwitchPriorities( job, jobB );
         }
 
         public void IncreasePriority<T>( T job ) where T : ManagerJob
         {
             ManagerJob jobB =
-                _stack.OfType<T>().OrderByDescending( mj => mj.Priority ).First( mj => mj.Priority < job.Priority );
+                _stack.OfType<T>().OrderByDescending( mj => mj.priority ).First( mj => mj.priority < job.priority );
             SwitchPriorities( job, jobB );
         }
 
         public void SwitchPriorities( ManagerJob a, ManagerJob b )
         {
-            int tmp = a.Priority;
-            a.Priority = b.Priority;
-            b.Priority = tmp;
+            int tmp = a.priority;
+            a.priority = b.priority;
+            b.priority = tmp;
         }
 
         public void TopPriority( ManagerJob job )
         {
-            job.Priority = -1;
+            job.priority = -1;
             CleanPriorities();
         }
 
         public void TopPriority<T>( T job ) where T : ManagerJob
         {
             // get list of priorities for this type.
-            List<T> jobsOfType = _stack.OfType<T>().OrderBy( j => j.Priority ).ToList();
-            List<int> priorities = jobsOfType.Select( j => j.Priority ).ToList();
+            List<T> jobsOfType = _stack.OfType<T>().OrderBy( j => j.priority ).ToList();
+            List<int> priorities = jobsOfType.Select( j => j.priority ).ToList();
 
             // make sure our job is on top.
-            job.Priority = -1;
+            job.priority = -1;
 
             // re-sort
-            jobsOfType = jobsOfType.OrderBy( j => j.Priority ).ToList();
+            jobsOfType = jobsOfType.OrderBy( j => j.priority ).ToList();
 
             // fill in priorities, making sure we don't affect other types.
             for ( var i = 0; i < jobsOfType.Count; i++ )
             {
-                jobsOfType[i].Priority = priorities[i];
+                jobsOfType[i].priority = priorities[i];
             }
         }
 
@@ -205,10 +205,10 @@ namespace FluffyManager
         /// </summary>
         private void CleanPriorities()
         {
-            List<ManagerJob> orderedStack = _stack.OrderBy( mj => mj.Priority ).ToList();
+            List<ManagerJob> orderedStack = _stack.OrderBy( mj => mj.priority ).ToList();
             for ( var i = 1; i <= _stack.Count; i++ )
             {
-                orderedStack[i - 1].Priority = i;
+                orderedStack[i - 1].priority = i;
             }
         }
 

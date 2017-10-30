@@ -6,6 +6,7 @@
   <FM.Manage>Manage!</FM.Manage>
   <FM.Delete>Delete</FM.Delete>
   <FM.All>All</FM.All>
+  <FM.TabDisabledBecause>(disabled: {0})</FM.TabDisabledBecause>
 
   <!-- Help and alert messages for the lexically challenged. -->
   <FM.HelpTitle>Colony Manager V2</FM.HelpTitle>
@@ -41,6 +42,8 @@
   <FME.PeriodShown>Period: {0}</FME.PeriodShown>
   <FME.PeriodShownTooltip>Currently showing power production and consumption for the last {0}.\n\nClick to change the period.</FME.PeriodShownTooltip>
   <FME.Power>Power</FME.Power>
+  <FME.NotResearched>Power management has not been researched</FME.NotResearched>
+  <FME.NoPoweredStation>No managing station has power</FME.NoPoweredStation>
   
   <!-- Overview Tab -->
   <FM.Overview>Overview</FM.Overview>

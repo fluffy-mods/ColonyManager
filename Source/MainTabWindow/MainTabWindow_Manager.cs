@@ -111,20 +111,30 @@ namespace FluffyManager
 
         public void DrawTabIcon( Rect rect, ManagerTab tab )
         {
-            if ( tab == CurrentTab )
+            if ( tab.Enabled )
             {
-                GUI.color = GenUI.MouseoverColor;
-                if ( Widgets.ButtonImage( rect, tab.Icon, GenUI.MouseoverColor ) )
+                if ( tab == CurrentTab )
                 {
-                    tab.Selected = null;
+                    GUI.color = GenUI.MouseoverColor;
+                    if ( Widgets.ButtonImage( rect, tab.Icon, GenUI.MouseoverColor ) )
+                    {
+                        tab.Selected = null;
+                    }
+                    GUI.color = Color.white;
                 }
-                GUI.color = Color.white;
+                else if ( Widgets.ButtonImage( rect, tab.Icon ) )
+                {
+                    GoTo( tab );
+                }
+                TooltipHandler.TipRegion( rect, tab.Label );
             }
-            else if ( Widgets.ButtonImage( rect, tab.Icon ) )
+            else
             {
-                GoTo( tab );
+                GUI.color = Color.grey;
+                GUI.DrawTexture( rect, tab.Icon );
+                GUI.color = Color.white;
+                TooltipHandler.TipRegion( rect, tab.Label + "FM.TabDisabledBecause".Translate( tab.DisabledReason ) );
             }
-            TooltipHandler.TipRegion( rect, tab.Label );
         }
 
         public override void PostClose()
@@ -155,10 +165,6 @@ namespace FluffyManager
             //    Find.WindowStack.Add( new Dialog_Message( "FM.HelpMessage".Translate(), "FM.HelpTitle".Translate() ) );
             //    Manager.For( Find.VisibleMap ).HelpShown = true;
             //}
-
-            // refresh tabs and unlock power if needed
-            Manager.For( Find.VisibleMap ).RefreshTabs();
-            Manager.For( Find.VisibleMap ).AddPowerTabIfUnlocked();
 
             // make sure the currently open tab is for this map
             if ( CurrentTab.manager.map != Find.VisibleMap )

@@ -250,7 +250,7 @@
 //                                                                                        pair =>
 //                                                                                        new BillTablePriority(
 //                                                                                            pair.Key, pair.Value,
-//                                                                                            job.Priority ) ) );
+//                                                                                            job.priority ) ) );
 //            }
 
 //            // no assigned bills, nothing to do.

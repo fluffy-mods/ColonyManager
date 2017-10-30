@@ -370,7 +370,7 @@ namespace FluffyManager
 
             // draw time since last action
             Text.Anchor = TextAnchor.MiddleCenter;
-            var lastUpdate = (Find.TickManager.TicksGame - job.LastAction);
+            var lastUpdate = (Find.TickManager.TicksGame - job.lastAction);
 
             // set color by how timely we've been
             if ( lastUpdate < job.ActionInterval )

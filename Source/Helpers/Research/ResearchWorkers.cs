@@ -14,7 +14,7 @@ namespace FluffyManager
 
         public override void Apply()
         {
-            Manager._powerUnlocked = true;
+            ManagerTab_Power.unlocked = true;
         }
 
         #endregion

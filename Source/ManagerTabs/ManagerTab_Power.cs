@@ -15,6 +15,7 @@ namespace FluffyManager
     {
         #region Fields
 
+        public static bool unlocked = false;
         private List<List<CompPowerBattery>> _batteries;
 
         private List<ThingDef> _batteryDefs;
@@ -101,9 +102,21 @@ namespace FluffyManager
 
         public override ManagerJob Selected { get; set; }
 
-        public override bool Visible
+        public override bool Enabled
         {
-            get { return AnyPoweredStationOnline; }
+            get { return unlocked && AnyPoweredStationOnline; }
+        }
+
+        public override string DisabledReason
+        {
+            get
+            {
+                if ( !unlocked )
+                    return "FME.NotResearched".Translate();
+                if ( !AnyPoweredStationOnline )
+                    return "FME.NoPoweredStation".Translate();
+                return "Not sure. It should be enabled? Send a bug report.";
+            }
         }
 
         #endregion Properties
@@ -158,7 +171,7 @@ namespace FluffyManager
             base.Tick();
 
             // once in a while, update the list of comps, and history thingcounts + theoretical maxes (where known).
-            if ( Find.TickManager.TicksGame % 2000 == 0 )
+            if ( Find.TickManager.TicksGame % 2000 == 0 && Enabled )
             {
 #if DEBUG_POWER
                 Log.Message( string.Join( ", ", _traderDefs.Select( d => d.LabelCap ).ToArray() ) );

@@ -27,8 +27,6 @@ namespace FluffyManager
 
         #endregion Constructors
 
-
-
         #region Enums
 
         public enum IconAreas
@@ -57,10 +55,9 @@ namespace FluffyManager
 
         public abstract ManagerJob Selected { get; set; }
 
-        public virtual bool Visible
-        {
-            get { return true; }
-        }
+        public virtual bool Enabled => true;
+
+        public virtual string DisabledReason => "";
 
         public abstract void DoWindowContents( Rect canvas );
 
