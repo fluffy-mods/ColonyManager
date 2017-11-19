@@ -481,8 +481,7 @@ namespace FluffyManager
 
         private void DoCountField( Rect rect, Utilities_Livestock.AgeAndSex ageSex )
         {
-            if ( _newCounts == null ||
-                 _newCounts[ageSex] == null )
+            if ( _newCounts == null || _newCounts[ageSex] == null )
             {
                 _newCounts = _selectedCurrent?.Trigger?.CountTargets.ToDictionary( k => k.Key, v => v.Value.ToString() );
             }

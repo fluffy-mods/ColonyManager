@@ -36,13 +36,13 @@ namespace FluffyManager
 
         static Utilities()
         {
-            updateIntervalOptions.Add( "FM.Hourly".Translate(), GenDate.TicksPerHour );
-            updateIntervalOptions.Add( "FM.MultiHourly".Translate( 2 ), GenDate.TicksPerHour * 2 );
-            updateIntervalOptions.Add( "FM.MultiHourly".Translate( 4 ), GenDate.TicksPerHour * 4 );
-            updateIntervalOptions.Add( "FM.MultiHourly".Translate( 8 ), GenDate.TicksPerHour * 8 );
-            updateIntervalOptions.Add( "FM.Daily".Translate(), GenDate.TicksPerDay );
-            updateIntervalOptions.Add( "FM.Monthly".Translate(), GenDate.TicksPerTwelfth );
-            updateIntervalOptions.Add( "FM.Yearly".Translate(), GenDate.TicksPerYear );
+            updateIntervalOptions[ "FM.Hourly".Translate() ] = GenDate.TicksPerHour;
+            updateIntervalOptions[ "FM.MultiHourly".Translate( 2 ) ] = GenDate.TicksPerHour * 2;
+            updateIntervalOptions[ "FM.MultiHourly".Translate( 4 ) ] = GenDate.TicksPerHour * 4;
+            updateIntervalOptions[ "FM.MultiHourly".Translate( 8 ) ] = GenDate.TicksPerHour * 8;
+            updateIntervalOptions[ "FM.Daily".Translate() ] = GenDate.TicksPerDay;
+            updateIntervalOptions[ "FM.Monthly".Translate() ] = GenDate.TicksPerTwelfth;
+            updateIntervalOptions[ "FM.Yearly".Translate() ] = GenDate.TicksPerYear;
         }
 
         public static Rect CenteredIn( this Rect inner, Rect outer, float x = 0f, float y = 0f )
