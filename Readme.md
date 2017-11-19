@@ -7,12 +7,9 @@ Colony Manager allows you to make colonists do the more tedious parts of managin
 Adds a worktype, which is stored in the world, which means you need to start a new game after adding/removing this mod. 
 
 **BETA VERSION**
-This is the first release on A17, and there were a lot of changes. For now, the Production and Import & Export tabs have been disabled. The production tab will likely be permanently removed, and migrated to be it's own mod. Import & Export has been buggy for a while, and needs to be rebuild.
+This is the first release on B18, and there were a lot of changes. The Production and Import & Export tabs are still disabled due to a lack of time. 
 
 # Features
-**Production Jobs**
- == removed ==
-
 **Hunting jobs**
 - Set a target for meat, and never worry about designating hunting manually again! 
 - Set an area to clear of all predators - keep your home area safe! 
@@ -34,16 +31,15 @@ This is the first release on A17, and there were a lot of changes. For now, the 
 - Prioritize jobs, the manager will handle prioritizing jobs on worktables (however standard priority ordering across worktables still applies). 
 
 **Import & Export**
- == disabled ==
+ == coming back soon(tm) ==
 
 # How does it work?
-You can manually set bills in the new Manager tab on the bottom of the screen. Once set, a colonist with the manager skill and worktype enabled will go to a manager station to figure out the best way to hand out jobs to individual workstations 
-Periodically, the manager will check if the assigned bills are still up-to-date, and make changes or delete bills where required. The manager will not touch bills that are set manually, nor will managers create jobs. You're still the overlord. 
-In theory there is no real limit to the number of global bills that can be set. 
+You can manually set jobs in the new Manager tab on the bottom of the screen. Once set, a colonist with the manager skill and worktype enabled will go to a manager station to figure out the best way to assign designations. 
+Periodically, the manager will check if the assigned designations are still up-to-date, and make changes or delete designations where required. The manager will not touch designations that are set manually, nor will managers create jobs. You're still the overlord. 
+In theory there is no real limit to the number of manager jobs that can be created. 
 
 # Notes
-Requires a new save. Adds a worktype, which in my tests gave errors on old savegames. 
-Should work perfectly fine with other mods that add bills, assuming they do nothing too fancy/weird. (I've tested with various modpacks - screenshots were taken with the ModVarietyPack.) 
+- Requires a new save. Adds a worktype, which in my tests gave errors on old savegames. If you also have my Work Tab mod, you should be able to add this mod in an ongoing save.
 
 # Contributors
  - KapTaiN KaVerN:	Minifiable research benches
@@ -73,4 +69,4 @@ Show your appreciation by buying me a coffee (or contribute towards a nice singl
 [![Buy Me a Coffee](http://i.imgur.com/EjWiUwx.gif)](https://ko-fi.com/fluffymods)
 
 # Version
-This is version v0.18.1.0
+This is version v0.18.2.0
