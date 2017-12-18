@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using static FluffyManager.Constants;
 
 namespace FluffyManager
 {
@@ -21,8 +22,6 @@ namespace FluffyManager
         public History History;
         public new Trigger_Threshold Trigger;
         private Utilities.CachedValue<int> _cachedCurrentDesignatedCount = new Utilities.CachedValue<int>( 0, 250 );
-
-        private float _margin = Utilities.Margin;
 
         private List<Designation> Designations = new List<Designation>();
 
@@ -137,10 +136,10 @@ namespace FluffyManager
             // (detailButton) | name | (bar | last update)/(stamp) -> handled in Utilities.DrawStatusForListEntry
 
             // set up rects
-            Rect labelRect = new Rect( _margin, _margin, rect.width -
-                                                         ( active ? StatusRectWidth + 4 * _margin : 2 * _margin ),
-                                       rect.height - 2 * _margin ),
-                 statusRect = new Rect( labelRect.xMax + _margin, _margin, StatusRectWidth, rect.height - 2 * _margin );
+            Rect labelRect = new Rect( Margin, Margin, rect.width -
+                                                         ( active ? StatusRectWidth + 4 * Margin : 2 * Margin ),
+                                       rect.height - 2 * Margin ),
+                 statusRect = new Rect( labelRect.xMax + Margin, Margin, StatusRectWidth, rect.height - 2 * Margin );
 
             // create label string
             string text = Label + "\n";
@@ -154,7 +153,7 @@ namespace FluffyManager
             GUI.BeginGroup( rect );
 
             // draw label
-            Utilities.Label( labelRect, text, subtext, TextAnchor.MiddleLeft, _margin );
+            Widgets_Labels.Label( labelRect, text, subtext, TextAnchor.MiddleLeft, margin: Margin );
 
             // if the bill has a manager job, give some more info.
             if ( active )

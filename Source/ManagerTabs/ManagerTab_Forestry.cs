@@ -3,11 +3,12 @@
 // 2016-12-09
 
 using System;
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using static FluffyManager.Constants;
+using static FluffyManager.Widgets_Labels;
 
 namespace FluffyManager
 {
@@ -16,8 +17,6 @@ namespace FluffyManager
         #region Fields
 
         private const float EntryHeight = 30f;
-
-        private const float Margin = Utilities.Margin;
 
         private readonly float _topAreaHeight = 30f;
 
@@ -117,7 +116,7 @@ namespace FluffyManager
             // clear wind cells | clear area | logging
             Rect typeLabelRect = new Rect( 0, cur.y, colRects[0].width * 2/3f, EntryHeight );
             Rect typeButtonRect = new Rect( colRects[0].width * 2 / 3f, cur.y, colRects[0].width / 3f, EntryHeight );
-            Utilities.Label( typeLabelRect, "FMF.JobType".Translate() );
+            Label( typeLabelRect, "FMF.JobType".Translate() );
             if ( Widgets.ButtonText( typeButtonRect, ( "FMF.JobType." + _selected.type ).Translate() ) )
             {
                 var options = new List<FloatMenuOption>();
@@ -138,7 +137,7 @@ namespace FluffyManager
             if ( _selected.type == ManagerJob_Forestry.ForestryJobType.ClearArea )
             {
                 var clearAdditionalAreasLabelRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-                Utilities.Label( clearAdditionalAreasLabelRect, "FMF.ClearAreas".Translate() );
+                Label( clearAdditionalAreasLabelRect, "FMF.ClearAreas".Translate() );
                 cur.y += EntryHeight;
 
                 var clearAdditionalAreasSelectorRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
@@ -176,7 +175,7 @@ namespace FluffyManager
 
                 // Logging area (5)
                 var loggingAreaTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-                Utilities.Label( loggingAreaTitleRect, "FMF.LoggingArea".Translate() );
+                Label( loggingAreaTitleRect, "FMF.LoggingArea".Translate() );
                 if (alt)
                     Widgets.DrawAltRect(loggingAreaTitleRect);
                 alt = !alt;
@@ -211,7 +210,7 @@ namespace FluffyManager
                 Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
                 var viewRect = new Rect( 0f, 0f, outRect.width, ( _selected.AllowedTrees.Count + 1 ) * EntryHeight );
                 if ( viewRect.height > outRect.height )
-                    viewRect.width -= Utilities.ScrollbarWidth;
+                    viewRect.width -= ScrollbarWidth;
 
                 // start scrolling view
                 Widgets.BeginScrollView( outRect, ref _contentScrollPosition, viewRect );
@@ -273,7 +272,7 @@ namespace FluffyManager
             }
             else // show 'all' for other types.
             {
-                Utilities.Label( colRects[1].AtZero(), "FM.All".Translate().Italic(), anchor: TextAnchor.MiddleCenter, color: Color.grey );
+                Label( colRects[1].AtZero(), "FM.All".Translate().Italic(), anchor: TextAnchor.MiddleCenter, color: Color.grey );
             }
 
             // close tree list
@@ -319,7 +318,7 @@ namespace FluffyManager
             float height = _leftRowHeight;
             var scrollView = new Rect( 0f, 0f, rect.width, height );
             if ( height > rect.height )
-                scrollView.width -= Utilities.ScrollbarWidth;
+                scrollView.width -= ScrollbarWidth;
 
             Widgets.BeginScrollView( rect, ref _scrollPosition, scrollView );
             Rect scrollContent = scrollView;
@@ -330,7 +329,7 @@ namespace FluffyManager
 
             foreach ( ManagerJob_Forestry job in _jobs )
             {
-                var row = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+                var row = new Rect( 0f, cur.y, scrollContent.width, LargeListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
                 if ( _selected == job )
                 {
@@ -356,11 +355,11 @@ namespace FluffyManager
                     _selected = job;
                 }
 
-                cur.y += Utilities.LargeListEntryHeight;
+                cur.y += LargeListEntryHeight;
             }
 
             // row for new job.
-            var newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+            var newRect = new Rect( 0f, cur.y, scrollContent.width, LargeListEntryHeight );
             Widgets.DrawHighlightIfMouseover( newRect );
 
             if ( i % 2 == 1 )
@@ -379,7 +378,7 @@ namespace FluffyManager
 
             TooltipHandler.TipRegion( newRect, "FMF.NewForestryJobTooltip".Translate() );
 
-            cur.y += Utilities.LargeListEntryHeight;
+            cur.y += LargeListEntryHeight;
 
             _leftRowHeight = cur.y;
             GUI.EndGroup();

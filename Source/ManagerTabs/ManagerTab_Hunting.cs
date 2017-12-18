@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using static FluffyManager.Constants;
 
 namespace FluffyManager
 {
@@ -17,7 +18,6 @@ namespace FluffyManager
         private Vector2 _animalsScrollPosition = Vector2.zero;
         private Vector2 _button = new Vector2( 200f, 40f );
         private float _leftRowHeight = 9999f;
-        private float _margin = Utilities.Margin;
         private Vector2 _scrollPosition = Vector2.zero;
         private ManagerJob_Hunting _selected;
         private float _topAreaHeight = 30f;
@@ -58,19 +58,19 @@ namespace FluffyManager
 
             // some variables
             float width = rect.width;
-            float height = rect.height - _topAreaHeight - _button.y - _margin;
+            float height = rect.height - _topAreaHeight - _button.y - Margin;
             var cols = 2;
-            float colWidth = width / cols - _margin;
+            float colWidth = width / cols - Margin;
             var colRects = new List<Rect>();
             var colTitleRects = new List<Rect>();
-            var buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - _margin,
-                                       _button.y - _margin );
+            var buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - Margin,
+                                       _button.y - Margin );
 
             // set up rects
             for ( var j = 0; j < cols; j++ )
             {
-                colRects.Add( new Rect( j * colWidth + j * _margin + _margin / 2, _topAreaHeight, colWidth, height ) );
-                colTitleRects.Add( new Rect( j * colWidth + j * _margin + _margin / 2, 0f, colWidth, _topAreaHeight ) );
+                colRects.Add( new Rect( j * colWidth + j * Margin + Margin / 2, _topAreaHeight, colWidth, height ) );
+                colTitleRects.Add( new Rect( j * colWidth + j * Margin + Margin / 2, 0f, colWidth, _topAreaHeight ) );
             }
 
             // keep track of location
@@ -80,8 +80,7 @@ namespace FluffyManager
             GUI.BeginGroup( rect );
 
             // settings.
-            Utilities.Label( colTitleRects[0], "FMH.Options".Translate(),
-                             anchor: TextAnchor.LowerLeft, lrMargin: _margin * 2, font: GameFont.Tiny );
+            Widgets_Labels.Label( colTitleRects[0], "FMH.Options".Translate(), TextAnchor.LowerLeft, margin: Margin * 2, font: GameFont.Tiny );
 
             GUI.DrawTexture( colRects[0], Resources.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[0] );
@@ -119,21 +118,18 @@ namespace FluffyManager
             cur.y += _entryHeight;
 
             // hunting grounds (4)
-            var huntingGroundsTitleRect = new Rect( cur.x, cur.y, colWidth - 2 * _margin, _entryHeight );
-            Utilities.Label( huntingGroundsTitleRect, "FMH.HuntingGrounds".Translate(), anchor: TextAnchor.MiddleLeft,
-                             lrMargin: _margin );
+            var huntingGroundsTitleRect = new Rect( cur.x, cur.y, colWidth - 2 * Margin, _entryHeight );
+            Widgets_Labels.Label( huntingGroundsTitleRect, "FMH.HuntingGrounds".Translate(), TextAnchor.MiddleLeft, margin: Margin );
             cur.y += _entryHeight;
 
-            var huntingGroundsRect = new Rect( cur.x + _margin, cur.y, colWidth - 2 * _margin, _entryHeight );
-            AreaAllowedGUI.DoAllowedAreaSelectors( huntingGroundsRect, ref _selected.HuntingGrounds, manager,
-                                                   AllowedAreaMode.Humanlike );
+            var huntingGroundsRect = new Rect( cur.x + Margin, cur.y, colWidth - 2 * Margin, _entryHeight );
+            AreaAllowedGUI.DoAllowedAreaSelectors( huntingGroundsRect, ref _selected.HuntingGrounds, manager );
             cur.y += _entryHeight;
 
             GUI.EndGroup();
 
             // animals.
-            Utilities.Label( colTitleRects[1], "FMH.Animals".Translate(),
-                             anchor: TextAnchor.LowerLeft, lrMargin: _margin * 2, font: GameFont.Tiny );
+            Widgets_Labels.Label( colTitleRects[1], "FMH.Animals".Translate(), TextAnchor.LowerLeft, margin: Margin * 2, font: GameFont.Tiny );
 
             GUI.DrawTexture( colRects[1], Resources.SlightlyDarkBackground );
             GUI.BeginGroup( colRects[1] );
@@ -142,7 +138,7 @@ namespace FluffyManager
             Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
             var viewRect = new Rect( 0f, 0f, outRect.width, ( _selected.AllowedAnimals.Count + 1 ) * _entryHeight ); // we also have an 'all' row...
             if ( viewRect.height > outRect.height )
-                viewRect.width -= Utilities.ScrollbarWidth;
+                viewRect.width -= ScrollbarWidth;
 
             // start scrolling view
             Widgets.BeginScrollView( outRect, ref _animalsScrollPosition, viewRect );
@@ -225,7 +221,7 @@ namespace FluffyManager
             float height = _leftRowHeight;
             var scrollView = new Rect( 0f, 0f, rect.width, height );
             if ( height > rect.height )
-                scrollView.width -= Utilities.ScrollbarWidth;
+                scrollView.width -= ScrollbarWidth;
 
             Widgets.BeginScrollView( rect, ref _scrollPosition, scrollView );
             Rect scrollContent = scrollView;
@@ -236,7 +232,7 @@ namespace FluffyManager
 
             foreach ( ManagerJob_Hunting job in Jobs )
             {
-                var row = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+                var row = new Rect( 0f, cur.y, scrollContent.width, LargeListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
                 if ( _selected == job )
                 {
@@ -262,11 +258,11 @@ namespace FluffyManager
                     _selected = job;
                 }
 
-                cur.y += Utilities.LargeListEntryHeight;
+                cur.y += LargeListEntryHeight;
             }
 
             // row for new job.
-            var newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+            var newRect = new Rect( 0f, cur.y, scrollContent.width, LargeListEntryHeight );
             Widgets.DrawHighlightIfMouseover( newRect );
 
             if ( i++ % 2 == 1 )
@@ -285,7 +281,7 @@ namespace FluffyManager
 
             TooltipHandler.TipRegion( newRect, "FMH.NewHuntingJobTooltip".Translate() );
 
-            cur.y += Utilities.LargeListEntryHeight;
+            cur.y += LargeListEntryHeight;
 
             _leftRowHeight = cur.y;
             GUI.EndGroup();
@@ -296,7 +292,7 @@ namespace FluffyManager
         {
             // set up rects
             var leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
-            var contentCanvas = new Rect( leftRow.xMax + _margin, 0f, canvas.width - leftRow.width - _margin,
+            var contentCanvas = new Rect( leftRow.xMax + Margin, 0f, canvas.width - leftRow.width - Margin,
                                           canvas.height );
 
             // draw overview row

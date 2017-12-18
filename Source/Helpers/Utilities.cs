@@ -9,29 +9,18 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using Verse;
-using Verse.AI;
+using static FluffyManager.Constants;
+using static FluffyManager.Widgets_Labels;
 
 namespace FluffyManager
 {
     public static class Utilities
     {
-        public const float LargeListEntryHeight = 50f;
-        public const float Margin = 6f;
-        public const float SliderHeight = 20f;
-        public const float ScrollbarWidth = 16f;
-        public static float BottomButtonHeight = 50f;
-        public static Vector2 ButtonSize = new Vector2( 200f, 40f );
 
         public static Dictionary<MapStockpileFilter, FilterCountCache> CountCache =
             new Dictionary<MapStockpileFilter, FilterCountCache>();
 
         public static Dictionary<string, int> updateIntervalOptions = new Dictionary<string, int>();
-        public static float LargeIconSize = 32f;
-        public static float ListEntryHeight = 30f;
-        public static float MediumIconSize = 24f;
-        public static float SmallIconSize = 16f;
-        public static float TitleHeight = 50f;
-        public static float TopAreaHeight = 30f;
         public static WorkTypeDef WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
 
         static Utilities()
@@ -153,43 +142,6 @@ namespace FluffyManager
         //    return string.Empty;
         //}
 
-        public static void Label( Rect rect, string label, string tooltip = null,
-                                  TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin,
-                                  float tbMargin = 0f, GameFont font = GameFont.Small, Color? color = null )
-        {
-            // apply margins
-            var labelRect = new Rect( rect.xMin + lrMargin, rect.yMin + tbMargin, rect.width - 2 * lrMargin,
-                                      rect.height - 2 * tbMargin );
-
-            // draw label with anchor - reset anchor
-            Text.Anchor = anchor;
-            Text.Font = font;
-            GUI.color = color ?? Color.white;
-            Widgets.Label( labelRect, label );
-            GUI.color = Color.white;
-            Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.UpperLeft;
-
-            // if set, draw tooltip
-            if ( tooltip != null )
-            {
-                TooltipHandler.TipRegion( rect, tooltip );
-            }
-        }
-
-        public static void Label( ref Vector2 cur, float width, float height, string label, string tooltip = null,
-                                  TextAnchor anchor = TextAnchor.MiddleLeft, float lrMargin = Margin,
-                                  float tbMargin = 0f, bool alt = false,
-                                  GameFont font = GameFont.Small, Color? color = null )
-        {
-            var rect = new Rect( cur.x, cur.y, width, height );
-            if ( alt )
-            {
-                Widgets.DrawAltRect( rect );
-            }
-            Label( rect, label, tooltip, anchor, lrMargin, tbMargin, font, color );
-            cur.y += height;
-        }
 
         private static bool TryGetCached( MapStockpileFilter mapStockpileFilter, out int count )
         {
@@ -321,7 +273,7 @@ namespace FluffyManager
             if ( job.Completed || job.Suspended )
             {
                 // put a stamp on it
-                var stampRect = new Rect( 0f, 0f, MediumIconSize, MediumIconSize );
+                var stampRect = new Rect( 0f, 0f, Constants.MediumIconSize, Constants.MediumIconSize );
 
                 // center stamp in available space
                 stampRect = stampRect.CenteredOnXIn( rect ).CenteredOnYIn( rect );
@@ -412,18 +364,18 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public static void DrawToggle( Rect rect, string label, ref bool checkOn, float size = 24f,
-                                       float margin = Margin, GameFont font = GameFont.Small )
+        public static void DrawToggle( Rect rect, string label, ref bool checkOn, float size = 24f, float margin = Margin, GameFont font = GameFont.Small, bool wrap = true )
         {
             // set up rects
             Rect labelRect = rect;
-            var checkRect = new Rect( rect.xMax - size - margin * 2, 0f, size, size );
+            labelRect.xMax -= size + margin * 2;
+            var checkRect = new Rect( rect.xMax - size - margin, 0f, size, size );
 
             // finetune rects
             checkRect = checkRect.CenteredOnYIn( labelRect );
 
             // draw label
-            Label( rect, label, null, TextAnchor.MiddleLeft, margin, font: font );
+            Label( labelRect, label, TextAnchor.MiddleLeft, font, margin: margin, wrap: wrap );
 
             // draw check
             if ( checkOn )
@@ -443,8 +395,7 @@ namespace FluffyManager
             }
         }
 
-        public static void DrawToggle( Rect rect, string label, bool checkOn, Action on, Action off, float size = 24f,
-                                       float margin = Margin )
+        public static void DrawToggle( Rect rect, string label, bool checkOn, Action on, Action off, float size = 24f, float margin = Margin )
         {
             // set up rects
             Rect labelRect = rect;
@@ -454,7 +405,7 @@ namespace FluffyManager
             checkRect = checkRect.CenteredOnYIn( labelRect );
 
             // draw label
-            Label( rect, label, null, TextAnchor.MiddleLeft, margin );
+            Label( rect, label, TextAnchor.MiddleLeft, GameFont.Small, margin: margin );
 
             // draw check
             if ( checkOn )
@@ -527,8 +478,8 @@ namespace FluffyManager
             return src.GetType().GetProperty( propName, flags ).GetValue( src, null );
         }
 
-        public static void LabelOutline( Rect icon, string label, string tooltip, TextAnchor anchor, float lrMargin,
-                                         float tbMargin, GameFont font, Color textColour, Color outlineColour )
+        public static void LabelOutline( Rect icon, string label, string tooltip, TextAnchor anchor, float margin,
+                                         GameFont font, Color textColour, Color outlineColour )
         {
             // horribly inefficient way of getting an outline to show - draw 4 background coloured labels with a 1px offset, then draw the foreground on top.
             int[] offsets = { -1, 0, 1 };
@@ -539,10 +490,10 @@ namespace FluffyManager
                     Rect offsetIcon = icon;
                     offsetIcon.x += xOffset;
                     offsetIcon.y += yOffset;
-                    Label( offsetIcon, label, null, anchor, lrMargin, tbMargin, font, outlineColour );
+                    Label( offsetIcon, label, anchor, font, outlineColour, margin );
                 }
 
-            Label( icon, label, tooltip, anchor, lrMargin, tbMargin, font, textColour );
+            Label( icon, label, tooltip, anchor, font, textColour, margin );
         }
 
         public static void Scribe_IntArray( ref List<int> values, string label )

@@ -36,11 +36,11 @@ namespace FluffyManager
         {
             // set up rects
             var filterRect = new Rect( inRect.ContractedBy( 6f ) );
-            filterRect.height -= 2 * ( Utilities.ListEntryHeight + Utilities.Margin );
-            var zoneRect = new Rect( filterRect.xMin, filterRect.yMax + Utilities.Margin, filterRect.width,
-                                     Utilities.ListEntryHeight );
-            var buttonRect = new Rect( filterRect.xMin, zoneRect.yMax + Utilities.Margin,
-                                       ( filterRect.width - Utilities.Margin ) / 2f, Utilities.ListEntryHeight );
+            filterRect.height -= 2 * ( Constants.ListEntryHeight + Margin );
+            var zoneRect = new Rect( filterRect.xMin, filterRect.yMax + Margin, filterRect.width,
+                                     Constants.ListEntryHeight );
+            var buttonRect = new Rect( filterRect.xMin, zoneRect.yMax + Margin,
+                                       ( filterRect.width - Margin ) / 2f, Constants.ListEntryHeight );
 
             // draw thingfilter
             filterUI.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter, Trigger.ParentFilter );
@@ -63,7 +63,7 @@ namespace FluffyManager
             }
 
             // move operator button canvas for count input
-            buttonRect.x = buttonRect.xMax + Utilities.Margin;
+            buttonRect.x = buttonRect.xMax + Margin;
 
             // if current input is invalid color the element red
             Color oldColor = GUI.color;

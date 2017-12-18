@@ -5,16 +5,13 @@
 using RimWorld;
 using UnityEngine;
 using Verse;
+using static FluffyManager.Constants;
 
 namespace FluffyManager
 {
     internal class MainTabWindow_Manager : MainTabWindow
     {
         public static ManagerTab CurrentTab;
-
-        private static float _iconSize = 30f;
-
-        private static float _margin = Utilities.Margin;
 
         public MainTabWindow_Manager()
         {
@@ -50,17 +47,17 @@ namespace FluffyManager
 
             // three areas of icons for tabs, left middle and right.
             var leftIcons = new Rect( 0f, 0f,
-                                      _margin +
-                                      Manager.For( Find.VisibleMap ).ManagerTabsLeft.Count * ( _iconSize + _margin ),
-                                      _iconSize );
+                                      Margin +
+                                      Manager.For( Find.VisibleMap ).ManagerTabsLeft.Count * ( LargeIconSize + Margin ),
+                                      LargeIconSize );
             var middleIcons = new Rect( 0f, 0f,
-                                        _margin +
-                                        Manager.For( Find.VisibleMap ).ManagerTabsMiddle.Count * ( _iconSize + _margin ),
-                                        _iconSize );
+                                        Margin +
+                                        Manager.For( Find.VisibleMap ).ManagerTabsMiddle.Count * ( LargeIconSize + Margin ),
+                                        LargeIconSize );
             var rightIcons = new Rect( 0f, 0f,
-                                       _margin +
-                                       Manager.For( Find.VisibleMap ).ManagerTabsRight.Count * ( _iconSize + _margin ),
-                                       _iconSize );
+                                       Margin +
+                                       Manager.For( Find.VisibleMap ).ManagerTabsRight.Count * ( LargeIconSize + Margin ),
+                                       LargeIconSize );
 
             // finetune rects
             middleIcons = middleIcons.CenteredOnXIn( canvas );
@@ -68,42 +65,42 @@ namespace FluffyManager
 
             // left icons (probably only overview, but hey...)
             GUI.BeginGroup( leftIcons );
-            var cur = new Vector2( _margin, 0f );
+            var cur = new Vector2( Margin, 0f );
             foreach ( ManagerTab tab in Manager.For( Find.VisibleMap ).ManagerTabsLeft )
             {
-                var iconRect = new Rect( cur.x, cur.y, _iconSize, _iconSize );
+                var iconRect = new Rect( cur.x, cur.y, LargeIconSize, LargeIconSize );
                 DrawTabIcon( iconRect, tab );
-                cur.x += _iconSize + _margin;
+                cur.x += LargeIconSize + Margin;
             }
 
             GUI.EndGroup();
 
             // middle icons (the bulk of icons)
             GUI.BeginGroup( middleIcons );
-            cur = new Vector2( _margin, 0f );
+            cur = new Vector2( Margin, 0f );
             foreach ( ManagerTab tab in Manager.For( Find.VisibleMap ).ManagerTabsMiddle )
             {
-                var iconRect = new Rect( cur.x, cur.y, _iconSize, _iconSize );
+                var iconRect = new Rect( cur.x, cur.y, LargeIconSize, LargeIconSize );
                 DrawTabIcon( iconRect, tab );
-                cur.x += _iconSize + _margin;
+                cur.x += LargeIconSize + Margin;
             }
 
             GUI.EndGroup();
 
             // right icons (probably only import/export, possbile settings?)
             GUI.BeginGroup( rightIcons );
-            cur = new Vector2( _margin, 0f );
+            cur = new Vector2( Margin, 0f );
             foreach ( ManagerTab tab in Manager.For( Find.VisibleMap ).ManagerTabsRight )
             {
-                var iconRect = new Rect( cur.x, cur.y, _iconSize, _iconSize );
+                var iconRect = new Rect( cur.x, cur.y, LargeIconSize, LargeIconSize );
                 DrawTabIcon( iconRect, tab );
-                cur.x += _iconSize + _margin;
+                cur.x += LargeIconSize + Margin;
             }
 
             GUI.EndGroup();
 
             // delegate actual content to the specific manager.
-            var contentCanvas = new Rect( 0f, _iconSize + _margin, canvas.width, canvas.height - _iconSize - _margin );
+            var contentCanvas = new Rect( 0f, LargeIconSize + Margin, canvas.width, canvas.height - LargeIconSize - Margin );
             GUI.BeginGroup( contentCanvas );
             CurrentTab.DoWindowContents( contentCanvas );
             GUI.EndGroup();

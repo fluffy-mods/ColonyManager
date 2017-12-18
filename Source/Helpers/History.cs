@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using static FluffyManager.Constants;
 
 namespace FluffyManager
 {
@@ -23,7 +24,6 @@ namespace FluffyManager
 
         private const int Breaks = 4;
         private const int DashLength = 3;
-        private const float Margin = Utilities.Margin;
         private const int Size = 100;
 
         public static Color DefaultLineColor = Color.white;
@@ -274,14 +274,13 @@ namespace FluffyManager
             // get out early if no chapters.
             if ( chapters.Count == 0 )
             {
-                GUI.DrawTexture( rect.ContractedBy( Utilities.Margin ), Resources.SlightlyDarkBackground );
-                Utilities.Label( rect, "FM.HistoryNoChapters".Translate(), null, TextAnchor.MiddleCenter,
-                                 color: Color.grey );
+                GUI.DrawTexture( rect.ContractedBy( Margin ), Resources.SlightlyDarkBackground );
+                Widgets_Labels.Label( rect, "FM.HistoryNoChapters".Translate(), TextAnchor.MiddleCenter, color: Color.grey );
                 return;
             }
 
             // stuff we need
-            Rect plot = rect.ContractedBy( Utilities.Margin );
+            Rect plot = rect.ContractedBy( Margin );
             plot.xMin += _yAxisMargin;
 
             // maximum of all chapters.
@@ -333,15 +332,15 @@ namespace FluffyManager
 
                 // do minimum stuff.
                 var realpos = new Vector2( pos.x, plot.height - closest.ValueAt( periodShown, (int)upos.x, sign ) * hu );
-                var blipRect = new Rect( realpos.x - Utilities.SmallIconSize / 2f,
-                                         realpos.y - Utilities.SmallIconSize / 2f, Utilities.SmallIconSize,
-                                         Utilities.SmallIconSize );
+                var blipRect = new Rect( realpos.x - SmallIconSize / 2f,
+                                         realpos.y - SmallIconSize / 2f, SmallIconSize,
+                                         SmallIconSize );
                 GUI.color = closest.lineColor;
                 GUI.DrawTexture( blipRect, Resources.StageB );
                 GUI.color = DefaultLineColor;
 
                 // get orientation of tooltip
-                Vector2 tippos = realpos + new Vector2( Utilities.Margin, Utilities.Margin );
+                Vector2 tippos = realpos + new Vector2( Margin, Margin );
                 string tip = chapters[minIndex].label + ": " +
                              FormatCount( chapters[minIndex].ValueAt( periodShown, (int)upos.x, sign ) );
                 Vector2 tipsize = Text.CalcSize( tip );
@@ -349,12 +348,12 @@ namespace FluffyManager
                 if ( tippos.x + tipsize.x > plot.width )
                 {
                     left = true;
-                    tippos.x -= tipsize.x + 2 * +Utilities.Margin;
+                    tippos.x -= tipsize.x + 2 * + Margin;
                 }
                 if ( tippos.y + tipsize.y > plot.height )
                 {
                     up = true;
-                    tippos.y -= tipsize.y + 2 * Utilities.Margin;
+                    tippos.y -= tipsize.y + 2 * Margin;
                 }
 
                 var anchor = TextAnchor.UpperLeft;
@@ -365,7 +364,7 @@ namespace FluffyManager
                 if ( !up && left )
                     anchor = TextAnchor.UpperRight;
                 var tooltipRect = new Rect( tippos.x, tippos.y, tipsize.x, tipsize.y );
-                Utilities.Label( tooltipRect, tip, anchor: anchor, font: GameFont.Tiny );
+                Widgets_Labels.Label( tooltipRect, tip, anchor: anchor, font: GameFont.Tiny );
             }
 
             // draw target line
@@ -392,7 +391,7 @@ namespace FluffyManager
                     GUI.color = chapter.lineColor;
                     Widgets.DrawLineHorizontal( cur.x, cur.y + rowHeight / 2f, lineLength );
                     cur.x += lineLength;
-                    Utilities.Label( ref cur, labelWidth, rowHeight, chapter.label, font: GameFont.Tiny );
+                    Widgets_Labels.Label( ref cur, labelWidth, rowHeight, chapter.label, font: GameFont.Tiny );
                     cur.x = 0f;
                 }
 
@@ -423,9 +422,9 @@ namespace FluffyManager
             // period / variables picker
             if ( DrawOptions )
             {
-                var switchRect = new Rect( rect.xMax - Utilities.SmallIconSize - Utilities.Margin,
-                                           rect.yMin + Utilities.Margin, Utilities.SmallIconSize,
-                                           Utilities.SmallIconSize );
+                var switchRect = new Rect( rect.xMax - SmallIconSize - Margin,
+                                           rect.yMin + Margin, SmallIconSize,
+                                           SmallIconSize );
 
                 Widgets.DrawHighlightIfMouseover( switchRect );
                 if ( Widgets.ButtonImage( switchRect, Resources.Cog ) )
@@ -463,9 +462,8 @@ namespace FluffyManager
             // get out early if no chapters.
             if ( ChaptersOrdered.Count == 0 )
             {
-                GUI.DrawTexture( canvas.ContractedBy( Utilities.Margin ), Resources.SlightlyDarkBackground );
-                Utilities.Label( canvas, "FM.HistoryNoChapters".Translate(), null, TextAnchor.MiddleCenter,
-                                 color: Color.grey );
+                GUI.DrawTexture( canvas.ContractedBy( Margin ), Resources.SlightlyDarkBackground );
+                Widgets_Labels.Label( canvas, "FM.HistoryNoChapters".Translate(), TextAnchor.MiddleCenter, color: Color.grey );
                 return;
             }
 
@@ -487,8 +485,8 @@ namespace FluffyManager
             viewRect.height = n * height;
             if ( viewRect.height > canvas.height )
             {
-                viewRect.width -= 16f + Utilities.Margin;
-                canvas.width -= Utilities.Margin;
+                viewRect.width -= 16f + Margin;
+                canvas.width -= Margin;
                 canvas.height -= 1f;
             }
             Widgets.BeginScrollView( canvas, ref scrollPos, viewRect );
@@ -496,14 +494,14 @@ namespace FluffyManager
             {
                 // set up rects
                 var row = new Rect( 0f, height * i, viewRect.width, height );
-                Rect icon = new Rect( Utilities.Margin, height * i, height, height ).ContractedBy( Utilities.Margin / 2f );
+                Rect icon = new Rect( Margin, height * i, height, height ).ContractedBy( Margin / 2f );
                 // icon is square, size defined by height.
-                var bar = new Rect( Utilities.Margin + height, height * i, viewRect.width - height - Utilities.Margin,
+                var bar = new Rect( Margin + height, height * i, viewRect.width - height - Margin,
                                     height );
 
                 // if icons should not be drawn make the bar full size.
                 if ( !DrawIcons )
-                    bar.xMin -= height + Utilities.Margin;
+                    bar.xMin -= height + Margin;
 
                 // bar details.
                 Rect barBox = bar.ContractedBy( ( height - barHeight ) / 2f );
@@ -532,7 +530,7 @@ namespace FluffyManager
                     if ( DrawCounts )
                     {
                         Utilities.LabelOutline( icon, ChaptersOrdered[i].ThingCount.count.ToString(), null,
-                                                TextAnchor.UpperLeft, 0f, 0f, GameFont.Tiny, Color.white, Color.black );
+                                                TextAnchor.UpperLeft, 0f, GameFont.Tiny, Color.white, Color.black );
                     }
                 }
 
@@ -565,12 +563,12 @@ namespace FluffyManager
                     // offset label a bit downwards and to the right
                     Rect rowInfoRect = row;
                     rowInfoRect.y += 3f;
-                    rowInfoRect.x += Utilities.Margin * 2;
+                    rowInfoRect.x += Constants.Margin * 2;
 
                     // x offset
-                    float xOffset = DrawIcons && thing != null ? height + Utilities.Margin * 2 : Utilities.Margin * 2;
+                    float xOffset = DrawIcons && thing != null ? height + Margin * 2 : Margin * 2;
 
-                    Utilities.LabelOutline( rowInfoRect, info, null, TextAnchor.MiddleLeft, xOffset, 0f, GameFont.Tiny,
+                    Utilities.LabelOutline( rowInfoRect, info, null, TextAnchor.MiddleLeft, xOffset, GameFont.Tiny,
                                             Color.white, Color.black );
                 }
 

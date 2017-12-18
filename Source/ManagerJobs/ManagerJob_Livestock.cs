@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
+using static FluffyManager.Constants;
 
 namespace FluffyManager
 {
@@ -433,14 +434,11 @@ namespace FluffyManager
             // (detailButton) | name | (bar | last update)/(stamp) -> handled in Utilities.DrawStatusForListEntry
 
             // set up rects
-            Rect labelRect = new Rect( Utilities.Margin, Utilities.Margin, rect.width -
-                                                                           ( active
-                                                                                 ? StatusRectWidth +
-                                                                                   4 * Utilities.Margin
-                                                                                 : 2 * Utilities.Margin ),
-                                       rect.height - 2 * Utilities.Margin ),
-                 statusRect = new Rect( labelRect.xMax + Utilities.Margin, Utilities.Margin, StatusRectWidth,
-                                        rect.height - 2 * Utilities.Margin );
+            Rect labelRect = new Rect(
+                Margin, Margin, rect.width - ( active ? StatusRectWidth + 4 * Margin : 2 * Margin ),
+                rect.height - 2 * Margin ),
+                statusRect = new Rect( labelRect.xMax + Margin, Margin, StatusRectWidth,
+                rect.height - 2 * Margin );
 
             // create label string
             string text = Label + "\n<i>";
@@ -456,7 +454,7 @@ namespace FluffyManager
             GUI.BeginGroup( rect );
 
             // draw label
-            Utilities.Label( labelRect, text, tooltip );
+            Widgets_Labels.Label( labelRect, text, tooltip );
 
             // if the bill has a manager job, give some more info.
             if ( active )
@@ -532,37 +530,6 @@ namespace FluffyManager
             return true;
         }
 
-        public void DrawTrainingSelector( Rect rect, float lrMargin = 0f )
-        {
-            if ( lrMargin > 0 )
-            {
-                rect.xMin += lrMargin;
-                rect.width -= 2 * lrMargin;
-            }
-
-            float width = rect.width / Training.Count;
-            List<TrainableDef> keys = Training.Defs;
-
-            GUI.BeginGroup( rect );
-            for ( var i = 0; i < Training.Count; i++ )
-            {
-                var cell = new Rect( i * width, 0f, width, rect.height );
-                bool visible;
-                AcceptanceReport report = CanBeTrained( Trigger.pawnKind, keys[i], out visible );
-                if ( visible && report.Accepted )
-                {
-                    bool checkOn = Training[keys[i]];
-                    Utilities.DrawToggle( cell, keys[i].LabelCap, ref checkOn, 16f, 0f, GameFont.Tiny );
-                    Training[keys[i]] = checkOn;
-                }
-                else if ( visible )
-                {
-                    Utilities.Label( cell, keys[i].LabelCap, report.Reason, font: GameFont.Tiny, color: Color.grey );
-                }
-            }
-
-            GUI.EndGroup();
-        }
 
         public class TrainingTracker : IExposable
         {

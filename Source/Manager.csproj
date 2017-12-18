@@ -17,7 +17,7 @@
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\Assemblies\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;RELOADER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
@@ -30,16 +30,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Reloader" Condition="$(DefineConstants.Contains('RELOADER'))">
+      <HintPath>..\..\..\reloader\0Reloader.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\..\Games\steamapps\common\RimWorld\RimWorldWin_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\Games\steamapps\common\RimWorld\RimWorldWin_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -49,6 +48,7 @@
     <Compile Include="Core\Alerts.cs" />
     <Compile Include="Core\Controller.cs" />
     <Compile Include="Core\Settings.cs" />
+    <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\Extensions\CompGlower_Extensions.cs" />
     <Compile Include="Helpers\Extensions\String_Extensions.cs" />
     <Compile Include="Helpers\Livestock\Utilities_Livestock.cs" />
@@ -59,7 +59,9 @@
     <Compile Include="Helpers\Production\Dialog_CreateJobsForIngredients.cs" />
     <Compile Include="Helpers\Research\ResearchWorkers.cs" />
     <Compile Include="Helpers\Resources.cs" />
+    <Compile Include="Helpers\UI\Widgets_Labels.cs" />
     <Compile Include="Helpers\UI\StockpileGUI.cs" />
+    <Compile Include="Helpers\UI\Widgets_Section.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Foraging.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Forestry.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Hunting.cs" />

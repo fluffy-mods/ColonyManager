@@ -5,6 +5,7 @@
 using RimWorld;
 using UnityEngine;
 using Verse;
+using static FluffyManager.Constants;
 
 namespace FluffyManager
 {
@@ -59,7 +60,7 @@ namespace FluffyManager
 
             // do list
             var curY = 2f;
-            var viewRect = new Rect( 0f, 0f, canvas.width - Utilities.ScrollbarWidth, viewHeight );
+            var viewRect = new Rect( 0f, 0f, canvas.width - ScrollbarWidth, viewHeight );
 
             // scrollview
             Widgets.BeginScrollView( canvas, ref scrollPosition, viewRect );

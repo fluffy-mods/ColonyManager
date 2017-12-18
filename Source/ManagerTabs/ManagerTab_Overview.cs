@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using static FluffyManager.Constants;
 
 namespace FluffyManager
 {
@@ -14,11 +15,7 @@ namespace FluffyManager
     {
         #region Fields
 
-        public const float Margin = Utilities.Margin,
-                           OverviewWidthRatio = .6f,
-                           RowHeight = Utilities.LargeListEntryHeight,
-                           RowHeightPawnOverview = 30f,
-                           IconSize = 30f;
+        public const float OverviewWidthRatio = .6f;
 
         public float OverviewHeight = 9999f;
         private Vector2 _overviewScrollPosition = Vector2.zero;
@@ -217,7 +214,7 @@ namespace FluffyManager
                 Rect contentRect = viewRect.AtZero();
                 contentRect.height = OverviewHeight;
                 if ( OverviewHeight > viewRect.height )
-                    contentRect.width -= Utilities.ScrollbarWidth;
+                    contentRect.width -= ScrollbarWidth;
 
                 GUI.BeginGroup( viewRect );
                 Widgets.BeginScrollView( viewRect, ref _overviewScrollPosition, contentRect );
@@ -239,7 +236,7 @@ namespace FluffyManager
                     }
 
                     // go to job icon
-                    var iconRect = new Rect( Margin, row.yMin + ( RowHeight - IconSize ) / 2, IconSize, IconSize );
+                    var iconRect = new Rect( Margin, row.yMin + ( LargeListEntryHeight - LargeIconSize ) / 2, LargeIconSize, LargeIconSize );
                     if ( Widgets.ButtonImage( iconRect, Jobs[i].Tab.Icon ) )
                     {
                         MainTabWindow_Manager.GoTo( Jobs[i].Tab, Jobs[i] );
@@ -250,8 +247,8 @@ namespace FluffyManager
 
                     // job specific overview.
                     Rect jobRect = row;
-                    jobRect.width -= RowHeight + IconSize + 2 * Margin; // - (a + b)?
-                    jobRect.x += IconSize + 2 * Margin;
+                    jobRect.width -= LargeListEntryHeight + LargeIconSize + 2 * Margin; // - (a + b)?
+                    jobRect.x += LargeIconSize + 2 * Margin;
                     Jobs[i].DrawListEntry( jobRect, true, true );
                     Widgets.DrawHighlightIfMouseover( row );
                     if ( Widgets.ButtonInvisible( jobRect ) )
@@ -272,18 +269,18 @@ namespace FluffyManager
         public void DrawPawnOverview( Rect rect )
         {
             // table body viewport
-            var tableOutRect = new Rect( 0f, RowHeightPawnOverview, rect.width, rect.height - RowHeightPawnOverview );
-            var tableViewRect = new Rect( 0f, RowHeightPawnOverview, rect.width, Workers.Count * RowHeightPawnOverview );
+            var tableOutRect = new Rect( 0f, ListEntryHeight, rect.width, rect.height - ListEntryHeight );
+            var tableViewRect = new Rect( 0f, ListEntryHeight, rect.width, Workers.Count * ListEntryHeight );
             if ( tableViewRect.height > tableOutRect.height )
-                tableViewRect.width -= Utilities.ScrollbarWidth;
+                tableViewRect.width -= ScrollbarWidth;
 
             // column width
             float colWidth = tableViewRect.width / 4 - Margin;
 
             // column headers
-            var nameColumnHeaderRect = new Rect( colWidth * 0, 0f, colWidth, RowHeightPawnOverview );
-            var activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth * 2.5f, RowHeightPawnOverview );
-            var priorityColumnHeaderRect = new Rect( colWidth * 3.5f, 0f, colWidth * .5f, RowHeightPawnOverview );
+            var nameColumnHeaderRect = new Rect( colWidth * 0, 0f, colWidth, ListEntryHeight );
+            var activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth * 2.5f, ListEntryHeight );
+            var priorityColumnHeaderRect = new Rect( colWidth * 3.5f, 0f, colWidth * .5f, ListEntryHeight );
 
             // label for priority column
             string workLabel = Find.PlaySettings.useWorkPriorities
@@ -294,10 +291,9 @@ namespace FluffyManager
             GUI.BeginGroup( rect );
 
             // draw labels
-            Utilities.Label( nameColumnHeaderRect, WorkTypeDef.pawnLabel + "FM.PluralSuffix".Translate(), null,
-                             TextAnchor.LowerCenter );
-            Utilities.Label( activityColumnHeaderRect, "FM.Activity".Translate(), null, TextAnchor.LowerCenter );
-            Utilities.Label( priorityColumnHeaderRect, workLabel, null, TextAnchor.LowerCenter );
+            Widgets_Labels.Label( nameColumnHeaderRect, WorkTypeDef.pawnLabel + "FM.PluralSuffix".Translate(), TextAnchor.LowerCenter );
+            Widgets_Labels.Label( activityColumnHeaderRect, "FM.Activity".Translate(), TextAnchor.LowerCenter );
+            Widgets_Labels.Label( priorityColumnHeaderRect, workLabel,  TextAnchor.LowerCenter );
 
             // begin scrolling area
             Widgets.BeginScrollView( tableOutRect, ref _workersScrollPosition, tableViewRect );
@@ -307,7 +303,7 @@ namespace FluffyManager
             Vector2 cur = Vector2.zero;
             for ( var i = 0; i < Workers.Count; i++ )
             {
-                var row = new Rect( cur.x, cur.y, tableViewRect.width, RowHeightPawnOverview );
+                var row = new Rect( cur.x, cur.y, tableViewRect.width, ListEntryHeight );
                 if ( i % 2 == 0 )
                 {
                     Widgets.DrawAltRect( row );
@@ -323,7 +319,7 @@ namespace FluffyManager
                     return;
                 }
 
-                cur.y += RowHeightPawnOverview;
+                cur.y += ListEntryHeight;
             }
 
             // end scrolling area
@@ -345,9 +341,9 @@ namespace FluffyManager
             float colWidth = rect.width / 4 - Margin;
 
             // cell rects
-            var nameRect = new Rect( colWidth * 0, rect.yMin, colWidth, RowHeightPawnOverview );
-            var activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2.5f, RowHeightPawnOverview );
-            var priorityRect = new Rect( colWidth * 3.5f, rect.yMin, colWidth * .5f, RowHeightPawnOverview );
+            var nameRect = new Rect( colWidth * 0, rect.yMin, colWidth, ListEntryHeight );
+            var activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2.5f, ListEntryHeight );
+            var priorityRect = new Rect( colWidth * 3.5f, rect.yMin, colWidth * .5f, ListEntryHeight );
 
             // name
             Widgets.DrawHighlightIfMouseover( nameRect );
@@ -363,13 +359,13 @@ namespace FluffyManager
                     Find.Selector.Select( pawn );
                 }
             }
-            Utilities.Label( nameRect, pawn.NameStringShort, "FM.ClickToJumpTo".Translate( pawn.LabelCap ),
-                             TextAnchor.MiddleLeft, Margin );
+            Widgets_Labels.Label( nameRect, pawn.NameStringShort, "FM.ClickToJumpTo".Translate( pawn.LabelCap ),
+                             TextAnchor.MiddleLeft, margin: Margin );
 
             // current activity (if curDriver != null)
             string activityString = pawn.jobs.curDriver?.GetReport() ?? "FM.NoCurJob".Translate();
-            Utilities.Label( activityRect, activityString, pawn.jobs.curDriver?.GetReport(), TextAnchor.MiddleCenter,
-                             Margin, font: GameFont.Tiny );
+            Widgets_Labels.Label( activityRect, activityString, pawn.jobs.curDriver?.GetReport(),
+                TextAnchor.MiddleCenter, margin: Margin, font: GameFont.Tiny );
 
             // priority button
             Rect priorityPosition = new Rect( 0f, 0f, 24f, 24f ).CenteredOnXIn( priorityRect )

@@ -16,7 +16,7 @@ namespace FluffyManager
 
         public static void DoSettingsWindowContents( Rect rect )
         {
-            var row = new Rect( rect.xMin, rect.yMin, rect.width, Utilities.ListEntryHeight );
+            var row = new Rect( rect.xMin, rect.yMin, rect.width, Constants.ListEntryHeight );
 
             // labels
             Text.Anchor = TextAnchor.LowerLeft;

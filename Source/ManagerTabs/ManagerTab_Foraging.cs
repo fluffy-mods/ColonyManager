@@ -2,11 +2,11 @@
 // ManagerTab_Foraging.cs
 // 2016-12-09
 
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using static FluffyManager.Constants;
 
 namespace FluffyManager
 {
@@ -15,8 +15,6 @@ namespace FluffyManager
         #region Fields
 
         private const float EntryHeight = 30f;
-
-        private const float Margin = Utilities.Margin;
 
         private readonly float _topAreaHeight = 30f;
 
@@ -120,8 +118,7 @@ namespace FluffyManager
             // Foraging area (3)
             var foragingAreaTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
             Widgets.DrawAltRect( foragingAreaTitleRect );
-            Utilities.Label( foragingAreaTitleRect, "FMG.ForagingArea".Translate(), anchor: TextAnchor.MiddleLeft,
-                             lrMargin: Margin );
+            Widgets_Labels.Label( foragingAreaTitleRect, "FMG.ForagingArea".Translate(), TextAnchor.MiddleLeft, margin: Margin );
             cur.y += EntryHeight;
 
             var foragingAreaRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
@@ -146,7 +143,7 @@ namespace FluffyManager
             Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
             var viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedPlants.Count * EntryHeight );
             if ( viewRect.height > outRect.height )
-                viewRect.width -= Utilities.ScrollbarWidth;
+                viewRect.width -= ScrollbarWidth;
 
             // start scrolling view
             Widgets.BeginScrollView( outRect, ref _contentScrollPosition, viewRect );
@@ -249,7 +246,7 @@ namespace FluffyManager
             float height = _leftRowHeight;
             var scrollView = new Rect( 0f, 0f, rect.width, height );
             if ( height > rect.height )
-                scrollView.width -= Utilities.ScrollbarWidth;
+                scrollView.width -= ScrollbarWidth;
 
             Widgets.BeginScrollView( rect, ref _scrollPosition, scrollView );
             Rect scrollContent = scrollView;
@@ -260,7 +257,7 @@ namespace FluffyManager
 
             foreach ( ManagerJob_Foraging job in _jobs )
             {
-                var row = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+                var row = new Rect( 0f, cur.y, scrollContent.width, LargeListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
                 if ( _selected == job )
                 {
@@ -286,11 +283,11 @@ namespace FluffyManager
                     _selected = job;
                 }
 
-                cur.y += Utilities.LargeListEntryHeight;
+                cur.y += LargeListEntryHeight;
             }
 
             // row for new job.
-            var newRect = new Rect( 0f, cur.y, scrollContent.width, Utilities.LargeListEntryHeight );
+            var newRect = new Rect( 0f, cur.y, scrollContent.width, LargeListEntryHeight );
             Widgets.DrawHighlightIfMouseover( newRect );
 
             if ( i % 2 == 1 )
@@ -309,7 +306,7 @@ namespace FluffyManager
 
             TooltipHandler.TipRegion( newRect, "FMG.NewForagingJobTooltip".Translate() );
 
-            cur.y += Utilities.LargeListEntryHeight;
+            cur.y += LargeListEntryHeight;
 
             _leftRowHeight = cur.y;
             GUI.EndGroup();

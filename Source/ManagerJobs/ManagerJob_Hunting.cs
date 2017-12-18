@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using static FluffyManager.Constants;
 
 namespace FluffyManager
 {
@@ -21,7 +22,6 @@ namespace FluffyManager
         public Area HuntingGrounds;
         public new Trigger_Threshold Trigger;
         public bool UnforbidCorpses = true;
-        private readonly float _margin = Utilities.Margin;
         private Utilities.CachedValue<int> _corpseCachedValue = new Utilities.CachedValue<int>();
         private Utilities.CachedValue<int> _designatedCachedValue = new Utilities.CachedValue<int>();
         private List<ThingDef> _humanLikeMeatDefs;
@@ -185,10 +185,10 @@ namespace FluffyManager
             int shownTargets = overview ? 4 : 3; // there's more space on the overview
 
             // set up rects
-            Rect labelRect = new Rect( _margin, _margin, rect.width -
-                                                         ( active ? StatusRectWidth + 4 * _margin : 2 * _margin ),
-                                       rect.height - 2 * _margin ),
-                 statusRect = new Rect( labelRect.xMax + _margin, _margin, StatusRectWidth, rect.height - 2 * _margin );
+            Rect labelRect = new Rect( Margin, Margin, rect.width -
+                                                         ( active ? StatusRectWidth + 4 * Margin : 2 * Margin ),
+                                       rect.height - 2 * Margin ),
+                 statusRect = new Rect( labelRect.xMax + Margin, Margin, StatusRectWidth, rect.height - 2 * Margin );
 
             // create label string
             string text = Label + "\n";
@@ -202,7 +202,7 @@ namespace FluffyManager
             GUI.BeginGroup( rect );
 
             // draw label
-            Utilities.Label( labelRect, text, subtext, TextAnchor.MiddleLeft, _margin );
+            Widgets_Labels.Label( labelRect, text, subtext, TextAnchor.MiddleLeft, margin: Margin );
 
             // if the bill has a manager job, give some more info.
             if ( active )

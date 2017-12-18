@@ -17,7 +17,6 @@ namespace FluffyManager
         private static float _entryHeight = 30f;
         private Vector2 _button = new Vector2( 200f, 40f );
         private float _leftRowHeight = 9999f;
-        private float _margin = Utilities.Margin;
         private Vector2 _scrollPosition = Vector2.zero;
         private ManagerJob_Trading _selected;
         private float _topAreaHeight = 30f;
@@ -59,7 +58,7 @@ namespace FluffyManager
         {
             // set up rects
             var leftRow = new Rect( 0f, 0f, DefaultLeftRowSize, canvas.height );
-            var contentCanvas = new Rect( leftRow.xMax + _margin, 0f, canvas.width - leftRow.width - _margin,
+            var contentCanvas = new Rect( leftRow.xMax + Constants.Margin, 0f, canvas.width - leftRow.width - Constants.Margin,
                                           canvas.height );
 
             // draw overview row

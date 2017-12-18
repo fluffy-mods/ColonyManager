@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using static FluffyManager.Constants;
 
 namespace FluffyManager
 {
@@ -129,13 +130,13 @@ namespace FluffyManager
         {
             // set up rects
             var overviewRect = new Rect( 0f, 0f, canvas.width, 150f );
-            var consumtionRect = new Rect( 0f, overviewRect.height + Utilities.Margin,
-                                           ( canvas.width - Utilities.Margin ) / 2f,
-                                           canvas.height - overviewRect.height - Utilities.Margin );
-            var productionRect = new Rect( consumtionRect.xMax + Utilities.Margin,
-                                           overviewRect.height + Utilities.Margin,
-                                           ( canvas.width - Utilities.Margin ) / 2f,
-                                           canvas.height - overviewRect.height - Utilities.Margin );
+            var consumtionRect = new Rect( 0f, overviewRect.height + Margin,
+                                           ( canvas.width - Margin ) / 2f,
+                                           canvas.height - overviewRect.height - Margin );
+            var productionRect = new Rect( consumtionRect.xMax + Margin,
+                                           overviewRect.height + Margin,
+                                           ( canvas.width - Margin ) / 2f,
+                                           canvas.height - overviewRect.height - Margin );
 
             // draw area BG's
             Widgets.DrawMenuSection( overviewRect );
@@ -201,9 +202,9 @@ namespace FluffyManager
         private void DrawConsumption( Rect canvas )
         {
             // setup rects
-            var plotRect = new Rect( canvas.xMin, canvas.yMin, canvas.width, ( canvas.height - Utilities.Margin ) / 2f );
-            var legendRect = new Rect( canvas.xMin, plotRect.yMax + Utilities.Margin, canvas.width,
-                                       ( canvas.height - Utilities.Margin ) / 2f );
+            var plotRect = new Rect( canvas.xMin, canvas.yMin, canvas.width, ( canvas.height - Margin ) / 2f );
+            var legendRect = new Rect( canvas.xMin, plotRect.yMax + Margin, canvas.width,
+                                       ( canvas.height - Margin ) / 2f );
 
             // draw the plot
             tradingHistory.DrawPlot( plotRect, negativeOnly: true );
@@ -215,12 +216,12 @@ namespace FluffyManager
         private void DrawOverview( Rect canvas )
         {
             // setup rects
-            var legendRect = new Rect( canvas.xMin, canvas.yMin, ( canvas.width - Utilities.Margin ) / 2f,
-                                       canvas.height - Utilities.ButtonSize.y - Utilities.Margin );
-            var plotRect = new Rect( legendRect.xMax + Utilities.Margin, canvas.yMin,
-                                     ( canvas.width - Utilities.Margin ) / 2f, canvas.height );
-            var buttonsRect = new Rect( canvas.xMin, legendRect.yMax + Utilities.Margin,
-                                        ( canvas.width - Utilities.Margin ) / 2f, Utilities.ButtonSize.y );
+            var legendRect = new Rect( canvas.xMin, canvas.yMin, ( canvas.width - Margin ) / 2f,
+                                       canvas.height - ButtonSize.y - Margin );
+            var plotRect = new Rect( legendRect.xMax + Margin, canvas.yMin,
+                                     ( canvas.width - Margin ) / 2f, canvas.height );
+            var buttonsRect = new Rect( canvas.xMin, legendRect.yMax + Margin,
+                                        ( canvas.width - Margin ) / 2f, ButtonSize.y );
 
             // draw the plot
             overallHistory.DrawPlot( plotRect );
@@ -233,16 +234,16 @@ namespace FluffyManager
             periodRect.width /= 2f;
 
             // label
-            Utilities.Label( periodRect, "FME.PeriodShown".Translate( tradingHistory.periodShown.ToString() ),
+            Widgets_Labels.Label( periodRect, "FME.PeriodShown".Translate( tradingHistory.periodShown.ToString() ),
                              "FME.PeriodShownTooltip".Translate( tradingHistory.periodShown.ToString() ) );
 
             // mark interactivity
             Rect searchIconRect = periodRect;
             searchIconRect.xMin = searchIconRect.xMax - searchIconRect.height;
-            if ( searchIconRect.height > Utilities.SmallIconSize )
+            if ( searchIconRect.height > SmallIconSize )
             {
                 // center it.
-                searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - Utilities.SmallIconSize ) / 2 );
+                searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - SmallIconSize ) / 2 );
             }
             GUI.DrawTexture( searchIconRect, Resources.Search );
             Widgets.DrawHighlightIfMouseover( periodRect );
@@ -268,9 +269,9 @@ namespace FluffyManager
         private void DrawProduction( Rect canvas )
         {
             // setup rects
-            var plotRect = new Rect( canvas.xMin, canvas.yMin, canvas.width, ( canvas.height - Utilities.Margin ) / 2f );
-            var legendRect = new Rect( canvas.xMin, plotRect.yMax + Utilities.Margin, canvas.width,
-                                       ( canvas.height - Utilities.Margin ) / 2f );
+            var plotRect = new Rect( canvas.xMin, canvas.yMin, canvas.width, ( canvas.height - Margin ) / 2f );
+            var legendRect = new Rect( canvas.xMin, plotRect.yMax + Margin, canvas.width,
+                                       ( canvas.height - Margin ) / 2f );
 
             // draw the plot
             tradingHistory.DrawPlot( plotRect, positiveOnly: true );

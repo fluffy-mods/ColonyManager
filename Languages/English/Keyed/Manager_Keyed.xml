@@ -182,20 +182,24 @@
   <FML.ButcherBonded>Bonded</FML.ButcherBonded>
   <FML.TameMore>Auto-designate animals to be tamed</FML.TameMore>
   <FML.TameArea>Allow taming in:</FML.TameArea>
-  <FML.Animals>Animals</FML.Animals>
   <FML.ListEntryTooltip>{0}s:\n{1}/{5} adult females\n{2}/{6} adult males\n{3}/{7} juvenile females\n{4}/{8} juvenile males</FML.ListEntryTooltip>
   <FML.TameWildCount>{0} tamed, {1} in the wild.</FML.TameWildCount>
-  <FML.Tame>tame</FML.Tame>
-  <FML.Wild>wild</FML.Wild>
-  <FML.NoAnimals>no {0} animals</FML.NoAnimals>
+  <FML.NoAnimals>no {0} {1}</FML.NoAnimals>
   <FML.GenderHeader>Gender</FML.GenderHeader>
   <FML.AgeHeader>Age (Lifestage)</FML.AgeHeader>
   <FML.MeatHeader>Expected meat amount when butchered</FML.MeatHeader>
   <FML.MilkHeader>Progress till next milking</FML.MilkHeader>
   <FML.WoolHeader>Progress till next shearing</FML.WoolHeader>
-  <FML.Yields>yields {0} x{1}</FML.Yields>
+  <FML.Yields>Expected yield: {0} x{1}</FML.Yields>
   <FML.TrainYoung>Train young animals</FML.TrainYoung>
   <FML.SendToSlaughterArea>Restrict animals designated for slaughter</FML.SendToSlaughterArea>
-  <FML.SlaughterArea>Slaughter area</FML.SlaughterArea>
+  <FM.Livestock.TargetCountsHeader>Target counts</FM.Livestock.TargetCountsHeader>
+  <FM.Livestock.AreaRestrictionsHeader>Area restrictions</FM.Livestock.AreaRestrictionsHeader>
+  <FM.Livestock.TrainingHeader>Training</FM.Livestock.TrainingHeader>
+  <FM.Livestock.ButcherHeader>Butchering</FM.Livestock.ButcherHeader>
+  <FM.Livestock.TamingHeader>Taming</FM.Livestock.TamingHeader>
+  <FML.Tame>tame</FML.Tame>
+  <FML.Wild>wild</FML.Wild>
+  <FM.Livestock.AnimalsHeader>{0} {1}</FM.Livestock.AnimalsHeader>
 
 </LanguageData>

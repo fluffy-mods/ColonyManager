@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using static FluffyManager.Constants;
 
 namespace FluffyManager
 {
@@ -204,15 +205,15 @@ namespace FluffyManager
                 tooltip = "FMP.ThresholdCountTooltip".Translate( CurCount, Count );
             }
 
-            Utilities.Label( thresholdLabelRect, label, tooltip );
+            Widgets_Labels.Label( thresholdLabelRect, label, tooltip );
 
             // add a little icon to mark interactivity
-            var searchIconRect = new Rect( thresholdLabelRect.xMax - Utilities.Margin - entryHeight, cur.y, entryHeight,
+            var searchIconRect = new Rect( thresholdLabelRect.xMax - Margin - entryHeight, cur.y, entryHeight,
                                            entryHeight );
-            if ( searchIconRect.height > Utilities.SmallIconSize )
+            if ( searchIconRect.height > SmallIconSize )
             {
                 // center it.
-                searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - Utilities.SmallIconSize ) / 2 );
+                searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - SmallIconSize ) / 2 );
             }
             GUI.DrawTexture( searchIconRect, Resources.Search );
 
@@ -222,13 +223,13 @@ namespace FluffyManager
                 Find.WindowStack.Add( DetailsWindow );
             }
 
-            var thresholdRect = new Rect( cur.x, cur.y, width, Utilities.SliderHeight );
+            var thresholdRect = new Rect( cur.x, cur.y, width, SliderHeight );
             if ( alt )
             {
                 Widgets.DrawAltRect( thresholdRect );
             }
             Count = (int)GUI.HorizontalSlider( thresholdRect, Count, 0, MaxUpperThreshold );
-            cur.y += Utilities.SliderHeight;
+            cur.y += SliderHeight;
         }
 
         public override void ExposeData()
