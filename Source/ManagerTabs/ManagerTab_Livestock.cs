@@ -2,6 +2,7 @@
 // ManagerTab_Livestock.cs
 // 2016-12-09
 
+using System;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace FluffyManager
         private List<ManagerJob_Livestock> _currentJobs;
 
         // init with 5's if new job.
-        private Dictionary<Utilities_Livestock.AgeAndSex, string> _newCounts =
+        private Dictionary<AgeAndSex, string> _newCounts =
             Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => "5" );
 
         private bool _onCurrentTab;
@@ -125,7 +126,7 @@ namespace FluffyManager
 
             // if it is, narrow it a bit to make room for the scrollbar.
             if ( optionsColumnViewRect.height > optionsColumnRect.height )
-                optionsColumnViewRect.width -= ScrollbarWidth;
+                optionsColumnViewRect.width -= ScrollbarWidth + Margin/2f;
 
             var animalsRect = new Rect( optionsColumnRect.xMax + Margin,
                 0f,
@@ -140,10 +141,11 @@ namespace FluffyManager
             var width = optionsColumnViewRect.width;
 
             Widgets_Section.Section( ref position, width, DrawTargetCountsSection, "FM.Livestock.TargetCountsHeader".Translate() );
-            Widgets_Section.Section( ref position, width, DrawAreaRestrictionsSection, "FM.Livestock.AreaRestrictionsHeader".Translate() );
-            Widgets_Section.Section( ref position, width, DrawTrainingSection, "FM.Livestock.TrainingHeader".Translate() );
-            Widgets_Section.Section( ref position, width, DrawButcherSection, "FM.Livestock.ButcherHeader".Translate() );
             Widgets_Section.Section( ref position, width, DrawTamingSection, "FM.Livestock.TamingHeader".Translate() );
+            Widgets_Section.Section( ref position, width, DrawButcherSection, "FM.Livestock.ButcherHeader".Translate() );
+            Widgets_Section.Section( ref position, width, DrawTrainingSection, "FM.Livestock.TrainingHeader".Translate() );
+            Widgets_Section.Section( ref position, width, DrawAreaRestrictionsSection, "FM.Livestock.AreaRestrictionsHeader".Translate() );
+            Widgets_Section.Section( ref position, width, DrawFollowSection, "FM.Livestock.FollowHeader".Translate() );
 
             GUI.EndGroup();
             GUI.EndScrollView(); // options
@@ -154,7 +156,7 @@ namespace FluffyManager
             Rect viewRect = animalsRect;
             viewRect.height = _actualHeight;
             if ( _actualHeight > animalsRect.height )
-                viewRect.width -= ScrollbarWidth;
+                viewRect.width -= ScrollbarWidth + Margin/2f;
 
             Widgets.BeginScrollView( animalsRect, ref _animalsScrollPosition, viewRect );
             GUI.BeginGroup( viewRect );
@@ -234,22 +236,126 @@ namespace FluffyManager
             Label( countRects[2, 0], "FML.Juvenile".Translate(), TextAnchor.MiddleRight, GameFont.Tiny);
 
             // fields
-            DoCountField(countRects[1, 1], Utilities_Livestock.AgeAndSex.AdultFemale);
-            DoCountField(countRects[1, 2], Utilities_Livestock.AgeAndSex.AdultMale);
-            DoCountField(countRects[2, 1], Utilities_Livestock.AgeAndSex.JuvenileFemale);
-            DoCountField(countRects[2, 2], Utilities_Livestock.AgeAndSex.JuvenileMale);
+            DoCountField(countRects[1, 1], AgeAndSex.AdultFemale);
+            DoCountField(countRects[1, 2], AgeAndSex.AdultMale);
+            DoCountField(countRects[2, 1], AgeAndSex.JuvenileFemale);
+            DoCountField(countRects[2, 2], AgeAndSex.JuvenileMale);
 
             return 3 * ListEntryHeight;
         }
 
+        private float DrawFollowSection( Vector2 pos, float width )
+        {
+            var start = pos;
+            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            var buttonRect = new Rect( 
+                rowRect.xMax * 3 / 4, 
+                0f, 
+                width * 1 / 4, 
+                ListEntryHeight * 2 / 3 )
+                .CenteredOnYIn(rowRect);
+
+            // master selection
+            Label( rowRect, "FM.Livestock.Master".Translate(), "FM.Livestock.MasterTip".Translate(),
+                TextAnchor.MiddleLeft, margin: Margin );
+            if ( Widgets.ButtonText( buttonRect, GetMasterLabel() ) )
+            {
+
+                var options = new List<FloatMenuOption>();
+
+                // modes
+                foreach (var _mode in GetMasterModes.Where(mm => ( mm & MasterMode.All ) == mm ) )
+                    options.Add(new FloatMenuOption($"FM.Livestock.MasterMode.{_mode}".Translate(), () => _selectedCurrent.Masters = _mode));
+                
+                // specific pawns
+                foreach ( var pawn in manager.map.mapPawns.FreeColonistsSpawned )
+                    if ( ( pawn.GetMasterMode() & MasterMode.All ) != MasterMode.Default )
+                        options.Add( new FloatMenuOption( "FM.Livestock.Master".Translate( pawn.LabelShort, pawn.skills.AverageOfRelevantSkillsFor( WorkTypeDefOf.Handling ) ),
+                            () =>
+                            {
+                                _selectedCurrent.Master = pawn;
+                                _selectedCurrent.Masters = MasterMode.Specific;
+                            } ) );
+
+                Find.WindowStack.Add( new FloatMenu( options ) );
+            }
+
+            // default follow
+            rowRect.y += ListEntryHeight;
+            var followRect = rowRect;
+            followRect.width /= 2f;
+            DrawToggle( followRect, "FM.Livestock.FollowDrafted".Translate(), ref _selectedCurrent.FollowDrafted, SmallIconSize, font: GameFont.Tiny );
+            followRect.x += followRect.width;
+            DrawToggle(followRect, "FM.Livestock.FollowFieldwork".Translate(), ref _selectedCurrent.FollowFieldwork, SmallIconSize, font: GameFont.Tiny);
+
+            
+            // follow when training
+            rowRect.y += ListEntryHeight;
+            DrawToggle( rowRect, "FM.Livestock.FollowTraining".Translate(), ref _selectedCurrent.FollowTraining );
+
+            // master selection
+            rowRect.y += ListEntryHeight;
+            Label(rowRect, "FM.Livestock.MasterTraining".Translate(), "FM.Livestock.MasterTrainingTip".Translate(),
+                TextAnchor.MiddleLeft, margin: Margin );
+
+            buttonRect = buttonRect.CenteredOnYIn(rowRect);
+            if (Widgets.ButtonText(buttonRect, GetTrainerLabel()))
+            {
+                var options = new List<FloatMenuOption>();
+
+                // modes
+                foreach (var _mode in GetMasterModes.Where(mm => ( mm & MasterMode.Trainers ) == mm))
+                    options.Add(new FloatMenuOption($"FM.Livestock.MasterMode.{_mode}".Translate(), () => _selectedCurrent.Trainers = _mode));
+
+                // specific pawns
+                foreach (var pawn in manager.map.mapPawns.FreeColonistsSpawned)
+                    if (( pawn.GetMasterMode() & MasterMode.Trainers ) == MasterMode.Trainers )
+                        options.Add(new FloatMenuOption("FM.Livestock.Master".Translate(pawn.LabelShort, pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Handling)),
+                            () =>
+                            {
+                                _selectedCurrent.Trainer = pawn;
+                                _selectedCurrent.Trainers = MasterMode.Specific;
+                            }));
+
+                Find.WindowStack.Add(new FloatMenu(options));
+            }
+            
+            return rowRect.yMax - start.y;
+        }
+
+        private List<MasterMode> GetMasterModes => Enum.GetValues( typeof( MasterMode ) ).Cast<MasterMode>().ToList();
+        
+        public string GetMasterLabel()
+        {
+            switch ( _selectedCurrent.Masters )
+            {
+                case MasterMode.Specific:
+                    return _selectedCurrent.Master.LabelShort;
+                default:
+                    return $"FM.Livestock.MasterMode.{_selectedCurrent.Masters}";
+            }
+        }
+
+        public string GetTrainerLabel()
+        {
+            switch (_selectedCurrent.Trainers)
+            {
+                case MasterMode.Specific:
+                    return _selectedCurrent.Trainer.LabelShort;
+                default:
+                    return $"FM.Livestock.MasterMode.{_selectedCurrent.Trainers}";
+            }
+        }
+
         private float DrawAreaRestrictionsSection( Vector2 pos, float width )
         {
+            var start = pos;
             // restrict to area
             var restrictAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
 
             DrawToggle(restrictAreaRect, "FML.RestrictToArea".Translate(),
                 ref _selectedCurrent.RestrictToArea);
-            var height = ListEntryHeight;
+            pos.y += ListEntryHeight;
 
             if (_selectedCurrent.RestrictToArea)
             {
@@ -265,7 +371,7 @@ namespace FluffyManager
                     for ( var y = 0; y < cols; y++ )
                         areaRects[x, y] = new Rect(
                             widths.Take( x ).Sum(),
-                            pos.y + height + heights.Take( y ).Sum(),
+                            pos.y + heights.Take( y ).Sum(),
                             widths[x],
                             heights[y] );
 
@@ -286,10 +392,56 @@ namespace FluffyManager
                     _selectedCurrent.RestrictArea[3], manager, AllowedAreaMode.Animal, Margin);
 
                 Text.Anchor = TextAnchor.UpperLeft; // DoAllowedAreaMode leaves the anchor in an incorrect state.
-                height += 3 * ListEntryHeight;
+                pos.y += 3 * ListEntryHeight;
             }
 
-            return height;
+            var sendToSlaughterAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            pos.y += ListEntryHeight;
+            if ( _selectedCurrent.ButcherExcess )
+            {
+                DrawToggle( sendToSlaughterAreaRect, "FML.SendToSlaughterArea".Translate(),
+                    ref _selectedCurrent.SendToSlaughterArea );
+
+                if ( _selectedCurrent.SendToSlaughterArea )
+                {
+                    var slaughterAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+                    AreaAllowedGUI.DoAllowedAreaSelectors( slaughterAreaRect, ref _selectedCurrent.SlaughterArea,
+                        manager, AllowedAreaMode.Animal );
+                    pos.y += ListEntryHeight;
+                }
+            }
+            else
+            {
+                sendToSlaughterAreaRect.xMin += Margin;
+                Label( sendToSlaughterAreaRect, "FML.SendToSlaughterArea".Translate(),
+                    "FM.Livestock.DisabledBecauseSlaughterExcessDisabled".Translate(), TextAnchor.MiddleLeft, 
+                    color: Color.grey );
+            }
+
+            var sendToTrainingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            pos.y += ListEntryHeight;
+            if (_selectedCurrent.Training.Any)
+            {
+                DrawToggle(sendToTrainingAreaRect, "FML.SendToTrainingArea".Translate(),
+                    ref _selectedCurrent.SendToTrainingArea);
+
+                if (_selectedCurrent.SendToTrainingArea)
+                {
+                    var trainingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+                    AreaAllowedGUI.DoAllowedAreaSelectors(trainingAreaRect, ref _selectedCurrent.TrainingArea,
+                        manager, AllowedAreaMode.Animal);
+                    pos.y += ListEntryHeight;
+                }
+            }
+            else
+            {
+                sendToTrainingAreaRect.xMin += Margin;
+                Label(sendToTrainingAreaRect, "FM.Livestock.SendToTrainingArea".Translate(),
+                    "FM.Livestock.DisabledBecauseNoTrainingSet".Translate(), TextAnchor.MiddleLeft,
+                    color: Color.grey);
+            }
+
+            return pos.y - start.y;
         }
 
         private float DrawTrainingSection( Vector2 pos, float width )
@@ -361,19 +513,6 @@ namespace FluffyManager
                     ref _selectedCurrent.ButcherBonded, 16f, Margin, GameFont.Tiny, false );
 
                 pos.y += ListEntryHeight;
-
-
-                var sendToSlaughterAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-                DrawToggle(sendToSlaughterAreaRect, "FML.SendToSlaughterArea".Translate(),
-                    ref _selectedCurrent.SendToSlaughterArea);
-                pos.y += ListEntryHeight;
-                
-                if (_selectedCurrent.SendToSlaughterArea)
-                {
-                    var slaughterAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-                    AreaAllowedGUI.DoAllowedAreaSelectors(slaughterAreaRect, ref _selectedCurrent.SlaughterArea, manager, AllowedAreaMode.Animal );
-                    pos.y += ListEntryHeight;
-                }
             }
 
             return pos.y - start.y;
@@ -437,7 +576,7 @@ namespace FluffyManager
             return pos.y - start.y;
         }
         
-        private void DoCountField( Rect rect, Utilities_Livestock.AgeAndSex ageSex )
+        private void DoCountField( Rect rect, AgeAndSex ageSex )
         {
             if ( _newCounts == null || _newCounts[ageSex] == null )
             {

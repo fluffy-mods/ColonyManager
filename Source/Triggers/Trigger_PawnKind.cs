@@ -14,7 +14,7 @@ namespace FluffyManager
     {
         #region Fields
 
-        public Dictionary<Utilities_Livestock.AgeAndSex, int> CountTargets;
+        public Dictionary<AgeAndSex, int> CountTargets;
         public PawnKindDef pawnKind;
         private Utilities.CachedValue<bool> _state = new Utilities.CachedValue<bool>();
 

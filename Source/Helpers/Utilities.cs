@@ -364,7 +364,7 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public static void DrawToggle( Rect rect, string label, ref bool checkOn, float size = 24f, float margin = Margin, GameFont font = GameFont.Small, bool wrap = true )
+        public static void DrawToggle( Rect rect, string label, ref bool checkOn, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small, bool wrap = true )
         {
             // set up rects
             Rect labelRect = rect;

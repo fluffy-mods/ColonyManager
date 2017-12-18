@@ -11,15 +11,30 @@ using Verse;
 
 namespace FluffyManager
 {
+    public enum AgeAndSex
+    {
+        AdultFemale = 0,
+        AdultMale = 1,
+        JuvenileFemale = 2,
+        JuvenileMale = 3
+    }
+
+    [Flags]
+    public enum MasterMode
+    {
+        Default = 0,
+        Hunters = 1,
+        Trainers = 2,
+        Melee = 4,
+        Ranged = 8,
+        Violent = 16,
+        NonViolent = 32,
+        All = Hunters | Trainers | Melee | Ranged | Violent | NonViolent,
+        Specific = 64 
+    }
+
     public static class Utilities_Livestock
     {
-        public enum AgeAndSex
-        {
-            AdultFemale = 0,
-            AdultMale = 1,
-            JuvenileFemale = 2,
-            JuvenileMale = 3
-        }
 
         public static AgeAndSex[] AgeSexArray = (AgeAndSex[]) Enum.GetValues( typeof( AgeAndSex ) );
 
@@ -63,6 +78,35 @@ namespace FluffyManager
                 default:
                     return p.gender == Gender.Male && p.ageTracker.CurLifeStageIndex < 2;
             }
+        }
+
+        public static MasterMode GetMasterMode( this Pawn pawn )
+        {
+            var mode = MasterMode.Default;
+
+            // TODO: Add getter to co-exist with WorkTab
+            if ( pawn.workSettings.WorkIsActive( WorkTypeDefOf.Hunting ) )
+                mode = mode | MasterMode.Hunters;
+
+            // TODO: Add getter to co-exist with WorkTab
+            if ( pawn.workSettings.WorkIsActive( WorkTypeDefOf.Handling ) )
+                mode = mode | MasterMode.Trainers;
+
+            if ( pawn.equipment.Primary?.def.IsMeleeWeapon ?? true ) // no weapon = melee 
+                mode = mode | MasterMode.Melee;
+
+            if ( pawn.equipment.Primary?.def.IsRangedWeapon ?? false )
+                mode = mode | MasterMode.Ranged;
+
+            if ( !pawn.story.WorkTagIsDisabled( WorkTags.Violent ) )
+                mode = mode | MasterMode.Violent;
+
+            else
+                mode = mode | MasterMode.NonViolent;
+
+            Logger.Debug( $"{pawn.LabelShort}: {mode}"  );
+
+            return mode;
         }
 
         public static IEnumerable<Pawn> GetAll( this PawnKindDef pawnKind, Map map )

@@ -37,7 +37,7 @@ namespace FluffyManager
             IconTrading = ContentFinder<Texture2D>.Get( "UI/Icons/Power" ),
 
             // misc
-            SlightlyDarkBackground = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .4f ),
+            SlightlyDarkBackground = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .2f ),
             DeleteX = ContentFinder<Texture2D>.Get( "UI/Buttons/Delete", true ),
             Cog = ContentFinder<Texture2D>.Get( "UI/Buttons/Cog" ),
             BarBackgroundActiveTexture = SolidColorMaterials.NewSolidColorTexture( new Color( 0.2f, 0.8f, 0.85f ) ),

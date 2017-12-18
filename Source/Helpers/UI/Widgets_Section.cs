@@ -34,7 +34,7 @@ namespace FluffyManager
             // NOTE: we're updating height _after_ drawing, so the background is technically always one frame behind.
             GUI.DrawTexture( contentRect, Resources.SlightlyDarkBackground );
             var height = drawerFunc( position + new Vector2( Margin, Margin ), width - 2 * Margin );
-            position.y += height + 2 * Margin;
+            position.y += height + 3 * Margin;
             _heights[id] = height;
         }
 
