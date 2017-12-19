@@ -45,8 +45,6 @@ namespace FluffyManager
 
         #endregion Constructors
 
-
-
         #region Properties
 
         public override bool Completed => !Trigger.State;
@@ -306,13 +304,19 @@ namespace FluffyManager
         {
             // all plants that yield something, and it isn't wood.
             var options = manager.map.Biome.AllWildPlants
-                                 .Where( plant => plant.plant.harvestYield > 0 &&
-                                                  plant.plant.harvestedThingDef != null &&
-                                                  plant.plant.harvestTag != "Wood" )
-                                // Caveworld Fauna
-                                 .Concat( DefDatabase<ThingDef>
-                                              .AllDefsListForReading
-                                              .Where( def => def.plant?.sowTags.Contains( "Fungiponics" ) ?? false ) )
+
+                                 // cave plants (shrooms)
+                                 .Concat( DefDatabase<ThingDef>.AllDefsListForReading
+                                    .Where( td => td.plant?.cavePlant ?? false ) )
+
+                                 // ambrosia
+                                 .Concat( ThingDefOf.PlantAmbrosia )
+
+                                 // that yield something that is not wood
+                                 .Where(plant => plant.plant.harvestYield > 0 &&
+                                                 plant.plant.harvestedThingDef != null &&
+                                                 plant.plant.harvestTag != "Wood")
+
                                  .Distinct();
 
             foreach ( ThingDef plant in options )

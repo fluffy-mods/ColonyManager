@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Reloader;
 using UnityEngine;
 using Verse;
 using static FluffyManager.Constants;
@@ -14,21 +15,10 @@ namespace FluffyManager
     {
         #region Fields
 
-        private const float EntryHeight = 30f;
-
-        private readonly float _topAreaHeight = 30f;
-
-        private Vector2 _button = new Vector2( 200f, 40f );
-
-        private Vector2 _contentScrollPosition = Vector2.zero;
-
         private List<ManagerJob_Foraging> _jobs;
-
-        private float _leftRowHeight = 9999f;
-
         private Vector2 _scrollPosition = Vector2.zero;
-
         private ManagerJob_Foraging _selected;
+        private float _leftRowHeight;
 
         #endregion Fields
 
@@ -51,7 +41,7 @@ namespace FluffyManager
 
         public override ManagerJob Selected
         {
-            get { return _selected; }
+            get { return (ManagerJob_Foraging) _selected; }
             set { _selected = (ManagerJob_Foraging)value; }
         }
 
@@ -61,150 +51,42 @@ namespace FluffyManager
 
         #region Methods
 
+        [ReloadMethod]
         public void DoContent( Rect rect )
         {
             // layout: settings | trees
             // draw background
             Widgets.DrawMenuSection( rect );
 
-            // some variables
-            float width = rect.width;
-            float height = rect.height - _topAreaHeight - _button.y - Margin;
-            var cols = 2;
-            float colWidth = width / cols - Margin;
-            var colRects = new List<Rect>();
-            var colTitleRects = new List<Rect>();
-            var buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - Margin,
-                                       _button.y - Margin );
+            // rects
+            var optionsColumnRect = new Rect(
+                rect.xMin,
+                rect.yMin,
+                rect.width * 3 / 5f,
+                rect.height - Margin - ButtonSize.y);
+            var plantsColumnRect = new Rect(
+                optionsColumnRect.xMax,
+                rect.yMin,
+                rect.width * 2 / 5f,
+                rect.height - Margin - ButtonSize.y);
+            var buttonRect = new Rect(
+                rect.xMax - ButtonSize.x,
+                rect.yMax - ButtonSize.y,
+                ButtonSize.x - Margin,
+                ButtonSize.y - Margin);
 
-            // set up rects
-            for ( var j = 0; j < cols; j++ )
-            {
-                colRects.Add( new Rect( j * colWidth + j * Margin + Margin / 2, _topAreaHeight, colWidth, height ) );
-                colTitleRects.Add( new Rect( j * colWidth + j * Margin + Margin * 2.5f, 0f, colWidth, _topAreaHeight ) );
-            }
+            Vector2 position;
+            float width;
+            Widgets_Section.BeginSectionColumn(optionsColumnRect, "Foraging.Options", out position, out width);
+            Widgets_Section.Section( ref position, width, DrawThreshold, "FM.Threshold".Translate() );
+            Widgets_Section.Section( ref position, width, DrawAreaRestriction, "FMG.ForagingArea".Translate() );
+            Widgets_Section.Section( ref position, width, DrawMaturePlants );
+            Widgets_Section.EndSectionColumn( "Foraging.Options", position );
 
-            // keep track of location
-            Vector2 cur;
+            Widgets_Section.BeginSectionColumn( plantsColumnRect, "Foraging.Plants", out position, out width );
+            Widgets_Section.Section( ref position, width, DrawPlantList, "FMG.Plants".Translate() );
+            Widgets_Section.EndSectionColumn( "Foraging.Plants", position );
 
-            // begin window
-            GUI.BeginGroup( rect );
-
-            // settings.
-            Text.Anchor = TextAnchor.LowerLeft;
-            Text.Font = GameFont.Tiny;
-            Widgets.Label( colTitleRects[0], "FMG.Options".Translate() );
-            Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.UpperLeft;
-
-            GUI.DrawTexture( colRects[0], Resources.SlightlyDarkBackground );
-            GUI.BeginGroup( colRects[0] );
-            cur = Vector2.zero;
-
-            // trigger config (1)
-            int currentCount = _selected.Trigger.CurCount;
-            int designatedCount = _selected.CurrentDesignatedCount;
-            int targetCount = _selected.Trigger.Count;
-            _selected.Trigger.DrawTriggerConfig( ref cur, colRects[0].width, EntryHeight, true,
-                                                 "FMG.TargetCount".Translate( currentCount, designatedCount, targetCount ),
-                                                 "FMG.TargetCountTooltip".Translate( currentCount, designatedCount,
-                                                                                     targetCount ) );
-
-            // Force mature plants only (2)
-            var forceMatureRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-            Utilities.DrawToggle( forceMatureRect, "FMG.ForceMature".Translate(), ref _selected.ForceFullyMature );
-            cur.y += EntryHeight;
-
-            // Foraging area (3)
-            var foragingAreaTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-            Widgets.DrawAltRect( foragingAreaTitleRect );
-            Widgets_Labels.Label( foragingAreaTitleRect, "FMG.ForagingArea".Translate(), TextAnchor.MiddleLeft, margin: Margin );
-            cur.y += EntryHeight;
-
-            var foragingAreaRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-            Widgets.DrawAltRect( foragingAreaRect );
-            AreaAllowedGUI.DoAllowedAreaSelectors( foragingAreaRect, ref _selected.ForagingArea, manager,
-                                                   lrMargin: Margin );
-            cur.y += EntryHeight;
-
-            GUI.EndGroup();
-
-            // plantdefs.
-            Text.Anchor = TextAnchor.LowerLeft;
-            Text.Font = GameFont.Tiny;
-            Widgets.Label( colTitleRects[1], "FMG.Plants".Translate() );
-            Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.UpperLeft;
-
-            GUI.DrawTexture( colRects[1], Resources.SlightlyDarkBackground );
-            GUI.BeginGroup( colRects[1] );
-            cur = Vector2.zero;
-
-            Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
-            var viewRect = new Rect( 0f, 0f, outRect.width, _selected.AllowedPlants.Count * EntryHeight );
-            if ( viewRect.height > outRect.height )
-                viewRect.width -= ScrollbarWidth;
-
-            // start scrolling view
-            Widgets.BeginScrollView( outRect, ref _contentScrollPosition, viewRect );
-
-            // list of keys in allowed trees list (all plans that yield wood in biome, static)
-            var plantDefs = new List<ThingDef>( _selected.AllowedPlants.Keys );
-
-            // toggle all
-            var toggleAllRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-            Widgets.DrawAltRect( toggleAllRect );
-            Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
-                                  _selected.AllowedPlants.Values.All( v => v ), delegate
-                                                                                    {
-                                                                                        foreach (
-                                                                                            ThingDef def in plantDefs )
-                                                                                        {
-                                                                                            _selected.AllowedPlants[def]
-                                                                                                = true;
-                                                                                        }
-                                                                                    }, delegate
-                                                                                           {
-                                                                                               foreach (
-                                                                                                   ThingDef def in
-                                                                                                       plantDefs )
-                                                                                               {
-                                                                                                   _selected
-                                                                                                       .AllowedPlants[
-                                                                                                                      def
-                                                                                                       ] = false;
-                                                                                               }
-                                                                                           } );
-
-            cur.y += EntryHeight;
-
-            // toggle for each plant
-            var i = 1;
-
-            foreach ( ThingDef def in plantDefs )
-            {
-                var toggleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-
-                // highlight alternate rows
-                if ( i++ % 2 == 0 )
-                {
-                    Widgets.DrawAltRect( toggleRect );
-                }
-
-                // draw the toggle
-                Utilities.DrawToggle( toggleRect, def.LabelCap, _selected.AllowedPlants[def],
-                                      delegate
-                                      { _selected.AllowedPlants[def] = !_selected.AllowedPlants[def]; } );
-
-                // update current position
-                cur.y += EntryHeight;
-            }
-
-            // close scrolling view
-            Widgets.EndScrollView();
-
-            // close tree list
-            GUI.EndGroup();
 
             // do the button
             if ( !_selected.Managed )
@@ -233,9 +115,90 @@ namespace FluffyManager
                     Refresh();
                 }
             }
+        }
 
-            // close window
-            GUI.EndGroup();
+        public float DrawThreshold( Vector2 pos, float width )
+        {
+            int currentCount = _selected.Trigger.CurCount;
+            int designatedCount = _selected.CurrentDesignatedCount;
+            int targetCount = _selected.Trigger.Count;
+            var start = pos;
+
+            _selected.Trigger.DrawTriggerConfig(ref pos, width, ListEntryHeight, false,
+                "FMG.TargetCount".Translate(currentCount, designatedCount, targetCount),
+                "FMG.TargetCountTooltip".Translate(currentCount, designatedCount, targetCount));
+
+            return pos.y - start.y;
+        }
+
+        public float DrawMaturePlants( Vector2 pos, float width )
+        {
+            // Force mature plants only (2)
+            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            Utilities.DrawToggle( rowRect, "FMG.ForceMature".Translate(), ref _selected.ForceFullyMature );
+
+            return ListEntryHeight;
+        }
+
+        public float DrawAreaRestriction( Vector2 pos, float width )
+        {
+            // Foraging area (3)
+            var foragingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            AreaAllowedGUI.DoAllowedAreaSelectors(foragingAreaRect, ref _selected.ForagingArea, manager );
+            return ListEntryHeight;
+        }
+
+        public float DrawPlantList( Vector2 pos, float width )
+        {
+            var start = pos;
+
+            // list of keys in allowed trees list (all plans that yield wood in biome, static)
+            var allowedPlants = _selected.AllowedPlants;
+            var plants = allowedPlants.Keys.ToList();
+
+            var rowRect = new Rect(
+                pos.x, 
+                pos.y, 
+                width, 
+                ListEntryHeight);
+
+            // toggle all
+            Utilities.DrawToggle( 
+                rowRect, 
+                "<i>" + "FM.All".Translate() + "</i>", 
+                allowedPlants.Values.All( p => p ),
+                () => plants.ForEach( p => allowedPlants[p] = true ),
+                () => plants.ForEach( p => allowedPlants[p] = false ) );
+
+            // toggle edible
+            rowRect.y += ListEntryHeight;
+            var edible = plants.Where( p => p.plant.harvestedThingDef.IsNutritionGivingIngestible ).ToList();
+            Utilities.DrawToggle( 
+                rowRect, 
+                "<i>" + "FM.Foraging.Edible".Translate() + "</i>",
+                edible.All( p => allowedPlants[p] ),
+                () => edible.ForEach( p => allowedPlants[p] = true ),
+                () => edible.ForEach( p => allowedPlants[p] = false ) );
+
+            // toggle shrooms
+            rowRect.y += ListEntryHeight;
+            var shrooms = plants.Where(p => p.plant.cavePlant ).ToList();
+            Utilities.DrawToggle(
+                rowRect,
+                "<i>" + "FM.Foraging.Mushrooms".Translate() + "</i>",
+                shrooms.All( p => allowedPlants[p] ),
+                () => shrooms.ForEach( p => allowedPlants[p] = true ),
+                () => shrooms.ForEach( p => allowedPlants[p] = false ) );
+
+            // toggle for each plant
+            foreach ( ThingDef plant in plants.OrderBy( p => p.LabelCap ) )
+            {
+                rowRect.y += ListEntryHeight;
+                Utilities.DrawToggle( rowRect, plant.LabelCap, _selected.AllowedPlants[plant],
+                    () => _selected.AllowedPlants[plant] = !_selected.AllowedPlants[plant] );
+            }
+
+            return rowRect.yMax - start.y;
         }
 
         public void DoLeftRow( Rect rect )

@@ -18,8 +18,6 @@ namespace FluffyManager
     {
 #region Fields
 
-        private float _actualHeight = 999f;
-        private Vector2 _animalsScrollPosition = Vector2.zero;
         private List<PawnKindDef> _availablePawnKinds;
         private List<ManagerJob_Livestock> _currentJobs;
 

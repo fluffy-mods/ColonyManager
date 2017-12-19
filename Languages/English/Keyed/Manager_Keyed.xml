@@ -109,6 +109,8 @@
   <FMG.ForceMature>Only fully matured plants</FMG.ForceMature>
   <FMG.ForagingArea>Allow foraging in:</FMG.ForagingArea>
   <FMG.Plants>Allowed plants</FMG.Plants>
+  <FM.Foraging.Edible>Edible plants</FM.Foraging.Edible>
+  <FM.Foraging.Mushrooms>Mushrooms</FM.Foraging.Mushrooms>
 
 
   <!-- Production Tab -->
