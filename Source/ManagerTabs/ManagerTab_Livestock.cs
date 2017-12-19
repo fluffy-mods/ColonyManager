@@ -12,10 +12,6 @@ using static FluffyManager.Constants;
 using static FluffyManager.Utilities;
 using static FluffyManager.Widgets_Labels;
 
-#if RELOADER
-using Reloader;
-#endif
-
 namespace FluffyManager
 {
     public class ManagerTab_Livestock : ManagerTab
@@ -79,9 +75,6 @@ namespace FluffyManager
 
 
 #region Methods
-#if RELOADER
-        [ReloadMethod]
-#endif
         public override void DoWindowContents( Rect canvas )
         {
             var leftRow = new Rect( 0f, 31f, DefaultLeftRowSize, canvas.height - 31f );
@@ -102,10 +95,8 @@ namespace FluffyManager
 
         private void DoContent( Rect rect )
         {
-
             // background
             Widgets.DrawMenuSection( rect );
-
 
             // cop out if nothing is selected.
             if ( _selectedCurrent == null )
@@ -113,35 +104,27 @@ namespace FluffyManager
                 Label( rect, "FM.Livestock.SelectPawnKind".Translate(), TextAnchor.MiddleCenter );
                 return;
             }
-
-            // begin window
-            GUI.BeginGroup( rect );
-            rect = rect.AtZero();
-
+            
             // rects
-            var optionsColumnRect = new Rect( Margin,
-                0f,
-                ( rect.width - Margin * 3 ) * 3 / 5,
+            var optionsColumnRect = new Rect( 
+                rect.xMin,
+                rect.yMin,
+                rect.width * 3/5f,
                 rect.height - Margin - ButtonSize.y );
-
-            // actual options column may be taller than available space.
-            var optionsColumnViewRect = new Rect( optionsColumnRect ) {height = optionsHeight};
-
-            // if it is, narrow it a bit to make room for the scrollbar.
-            if ( optionsColumnViewRect.height > optionsColumnRect.height )
-                optionsColumnViewRect.width -= ScrollbarWidth + Margin/2f;
-
-            var animalsRect = new Rect( optionsColumnRect.xMax + Margin,
-                0f,
-                ( rect.width - Margin * 3 ) * 2 / 5,
+            var animalsColumnRect = new Rect(
+                optionsColumnRect.xMax,
+                rect.yMin,
+                rect.width * 2 / 5f,
                 rect.height - Margin - ButtonSize.y );
+            var buttonRect = new Rect(
+                rect.xMax - ButtonSize.x,
+                rect.yMax - ButtonSize.y,
+                ButtonSize.x - Margin,
+                ButtonSize.y - Margin );
 
-            // options
-            Widgets.BeginScrollView( optionsColumnRect, ref optionsScrollPosition, optionsColumnViewRect );
-            GUI.BeginGroup(optionsColumnViewRect);
-
-            var position = Vector2.zero;
-            var width = optionsColumnViewRect.width;
+            Vector2 position;
+            float width;
+            Widgets_Section.BeginSectionColumn( optionsColumnRect, "Livestock.Options", out position, out width );
 
             Widgets_Section.Section( ref position, width, DrawTargetCountsSection, "FM.Livestock.TargetCountsHeader".Translate() );
             Widgets_Section.Section( ref position, width, DrawTamingSection, "FM.Livestock.TamingHeader".Translate() );
@@ -150,34 +133,17 @@ namespace FluffyManager
             Widgets_Section.Section( ref position, width, DrawAreaRestrictionsSection, "FM.Livestock.AreaRestrictionsHeader".Translate() );
             Widgets_Section.Section( ref position, width, DrawFollowSection, "FM.Livestock.FollowHeader".Translate() );
 
-            GUI.EndGroup();
-            GUI.EndScrollView(); // options
-            optionsHeight = position.y;
+            Widgets_Section.EndSectionColumn( "Livestock.Options", position );
 
             // Start animals list
             // get our pawnkind
-            Rect viewRect = animalsRect;
-            viewRect.height = _actualHeight;
-            if ( _actualHeight > animalsRect.height )
-                viewRect.width -= ScrollbarWidth + Margin/2f;
-
-            Widgets.BeginScrollView( animalsRect, ref _animalsScrollPosition, viewRect );
-            GUI.BeginGroup( viewRect );
-            position = Vector2.zero;
+            Widgets_Section.BeginSectionColumn( animalsColumnRect, "Livestock.Animals", out position, out width );
             
-            Widgets_Section.Section( ref position, viewRect.width, DrawTamedAnimalSection, "FM.Livestock.AnimalsHeader".Translate( "FML.Tame".Translate(), _selectedCurrent.Trigger.pawnKind.GetLabelPlural() ).CapitalizeFirst() );
-            Widgets_Section.Section( ref position, viewRect.width, DrawWildAnimalSection, "FM.Livestock.AnimalsHeader".Translate( "FML.Wild".Translate(), _selectedCurrent.Trigger.pawnKind.GetLabelPlural() ).CapitalizeFirst());
+            Widgets_Section.Section( ref position, width, DrawTamedAnimalSection, "FM.Livestock.AnimalsHeader".Translate( "FML.Tame".Translate(), _selectedCurrent.Trigger.pawnKind.GetLabelPlural() ).CapitalizeFirst() );
+            Widgets_Section.Section( ref position, width, DrawWildAnimalSection, "FM.Livestock.AnimalsHeader".Translate( "FML.Wild".Translate(), _selectedCurrent.Trigger.pawnKind.GetLabelPlural() ).CapitalizeFirst());
 
-            // update list height
-            _actualHeight = position.y;
+            Widgets_Section.EndSectionColumn( "Livestock.Animals", position );
 
-            GUI.EndGroup(); // animals
-            Widgets.EndScrollView();
-
-            // bottom button
-            var buttonRect = new Rect( rect.xMax - ButtonSize.x, rect.yMax - ButtonSize.y,
-                ButtonSize.x - Margin,
-                ButtonSize.y - Margin );
 
             // add / remove to the stack
             if ( _selectedCurrent.Managed )
@@ -204,8 +170,6 @@ namespace FluffyManager
                 }
                 TooltipHandler.TipRegion( buttonRect, "FMP.ManageBillTooltip".Translate() );
             }
-
-            GUI.EndGroup(); // window
         }
 
         private float DrawTargetCountsSection( Vector2 pos, float width )

@@ -11,6 +11,60 @@ namespace FluffyManager
 {
     public static class Widgets_Section
     {
+        private static Dictionary<string, float> _columnHeights = new Dictionary<string, float>();
+        private static Dictionary<string, Vector2> _columnScrollPositions = new Dictionary<string, Vector2>();
+        private static Dictionary<string, Vector2> _startingPosition = new Dictionary<string, Vector2>();
+
+        public static void BeginSectionColumn( Rect canvas, string identifier, out Vector2 position, out float width )
+        {
+            var height = GetHeight( identifier );
+            var scrollPosition = GetScrollPosition( identifier );
+            var outRect = canvas.ContractedBy( Margin );
+            var viewRect = new Rect( outRect.xMin, outRect.yMin, outRect.width, height );
+            if ( viewRect.height > outRect.height )
+                viewRect.width -= ScrollbarWidth + Margin / 2f;
+
+            Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
+            GUI.BeginGroup( viewRect );
+            viewRect = viewRect.AtZero();
+
+            position = new Vector2(viewRect.xMin, viewRect.yMin);
+            width = viewRect.width;
+
+            _columnScrollPositions[identifier] = scrollPosition;
+            _startingPosition[identifier] = position;
+        }
+
+        public static void EndSectionColumn( string identifier, Vector2 position )
+        {
+            GUI.EndGroup();
+            Widgets.EndScrollView();
+
+            _columnHeights[identifier] = position.y - _startingPosition[identifier].y;
+        }
+
+        private static float GetHeight(string identifier)
+        {
+            float height;
+            if (_columnHeights.TryGetValue(identifier, out height))
+                return height;
+
+            height = 0f;
+            _columnHeights[identifier] = height;
+            return height;
+        }
+
+        private static Vector2 GetScrollPosition(string identifier)
+        {
+            Vector2 scrollposition;
+            if (_columnScrollPositions.TryGetValue(identifier, out scrollposition))
+                return scrollposition;
+
+            scrollposition = Vector2.zero;
+            _columnScrollPositions[identifier] = scrollposition;
+            return scrollposition;
+        }
+
         public static void Section( ref Vector2 position, float width, Func<Vector2, float, float> drawerFunc, string header = null, int id = 0 )
         {
             bool hasHeader = !header.NullOrEmpty();

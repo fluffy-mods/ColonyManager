@@ -7,6 +7,10 @@ using UnityEngine;
 using Verse;
 using static FluffyManager.Constants;
 
+#if RELOADER
+using Reloader;
+#endif
+
 namespace FluffyManager
 {
     internal class MainTabWindow_Manager : MainTabWindow
@@ -40,6 +44,9 @@ namespace FluffyManager
             }
         }
 
+#if RELOADER
+        [ReloadMethod]
+#endif
         public override void DoWindowContents( Rect canvas )
         {
             // zooming in seems to cause Text.Font to start at Tiny, make sure it's set to Small for our panels.
@@ -104,6 +111,9 @@ namespace FluffyManager
             GUI.BeginGroup( contentCanvas );
             CurrentTab.DoWindowContents( contentCanvas );
             GUI.EndGroup();
+
+            // for some stupid reason, we sometimes get left a bad anchor
+            Text.Anchor = TextAnchor.UpperLeft;
         }
 
         public void DrawTabIcon( Rect rect, ManagerTab tab )
