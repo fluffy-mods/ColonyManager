@@ -6,12 +6,15 @@ using System;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using Reloader;
 using UnityEngine;
 using Verse;
 using static FluffyManager.Constants;
 using static FluffyManager.Utilities;
 using static FluffyManager.Widgets_Labels;
+
+#if RELOADER
+using Reloader;
+#endif
 
 namespace FluffyManager
 {
@@ -71,11 +74,11 @@ namespace FluffyManager
             }
         }
 
-        #endregion Properties
+#endregion Properties
 
 
 
-        #region Methods
+#region Methods
 #if RELOADER
         [ReloadMethod]
 #endif
@@ -256,7 +259,7 @@ namespace FluffyManager
                 .CenteredOnYIn(rowRect);
 
             // master selection
-            Label( rowRect, "FM.Livestock.Master".Translate(), "FM.Livestock.MasterTip".Translate(),
+            Label( rowRect, "FM.Livestock.MasterDefault".Translate(), "FM.Livestock.MasterDefaultTip".Translate(),
                 TextAnchor.MiddleLeft, margin: Margin );
             if ( Widgets.ButtonText( buttonRect, GetMasterLabel() ) )
             {
@@ -268,58 +271,71 @@ namespace FluffyManager
                     options.Add(new FloatMenuOption($"FM.Livestock.MasterMode.{_mode}".Translate(), () => _selectedCurrent.Masters = _mode));
                 
                 // specific pawns
-                foreach ( var pawn in manager.map.mapPawns.FreeColonistsSpawned )
-                    if ( ( pawn.GetMasterMode() & MasterMode.All ) != MasterMode.Default )
-                        options.Add( new FloatMenuOption( "FM.Livestock.Master".Translate( pawn.LabelShort, pawn.skills.AverageOfRelevantSkillsFor( WorkTypeDefOf.Handling ) ),
-                            () =>
-                            {
-                                _selectedCurrent.Master = pawn;
-                                _selectedCurrent.Masters = MasterMode.Specific;
-                            } ) );
+                foreach ( var pawn in _selectedCurrent.Trigger.pawnKind.GetMasterOptions( manager, MasterMode.All ) )
+                    options.Add( new FloatMenuOption( "FM.Livestock.Master".Translate( pawn.LabelShort, pawn.skills.AverageOfRelevantSkillsFor( WorkTypeDefOf.Handling ) ),
+                        () =>
+                        {
+                            _selectedCurrent.Master = pawn;
+                            _selectedCurrent.Masters = MasterMode.Specific;
+                        } ) );
 
                 Find.WindowStack.Add( new FloatMenu( options ) );
             }
 
             // default follow
             rowRect.y += ListEntryHeight;
-            var followRect = rowRect;
-            followRect.width /= 2f;
-            DrawToggle( followRect, "FM.Livestock.FollowDrafted".Translate(), ref _selectedCurrent.FollowDrafted, SmallIconSize, font: GameFont.Tiny );
-            followRect.x += followRect.width;
-            DrawToggle(followRect, "FM.Livestock.FollowFieldwork".Translate(), ref _selectedCurrent.FollowFieldwork, SmallIconSize, font: GameFont.Tiny);
+            TooltipHandler.TipRegion( rowRect, "FM.Livestock.FollowTip".Translate() );
+            DrawToggle( rowRect, "FM.Livestock.Follow".Translate(), ref _selectedCurrent.SetFollow );
 
-            
+            if ( _selectedCurrent.SetFollow )
+            {
+                rowRect.y += ListEntryHeight;
+                var followRect = rowRect;
+                followRect.width /= 2f;
+                DrawToggle( followRect, "FM.Livestock.FollowDrafted".Translate(), ref _selectedCurrent.FollowDrafted,
+                    SmallIconSize, font: GameFont.Tiny );
+                followRect.x += followRect.width;
+                DrawToggle( followRect, "FM.Livestock.FollowFieldwork".Translate(),
+                    ref _selectedCurrent.FollowFieldwork, SmallIconSize, font: GameFont.Tiny );
+            }
+
             // follow when training
             rowRect.y += ListEntryHeight;
+            TooltipHandler.TipRegion( rowRect, "FM.Livestock.FollowTrainingTip".Translate() );
             DrawToggle( rowRect, "FM.Livestock.FollowTraining".Translate(), ref _selectedCurrent.FollowTraining );
 
             // master selection
-            rowRect.y += ListEntryHeight;
-            Label(rowRect, "FM.Livestock.MasterTraining".Translate(), "FM.Livestock.MasterTrainingTip".Translate(),
-                TextAnchor.MiddleLeft, margin: Margin );
-
-            buttonRect = buttonRect.CenteredOnYIn(rowRect);
-            if (Widgets.ButtonText(buttonRect, GetTrainerLabel()))
+            if ( _selectedCurrent.FollowTraining )
             {
-                var options = new List<FloatMenuOption>();
+                rowRect.y += ListEntryHeight;
+                Label( rowRect, "FM.Livestock.MasterTraining".Translate(), "FM.Livestock.MasterTrainingTip".Translate(),
+                    TextAnchor.MiddleLeft, margin: Margin );
 
-                // modes
-                foreach (var _mode in GetMasterModes.Where(mm => ( mm & MasterMode.Trainers ) == mm))
-                    options.Add(new FloatMenuOption($"FM.Livestock.MasterMode.{_mode}".Translate(), () => _selectedCurrent.Trainers = _mode));
+                buttonRect = buttonRect.CenteredOnYIn( rowRect );
+                if ( Widgets.ButtonText( buttonRect, GetTrainerLabel() ) )
+                {
+                    var options = new List<FloatMenuOption>();
 
-                // specific pawns
-                foreach (var pawn in manager.map.mapPawns.FreeColonistsSpawned)
-                    if (( pawn.GetMasterMode() & MasterMode.Trainers ) == MasterMode.Trainers )
-                        options.Add(new FloatMenuOption("FM.Livestock.Master".Translate(pawn.LabelShort, pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Handling)),
+                    // modes
+                    foreach ( var _mode in GetMasterModes.Where( mm => ( mm & MasterMode.Trainers ) == mm ) )
+                        options.Add( new FloatMenuOption( $"FM.Livestock.MasterMode.{_mode}".Translate(),
+                            () => _selectedCurrent.Trainers = _mode ) );
+
+                    // specific pawns
+                    foreach ( var pawn in _selectedCurrent.Trigger.pawnKind.GetTrainers( manager, MasterMode.Trainers ) )
+                        options.Add( new FloatMenuOption(
+                            "FM.Livestock.Master".Translate( pawn.LabelShort,
+                                pawn.skills.AverageOfRelevantSkillsFor( WorkTypeDefOf.Handling ) ),
                             () =>
                             {
                                 _selectedCurrent.Trainer = pawn;
                                 _selectedCurrent.Trainers = MasterMode.Specific;
-                            }));
+                            } ) );
 
-                Find.WindowStack.Add(new FloatMenu(options));
+                    Find.WindowStack.Add( new FloatMenu( options ) );
+                }
             }
-            
+
             return rowRect.yMax - start.y;
         }
 
@@ -332,7 +348,7 @@ namespace FluffyManager
                 case MasterMode.Specific:
                     return _selectedCurrent.Master.LabelShort;
                 default:
-                    return $"FM.Livestock.MasterMode.{_selectedCurrent.Masters}";
+                    return $"FM.Livestock.MasterMode.{_selectedCurrent.Masters}".Translate();
             }
         }
 
@@ -343,7 +359,7 @@ namespace FluffyManager
                 case MasterMode.Specific:
                     return _selectedCurrent.Trainer.LabelShort;
                 default:
-                    return $"FM.Livestock.MasterMode.{_selectedCurrent.Trainers}";
+                    return $"FM.Livestock.MasterMode.{_selectedCurrent.Trainers}".Translate();
             }
         }
 

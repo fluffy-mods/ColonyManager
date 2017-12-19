@@ -41,6 +41,12 @@ namespace FluffyManager
         private static Dictionary<Pair<PawnKindDef, Map>, Utilities.CachedValue<IEnumerable<Pawn>>> _allCache =
             new Dictionary<Pair<PawnKindDef, Map>, Utilities.CachedValue<IEnumerable<Pawn>>>();
 
+        private static Dictionary<Triplet<PawnKindDef, Map, MasterMode>, Utilities.CachedValue<IEnumerable<Pawn>>> _masterCache =
+                new Dictionary<Triplet<PawnKindDef, Map, MasterMode>, Utilities.CachedValue<IEnumerable<Pawn>>>();
+
+        private static Dictionary<Pawn, Utilities.CachedValue<IEnumerable<Pawn>>> _followerCache =
+            new Dictionary<Pawn, Utilities.CachedValue<IEnumerable<Pawn>>>();
+
         private static Dictionary<PawnKindDef, Utilities.CachedValue<bool>> _milkablePawnkind =
             new Dictionary<PawnKindDef, Utilities.CachedValue<bool>>();
 
@@ -52,6 +58,8 @@ namespace FluffyManager
 
         private static Dictionary<Pawn, Utilities.CachedValue<bool>> _shearablePawn =
             new Dictionary<Pawn, Utilities.CachedValue<bool>>();
+
+
 
         public static bool Juvenile( this AgeAndSex ageSex )
         {
@@ -104,8 +112,6 @@ namespace FluffyManager
             else
                 mode = mode | MasterMode.NonViolent;
 
-            Logger.Debug( $"{pawn.LabelShort}: {mode}"  );
-
             return mode;
         }
 
@@ -142,6 +148,89 @@ namespace FluffyManager
             return cached;
         }
 
+        public static List<Pawn> GetMasterOptions( this PawnKindDef pawnkind, Map map, MasterMode mode )
+        {
+            // check if we have a cached version
+            IEnumerable<Pawn> cached;
+
+            // does it exist at all?
+            var key = new Triplet<PawnKindDef, Map, MasterMode>( pawnkind, map, mode );
+            bool cacheExists = _masterCache.ContainsKey(key);
+
+            // is it up to date?
+            if (cacheExists &&
+                _masterCache[key].TryGetValue(out cached) && cached != null)
+                return cached.ToList();
+
+            // if not, get a new list.
+            cached = map.mapPawns.FreeColonistsSpawned
+                .Where( p => !p.Dead &&
+
+                    // matches mode
+                    ( p.GetMasterMode() & mode ) != MasterMode.Default
+                );
+            
+            // update if key exists
+            if (cacheExists)
+                _masterCache[key].Update(cached);
+
+            // else add it
+            else
+            {
+                // severely limit cache to only apply for one cycle (one job)
+                _masterCache.Add(key, new Utilities.CachedValue<IEnumerable<Pawn>>(cached, 2));
+            }
+            return cached.ToList();
+        }
+
+        public static List<Pawn> GetFollowers( this Pawn pawn )
+        {
+            // check if we have a cached version
+            IEnumerable<Pawn> cached;
+
+            // does it exist at all?
+            bool cacheExists = _followerCache.ContainsKey(pawn);
+
+            // is it up to date?
+            if (cacheExists && _followerCache[pawn].TryGetValue(out cached) && cached != null)
+                return cached.ToList();
+
+            // if not, get a new list.
+            cached = pawn.MapHeld.mapPawns.PawnsInFaction( pawn.Faction )
+                .Where(p => !p.Dead &&
+                            p.RaceProps.Animal &&
+                            p.playerSettings.master == pawn
+                );
+
+            // update if key exists
+            if (cacheExists)
+                _followerCache[pawn].Update(cached);
+
+            // else add it
+            else
+            {
+                // severely limit cache to only apply for one cycle (one job)
+                _followerCache.Add(pawn, new Utilities.CachedValue<IEnumerable<Pawn>>(cached, 2));
+            }
+            return cached.ToList();
+        }
+
+        public static List<Pawn> GetFollowers( this Pawn pawn, PawnKindDef pawnKind )
+        {
+            return GetFollowers( pawn ).Where( f => f.kindDef == pawnKind ).ToList();
+        }
+
+        public static List<Pawn> GetTrainers( this PawnKindDef pawnkind, Map map, MasterMode mode )
+        {
+            return pawnkind.GetMasterOptions( map, mode ).Where( p =>
+                        // skill high enough to handle (copied from StatWorker_MinimumHandlingSkill)
+                        // NOTE: This does NOT apply postprocessing, so scenario and other offsets DO NOT apply.
+                        // we can't actually use StatRequests because they're hardcoded for either Things or BuildableDefs.
+                        p.skills.GetSkill( SkillDefOf.Animals ).Level >=
+                            Mathf.Clamp(GenMath.LerpDouble(0.3f, 1f, 0f, 9f, pawnkind.RaceProps.wildness ), 0f, 20f) )
+                        .ToList();
+        }
+
         public static List<Pawn> GetWild( this PawnKindDef pawnKind, Map map )
         {
             return pawnKind.GetAll( map ).Where( p => p.Faction == null ).ToList();
@@ -151,7 +240,7 @@ namespace FluffyManager
         {
             return pawnKind.GetAll( map ).Where( p => p.Faction == Faction.OfPlayer ).ToList();
         }
-
+        
         public static IEnumerable<Pawn> GetAll( this PawnKindDef pawnKind, Map map, AgeAndSex ageSex )
         {
             return pawnKind.GetAll( map ).Where( p => PawnIsOfAgeSex( p, ageSex ) ); // is of age and sex we want

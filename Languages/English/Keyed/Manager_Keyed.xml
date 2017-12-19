@@ -201,5 +201,33 @@
   <FML.Tame>tame</FML.Tame>
   <FML.Wild>wild</FML.Wild>
   <FM.Livestock.AnimalsHeader>{0} {1}</FM.Livestock.AnimalsHeader>
+  <FM.Livestock.SelectPawnKind>No job selected</FM.Livestock.SelectPawnKind>
+  <FM.Livestock.DisabledBecauseSlaughterExcessDisabled>Disabled because excess livestock is not being butchered.</FM.Livestock.DisabledBecauseSlaughterExcessDisabled>
+  <FML.SendToTrainingArea>Restrict animals marked for training</FML.SendToTrainingArea>
+  <FM.Livestock.DisabledBecauseNoTrainingSet>Disabled because no training target is set.</FM.Livestock.DisabledBecauseNoTrainingSet>
+
+  <!-- following -->
+  <FM.Livestock.FollowHeader>Following</FM.Livestock.FollowHeader>
+  <FM.Livestock.MasterDefault>Assign master(s)</FM.Livestock.MasterDefault>
+  <FM.Livestock.MasterDefaultTip>Assign animals to a specific master, or to groups of colonists. May overwrite user settings when enabled.</FM.Livestock.MasterDefaultTip>
+  <FM.Livestock.Follow>Set master following</FM.Livestock.Follow>
+  <FM.Livestock.FollowTip>Set master follow settings, will overwrite user settings when enabled. If disabled, masters can be assigned manually.</FM.Livestock.FollowTip>
+  <FM.Livestock.FollowDrafted>Drafted</FM.Livestock.FollowDrafted>
+  <FM.Livestock.FollowFieldwork>Fieldwork</FM.Livestock.FollowFieldwork>
+  <FM.Livestock.FollowTraining>Follow trainer</FM.Livestock.FollowTraining>
+  <FM.Livestock.FollowTrainingTip>Make animals marked for training try to follow their trainer.</FM.Livestock.FollowTrainingTip>
+  <FM.Livestock.MasterTraining>Assign trainer(s)</FM.Livestock.MasterTraining>
+  <FM.Livestock.MasterTrainingTip>Assign animals marked for training to a specific master (trainer), or to all trainers. May overwrite user settings when enabled.</FM.Livestock.MasterTrainingTip>
+  <FM.Livestock.Master>{0} ({1})</FM.Livestock.Master> <!-- 0; pawn name, 1; skill level -->
+
+  <!-- MasterMode enum -->
+  <FM.Livestock.MasterMode.Default>Manual</FM.Livestock.MasterMode.Default>
+  <FM.Livestock.MasterMode.Hunters>Hunters</FM.Livestock.MasterMode.Hunters>
+  <FM.Livestock.MasterMode.Trainers>Trainers</FM.Livestock.MasterMode.Trainers>
+  <FM.Livestock.MasterMode.Melee>Melee</FM.Livestock.MasterMode.Melee>
+  <FM.Livestock.MasterMode.Ranged>Ranged</FM.Livestock.MasterMode.Ranged>
+  <FM.Livestock.MasterMode.Violent>Violent</FM.Livestock.MasterMode.Violent>
+  <FM.Livestock.MasterMode.NonViolent>Non-violent</FM.Livestock.MasterMode.NonViolent>
+  <FM.Livestock.MasterMode.All>All</FM.Livestock.MasterMode.All>
 
 </LanguageData>

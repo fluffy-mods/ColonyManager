@@ -11,6 +11,10 @@ using Verse;
 using Verse.Sound;
 using static FluffyManager.Constants;
 
+#if RELOADER
+using Reloader;
+#endif
+
 namespace FluffyManager
 {
     public class ManagerJob_Livestock : ManagerJob
@@ -31,6 +35,7 @@ namespace FluffyManager
         public TrainingTracker Training;
         public new Trigger_PawnKind Trigger;
         public bool TryTameMore;
+        public bool SetFollow;
         public bool FollowDrafted;
         public bool FollowFieldwork;
         public bool FollowTraining;
@@ -77,6 +82,7 @@ namespace FluffyManager
             ButcherBonded = false;
 
             // following
+            SetFollow = true;
             FollowDrafted = true;
             FollowFieldwork = true;
             FollowTraining = false;
@@ -144,6 +150,7 @@ namespace FluffyManager
             Scribe_Values.Look( ref SendToSlaughterArea, "SendToSlaughterArea", false );
             Scribe_Values.Look( ref SendToTrainingArea, "SendToTrainingArea", false );
             Scribe_Values.Look( ref TryTameMore, "TryTameMore", false );
+            Scribe_Values.Look( ref SetFollow, "SetFollow", true );
             Scribe_Values.Look( ref FollowDrafted, "FollowDrafted", true );
             Scribe_Values.Look( ref FollowFieldwork, "FollowFieldwork", true );
             Scribe_Values.Look( ref FollowTraining, "FollowTraining", false );
@@ -192,6 +199,9 @@ namespace FluffyManager
             // handle taming
             DoTamingJobs( ref actionTaken );
 
+            // follow settings
+            DoFollowSettings( ref actionTaken );
+
             return actionTaken;
         }
 
@@ -213,12 +223,13 @@ namespace FluffyManager
                         }
 
                         // training
-                        else if ( SendToTrainingArea
-                            && p.playerSettings.AreaRestriction != TrainingArea
-                            && p.training.NextTrainableToTrain() != null )
+                        else if ( SendToTrainingArea && p.training.NextTrainableToTrain() != null )
                         {
-                            actionTaken = true;
-                            p.playerSettings.AreaRestriction = TrainingArea;
+                            if ( p.playerSettings.AreaRestriction != TrainingArea )
+                            {
+                                actionTaken = true;
+                                p.playerSettings.AreaRestriction = TrainingArea;
+                            }
                         }
 
                         // all
@@ -229,6 +240,118 @@ namespace FluffyManager
                         }
                     }
                 }
+            }
+        }
+
+#if RELOADER
+        [ReloadMethod]
+#endif
+        public void DoFollowSettings( ref bool actionTaken )
+        {
+            foreach ( var animal in Trigger.pawnKind.GetTame( manager ) )
+            {
+                // training
+                Logger.Follow( animal.LabelShort );
+                if ( FollowTraining && animal.training.NextTrainableToTrain() != null )
+                {
+                    Logger.Follow( "\ttraining"  );
+                    if ( Trainers != MasterMode.Default )
+                    {
+                        SetMaster( animal, Trainers, Trainer, ref actionTaken );
+                        SetFollowing( animal, false, true, ref actionTaken);
+                    }
+                }
+
+                // default 
+                else
+                {
+                    if ( Masters != MasterMode.Default )
+                    {
+                        SetMaster( animal, Masters, Master, ref actionTaken);
+                    }
+                    if ( SetFollow )
+                    {
+                        SetFollowing( animal, FollowDrafted, FollowFieldwork, ref actionTaken);
+                    }
+                }
+            }
+        }
+
+        public void SetMaster( Pawn animal, MasterMode mode, Pawn specificMaster, ref bool actionTaken )
+        {
+            switch ( mode )
+            {
+                case MasterMode.Default:
+                    break;
+                case MasterMode.Specific:
+                    SetMaster( animal, specificMaster, ref actionTaken );
+                    break;
+                default:
+                    var master = GetMaster( animal, mode );
+                    SetMaster( animal, master, ref actionTaken );
+                    break;
+            }
+        }
+
+        public Pawn GetMaster( Pawn animal, MasterMode mode )
+        {
+            var master = animal.playerSettings.master;
+            var options = animal.kindDef.GetMasterOptions( manager, mode );
+
+            Logger.Follow( $"Getting master for {animal.LabelShort}:\n\tcurrent: {master?.LabelShort ?? "None"}\n\toptions:\n"  );
+#if DEBUG_FOLLOW
+            foreach ( var option in options )
+            {
+                Logger.Follow( $"\t\t{option.LabelShort}\n" );
+            }
+#endif
+
+            // cop out if no options
+            if ( options.NullOrEmpty() )
+                return null;
+
+            // if we currently have a master, our current master is a valid option, 
+            // and all the options have roughly equal amounts of pets following them, we don't need to take action
+            if ( master != null && options.Contains( master ) && RoughlyEquallyDistributed( options ) )
+                return master;
+
+            // otherwise, assign a master that has the least amount of current followers.
+            return options.MinBy( p => p.GetFollowers().Count );
+        }
+
+        private bool RoughlyEquallyDistributed( List<Pawn> masters )
+        {
+            var followerCounts = masters.Select( p => p.GetFollowers( Trigger.pawnKind ).Count );
+            return followerCounts.Max() - followerCounts.Min() <= 1;
+        }
+
+        public void SetMaster( Pawn animal, Pawn master, ref bool actionTaken )
+        {
+            Logger.Follow( $"Current: {master?.LabelShort ?? "None"}, New: {master?.LabelShort ?? "None"}"  );
+            if ( animal.playerSettings.master != master )
+            {
+                animal.playerSettings.master = master;
+                actionTaken = true;
+            }
+        }
+
+        public void SetFollowing( Pawn animal, bool drafted, bool fieldwork, ref bool actionTaken )
+        {
+            if ( animal?.playerSettings == null )
+            {
+                Log.Warning( "NULL!" );
+                return;
+            }
+            Logger.Follow( $"Current: {animal.playerSettings.followDrafted} | {animal.playerSettings.followFieldwork}, {drafted} | {fieldwork}" );
+            if ( animal.playerSettings.followDrafted != drafted )
+            {
+                animal.playerSettings.followDrafted = drafted;
+                actionTaken = true;
+            }
+            if ( animal.playerSettings.followFieldwork != fieldwork )
+            {
+                animal.playerSettings.followFieldwork = fieldwork;
+                actionTaken = true;
             }
         }
 

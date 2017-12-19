@@ -15,5 +15,11 @@ namespace FluffyManager
         {
             Verse.Log.Message( identifier + " :: " + message );
         }
+
+        [Conditional( "DEBUG_FOLLOW" )]
+        public static void Follow( string message )
+        {
+            Verse.Log.Message( identifier + " :: " + message );
+        }
     }
 }
