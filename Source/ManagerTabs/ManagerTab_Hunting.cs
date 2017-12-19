@@ -14,7 +14,6 @@ namespace FluffyManager
 {
     internal class ManagerTab_Hunting : ManagerTab
     {
-        private Vector2 _animalsScrollPosition = Vector2.zero;
         private float _leftRowHeight = 9999f;
         private Vector2 _scrollPosition = Vector2.zero;
         private ManagerJob_Hunting _selected;
@@ -194,6 +193,16 @@ namespace FluffyManager
                 herders.All( h => allowedAnimals[h] ),
                 () => herders.ForEach( h => _selected.AllowedAnimals[h] = true ),
                 () => herders.ForEach( h => _selected.AllowedAnimals[h] = false ) );
+
+            // exploding animals
+            rowRect.y += ListEntryHeight;
+            var exploding = animals
+                .Where( a => a.RaceProps.deathActionWorkerClass == typeof( DeathActionWorker_SmallExplosion )
+                             || a.RaceProps.deathActionWorkerClass == typeof( DeathActionWorker_BigExplosion ) ).ToList();
+            Utilities.DrawToggle(rowRect, "<i>" + "FM.Hunting.Exploding".Translate() + "</i>",
+                exploding.All(e => allowedAnimals[e]),
+                () => exploding.ForEach(e => _selected.AllowedAnimals[e] = true),
+                () => exploding.ForEach(e => _selected.AllowedAnimals[e] = false));
 
             // toggle for each animal
             foreach (PawnKindDef animal in animals)

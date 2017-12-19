@@ -220,6 +220,7 @@ namespace FluffyManager
                 pos.y,
                 width,
                 ListEntryHeight);
+
             // NOTE: AllowSaplings logic is the reverse from the label that is shown to the user.
             Utilities.DrawToggle( rowRect, "FMF.AllowSaplings".Translate(), 
                 !_selected.AllowSaplings,

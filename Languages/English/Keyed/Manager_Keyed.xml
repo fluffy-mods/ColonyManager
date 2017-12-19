@@ -80,6 +80,7 @@
   <FMH.TargetCountTooltip>Target: {3}\n{0} in storage\n{1} expected from butchery\n{2} expected from current designations.</FMH.TargetCountTooltip>
   <FM.Hunting.Predators>Predators</FM.Hunting.Predators>
   <FM.Hunting.HerdAnimals>Herd animals</FM.Hunting.HerdAnimals>
+  <FM.Hunting.Exploding>Exploding</FM.Hunting.Exploding>
   <FM.Hunting.AreaRestriction>Restrict hunting to</FM.Hunting.AreaRestriction>
 
   <!-- Forestry Tab -->
