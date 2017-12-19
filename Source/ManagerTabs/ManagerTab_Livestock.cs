@@ -414,7 +414,7 @@ namespace FluffyManager
             else
             {
                 sendToTrainingAreaRect.xMin += Margin;
-                Label(sendToTrainingAreaRect, "FM.Livestock.SendToTrainingArea".Translate(),
+                Label(sendToTrainingAreaRect, "FML.SendToTrainingArea".Translate(),
                     "FM.Livestock.DisabledBecauseNoTrainingSet".Translate(), TextAnchor.MiddleLeft,
                     color: Color.grey);
             }
