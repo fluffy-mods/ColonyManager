@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Reloader;
 using UnityEngine;
 using Verse;
 using static FluffyManager.Constants;
@@ -16,20 +17,9 @@ namespace FluffyManager
     {
         #region Fields
 
-        private const float EntryHeight = 30f;
-
-        private readonly float _topAreaHeight = 30f;
-
-        private Vector2 _button = new Vector2( 200f, 40f );
-
-        private Vector2 _contentScrollPosition = Vector2.zero;
-
         private List<ManagerJob_Forestry> _jobs;
-
         private float _leftRowHeight = 9999f;
-
         private Vector2 _scrollPosition = Vector2.zero;
-
         private ManagerJob_Forestry _selected;
 
         #endregion Fields
@@ -67,216 +57,68 @@ namespace FluffyManager
 
         #endregion Properties
 
-
-
         #region Methods
 
+        [ReloadMethod]
         public void DoContent( Rect rect )
         {
             // layout: settings | trees
             // draw background
             Widgets.DrawMenuSection( rect );
 
-            // some variables
-            float width = rect.width;
-            float height = rect.height - _topAreaHeight - _button.y - Margin;
-            var cols = 2;
-            float colWidth = width / cols - Margin;
-            var colRects = new List<Rect>();
-            var colTitleRects = new List<Rect>();
-            var buttonRect = new Rect( rect.width - _button.x, rect.height - _button.y, _button.x - Margin,
-                                       _button.y - Margin );
 
-            // set up rects
-            for ( var j = 0; j < cols; j++ )
-            {
-                colRects.Add( new Rect( j * colWidth + j * Margin + Margin / 2, _topAreaHeight, colWidth, height ) );
-                colTitleRects.Add( new Rect( j * colWidth + j * Margin + Margin * 2.5f, 0f, colWidth, _topAreaHeight ) );
-            }
+            // rects
+            var optionsColumnRect = new Rect(
+                rect.xMin,
+                rect.yMin,
+                rect.width * 3 / 5f,
+                rect.height - Margin - ButtonSize.y);
+            var treesColumnRect = new Rect(
+                optionsColumnRect.xMax,
+                rect.yMin,
+                rect.width * 2 / 5f,
+                rect.height - Margin - ButtonSize.y);
+            var buttonRect = new Rect(
+                rect.xMax - ButtonSize.x,
+                rect.yMax - ButtonSize.y,
+                ButtonSize.x - Margin,
+                ButtonSize.y - Margin);
 
-            // keep track of location
-            Vector2 cur;
+            Vector2 position;
+            float width;
+            Widgets_Section.BeginSectionColumn( optionsColumnRect, "Forestry.Options", out position, out width );
+            Widgets_Section.Section( ref position, width, DrawJobType, "FMF.JobType".Translate() );
 
-            // begin window
-            GUI.BeginGroup( rect );
-
-            // settings.
-            Text.Anchor = TextAnchor.LowerLeft;
-            Text.Font = GameFont.Tiny;
-            Widgets.Label( colTitleRects[0], "FMF.Options".Translate() );
-            Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.UpperLeft;
-
-            GUI.DrawTexture( colRects[0], Resources.SlightlyDarkBackground );
-            GUI.BeginGroup( colRects[0] );
-            cur = Vector2.zero;
-            bool alt = false;
-
-            // type of job;
-            // clear wind cells | clear area | logging
-            Rect typeLabelRect = new Rect( 0, cur.y, colRects[0].width * 2/3f, EntryHeight );
-            Rect typeButtonRect = new Rect( colRects[0].width * 2 / 3f, cur.y, colRects[0].width / 3f, EntryHeight );
-            Label( typeLabelRect, "FMF.JobType".Translate() );
-            if ( Widgets.ButtonText( typeButtonRect, ( "FMF.JobType." + _selected.type ).Translate() ) )
-            {
-                var options = new List<FloatMenuOption>();
-                foreach ( var type in Enum.GetValues( typeof( ManagerJob_Forestry.ForestryJobType ) ) as ManagerJob_Forestry.ForestryJobType[] )
-                    options.Add( new FloatMenuOption( ( "FMF.JobType." + type ).Translate(), () => _selected.type = type ) );
-                Find.WindowStack.Add( new FloatMenu( options ) );
-            }
-            cur.y += EntryHeight;
-
-            if ( alt )
-            {
-                Widgets.DrawAltRect( typeLabelRect );
-                Widgets.DrawAltRect( typeButtonRect );
-            }
-            alt = !alt;
-            
-            // clear areas
             if ( _selected.type == ManagerJob_Forestry.ForestryJobType.ClearArea )
             {
-                var clearAdditionalAreasLabelRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-                Label( clearAdditionalAreasLabelRect, "FMF.ClearAreas".Translate() );
-                cur.y += EntryHeight;
-
-                var clearAdditionalAreasSelectorRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-                AreaAllowedGUI.DoAllowedAreaSelectorsMC( clearAdditionalAreasSelectorRect, ref _selected.ClearAreas,
-                    Margin );
-                cur.y += EntryHeight;
-
-                if ( alt )
-                {
-                    Widgets.DrawAltRect( clearAdditionalAreasSelectorRect );
-                    Widgets.DrawAltRect( clearAdditionalAreasLabelRect );
-                }
-                alt = !alt;
+                Widgets_Section.Section( ref position, width, DrawClearArea, "FMF.JobType.ClearArea".Translate() );
             }
 
-            // trigger config
             if ( _selected.type == ManagerJob_Forestry.ForestryJobType.Logging )
             {
-                int currentCount = _selected.Trigger.CurCount;
-                int designatedCount = _selected.GetWoodInDesignations();
-                int targetCount = _selected.Trigger.Count;
-                _selected.Trigger.DrawTriggerConfig( ref cur, colRects[0].width, EntryHeight, alt,
-                    "FMF.TargetCount".Translate( currentCount, designatedCount, targetCount ),
-                    "FMF.TargetCountTooltip".Translate( currentCount, designatedCount,
-                        targetCount ) );
-                alt = !alt;
-
-                // Allow saplings (4)
-                var allowSaplingsRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-                Utilities.DrawToggle( allowSaplingsRect, "FMF.AllowSaplings".Translate(), ref _selected.AllowSaplings );
-                if (alt)
-                    Widgets.DrawAltRect(allowSaplingsRect);
-                alt = !alt;
-                cur.y += EntryHeight;
-
-                // Logging area (5)
-                var loggingAreaTitleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-                Label( loggingAreaTitleRect, "FMF.LoggingArea".Translate() );
-                if (alt)
-                    Widgets.DrawAltRect(loggingAreaTitleRect);
-                alt = !alt;
-                cur.y += EntryHeight;
-
-                var loggingAreaRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-                AreaAllowedGUI.DoAllowedAreaSelectors( loggingAreaRect, ref _selected.LoggingArea, manager, lrMargin: Margin );
-                if(alt)
-                    Widgets.DrawAltRect(loggingAreaRect);
-                alt = !alt;
-                cur.y += EntryHeight;
+                Widgets_Section.Section( ref position, width, DrawThreshold, "FM.Threshold".Translate() );
+                Widgets_Section.Section( ref position, width, DrawAreaRestriction, "FMF.LoggingArea".Translate() );
+                Widgets_Section.Section( ref position, width, DrawAllowSaplings );
             }
+            Widgets_Section.EndSectionColumn( "Forestry.Options", position );
 
 
-            GUI.EndGroup();
+            Widgets_Section.BeginSectionColumn( treesColumnRect, "Forestry.Trees", out position, out width );
 
-            // treedefs.
-            Text.Anchor = TextAnchor.LowerLeft;
-            Text.Font = GameFont.Tiny;
-            Widgets.Label( colTitleRects[1], "FMF.Trees".Translate() );
-            Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.UpperLeft;
-
-            GUI.DrawTexture( colRects[1], Resources.SlightlyDarkBackground );
-            GUI.BeginGroup( colRects[1] );
-            cur = Vector2.zero;
-
-            // show list of tree types for logging jobs
-            if ( _selected.type == ManagerJob_Forestry.ForestryJobType.Logging )
+            switch ( _selected.type )
             {
-
-                Rect outRect = colRects[1].AtZero().ContractedBy( 1f );
-                var viewRect = new Rect( 0f, 0f, outRect.width, ( _selected.AllowedTrees.Count + 1 ) * EntryHeight );
-                if ( viewRect.height > outRect.height )
-                    viewRect.width -= ScrollbarWidth;
-
-                // start scrolling view
-                Widgets.BeginScrollView( outRect, ref _contentScrollPosition, viewRect );
-
-                // list of keys in allowed trees list (all plans that yield wood in biome, static)
-                var treeDefs = new List<ThingDef>( _selected.AllowedTrees.Keys );
-
-                // toggle all
-                var toggleAllRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-                Widgets.DrawAltRect( toggleAllRect );
-                Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
-                    _selected.AllowedTrees.Values.All( v => v ), delegate
-                    {
-                        foreach (
-                            ThingDef def in treeDefs )
-                        {
-                            _selected.AllowedTrees[def] =
-                                true;
-                        }
-                    }, delegate
-                    {
-                        foreach (
-                            ThingDef def in
-                            treeDefs )
-                        {
-                            _selected.AllowedTrees
-                                [def] = false;
-                        }
-                    } );
-
-                cur.y += EntryHeight;
-
-                // toggle for each tree
-                var i = 1;
-
-                foreach ( ThingDef def in treeDefs )
-                {
-                    var toggleRect = new Rect( cur.x, cur.y, colWidth, EntryHeight );
-
-                    // highlight alternate rows
-                    if ( i++ % 2 == 0 )
-                    {
-                        Widgets.DrawAltRect( toggleRect );
-                    }
-
-                    // draw the toggle
-                    Utilities.DrawToggle( toggleRect, def.LabelCap, _selected.AllowedTrees[def],
-                        delegate
-                        {
-                            _selected.AllowedTrees[def] = !_selected.AllowedTrees[def];
-                        } );
-
-                    // update current position
-                    cur.y += EntryHeight;
-                }
-
-                // close scrolling view
-                Widgets.EndScrollView();
-            }
-            else // show 'all' for other types.
-            {
-                Label( colRects[1].AtZero(), "FM.All".Translate().Italic(), anchor: TextAnchor.MiddleCenter, color: Color.grey );
+                case ManagerJob_Forestry.ForestryJobType.ClearArea:
+                    Widgets_Section.Section(ref position, width, DrawEmpty_ClearArea, "FMF.Trees".Translate());
+                    break;
+                case ManagerJob_Forestry.ForestryJobType.ClearWind:
+                    Widgets_Section.Section(ref position, width, DrawEmpty_ClearWind, "FMF.Trees".Translate());
+                    break;
+                case ManagerJob_Forestry.ForestryJobType.Logging:
+                    Widgets_Section.Section( ref position, width, DrawTreeList, "FMF.Trees".Translate() );
+                    break;
             }
 
-            // close tree list
-            GUI.EndGroup();
+            Widgets_Section.EndSectionColumn( "Forestry.Trees", position );
 
             // do the button
             if ( !_selected.Managed )
@@ -305,9 +147,136 @@ namespace FluffyManager
                     Refresh();
                 }
             }
+        }
 
-            // close window
-            GUI.EndGroup();
+        public float DrawJobType( Vector2 pos, float width )
+        {
+            // type of job;
+            // clear wind cells | clear area | logging
+            var types = Enum.GetValues( typeof( ManagerJob_Forestry.ForestryJobType ) ) as ManagerJob_Forestry.ForestryJobType[];
+            var cellWidth = width / types.Length;
+
+            Rect cellRect = new Rect(
+                pos.x,
+                pos.y,
+                cellWidth,
+                ListEntryHeight );
+
+            foreach ( var type in types )
+            {
+                Utilities.DrawToggle( 
+                    cellRect, 
+                    $"FMF.JobType.{type}".Translate(),
+                    _selected.type == type,
+                    () => _selected.type = type,
+                    () => {}, 
+                    wrap: false );
+                cellRect.x += cellWidth;
+            }
+
+            return ListEntryHeight;
+        }
+
+        public float DrawClearArea( Vector2 pos, float width )
+        {
+            var rowRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                ListEntryHeight );
+            AreaAllowedGUI.DoAllowedAreaSelectorsMC( rowRect, ref _selected.ClearAreas );
+            return ListEntryHeight;
+        }
+
+        public float DrawThreshold( Vector2 pos, float width )
+        {
+            var start = pos;
+            int currentCount = _selected.Trigger.CurCount;
+            int designatedCount = _selected.GetWoodInDesignations();
+            int targetCount = _selected.Trigger.Count;
+
+            _selected.Trigger.DrawTriggerConfig(ref pos, width, ListEntryHeight, false,
+                "FMF.TargetCount".Translate(currentCount, designatedCount, targetCount),
+                "FMF.TargetCountTooltip".Translate(currentCount, designatedCount, targetCount));
+
+            return pos.y - start.y;
+        }
+
+        public float DrawAreaRestriction( Vector2 pos, float width )
+        {
+            var rowRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                ListEntryHeight );
+            AreaAllowedGUI.DoAllowedAreaSelectors( rowRect, ref _selected.LoggingArea, manager );
+            return ListEntryHeight;
+        }
+
+        public float DrawAllowSaplings( Vector2 pos, float width )
+        {
+            var rowRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                ListEntryHeight);
+            // NOTE: AllowSaplings logic is the reverse from the label that is shown to the user.
+            Utilities.DrawToggle( rowRect, "FMF.AllowSaplings".Translate(), 
+                !_selected.AllowSaplings,
+                () => _selected.AllowSaplings = false, 
+                () => _selected.AllowSaplings = true );
+            return ListEntryHeight;
+        }
+
+        public float DrawTreeList( Vector2 pos, float width )
+        {
+            var start = pos;
+            var rowRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                ListEntryHeight);
+            var allowedTrees = _selected.AllowedTrees;
+            var trees = new List<ThingDef>( allowedTrees.Keys );
+
+            // toggle all
+            var toggleAllRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
+                _selected.AllowedTrees.Values.All( v => v ),
+                () => trees.ForEach( t => allowedTrees[t] = true ),
+                () => trees.ForEach( t => allowedTrees[t] = false ) );
+
+            // toggle for each tree
+            foreach (ThingDef def in trees)
+            {
+                rowRect.y += ListEntryHeight;
+                Utilities.DrawToggle( rowRect, def.LabelCap, _selected.AllowedTrees[def],
+                    () => _selected.AllowedTrees[def] = !_selected.AllowedTrees[def] );
+            }
+
+            return rowRect.yMax - start.y;
+        }
+
+        public float DrawEmpty_ClearArea(Vector2 pos, float width)
+        {
+            return DrawEmpty("FMF.ClearArea.TreesExplanation".Translate(), pos, width);
+        }
+
+        public float DrawEmpty_ClearWind(Vector2 pos, float width)
+        {
+            return DrawEmpty("FMF.ClearWind.TreesExplanation".Translate(), pos, width);
+        }
+
+        public float DrawEmpty( string label, Vector2 pos, float width )
+        {
+            var height = Mathf.Max( Text.CalcHeight( label, width ), ListEntryHeight );
+            var rowRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                height );
+            Label( rowRect, label, TextAnchor.MiddleLeft, color: Color.gray );
+            return height;
         }
 
         public void DoLeftRow( Rect rect )

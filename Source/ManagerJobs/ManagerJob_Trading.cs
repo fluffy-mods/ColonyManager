@@ -45,8 +45,6 @@ namespace FluffyManager
 
         #endregion Properties
 
-
-
         #region Methods
 
         public override void CleanUp()

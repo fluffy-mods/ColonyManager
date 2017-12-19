@@ -395,17 +395,18 @@ namespace FluffyManager
             }
         }
 
-        public static void DrawToggle( Rect rect, string label, bool checkOn, Action on, Action off, float size = SmallIconSize, float margin = Margin )
+        public static void DrawToggle( Rect rect, string label, bool checkOn, Action on, Action off, float size = SmallIconSize, float margin = Margin, bool wrap = true )
         {
             // set up rects
             Rect labelRect = rect;
             var checkRect = new Rect( rect.xMax - size - margin, 0f, size, size );
+            labelRect.xMax = checkRect.xMin - Margin / 2f;
 
             // finetune rects
             checkRect = checkRect.CenteredOnYIn( labelRect );
 
             // draw label
-            Label( rect, label, TextAnchor.MiddleLeft, GameFont.Small, margin: margin );
+            Label( rect, label, TextAnchor.MiddleLeft, GameFont.Small, margin: margin, wrap: wrap );
 
             // draw check
             if ( checkOn )

@@ -89,15 +89,17 @@
   <FMF.Options>Options</FMF.Options>
   <FMF.Trees>Allowed trees</FMF.Trees>
   <FMF.ClearWindCells>Clear wind turbine cells</FMF.ClearWindCells>
-  <FMF.AllowSaplings>Allow cutting not fully matured trees</FMF.AllowSaplings>
+  <FMF.AllowSaplings>Only fully matured trees</FMF.AllowSaplings>
   <FMF.LoggingArea>Alllow logging in:</FMF.LoggingArea>
   <FMF.TargetCount>Target count: {0}+{1}/{2}</FMF.TargetCount>
   <FMF.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMF.TargetCountTooltip>
   <FMF.ClearAreas>Clear areas of all vegetation:</FMF.ClearAreas>
   <FMF.JobType>Job type</FMF.JobType>
   <FMF.JobType.ClearArea>Clear areas</FMF.JobType.ClearArea>
-  <FMF.JobType.ClearWind>Clear wind turbines</FMF.JobType.ClearWind>
+  <FMF.JobType.ClearWind>Clear turbines</FMF.JobType.ClearWind>
   <FMF.JobType.Logging>Wood logging</FMF.JobType.Logging>
+  <FMF.ClearArea.TreesExplanation>Cuts all plants that provide cover.</FMF.ClearArea.TreesExplanation>
+  <FMF.ClearWind.TreesExplanation>Cuts all plants that block wind.</FMF.ClearWind.TreesExplanation>
 
   <!-- Foraging (Gathering) tab -->
   <FMG.Foraging>Foraging</FMG.Foraging>
