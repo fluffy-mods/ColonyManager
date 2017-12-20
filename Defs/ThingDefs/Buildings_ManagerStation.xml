@@ -106,6 +106,8 @@
 				<speed>500</speed>
 			</li>
 			<li Class="CompProperties_Forbiddable"/>
+			<li Class="CompProperties_Flickable"/>
+			<li Class="CompProperties_Breakdownable"/>
 		</comps>
 		<researchPrerequisites>
 			<li>ManagingSoftware</li>
@@ -156,7 +158,9 @@
 				<glowRadius>3</glowRadius>
 				<glowColor>(255,0,0,0)</glowColor>
 			</li>
-			<li Class="CompProperties_Forbiddable"/>
+			<li Class="CompProperties_Forbiddable"/>			
+			<li Class="CompProperties_Flickable"/>
+			<li Class="CompProperties_Breakdownable"/>
 		</comps>
 		<researchPrerequisites>
 			<li>AdvancedManagingSoftware</li>

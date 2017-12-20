@@ -178,11 +178,11 @@ namespace FluffyManager
                 }
 
                 // blinking on primary
-                if ( tick % 30 < 25 )
+                if ( tick % 30 == 0 )
                 {
                     PrimaryColourBlinker = PrimaryColour;
                 }
-                else
+                if (tick % 30 == 25 )
                 {
                     PrimaryColourBlinker = Color.black;
                 }
