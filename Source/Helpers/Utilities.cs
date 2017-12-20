@@ -395,7 +395,13 @@ namespace FluffyManager
             }
         }
 
-        public static void DrawToggle( Rect rect, string label, bool checkOn, Action on, Action off, float size = SmallIconSize, float margin = Margin, bool wrap = true )
+        public static void DrawToggle( Rect rect, string label, bool checkOn, Action on, Action off,
+            float size = SmallIconSize, float margin = Margin, bool wrap = true )
+        {
+            DrawToggle( rect, label, checkOn, !checkOn, on, off, size, margin, wrap );
+        }
+
+        public static void DrawToggle( Rect rect, string label, bool checkOn, bool checkOff, Action on, Action off, float size = SmallIconSize, float margin = Margin, bool wrap = true )
         {
             // set up rects
             Rect labelRect = rect;
@@ -409,26 +415,31 @@ namespace FluffyManager
             Label( rect, label, TextAnchor.MiddleLeft, GameFont.Small, margin: margin, wrap: wrap );
 
             // draw check
+
             if ( checkOn )
             {
                 GUI.DrawTexture( checkRect, Widgets.CheckboxOnTex );
             }
-            else
+            else if ( checkOff )
             {
                 GUI.DrawTexture( checkRect, Widgets.CheckboxOffTex );
+            }
+            else
+            {
+                GUI.DrawTexture( checkRect, Widgets.CheckboxPartialTex );
             }
 
             // interactivity
             Widgets.DrawHighlightIfMouseover( rect );
             if ( Widgets.ButtonInvisible( rect ) )
             {
-                if ( checkOn )
+                if ( !checkOn )
                 {
-                    off();
+                    on();
                 }
                 else
                 {
-                    on();
+                    off();
                 }
             }
         }

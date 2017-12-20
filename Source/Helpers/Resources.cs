@@ -44,6 +44,7 @@ namespace FluffyManager
             BarBackgroundInactiveTexture = SolidColorMaterials.NewSolidColorTexture( new Color( 0.7f, 0.7f, 0.7f ) ),
             Search = ContentFinder<Texture2D>.Get( "UI/Buttons/Search" ),
             BarShader = ContentFinder<Texture2D>.Get( "UI/Misc/BarShader" ),
+            Refresh = ContentFinder<Texture2D>.Get( "UI/Icons/refresh" ),
 
             // livestock header icons
             WoolIcon = ContentFinder<Texture2D>.Get( "UI/Icons/wool" ),

@@ -40,33 +40,21 @@ namespace FluffyManager
             Label( labelRect, label, anchor, font, color, margin, wrap );
         }
         
-        // This is NOT thread safe!
-        private static Color _oldColor;
-        private static TextAnchor _oldAnchor;
-        private static GameFont _oldFont;
-        private static bool _oldWrap;
         
         private static void Begin(TextAnchor anchor, GameFont font, Color color, bool wrap )
         {
-            _oldColor = GUI.color;
             GUI.color = color;
-
-            _oldAnchor = Text.Anchor;
             Text.Anchor = anchor;
-
-            _oldFont = Text.Font;
             Text.Font = font;
-
-            _oldWrap = Text.WordWrap;
             Text.WordWrap = wrap;
         }
 
         private static void End()
         {
-            GUI.color = _oldColor;
-            Text.Font = _oldFont;
-            Text.Anchor = _oldAnchor;
-            Text.WordWrap = _oldWrap;
+            GUI.color = Color.white;
+            Text.Font = GameFont.Small;
+            Text.Anchor = TextAnchor.UpperLeft;
+            Text.WordWrap = true;
         }
     }
 }

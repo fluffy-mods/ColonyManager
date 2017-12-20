@@ -111,7 +111,8 @@ namespace FluffyManager
                     Widgets_Section.Section(ref position, width, DrawEmpty_ClearWind, "FMF.Trees".Translate());
                     break;
                 case ManagerJob_Forestry.ForestryJobType.Logging:
-                    Widgets_Section.Section( ref position, width, DrawTreeList, "FMF.Trees".Translate() );
+                    Widgets_Section.Section( ref position, width, DrawTreeShortcuts, "FMF.Trees".Translate() );
+                    Widgets_Section.Section( ref position, width, DrawTreeList );
                     break;
             }
 
@@ -226,6 +227,28 @@ namespace FluffyManager
             return ListEntryHeight;
         }
 
+        public float DrawTreeShortcuts( Vector2 pos, float width )
+        {
+            var start = pos;
+            var rowRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                ListEntryHeight);
+            var allowedTrees = _selected.AllowedTrees;
+            var trees = new List<ThingDef>(allowedTrees.Keys);
+
+            // toggle all
+            var toggleAllRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
+                _selected.AllowedTrees.Values.All( v => v ),
+                _selected.AllowedTrees.Values.All( v => !v ),
+                () => trees.ForEach( t => allowedTrees[t] = true ),
+                () => trees.ForEach( t => allowedTrees[t] = false ) );
+
+            return rowRect.yMax - start.y;
+        }
+
         public float DrawTreeList( Vector2 pos, float width )
         {
             var start = pos;
@@ -237,22 +260,15 @@ namespace FluffyManager
             var allowedTrees = _selected.AllowedTrees;
             var trees = new List<ThingDef>( allowedTrees.Keys );
 
-            // toggle all
-            var toggleAllRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
-                _selected.AllowedTrees.Values.All( v => v ),
-                () => trees.ForEach( t => allowedTrees[t] = true ),
-                () => trees.ForEach( t => allowedTrees[t] = false ) );
-
             // toggle for each tree
             foreach (ThingDef def in trees)
             {
-                rowRect.y += ListEntryHeight;
                 Utilities.DrawToggle( rowRect, def.LabelCap, _selected.AllowedTrees[def],
                     () => _selected.AllowedTrees[def] = !_selected.AllowedTrees[def] );
+                rowRect.y += ListEntryHeight;
             }
 
-            return rowRect.yMax - start.y;
+            return rowRect.yMin - start.y;
         }
 
         public float DrawEmpty_ClearArea(Vector2 pos, float width)

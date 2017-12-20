@@ -82,7 +82,15 @@ namespace FluffyManager
 
             // animals
             Widgets_Section.BeginSectionColumn( animalsColumnRect, "Hunting.Animals", out position, out width );
-            Widgets_Section.Section( ref position, width, DrawAnimalList, "FMH.Animals".Translate() );
+            var refreshRect = new Rect(
+                position.x + width - SmallIconSize - 2 * Margin,
+                position.y + Margin,
+                SmallIconSize,
+                SmallIconSize);
+            if ( Widgets.ButtonImage( refreshRect, Resources.Refresh, Color.grey ) )
+                _selected.RefreshAllowedAnimals();
+            Widgets_Section.Section( ref position, width, DrawAnimalShortcuts, "FMH.Animals".Translate() );
+            Widgets_Section.Section( ref position, width, DrawAnimalList );
             Widgets_Section.EndSectionColumn( "Hunting.Animals", position );
 
             // do the button
@@ -163,58 +171,72 @@ namespace FluffyManager
             return ListEntryHeight;
         }
 
-        public float DrawAnimalList( Vector2 pos, float width )
+        public float DrawAnimalShortcuts( Vector2 pos, float width )
         {
             var start = pos;
 
             // list of keys in allowed animals list (all animals in biome + visible animals on map)
             var allowedAnimals = _selected.AllowedAnimals;
-            var animals = new List<PawnKindDef>( allowedAnimals.Keys );
+            var animals = new List<PawnKindDef>(allowedAnimals.Keys);
 
             // toggle all
             var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
             Utilities.DrawToggle(rowRect, "<i>" + "FM.All".Translate() + "</i>",
                 _selected.AllowedAnimals.Values.All(v => v),
+                _selected.AllowedAnimals.Values.All(v => !v),
                 () => animals.ForEach(a => _selected.AllowedAnimals[a] = true),
                 () => animals.ForEach(a => _selected.AllowedAnimals[a] = false));
 
             // toggle predators
             rowRect.y += ListEntryHeight;
-            var predators = animals.Where( a => a.RaceProps.predator ).ToList();
+            var predators = animals.Where(a => a.RaceProps.predator).ToList();
             Utilities.DrawToggle(rowRect, "<i>" + "FM.Hunting.Predators".Translate() + "</i>",
-                predators.All( p => allowedAnimals[p] ),
+                predators.All(p => allowedAnimals[p]),
+                predators.All(p => !allowedAnimals[p]),
                 () => predators.ForEach(p => _selected.AllowedAnimals[p] = true),
                 () => predators.ForEach(p => _selected.AllowedAnimals[p] = false));
 
             // toggle herd animals
             rowRect.y += ListEntryHeight;
-            var herders = animals.Where( a => a.RaceProps.herdAnimal ).ToList();
-            Utilities.DrawToggle( rowRect, "<i>" + "FM.Hunting.HerdAnimals".Translate() + "</i>",
-                herders.All( h => allowedAnimals[h] ),
-                () => herders.ForEach( h => _selected.AllowedAnimals[h] = true ),
-                () => herders.ForEach( h => _selected.AllowedAnimals[h] = false ) );
+            var herders = animals.Where(a => a.RaceProps.herdAnimal).ToList();
+            Utilities.DrawToggle(rowRect, "<i>" + "FM.Hunting.HerdAnimals".Translate() + "</i>",
+                herders.All(h => allowedAnimals[h]),
+                herders.All(h => !allowedAnimals[h]),
+                () => herders.ForEach(h => _selected.AllowedAnimals[h] = true),
+                () => herders.ForEach(h => _selected.AllowedAnimals[h] = false));
 
             // exploding animals
             rowRect.y += ListEntryHeight;
             var exploding = animals
-                .Where( a => a.RaceProps.deathActionWorkerClass == typeof( DeathActionWorker_SmallExplosion )
-                             || a.RaceProps.deathActionWorkerClass == typeof( DeathActionWorker_BigExplosion ) ).ToList();
+                .Where(a => a.RaceProps.deathActionWorkerClass == typeof(DeathActionWorker_SmallExplosion)
+                            || a.RaceProps.deathActionWorkerClass == typeof(DeathActionWorker_BigExplosion)).ToList();
             Utilities.DrawToggle(rowRect, "<i>" + "FM.Hunting.Exploding".Translate() + "</i>",
                 exploding.All(e => allowedAnimals[e]),
+                exploding.All(e => !allowedAnimals[e]),
                 () => exploding.ForEach(e => _selected.AllowedAnimals[e] = true),
                 () => exploding.ForEach(e => _selected.AllowedAnimals[e] = false));
 
+            return rowRect.yMax - start.y;
+        }
+
+        public float DrawAnimalList( Vector2 pos, float width )
+        {
+            var start = pos;
+            // list of keys in allowed animals list (all animals in biome + visible animals on map)
+            var allowedAnimals = _selected.AllowedAnimals;
+            var animals = new List<PawnKindDef>(allowedAnimals.Keys);
+
             // toggle for each animal
+            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
             foreach (PawnKindDef animal in animals)
             {
-                rowRect.y += ListEntryHeight;
-
                 // draw the toggle
                 Utilities.DrawToggle(rowRect, animal.LabelCap, _selected.AllowedAnimals[animal],
                     () => _selected.AllowedAnimals[animal] = !_selected.AllowedAnimals[animal]);
+                rowRect.y += ListEntryHeight;
             }
 
-            return rowRect.yMax - start.y;
+            return rowRect.yMin - start.y;
         }
 
         public void DoLeftRow( Rect rect )
@@ -319,8 +341,8 @@ namespace FluffyManager
 
             // update pawnkind options
             foreach ( ManagerJob_Hunting job in Jobs )
-                job.UpdateAllowedAnimals();
-            _selected?.UpdateAllowedAnimals();
+                job.RefreshAllowedAnimals();
+            _selected?.RefreshAllowedAnimals();
         }
     }
 }

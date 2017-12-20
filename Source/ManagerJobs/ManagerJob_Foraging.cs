@@ -302,22 +302,32 @@ namespace FluffyManager
 
         public void RefreshAllowedPlants( bool firstTime = false )
         {
+            Logger.Debug( "Refreshing allowed plants" );
+
             // all plants that yield something, and it isn't wood.
             var options = manager.map.Biome.AllWildPlants
 
-                                 // cave plants (shrooms)
-                                 .Concat( DefDatabase<ThingDef>.AllDefsListForReading
-                                    .Where( td => td.plant?.cavePlant ?? false ) )
+                // cave plants (shrooms)
+                .Concat( DefDatabase<ThingDef>.AllDefsListForReading
+                    .Where( td => td.plant?.cavePlant ?? false ) )
 
-                                 // ambrosia
-                                 .Concat( ThingDefOf.PlantAmbrosia )
+                // ambrosia
+                .Concat( ThingDefOf.PlantAmbrosia )
 
-                                 // that yield something that is not wood
-                                 .Where(plant => plant.plant.harvestYield > 0 &&
-                                                 plant.plant.harvestedThingDef != null &&
-                                                 plant.plant.harvestTag != "Wood")
+                // and anything on the map that is not in a plant zone/planter
+                .Concat( manager.map.listerThings.AllThings.OfType<Plant>()
+                    .Where( p => p.Spawned && 
+                                 !( manager.map.zoneManager.ZoneAt( p.Position ) is IPlantToGrowSettable ) && 
+                                 manager.map.thingGrid.ThingsAt( p.Position ).FirstOrDefault( t => t is Building_PlantGrower ) == null )
+                    .Select( p => p.def )
+                    .Distinct() )
 
-                                 .Distinct();
+                // that yield something that is not wood
+                .Where( plant => plant.plant.harvestYield > 0 &&
+                                 plant.plant.harvestedThingDef != null &&
+                                 plant.plant.harvestTag != "Wood" )
+
+                .Distinct();
 
             foreach ( ThingDef plant in options )
             {

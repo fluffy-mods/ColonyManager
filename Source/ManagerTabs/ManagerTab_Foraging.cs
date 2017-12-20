@@ -80,7 +80,15 @@ namespace FluffyManager
             Widgets_Section.EndSectionColumn( "Foraging.Options", position );
 
             Widgets_Section.BeginSectionColumn( plantsColumnRect, "Foraging.Plants", out position, out width );
-            Widgets_Section.Section( ref position, width, DrawPlantList, "FMG.Plants".Translate() );
+            var refreshRect = new Rect(
+                position.x + width - SmallIconSize - 2 * Margin,
+                position.y + Margin,
+                SmallIconSize,
+                SmallIconSize );
+            if ( Widgets.ButtonImage( refreshRect, Resources.Refresh, Color.grey ) )
+                _selected.RefreshAllowedPlants();
+            Widgets_Section.Section( ref position, width, DrawPlantShortcuts, "FMG.Plants".Translate() );
+            Widgets_Section.Section( ref position, width, DrawPlantList );
             Widgets_Section.EndSectionColumn( "Foraging.Plants", position );
 
 
@@ -144,6 +152,54 @@ namespace FluffyManager
             return ListEntryHeight;
         }
 
+        public float DrawPlantShortcuts( Vector2 pos, float width )
+        {
+            var start = pos;
+
+            // list of keys in allowed trees list (all plans that yield wood in biome, static)
+            var allowedPlants = _selected.AllowedPlants;
+            var plants = allowedPlants.Keys.ToList();
+
+            var rowRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                ListEntryHeight);
+
+            // toggle all
+            Utilities.DrawToggle(
+                rowRect,
+                "<i>" + "FM.All".Translate() + "</i>",
+                allowedPlants.Values.All(p => p),
+                allowedPlants.Values.All(p => !p),
+                () => plants.ForEach(p => allowedPlants[p] = true),
+                () => plants.ForEach(p => allowedPlants[p] = false));
+
+            // toggle edible
+            rowRect.y += ListEntryHeight;
+            var edible = plants.Where(p => p.plant.harvestedThingDef.IsNutritionGivingIngestible).ToList();
+            Utilities.DrawToggle(
+                rowRect,
+                "<i>" + "FM.Foraging.Edible".Translate() + "</i>",
+                edible.All(p => allowedPlants[p]),
+                edible.All(p => !allowedPlants[p]),
+                () => edible.ForEach(p => allowedPlants[p] = true),
+                () => edible.ForEach(p => allowedPlants[p] = false));
+
+            // toggle shrooms
+            rowRect.y += ListEntryHeight;
+            var shrooms = plants.Where(p => p.plant.cavePlant).ToList();
+            Utilities.DrawToggle(
+                rowRect,
+                "<i>" + "FM.Foraging.Mushrooms".Translate() + "</i>",
+                shrooms.All(p => allowedPlants[p]),
+                shrooms.All(p => !allowedPlants[p]),
+                () => shrooms.ForEach(p => allowedPlants[p] = true),
+                () => shrooms.ForEach(p => allowedPlants[p] = false));
+
+            return rowRect.yMax - start.y;
+        }
+
         public float DrawPlantList( Vector2 pos, float width )
         {
             var start = pos;
@@ -158,43 +214,15 @@ namespace FluffyManager
                 width, 
                 ListEntryHeight);
 
-            // toggle all
-            Utilities.DrawToggle( 
-                rowRect, 
-                "<i>" + "FM.All".Translate() + "</i>", 
-                allowedPlants.Values.All( p => p ),
-                () => plants.ForEach( p => allowedPlants[p] = true ),
-                () => plants.ForEach( p => allowedPlants[p] = false ) );
-
-            // toggle edible
-            rowRect.y += ListEntryHeight;
-            var edible = plants.Where( p => p.plant.harvestedThingDef.IsNutritionGivingIngestible ).ToList();
-            Utilities.DrawToggle( 
-                rowRect, 
-                "<i>" + "FM.Foraging.Edible".Translate() + "</i>",
-                edible.All( p => allowedPlants[p] ),
-                () => edible.ForEach( p => allowedPlants[p] = true ),
-                () => edible.ForEach( p => allowedPlants[p] = false ) );
-
-            // toggle shrooms
-            rowRect.y += ListEntryHeight;
-            var shrooms = plants.Where(p => p.plant.cavePlant ).ToList();
-            Utilities.DrawToggle(
-                rowRect,
-                "<i>" + "FM.Foraging.Mushrooms".Translate() + "</i>",
-                shrooms.All( p => allowedPlants[p] ),
-                () => shrooms.ForEach( p => allowedPlants[p] = true ),
-                () => shrooms.ForEach( p => allowedPlants[p] = false ) );
-
             // toggle for each plant
             foreach ( ThingDef plant in plants.OrderBy( p => p.LabelCap ) )
             {
-                rowRect.y += ListEntryHeight;
                 Utilities.DrawToggle( rowRect, plant.LabelCap, _selected.AllowedPlants[plant],
                     () => _selected.AllowedPlants[plant] = !_selected.AllowedPlants[plant] );
+                rowRect.y += ListEntryHeight;
             }
 
-            return rowRect.yMax - start.y;
+            return rowRect.yMin - start.y;
         }
 
         public void DoLeftRow( Rect rect )

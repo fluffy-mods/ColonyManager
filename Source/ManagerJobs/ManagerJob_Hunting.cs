@@ -83,7 +83,7 @@ namespace FluffyManager
             
             // init stuff if we're not loading
             if (Scribe.mode == LoadSaveMode.Inactive)
-                UpdateAllowedAnimals();
+                RefreshAllowedAnimals();
         }
 
         #endregion Constructors
@@ -479,7 +479,7 @@ namespace FluffyManager
 
         #endregion Methods
 
-        public void UpdateAllowedAnimals()
+        public void RefreshAllowedAnimals()
         {
             // add animals that were not already in the list, disallow by default.
             foreach ( PawnKindDef pawnKind in manager.map.Biome.AllWildAnimals
