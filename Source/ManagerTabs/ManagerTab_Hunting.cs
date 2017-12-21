@@ -17,7 +17,6 @@ namespace FluffyManager
         private float _leftRowHeight = 9999f;
         private Vector2 _scrollPosition = Vector2.zero;
         private ManagerJob_Hunting _selected;
-        private float _topAreaHeight = 30f;
 
         public List<ManagerJob_Hunting> Jobs;
 
@@ -130,7 +129,7 @@ namespace FluffyManager
             int currentCount = _selected.Trigger.CurCount;
             int corpseCount = _selected.GetMeatInCorpses();
             int designatedCount = _selected.GetMeatInDesignations();
-            int targetCount = _selected.Trigger.Count;
+            int targetCount = _selected.Trigger.TargetCount;
 
             _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight, false,
                 "FMH.TargetCount".Translate(currentCount, corpseCount, designatedCount,
@@ -168,7 +167,11 @@ namespace FluffyManager
         {
             var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
             AreaAllowedGUI.DoAllowedAreaSelectors(rowRect, ref _selected.HuntingGrounds, manager);
-            return ListEntryHeight;
+
+            rowRect.y += ListEntryHeight;
+            Utilities.DrawReachabilityToggle(rowRect, ref _selected.CheckReachable);
+
+            return rowRect.yMax - pos.y;
         }
 
         public float DrawAnimalShortcuts( Vector2 pos, float width )
@@ -239,7 +242,7 @@ namespace FluffyManager
             return rowRect.yMin - start.y;
         }
 
-        public void DoLeftRow( Rect rect )
+        public void DoJobList( Rect rect )
         {
             Widgets.DrawMenuSection( rect );
 
@@ -322,7 +325,7 @@ namespace FluffyManager
                                           canvas.height );
 
             // draw overview row
-            DoLeftRow( leftRow );
+            DoJobList( leftRow );
 
             // draw job interface if something is selected.
             if ( Selected != null )

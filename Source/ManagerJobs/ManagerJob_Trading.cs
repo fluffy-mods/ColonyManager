@@ -38,7 +38,7 @@ namespace FluffyManager
         // It does require a trader to do things, but that's further down the line.
         public override bool Managed => false;
 
-        public override ManagerTab Tab => manager.ManagerTabs.Find( tab => tab is ManagerTab_Trading );
+        public override ManagerTab Tab => manager.Tabs.Find( tab => tab is ManagerTab_Trading );
         // TODO: string representation of filters.
         public override string[] Targets => new[] { "" };
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Warden;

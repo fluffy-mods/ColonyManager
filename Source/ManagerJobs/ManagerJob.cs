@@ -2,10 +2,12 @@
 // ManagerJob.cs
 // 2016-12-09
 
+using System.Linq;
 using RimWorld;
 using System.Text;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 
 namespace FluffyManager
 {
@@ -63,6 +65,13 @@ namespace FluffyManager
         public abstract string Label { get; }
         public virtual bool Managed { get; set; }
 
+        public virtual bool IsReachable( Thing target )
+        {
+            return !target.Position.Fogged( manager.map )
+                   && ( !CheckReachable || manager.map.mapPawns.FreeColonistsSpawned.Any( p => p.CanReach( target, PathEndMode.Touch, Danger.Some ) ) );
+        }
+
+        public bool CheckReachable = true;
         public virtual bool ShouldDoNow => Managed && !Suspended && !Completed && lastAction + ActionInterval < Find.TickManager.TicksGame;
 
         public virtual SkillDef SkillDef { get; } = null;
@@ -72,7 +81,6 @@ namespace FluffyManager
         public abstract WorkTypeDef WorkTypeDef { get; }
 
         #endregion Properties
-
 
 
         #region Methods
@@ -96,6 +104,7 @@ namespace FluffyManager
             Scribe_Values.Look( ref _actionInterval, "ActionInterval" );
             Scribe_Values.Look( ref lastAction, "lastAction" );
             Scribe_Values.Look( ref priority, "priority" );
+            Scribe_Values.Look( ref CheckReachable, "CheckReachable", true );
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit || Manager.LoadSaveMode == Manager.Modes.ImportExport )
             {

@@ -21,7 +21,7 @@ namespace FluffyManager
             }
         }
 
-        public static ManagerTab DefaultTab => Manager.For( Find.VisibleMap ).ManagerTabs[0];
+        public static ManagerTab DefaultTab => Manager.For( Find.VisibleMap ).Tabs[0];
 
         public static void GoTo( ManagerTab tab, ManagerJob job = null )
         {

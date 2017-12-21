@@ -111,7 +111,7 @@ namespace FluffyManager
 
         public override ManagerTab Tab
         {
-            get { return Manager.For( manager ).ManagerTabs.OfType<ManagerTab_Livestock>().First(); }
+            get { return Manager.For( manager ).Tabs.OfType<ManagerTab_Livestock>().First(); }
         }
 
         public override string[] Targets
@@ -450,10 +450,10 @@ namespace FluffyManager
 
                     // get list of animals in sorted by youngest weighted to distance.
                     List<Pawn> animals = Trigger.pawnKind.GetWild( manager, ageSex )
-                                                .Where( p => p != null && p.Spawned &&
-                                                             manager.map.designationManager.DesignationOn( p ) == null &&
-                                                             ( TameArea == null ||
-                                                               TameArea.ActiveCells.Contains( p.Position ) ) ).ToList();
+                        .Where( p => p != null && p.Spawned &&
+                                     manager.map.designationManager.DesignationOn( p ) == null &&
+                                     ( TameArea == null || TameArea.ActiveCells.Contains( p.Position ) ) &&
+                                     IsReachable( p ) ).ToList();
 
                     // skip if no animals available.
                     if ( animals.Count == 0 )

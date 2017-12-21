@@ -17,7 +17,7 @@
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\Assemblies\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELOADER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;RELOADER, DEBUG_PERFORMANCE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
@@ -67,8 +67,10 @@
     <Compile Include="ManagerJobs\ManagerJob_Forestry.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Hunting.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Livestock.cs" />
+    <Compile Include="ManagerJobs\ManagerJob_Mining.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Trading.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Foraging.cs" />
+    <Compile Include="ManagerTabs\ManagerTab_Mining.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Power.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Trading.cs" />
     <Compile Include="Triggers\Trigger_PawnKind.cs" />

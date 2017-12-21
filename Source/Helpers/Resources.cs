@@ -35,6 +35,7 @@ namespace FluffyManager
             IconForaging = ContentFinder<Texture2D>.Get( "UI/Icons/Foraging" ),
             IconPower = ContentFinder<Texture2D>.Get( "UI/Icons/Power" ),
             IconTrading = ContentFinder<Texture2D>.Get( "UI/Icons/Power" ),
+            // IconMining = ContentFinder<Texture2D>.Get( "UI/Icons/Mining" ),
 
             // misc
             SlightlyDarkBackground = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .2f ),
@@ -45,6 +46,7 @@ namespace FluffyManager
             Search = ContentFinder<Texture2D>.Get( "UI/Buttons/Search" ),
             BarShader = ContentFinder<Texture2D>.Get( "UI/Misc/BarShader" ),
             Refresh = ContentFinder<Texture2D>.Get( "UI/Icons/refresh" ),
+            Stopwatch = ContentFinder<Texture2D>.Get( "UI/Icons/stopwatch" ),
 
             // livestock header icons
             WoolIcon = ContentFinder<Texture2D>.Get( "UI/Icons/wool" ),
@@ -56,6 +58,7 @@ namespace FluffyManager
             MaleIcon = ContentFinder<Texture2D>.Get( "UI/Icons/male" ),
             MeatIcon = ContentFinder<Texture2D>.Get( "UI/Icons/meat" ),
             UnkownIcon = ContentFinder<Texture2D>.Get( "UI/Icons/unknown" );
+
 
         //public static Texture2D[] LifeStages = {StageA, StageB, StageC};
 

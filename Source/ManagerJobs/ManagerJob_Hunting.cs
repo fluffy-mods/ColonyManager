@@ -6,8 +6,10 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Reloader;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 using static FluffyManager.Constants;
 
 namespace FluffyManager
@@ -25,6 +27,8 @@ namespace FluffyManager
         private Utilities.CachedValue<int> _corpseCachedValue = new Utilities.CachedValue<int>();
         private Utilities.CachedValue<int> _designatedCachedValue = new Utilities.CachedValue<int>();
         private List<ThingDef> _humanLikeMeatDefs;
+
+        public override bool Completed => !Trigger.State;
 
         private bool _allowHumanLikeMeat;
         public bool AllowHumanLikeMeat
@@ -89,12 +93,7 @@ namespace FluffyManager
         #endregion Constructors
 
         #region Properties
-
-        public override bool Completed
-        {
-            get { return !Trigger.State; }
-        }
-
+        
         public List<Corpse> Corpses
         {
             get
@@ -137,7 +136,7 @@ namespace FluffyManager
 
         public override ManagerTab Tab
         {
-            get { return Manager.For( manager ).ManagerTabs.Find( tab => tab is ManagerTab_Hunting ); }
+            get { return Manager.For( manager ).Tabs.Find( tab => tab is ManagerTab_Hunting ); }
         }
 
         public override string[] Targets
@@ -214,7 +213,7 @@ namespace FluffyManager
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            History.DrawPlot( rect, Trigger.Count );
+            History.DrawPlot( rect, Trigger.TargetCount );
         }
 
         public override void ExposeData()
@@ -349,7 +348,7 @@ namespace FluffyManager
             List<Pawn> huntableAnimals = GetHuntableAnimalsSorted();
 
             // while totalCount < count AND we have animals that can be designated, designate animal.
-            for ( var i = 0; i < huntableAnimals.Count && totalCount < Trigger.Count; i++ )
+            for ( var i = 0; i < huntableAnimals.Count && totalCount < Trigger.TargetCount; i++ )
             {
                 AddDesignation( huntableAnimals[i] );
                 totalCount += huntableAnimals[i].EstimatedMeatCount();
@@ -435,6 +434,7 @@ namespace FluffyManager
             }
         }
 
+        // TODO: refactor into a yielding iterator for performance?
         private List<Pawn> GetHuntableAnimalsSorted()
         {
             // get the 'home' position
@@ -459,22 +459,38 @@ namespace FluffyManager
                    && IsValidHuntingTarget( (Pawn)t.Thing );
         }
 
-        private bool IsValidHuntingTarget( Pawn p )
+        [ReloadMethod]
+        private bool IsValidHuntingTarget( Pawn target )
         {
-            return p.RaceProps.Animal
-                   && !p.health.Dead
-                   && p.Spawned
+            //Logger.Debug( target.LabelShort );
+            //Logger.Debug( "\tAnimal: " + target.RaceProps.Animal );
+            //Logger.Debug( "\tAlive: " + !target.health.Dead );
+            //Logger.Debug( "\tSpawned: " + target.Spawned );
+            //Logger.Debug( "\tWild: " + ( target.Faction != Faction.OfPlayer ) );
+            //Logger.Debug( "\tListed: " + AllowedAnimals.ContainsKey( target.kindDef ) );
+            //if ( !AllowedAnimals.ContainsKey( target.kindDef ) )
+            //    return false;
+            //Logger.Debug( "\tAllowed: " + AllowedAnimals[target.kindDef] );
+            //Logger.Debug( "\tNot designated: " + ( manager.map.designationManager.DesignationOn( target ) == null ) );
+            //Logger.Debug( "\tIn hunting grounds: " + ( HuntingGrounds == null || HuntingGrounds.ActiveCells.Contains( target.Position ) ) );
+            //Logger.Debug( "\tFogged: " + !target.Position.Fogged( manager.map ) );
+            //Logger.Debug( "\tReachable: " +
+            //              manager.map.mapPawns.FreeColonistsSpawned.Any( p => p.CanReach( p, PathEndMode.Touch,
+            //                  Danger.Some ) ) );
+
+            return target.RaceProps.Animal
+                   && !target.health.Dead
+                   && target.Spawned
 
                    // wild animals only
-                   && p.Faction == null
+                   && target.Faction == null
 
                    // non-biome animals won't be on the list
-                   && AllowedAnimals.ContainsKey( p.kindDef )
-                   && AllowedAnimals[p.kindDef]
-                   && manager.map.designationManager.DesignationOn( p ) == null
-                   && ( HuntingGrounds == null
-                        || HuntingGrounds.ActiveCells.Contains( p.Position ) )
-                   && manager.map.reachability.CanReachColony( p.Position );
+                   && AllowedAnimals.ContainsKey( target.kindDef )
+                   && AllowedAnimals[target.kindDef]
+                   && manager.map.designationManager.DesignationOn( target ) == null
+                   && ( HuntingGrounds == null || HuntingGrounds.ActiveCells.Contains( target.Position ) )
+                   && IsReachable( target );
         }
 
         #endregion Methods

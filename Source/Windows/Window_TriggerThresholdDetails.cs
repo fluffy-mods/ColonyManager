@@ -73,10 +73,10 @@ namespace FluffyManager
             }
             else
             {
-                Trigger.Count = int.Parse( Input );
-                if ( Trigger.Count > Trigger.MaxUpperThreshold )
+                Trigger.TargetCount = int.Parse( Input );
+                if ( Trigger.TargetCount > Trigger.MaxUpperThreshold )
                 {
-                    Trigger.MaxUpperThreshold = Trigger.Count;
+                    Trigger.MaxUpperThreshold = Trigger.TargetCount;
                 }
             }
 
@@ -96,7 +96,7 @@ namespace FluffyManager
         public override void PreOpen()
         {
             base.PreOpen();
-            Input = Trigger.Count.ToString();
+            Input = Trigger.TargetCount.ToString();
         }
 
         #endregion Methods

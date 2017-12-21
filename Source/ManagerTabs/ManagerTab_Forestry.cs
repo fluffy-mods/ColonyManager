@@ -191,7 +191,7 @@ namespace FluffyManager
             var start = pos;
             int currentCount = _selected.Trigger.CurCount;
             int designatedCount = _selected.GetWoodInDesignations();
-            int targetCount = _selected.Trigger.Count;
+            int targetCount = _selected.Trigger.TargetCount;
 
             _selected.Trigger.DrawTriggerConfig(ref pos, width, ListEntryHeight, false,
                 "FMF.TargetCount".Translate(currentCount, designatedCount, targetCount),
@@ -208,7 +208,11 @@ namespace FluffyManager
                 width,
                 ListEntryHeight );
             AreaAllowedGUI.DoAllowedAreaSelectors( rowRect, ref _selected.LoggingArea, manager );
-            return ListEntryHeight;
+
+            rowRect.y += ListEntryHeight;
+            Utilities.DrawReachabilityToggle(rowRect, ref _selected.CheckReachable);
+
+            return rowRect.yMax - pos.y;
         }
 
         public float DrawAllowSaplings( Vector2 pos, float width )

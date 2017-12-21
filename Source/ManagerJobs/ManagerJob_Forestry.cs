@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 using static FluffyManager.Constants;
 
 namespace FluffyManager
@@ -101,7 +102,7 @@ namespace FluffyManager
 
         public override ManagerTab Tab
         {
-            get { return Manager.For( manager ).ManagerTabs.Find( tab => tab is ManagerTab_Forestry ); }
+            get { return Manager.For( manager ).Tabs.Find( tab => tab is ManagerTab_Forestry ); }
         }
 
         public override string[] Targets
@@ -220,7 +221,7 @@ namespace FluffyManager
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            History.DrawPlot( rect, Trigger.Count );
+            History.DrawPlot( rect, Trigger.TargetCount );
         }
 
         public override void ExposeData()
@@ -340,7 +341,7 @@ namespace FluffyManager
             List<Plant> trees = GetLoggableTreesSorted();
 
             // designate untill we're either out of trees or we have enough designated.
-            for (var i = 0; i < trees.Count && count < Trigger.Count; i++)
+            for (var i = 0; i < trees.Count && count < Trigger.TargetCount; i++)
             {
                 workDone = true;
                 AddDesignation(trees[i], DesignationDefOf.HarvestPlant);
@@ -422,7 +423,9 @@ namespace FluffyManager
         {
             IntVec3 position = manager.map.GetBaseCenter();
 
-            // get a list of trees that are not designated in the logging grounds and are reachable, sorted by yield / distance * 2
+#if DEBUG_PERFORMANCE
+            DeepProfiler.Start( "GetLoggableTreesSorted" );
+#endif
             List<Plant> list = manager.map.listerThings.AllThings.Where( IsValidForestryTarget )
 
                                       // OrderBy defaults to ascending, switch sign on current yield to get descending
@@ -430,6 +433,10 @@ namespace FluffyManager
                                       .OrderBy( p => -p.YieldNow() /
                                                      ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) )
                                       .ToList();
+
+#if DEBUG_PERFORMANCE
+            DeepProfiler.End();
+#endif
 
             return list;
         }
@@ -462,22 +469,24 @@ namespace FluffyManager
                    && IsValidForestryTarget( (Plant)t );
         }
 
-        private bool IsValidForestryTarget( Plant p )
+        private bool IsValidForestryTarget( Plant target )
         {
-            return p.def.plant != null
+            return target.def.plant != null
 
                    // non-biome trees won't be on the list
-                   && AllowedTrees.ContainsKey( p.def )
+                   && AllowedTrees.ContainsKey( target.def )
 
                    // also filters out non-tree plants
-                   && AllowedTrees[p.def]
-                   && p.Spawned
-                   && manager.map.designationManager.DesignationOn( p ) == null
+                   && AllowedTrees[target.def]
+                   && target.Spawned
+                   && manager.map.designationManager.DesignationOn( target ) == null
 
                    // cut only mature trees, or saplings that yield something right now.
-                   && ( ( AllowSaplings && p.YieldNow() > 1 ) || p.LifeStage == PlantLifeStage.Mature )
-                   && ( LoggingArea == null || LoggingArea.ActiveCells.Contains( p.Position ) )
-                   && manager.map.reachability.CanReachColony( p.Position );
+                   && ( ( AllowSaplings && target.YieldNow() > 1 ) || target.LifeStage == PlantLifeStage.Mature )
+                   && ( LoggingArea == null || LoggingArea.ActiveCells.Contains( target.Position ) )
+
+                   // reachable
+                   && IsReachable( target );
         }
 
         #endregion Methods

@@ -24,6 +24,8 @@
   <FM.OrderBottom>Minimum priority</FM.OrderBottom>
   <multiple>[multiple]</multiple>
   <FM.Threshold>Threshold</FM.Threshold>
+  <FM.CheckReachability>Check if targets are reachable</FM.CheckReachability>
+  <FM.CheckReachability.Tip>Disabling this setting may improve performance, particularly on large maps, mountainous maps, and colonies with high numbers of colonists.</FM.CheckReachability.Tip>
 
   <!-- time periods for update interval -->
   <FM.DefaultUpdateInterval>Default update interval</FM.DefaultUpdateInterval>

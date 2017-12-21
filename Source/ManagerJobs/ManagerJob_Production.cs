@@ -47,7 +47,7 @@
 
 //        public override ManagerTab Tab
 //        {
-//            get { return manager.ManagerTabs.Find( tab => tab is ManagerTab_Production ); }
+//            get { return manager.Tabs.Find( tab => tab is ManagerTab_Production ); }
 //        }
 
 //        public override bool IsValid

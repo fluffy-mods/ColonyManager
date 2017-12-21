@@ -498,23 +498,21 @@ namespace FluffyManager
 
         private float DrawTamingSection( Vector2 pos, float width )
         {
-            var start = pos;
-
             // try tame more?
-            var tameMoreRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            pos.y += ListEntryHeight;
+            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            DrawToggle(rowRect, "FML.TameMore".Translate(), ref _selectedCurrent.TryTameMore);
 
-            DrawToggle(tameMoreRect, "FML.TameMore".Translate(), ref _selectedCurrent.TryTameMore);
-
-            // area to train from (if taming more);
+            // area to tame from (if taming more);
             if (_selectedCurrent.TryTameMore)
             {
-                var tameAreaSelectorRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-                AreaAllowedGUI.DoAllowedAreaSelectors(tameAreaSelectorRect, ref _selectedCurrent.TameArea, manager );
-                pos.y += ListEntryHeight;
+                rowRect.y += ListEntryHeight;
+                AreaAllowedGUI.DoAllowedAreaSelectors(rowRect, ref _selectedCurrent.TameArea, manager );
+
+                rowRect.y += ListEntryHeight;
+                DrawReachabilityToggle( rowRect, ref _selectedCurrent.CheckReachable );
             }
 
-            return pos.y - start.y;
+            return rowRect.yMax - pos.y;
         }
 
         private float DrawTamedAnimalSection( Vector2 pos, float width )

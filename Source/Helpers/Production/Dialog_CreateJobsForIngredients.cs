@@ -107,7 +107,7 @@
 //                }
 
 //                // we've probably added some bills, so refresh the tab.
-//                manager.ManagerTabs.OfType<ManagerTab_Production>().FirstOrDefault()?.Refresh();
+//                manager.Tabs.OfType<ManagerTab_Production>().FirstOrDefault()?.Refresh();
 
 //                // close this window.
 //                Close();

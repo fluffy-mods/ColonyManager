@@ -27,12 +27,12 @@ namespace FluffyManager
         private JobStack _stack;
         private int id = -1;
 
-        public List<ManagerTab> ManagerTabs;
+        public List<ManagerTab> Tabs;
 
         public Manager( Map map ) : base( map )
         {
             _stack = new JobStack( this );
-            ManagerTabs = new List<ManagerTab>
+            Tabs = new List<ManagerTab>
                           {
                               new ManagerTab_Overview( this ),
                               //new ManagerTab_Production( this ),
@@ -57,7 +57,7 @@ namespace FluffyManager
             {
                 if ( _managerTabsLeft == null )
                 {
-                    _managerTabsLeft = ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Left ).ToList();
+                    _managerTabsLeft = Tabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Left ).ToList();
                 }
                 return _managerTabsLeft;
             }
@@ -70,7 +70,7 @@ namespace FluffyManager
                 if ( _managerTabsMiddle == null )
                 {
                     _managerTabsMiddle =
-                        ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Middle ).ToList();
+                        Tabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Middle ).ToList();
                 }
                 return _managerTabsMiddle;
             }
@@ -83,7 +83,7 @@ namespace FluffyManager
                 if ( _managerTabsRight == null )
                 {
                     _managerTabsRight =
-                        ManagerTabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Right ).ToList();
+                        Tabs.Where( tab => tab.IconArea == ManagerTab.IconAreas.Right ).ToList();
                 }
                 return _managerTabsRight;
             }
@@ -117,7 +117,7 @@ namespace FluffyManager
             Scribe_Values.Look( ref HelpShown, "HelpShown", false );
             Scribe_Deep.Look( ref _stack, "JobStack", this );
 
-            foreach ( ManagerTab tab in ManagerTabs )
+            foreach ( ManagerTab tab in Tabs )
             {
                 var exposableTab = tab as IExposable;
                 if ( exposableTab != null )
@@ -146,7 +146,7 @@ namespace FluffyManager
                 job.Tick();
 
             // tick tabs
-            foreach ( ManagerTab tab in ManagerTabs )
+            foreach ( ManagerTab tab in Tabs )
                 tab.Tick();
         }
 

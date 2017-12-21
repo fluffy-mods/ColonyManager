@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 using static FluffyManager.Constants;
 
 namespace FluffyManager
@@ -80,7 +81,7 @@ namespace FluffyManager
 
         public override string Label => "FMG.Foraging".Translate();
 
-        public override ManagerTab Tab => Manager.For( manager ).ManagerTabs.Find( tab => tab is ManagerTab_Foraging );
+        public override ManagerTab Tab => Manager.For( manager ).Tabs.Find( tab => tab is ManagerTab_Foraging );
 
         public override string[] Targets
             => AllowedPlants.Keys.Where( key => AllowedPlants[key] ).Select( plant => plant.LabelCap ).ToArray();
@@ -163,7 +164,7 @@ namespace FluffyManager
 
         public override void DrawOverviewDetails( Rect rect )
         {
-            History.DrawPlot( rect, Trigger.Count );
+            History.DrawPlot( rect, Trigger.TargetCount );
         }
 
         public override void ExposeData()
@@ -205,11 +206,11 @@ namespace FluffyManager
 
             // designate plants until trigger is met.
             int count = Trigger.CurCount + CurrentDesignatedCount;
-            if ( count < Trigger.Count )
+            if ( count < Trigger.TargetCount )
             {
                 List<Plant> targets = GetValidForagingTargetsSorted();
 
-                for ( var i = 0; i < targets.Count && count < Trigger.Count; i++ )
+                for ( var i = 0; i < targets.Count && count < Trigger.TargetCount; i++ )
                 {
                     var des = new Designation( targets[i], DesignationDefOf.HarvestPlant );
                     count += targets[i].YieldNow();
@@ -268,32 +269,32 @@ namespace FluffyManager
 
         private bool IsValidForagingTarget( Thing t )
         {
-            return t is Plant
-                   && IsValidForagingTarget( (Plant)t );
+            var plant = t as Plant;
+            return plant != null && IsValidForagingTarget( plant );
         }
 
-        private bool IsValidForagingTarget( Plant p )
+        private bool IsValidForagingTarget( Plant target )
         {
             // should be a plant, and be on the same map as this job
-            return p.def.plant != null
-                   && p.Map == manager.map
+            return target.def.plant != null
+                   && target.Map == manager.map
 
                    // non-biome plants won't be on the list, also filters non-yield or wood plants
-                   && AllowedPlants.ContainsKey( p.def )
-                   && AllowedPlants[p.def]
-                   && p.Spawned
-                   && manager.map.designationManager.DesignationOn( p ) == null
+                   && AllowedPlants.ContainsKey( target.def )
+                   && AllowedPlants[target.def]
+                   && target.Spawned
+                   && manager.map.designationManager.DesignationOn( target ) == null
 
                    // cut only mature plants, or non-mature that yield something right now.
-                   && ( ( !ForceFullyMature && p.YieldNow() > 1 )
-                        || p.LifeStage == PlantLifeStage.Mature )
+                   && ( ( !ForceFullyMature && target.YieldNow() > 1 )
+                        || target.LifeStage == PlantLifeStage.Mature )
 
                    // limit to area of interest
                    && ( ForagingArea == null
-                        || ForagingArea.ActiveCells.Contains( p.Position ) )
+                        || ForagingArea.ActiveCells.Contains( target.Position ) )
 
-                   // can we reach it? ( can it reach us? )
-                   && manager.map.reachability.CanReachColony( p.Position );
+                   // reachable
+                   && IsReachable( target );
         }
 
 

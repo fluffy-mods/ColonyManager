@@ -125,7 +125,7 @@ namespace FluffyManager
         {
             int currentCount = _selected.Trigger.CurCount;
             int designatedCount = _selected.CurrentDesignatedCount;
-            int targetCount = _selected.Trigger.Count;
+            int targetCount = _selected.Trigger.TargetCount;
             var start = pos;
 
             _selected.Trigger.DrawTriggerConfig(ref pos, width, ListEntryHeight, false,
@@ -146,10 +146,13 @@ namespace FluffyManager
 
         public float DrawAreaRestriction( Vector2 pos, float width )
         {
-            // Foraging area (3)
-            var foragingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            AreaAllowedGUI.DoAllowedAreaSelectors(foragingAreaRect, ref _selected.ForagingArea, manager );
-            return ListEntryHeight;
+            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            AreaAllowedGUI.DoAllowedAreaSelectors(rowRect, ref _selected.ForagingArea, manager );
+
+            rowRect.y += ListEntryHeight;
+            Utilities.DrawReachabilityToggle(rowRect, ref _selected.CheckReachable);
+
+            return rowRect.yMax - pos.y;
         }
 
         public float DrawPlantShortcuts( Vector2 pos, float width )

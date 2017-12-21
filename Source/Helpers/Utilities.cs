@@ -58,8 +58,7 @@ namespace FluffyManager
             // we need to define a 'base' position to calculate distances.
             // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
             IntVec3 position = IntVec3.Zero;
-            Building managerStation =
-                map.listerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
+            Building managerStation = map.listerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
             if ( managerStation != null )
             {
                 position = managerStation.Position;
@@ -364,15 +363,27 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
+        public static void DrawReachabilityToggle( Rect rect, ref bool reachability )
+        {
+            DrawToggle( rect, "FM.CheckReachability".Translate(), ref reachability );
+
+            var iconRect = new Rect(
+                rect.xMax - ( SmallIconSize + Margin ) * 2,
+                0f,
+                SmallIconSize,
+                SmallIconSize ).CenteredOnYIn( rect );
+            TooltipHandler.TipRegion( iconRect, "FM.CheckReachability.Tip".Translate() );
+            GUI.color = Color.grey;
+            GUI.DrawTexture( iconRect, Resources.Stopwatch );
+            GUI.color = Color.white;
+        }
+
         public static void DrawToggle( Rect rect, string label, ref bool checkOn, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small, bool wrap = true )
         {
             // set up rects
             Rect labelRect = rect;
             labelRect.xMax -= size + margin * 2;
-            var checkRect = new Rect( rect.xMax - size - margin, 0f, size, size );
-
-            // finetune rects
-            checkRect = checkRect.CenteredOnYIn( labelRect );
+            var checkRect = new Rect( rect.xMax - size - margin, 0f, size, size ).CenteredOnYIn(labelRect);
 
             // draw label
             Label( labelRect, label, TextAnchor.MiddleLeft, font, margin: margin, wrap: wrap );
