@@ -6,7 +6,6 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Reloader;
 using UnityEngine;
 using Verse;
 using Verse.AI;
@@ -459,24 +458,23 @@ namespace FluffyManager
                    && IsValidHuntingTarget( (Pawn)t.Thing );
         }
 
-        [ReloadMethod]
         private bool IsValidHuntingTarget( Pawn target )
         {
-            //Logger.Debug( target.LabelShort );
-            //Logger.Debug( "\tAnimal: " + target.RaceProps.Animal );
-            //Logger.Debug( "\tAlive: " + !target.health.Dead );
-            //Logger.Debug( "\tSpawned: " + target.Spawned );
-            //Logger.Debug( "\tWild: " + ( target.Faction != Faction.OfPlayer ) );
-            //Logger.Debug( "\tListed: " + AllowedAnimals.ContainsKey( target.kindDef ) );
-            //if ( !AllowedAnimals.ContainsKey( target.kindDef ) )
+            Logger.Debug(target.LabelShort);
+            Logger.Debug("\tAnimal: " + target.RaceProps.Animal);
+            Logger.Debug("\tAlive: " + !target.health.Dead);
+            Logger.Debug("\tSpawned: " + target.Spawned);
+            Logger.Debug("\tWild: " + (target.Faction != Faction.OfPlayer));
+            Logger.Debug("\tListed: " + AllowedAnimals.ContainsKey(target.kindDef));
+            //if (!AllowedAnimals.ContainsKey(target.kindDef))
             //    return false;
-            //Logger.Debug( "\tAllowed: " + AllowedAnimals[target.kindDef] );
-            //Logger.Debug( "\tNot designated: " + ( manager.map.designationManager.DesignationOn( target ) == null ) );
-            //Logger.Debug( "\tIn hunting grounds: " + ( HuntingGrounds == null || HuntingGrounds.ActiveCells.Contains( target.Position ) ) );
-            //Logger.Debug( "\tFogged: " + !target.Position.Fogged( manager.map ) );
-            //Logger.Debug( "\tReachable: " +
-            //              manager.map.mapPawns.FreeColonistsSpawned.Any( p => p.CanReach( p, PathEndMode.Touch,
-            //                  Danger.Some ) ) );
+            Logger.Debug("\tAllowed: " + AllowedAnimals[target.kindDef]);
+            Logger.Debug("\tNot designated: " + (manager.map.designationManager.DesignationOn(target) == null));
+            Logger.Debug("\tIn hunting grounds: " + (HuntingGrounds == null || HuntingGrounds.ActiveCells.Contains(target.Position)));
+            Logger.Debug("\tFogged: " + !target.Position.Fogged(manager.map));
+            Logger.Debug("\tReachable: " +
+                          manager.map.mapPawns.FreeColonistsSpawned.Any(p => p.CanReach(p, PathEndMode.Touch,
+                             Danger.Some)));
 
             return target.RaceProps.Animal
                    && !target.health.Dead
