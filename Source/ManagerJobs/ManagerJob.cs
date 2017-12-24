@@ -79,7 +79,7 @@ namespace FluffyManager
             {
                 var path = target.Map.pathFinder.FindPath( source, target,
                     TraverseParms.For( TraverseMode.PassDoors, Danger.Some ), PathEndMode.Touch );
-                var cost = path.TotalCost;
+                var cost = path.Found ? path.TotalCost : int.MaxValue;
                 path.ReleaseToPool();
                 return cost * 2;
             }
