@@ -297,7 +297,7 @@ namespace FluffyManager
 
         public override void Tick()
         {
-            History.Update( Trigger.CurCount, GetWoodInDesignations() );
+            History.Update( Trigger.CurrentCount, GetWoodInDesignations() );
         }
 
         public override bool TryDoJob()
@@ -335,7 +335,7 @@ namespace FluffyManager
             AddRelevantGameDesignations();
             
             // get current lumber count
-            int count = Trigger.CurCount + GetWoodInDesignations();
+            int count = Trigger.CurrentCount + GetWoodInDesignations();
 
             // get sorted list of loggable trees
             List<Plant> trees = GetLoggableTreesSorted();
@@ -430,8 +430,7 @@ namespace FluffyManager
 
                                       // OrderBy defaults to ascending, switch sign on current yield to get descending
                                       .Select( p => p as Plant )
-                                      .OrderBy( p => -p.YieldNow() /
-                                                     ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) )
+                                      .OrderBy( p => -p.YieldNow() / Distance( p, position ) )
                                       .ToList();
 
 #if DEBUG_PERFORMANCE

@@ -20,5 +20,7 @@ namespace FluffyManager
         public const float TitleHeight = 50f;
         public const float TopAreaHeight = 30f;
         public const float SectionHeaderHeight = 25f;
+        public const int MaxRegionDistance = 4;
+        public const float MaxPathCost = 500f;
     }
 }

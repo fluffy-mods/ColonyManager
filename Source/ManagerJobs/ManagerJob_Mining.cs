@@ -1,293 +1,699 @@
-﻿//// ManagerJob_Mining.cs
-//// Copyright Karel Kroeze, 2017-2017
+﻿// ManagerJob_Mining.cs
+// Copyright Karel Kroeze, 2017-2017
 
-//using RimWorld;
-//using System.Collections.Generic;
-//using System.Linq;
-//using UnityEngine;
-//using Verse;
-//using static FluffyManager.Constants;
+using System;
+using RimWorld;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
+using static FluffyManager.Constants;
 
-//namespace FluffyManager
-//{
-//    public class ManagerJob_Mining: ManagerJob
-//    {
-//        public Dictionary<ThingDef, bool> AllowedMinerals = new Dictionary<ThingDef, bool>();
-//        public List<Designation> Designations = new List<Designation>();
-//        public History History;
-//        public Area MiningArea;
-//        public new Trigger_Threshold Trigger;
-//        private Utilities.CachedValue<int> _designatedCachedValue = new Utilities.CachedValue<int>();
-//        private Utilities.CachedValue<int> _chunksCachedValue = new Utilities.CachedValue<int>();
+namespace FluffyManager
+{
+    public class ManagerJob_Mining : ManagerJob
+    {
+        public enum SyncDirection
+        {
+            FilterToAllowed,
+            AllowedToFilter
+        }
 
-//        public bool DeconstructChunks = true;
-//        public bool DeconstructBuildings = false;
-//        public bool CheckRoofSupport = true;
-//        public bool CheckRoofSupportAdvanced = false;
-//        public bool CheckRoomDivision = true;
+        public Dictionary<ThingDef, bool> AllowedMinerals = new Dictionary<ThingDef, bool>();
+        public Dictionary<ThingDef, bool> AllowedBuildings = new Dictionary<ThingDef, bool>();
+        public List<Designation> Designations = new List<Designation>();
+        public History History;
+        public Area MiningArea;
+        public new Trigger_Threshold Trigger;
+        private Utilities.CachedValue<int> _designatedCachedValue = new Utilities.CachedValue<int>();
+        private Utilities.CachedValue<int> _chunksCachedValue = new Utilities.CachedValue<int>();
+        public SyncDirection Sync = SyncDirection.AllowedToFilter;
 
-//        public ManagerJob_Mining( Manager manager ) : base( manager )
-//        {
-//            // populate the trigger field, set the root category to meats and allow all but human & insect meat.
-//            Trigger = new Trigger_Threshold( this );
+        private const int RoofSupportGridSpacing = 5;
 
-//            // start the history tracker;
-//            History = new History(new[] { "stock", "chunks", "designated" },
-//                new[] { Color.white, new Color(.7f, .7f, .7f), new Color(.4f, .4f, .4f) });
+        public bool SyncFilterAndAllowed = true;
+        public bool DeconstructBuildings = false;
+        public bool CheckRoofSupport = true;
+        public bool CheckRoofSupportAdvanced = false;
+        public bool CheckRoomDivision = true;
 
-//            // init stuff if we're not loading
-//            if (Scribe.mode == LoadSaveMode.Inactive)
-//                RefreshAllowedMinerals();
-//        }
+        public ManagerJob_Mining(Manager manager) : base(manager)
+        {
+            // populate the trigger field, set the root category to meats and allow all but human & insect meat.
+            Trigger = new Trigger_Threshold(this);
 
-//        public override string Label => "FM.Mining".Translate();
-//        public override ManagerTab Tab => manager.Tabs.Find(tab => tab is ManagerTab_Mining );
+            // start the history tracker;
+            History = new History(new[] { "stock", "chunks", "designated" },
+                new[] { Color.white, new Color(.7f, .7f, .7f), new Color(.4f, .4f, .4f) });
 
-//        public override string[] Targets => AllowedMinerals.Keys
-//            .Where( key => AllowedMinerals[key] )
-//            .Select( pk => pk.LabelCap ).ToArray();
+            // init stuff if we're not loading
+            if (Scribe.mode == LoadSaveMode.Inactive)
+                RefreshAllowedMinerals();
+        }
 
-//        public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Mining;
-//        public override void CleanUp()
-//        {
-//            RemoveObsoleteDesignations();
-//            foreach( var designation in Designations )
-//                designation.Delete();
+        public override bool Completed => !Trigger.State;
+        public override string Label => "FM.Mining".Translate();
+        public override ManagerTab Tab => manager.Tabs.Find(tab => tab is ManagerTab_Mining);
 
-//            Designations.Clear();
-//        }
+        public override string[] Targets => AllowedMinerals.Keys
+            .Where(key => AllowedMinerals[key])
+            .Select(pk => pk.LabelCap).ToArray();
 
-//        private void RemoveObsoleteDesignations()
-//        {
-//            // get the intersection of bills in the game and bills in our list.
-//            var designations = manager.map.designationManager.allDesignations.Where( d =>
-//                ( d.def == DesignationDefOf.Mine || d.def == DesignationDefOf.Deconstruct ) &&
-//                ( !d.target.HasThing || d.target.Thing.Map == manager.map ) ); // equates to SpawnedDesignationsOfDef, with two defs.
-//            Designations = Designations.Intersect( designations ).ToList();
-//        }
+        public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Mining;
+        public override void CleanUp()
+        {
+            RemoveObsoleteDesignations();
+            foreach (var designation in Designations)
+                designation.Delete();
 
-//        public override void DrawListEntry(Rect rect, bool overview = true, bool active = true)
-//        {
-//            // (detailButton) | name | (bar | last update)/(stamp) -> handled in Utilities.DrawStatusForListEntry
-//            int shownTargets = overview ? 4 : 3; // there's more space on the overview
+            Designations.Clear();
+        }
 
-//            // set up rects
-//            Rect labelRect = new Rect(Margin, Margin, rect.width -
-//                                                      (active ? StatusRectWidth + 4 * Margin : 2 * Margin),
-//                    rect.height - 2 * Margin),
-//                statusRect = new Rect(labelRect.xMax + Margin, Margin, StatusRectWidth, rect.height - 2 * Margin);
+        private void RemoveObsoleteDesignations()
+        {
+            // get the intersection of bills in the game and bills in our list.
+            var designations = manager.map.designationManager.allDesignations.Where(d =>
+               (d.def == DesignationDefOf.Mine || d.def == DesignationDefOf.Deconstruct) &&
+               (!d.target.HasThing || d.target.Thing.Map == manager.map)); // equates to SpawnedDesignationsOfDef, with two defs.
+            Designations = Designations.Intersect(designations).ToList();
+        }
 
-//            // create label string
-//            string text = Label + "\n";
-//            string subtext = string.Join(", ", Targets);
-//            if (subtext.Fits(labelRect))
-//                text += subtext.Italic();
-//            else
-//                text += "multiple".Translate().Italic();
+        public override void DrawListEntry(Rect rect, bool overview = true, bool active = true)
+        {
+            // (detailButton) | name | (bar | last update)/(stamp) -> handled in Utilities.DrawStatusForListEntry
+            int shownTargets = overview ? 4 : 3; // there's more space on the overview
 
-//            // do the drawing
-//            GUI.BeginGroup(rect);
+            // set up rects
+            Rect labelRect = new Rect(Margin, Margin, rect.width -
+                                                      (active ? StatusRectWidth + 4 * Margin : 2 * Margin),
+                    rect.height - 2 * Margin),
+                statusRect = new Rect(labelRect.xMax + Margin, Margin, StatusRectWidth, rect.height - 2 * Margin);
 
-//            // draw label
-//            Widgets_Labels.Label(labelRect, text, subtext, TextAnchor.MiddleLeft, margin: Margin);
+            // create label string
+            string text = Label + "\n";
+            string subtext = string.Join(", ", Targets);
+            if (subtext.Fits(labelRect))
+                text += subtext.Italic();
+            else
+                text += "multiple".Translate().Italic();
 
-//            // if the bill has a manager job, give some more info.
-//            if (active)
-//            {
-//                this.DrawStatusForListEntry(statusRect, Trigger);
-//            }
-//            GUI.EndGroup();
-//        }
+            // do the drawing
+            GUI.BeginGroup(rect);
 
-//        public override void DrawOverviewDetails( Rect rect )
-//        {
-//            History.DrawPlot( rect, Trigger.TargetCount );
-//        }
+            // draw label
+            Widgets_Labels.Label(labelRect, text, subtext, TextAnchor.MiddleLeft, margin: Margin);
 
-//        public override void ExposeData()
-//        {
-//            base.ExposeData();
+            // if the bill has a manager job, give some more info.
+            if (active)
+            {
+                this.DrawStatusForListEntry(statusRect, Trigger);
+            }
+            GUI.EndGroup();
+        }
 
-//            Scribe_References.Look( ref MiningArea, "MiningArea" );
-//            Scribe_Deep.Look( ref Trigger, "Trigger", manager );
-//            Scribe_Collections.Look( ref AllowedMinerals, "AllowedMinerals", LookMode.Def, LookMode.Value );
-//            Scribe_Values.Look( ref DeconstructChunks, "DeconstructChunks", true );
-//            Scribe_Values.Look( ref DeconstructBuildings, "DeconstructBuildings", false );
-//            Scribe_Values.Look( ref CheckRoofSupport, "CheckRoofSupport", true );
-//            Scribe_Values.Look( ref CheckRoofSupportAdvanced, "CheckRoofSupportAdvanced", false );
-//            Scribe_Values.Look( ref CheckRoomDivision, "CheckRoomDivision", true );
+        public override void DrawOverviewDetails(Rect rect)
+        {
+            History.DrawPlot(rect, Trigger.TargetCount);
+        }
 
-//            // don't store history in import/export mode.
-//            if (Manager.LoadSaveMode == Manager.Modes.Normal)
-//            {
-//                Scribe_Deep.Look(ref History, "History");
-//            }
-//        }
+        public override void ExposeData()
+        {
+            base.ExposeData();
 
-//        public override void Tick()
-//        {
-//            History.Update( Trigger.CurCount, GetMineralsInChunks(), GetMineralsInDesignations() );
-//        }
+            Scribe_References.Look(ref MiningArea, "MiningArea");
+            Scribe_Deep.Look(ref Trigger, "Trigger", manager);
+            Scribe_Collections.Look(ref AllowedMinerals, "AllowedMinerals", LookMode.Def, LookMode.Value);
+            Scribe_Collections.Look(ref AllowedBuildings, "AllowedBuildings", LookMode.Def, LookMode.Value);
+            Scribe_Values.Look(ref SyncFilterAndAllowed, "SyncFilterAndAllowed", true );
+            Scribe_Values.Look(ref DeconstructBuildings, "DeconstructBuildings", false);
+            Scribe_Values.Look(ref CheckRoofSupport, "CheckRoofSupport", true);
+            Scribe_Values.Look(ref CheckRoofSupportAdvanced, "CheckRoofSupportAdvanced", false);
+            Scribe_Values.Look(ref CheckRoomDivision, "CheckRoomDivision", true);
 
-//        public override bool TryDoJob()
-//        {
-//            var workDone = false;
+            // don't store history in import/export mode.
+            if (Manager.LoadSaveMode == Manager.Modes.Normal)
+            {
+                Scribe_Deep.Look(ref History, "History");
+            }
+        }
 
-//            RemoveObsoleteDesignations();
-//            AddRelevantGameDesignations();
+        public override void Tick()
+        {
+            History.Update(Trigger.CurrentCount, GetCountInChunks(), GetCountInDesignations());
+        }
 
-//            int count = Trigger.CurCount + GetMineralsInChunks() + GetMineralsInDesignations();
+        public override bool TryDoJob()
+        {
+            var workDone = false;
 
-//            if ( DeconstructChunks )
-//            {
-//                var chunks = GetDeconstructableChunks();
-//                for (int i = 0; i < chunks.Length && count < Trigger.TargetCount; i++)
-//                {
-//                    AddDesignation( chunks[i], DesignationDefOf.Deconstruct );
-//                    count += chunks[i].Yield;
-//                }
-//            }
+            RemoveObsoleteDesignations();
+            AddRelevantGameDesignations();
 
-//            if ( DeconstructBuildings )
-//            {
-//                var buildings = GetDeconstructableBuildings();
-//                for ( int i = 0; i < buildings.Length && count < Trigger.TargetCount; i++ )
-//                {
-//                    AddDesignation( buildings[i], DesignationDefOf.Deconstruct );
-//                    count += buildings[i].Yield;
-//                }
-//            }
+            int count = Trigger.CurrentCount + GetCountInChunks() + GetCountInDesignations();
 
-//            var minerals = GetMinableMineralsSorted();
-//            for ( int i = 0; i < minerals.Length && count < Trigger.TargetCount; i++ )
-//            {
-//                AddDesignation( minerals[i], DesignationDefOf.Mine );
-//                count += minerals[i].Yield;
-//            }
+            if ( DeconstructBuildings )
+            {
+                var buildings = GetDeconstructibleBuildingsSorted();
+                for ( int i = 0; i < buildings.Count && count < Trigger.TargetCount; i++ )
+                {
+                    AddDesignation( buildings[i], DesignationDefOf.Deconstruct );
+                    count += GetCountInBuilding( buildings[i] );
+                }
+            }
 
-//            return workDone;
-//        }
+            var minerals = GetMinableMineralsSorted();
+            for ( int i = 0; i < minerals.Count && count < Trigger.TargetCount; i++ )
+            {
+                if ( !IsARoofSupport_Advanced( minerals[i] ) )
+                {
+                    AddDesignation( minerals[i], DesignationDefOf.Mine );
+                    count += GetCountInMineral( minerals[i] );
+                }
 
-//        public void AddRelevantGameDesignations()
-//        {
-//            foreach ( Designation des in manager.map.designationManager
-//                .SpawnedDesignationsOfDef( DesignationDefOf.Mine )
-//                .Except( Designations )
-//                .Where( des => IsValidMiningTarget( des.target ) ) )
-//            {
-//                AddDesignation( des );
-//            }
-//            foreach ( Designation des in manager.map.designationManager
-//                .SpawnedDesignationsOfDef( DesignationDefOf.Deconstruct )
-//                .Except( Designations )
-//                .Where( des => IsValidDeconstructionTarget( des.target ) ) )
-//            {
-//                AddDesignation( des );
-//            }
-//        }
+            }
 
-//        public bool IsValidMiningTarget( LocalTargetInfo target )
-//        {
-//            return target.HasThing
-//                   && target.IsValid
-//                   && IsValidMiningTarget( target.Thing );
-//        }
+            return workDone;
+        }
 
-//        public bool IsValidMiningTarget( Thing mineral )
-//        {
-//            // mineable
-//            return mineral.def.mineable
+        public int GetCountInChunks()
+        {
+            int count;
+            if ( _chunksCachedValue.TryGetValue( out count ) )
+                return count;
 
-//                   // allowed
-//                   && AllowedMinerals.ContainsKey( mineral.def )
-//                   && AllowedMinerals[mineral.def]
+            count = manager.map.listerThings.AllThings
+                .Where( t => t.Faction == Faction.OfPlayer
+                             && !t.IsForbidden( Faction.OfPlayer )
+                             && IsChunk( t.def ) )
+                .Sum( GetCountInChunk );
 
-//                   // not yet designated
-//                   && manager.map.designationManager.DesignationOn( mineral ) == null
+            _chunksCachedValue.Update( count );
+            return count;
+        }
 
-//                   // matches settings
-//                   && IsInAllowedArea( mineral)
-//                   && IsNotARoomDivider(mineral)
-//                   && IsNotARoofSupport( mineral )
+        public int GetCountInDesignations()
+        {
+            int count = 0;
+            if (_designatedCachedValue.TryGetValue(out count))
+                return count;
 
-//                   // can be reached
-//                   && manager.map.reachability.CanReachColony( mineral.Position );
-//        }
+            // deconstruction jobs
+            count += Designations.Where( d => d.def == DesignationDefOf.Deconstruct )
+                .Sum( d => GetCountInBuilding( d.target.Thing as Building ) );
 
-//        public bool IsValidDeconstructionTarget( Building target )
-//        {
-//            return target.Spawned
+            // mining jobs
+            var mineralCounts = Designations.Where( d => d.def == DesignationDefOf.Mine )
+                .Select( d => manager.map.thingGrid.ThingsListAtFast( d.target.Cell ).FirstOrDefault()?.def )
+                .Where( d => d != null )
+                .GroupBy( d => d, d => d, ( d, g ) => new {def = d, count = g.Count()} )
+                .Where( g => Allowed( g.def ) );
 
-//                   // not ours
-//                   && target.Faction != Faction.OfPlayer
+            foreach ( var mineralCount in mineralCounts )
+                count += GetCountInMineral( mineralCount.def ) * mineralCount.count;
 
-//                   // allowed
-//                   && !target.IsForbidden( Faction.OfPlayer )
-//                   && AllowedBuildings.ContainsKey( target.def )
-//                   && AllowedBuildings[target.def]
+            _designatedCachedValue.Update( count );
+            return count;
+        }
 
-//                   // in allowed area & reachable
-//                   && IsInAllowedArea( target )
-//                   && manager.map.reachability.CanReachColony( target.Position );
-//            manager.map.reachability.CanReachUnfogged(  )
-//        }
+        public int GetCountInBuilding( Building building )
+        {
+            var def = building?.def;
+            if ( def == null )
+                return 0;
 
-//        public bool IsInAllowedArea( Thing target )
-//        {
-//            return MiningArea == null || MiningArea.ActiveCells.Contains( target.Position );
-//        }
+            var count = def.CostListAdjusted( building.Stuff )
+                .Where( Counted )
+                .Sum( tc => tc.count * def.resourcesFractionWhenDeconstructed );
+            return Mathf.RoundToInt( count );
+        }
 
-//        public bool IsNotARoofSupport( Thing target )
-//        {
-//            if ( !CheckRoofSupport )
-//                return true;
+        public int GetCountInMineral( Mineable rock )
+        {
+            return GetCountInMineral( rock.def );
+        }
 
-//            if ( CheckRoofSupportAdvanced )
-//            {
-//                //
-//            }
-//            else
-//            {
-//                //
-//            }
-//        }
+        public int GetCountInMineral( ThingDef rock )
+        {
+            var resource = rock.building?.mineableThing;
+            if ( resource == null )
+                return 0;
 
-//        public bool IsNotARoomDivider( Thing target )
-//        {
-//            if ( !CheckRoomDivision )
-//                return true;
+            // stone chunks
+            if ( IsChunk( resource ) )
+                return (int) ( GetCountInChunk( resource ) * rock.building.mineableDropChance);
 
-//            //
-//        }
+            // metals
+            if ( Counted( resource ) )
+                return (int) ( rock.building.mineableYield * rock.building.mineableDropChance );
 
-//        public bool IsValidDeconstructionTarget(LocalTargetInfo target)
-//        {
-//            return target.HasThing
-//                   && target.IsValid
-//                   && target.Thing is Building
-//                   && IsValidDeconstructionTarget( target.Thing );
-//        }
+            return 0;
+        }
 
-//        public bool IsValidDeconstructionTarget( Building target )
-//        {
-            
-//        }
+        public bool IsChunk( ThingDef def )
+        {
+            return def?.thingCategories?.Any( c => ThingCategoryDefOf.Chunks.ThisAndChildCategoryDefs.Contains( c ) ) ?? false;
+        }
 
-//        public void AddDesignation( Designation designation )
-//        {
-//            manager.map.designationManager.AddDesignation(designation);
-//            Designations.Add(designation);
-//        }
+        public bool Allowed( ThingDef thingDef )
+        {
+            if (thingDef == null)
+                return false;
+            return AllowedMineral( thingDef ) || AllowedBuilding( thingDef );
+        }
+
+        public void SetAllowMineral( ThingDef mineral, bool allow, bool sync = true )
+        {
+            if ( mineral == null )
+                throw new ArgumentNullException( nameof( mineral ) );
+            AllowedMinerals[mineral] = allow;
+
+            if ( SyncFilterAndAllowed && sync )
+            {
+                Sync = SyncDirection.AllowedToFilter;
+                foreach ( var material in GetMaterialsInMineral( mineral ) )
+                {
+                    if ( Trigger.ParentFilter.Allows( material ) )
+                    {
+                        Trigger.ThresholdFilter.SetAllow( material, allow );
+                    }
+                }
+            }
+        }
+
+        public List<ThingDef> GetMaterialsInMineral( ThingDef mineral )
+        {
+            var resource = mineral.building?.mineableThing;
+            if ( resource == null )
+                return new List<ThingDef>();
+
+            // stone chunks
+            if ( IsChunk( resource ) )
+                return GetMaterialsInChunk( resource );
+
+            // metals
+            var list = new List<ThingDef>();
+            list.Add( resource );
+            return list;
+        }
+
+        public List<ThingDef> GetMaterialsInChunk( ThingDef chunk )
+        {
+            var materials = new List<ThingDef>();
+            materials.Add( chunk );
+
+            if ( !chunk.butcherProducts.NullOrEmpty() )
+                materials.AddRange( chunk.butcherProducts.Select( tc => tc.thingDef ) );
+
+            return materials;
+        }
+
+        public void SetAllowBuilding( ThingDef building, bool allow, bool sync = true )
+        {
+            if ( building == null )
+                throw new ArgumentNullException( nameof( building ) );
+            AllowedBuildings[building] = allow;
+
+            if ( SyncFilterAndAllowed && sync )
+            {
+                Sync = SyncDirection.AllowedToFilter;
+                foreach ( var material in GetMaterialsInBuilding( building ) )
+                {
+                    if ( Trigger.ParentFilter.Allows( material ) )
+                    {
+                        Trigger.ThresholdFilter.SetAllow( material, allow );
+                    }
+                }
+            }
+        }
+
+        public List<ThingDef> GetMaterialsInBuilding(ThingDef building)
+        {
+            if ( building == null )
+                return new List<ThingDef>();
+
+            var baseCosts = building.costList.NullOrEmpty()
+                ? new List<ThingDef>()
+                : building.costList.Select( tc => tc.thingDef );
+            var possibleStuffs = DefDatabase<ThingDef>.AllDefsListForReading
+                .Where( td => td.IsStuff
+                              && !td.stuffProps.categories.NullOrEmpty()
+                              && !building.stuffCategories.NullOrEmpty()
+                              && td.stuffProps.categories.Intersect( building.stuffCategories ).Any() );
+
+            return baseCosts.Concat( possibleStuffs ).ToList();
+        }
+
+        public bool AllowedMineral(ThingDef thingDef)
+        {
+            if ( thingDef == null )
+                return false;
+            return AllowedMinerals.ContainsKey(thingDef) && AllowedMinerals[thingDef];
+        }
+
+        public bool AllowedBuilding(ThingDef thingDef)
+        {
+            if (thingDef == null)
+                return false;
+            return AllowedBuildings.ContainsKey(thingDef) && AllowedBuildings[thingDef];
+        }
+
+        public bool Counted( ThingCountClass thingCount )
+        {
+            return Counted( thingCount.thingDef );
+        }
+
+        public bool Counted( ThingDef thingDef )
+        {
+            return Trigger.ThresholdFilter.Allows( thingDef );
+        }
+
+        public int GetCountInChunk( Thing chunk )
+        {
+            return GetCountInChunk( chunk.def );
+        }
+
+        public int GetCountInChunk( ThingDef chunk )
+        {
+            if (chunk.butcherProducts.NullOrEmpty())
+                return 0;
+
+            return chunk.butcherProducts
+                .Where(Counted)
+                .Sum(tc => tc.count);
+        }
+
+        public List<Building> GetDeconstructibleBuildingsSorted()
+        {
+            var position = manager.map.GetBaseCenter();
+
+            return manager.map.listerThings.ThingsInGroup( ThingRequestGroup.BuildingArtificial ).OfType<Building>()
+                .Where( IsValidDeconstructionTarget )
+                .OrderBy( b => -GetCountInBuilding( b ) / Distance( b, position ) )
+                .ToList();
+        }
+
+        public List<Mineable> GetMinableMineralsSorted()
+        {
+            var position = manager.map.GetBaseCenter();
+
+            return manager.map.listerThings.AllThings.OfType<Mineable>()
+                .Where( IsValidMiningTarget )
+                .OrderBy( r => -GetCountInMineral( r ) / Distance( r, position ) )
+                .ToList();
+        }
+
+        public void AddRelevantGameDesignations()
+        {
+            foreach (Designation des in manager.map.designationManager
+                .SpawnedDesignationsOfDef(DesignationDefOf.Mine)
+                .Except(Designations)
+                .Where(des => IsValidMiningTarget(des.target)))
+            {
+                AddDesignation(des);
+            }
+            foreach (Designation des in manager.map.designationManager
+                .SpawnedDesignationsOfDef(DesignationDefOf.Deconstruct)
+                .Except(Designations)
+                .Where(des => IsValidDeconstructionTarget(des.target)))
+            {
+                AddDesignation(des);
+            }
+        }
+
+        public bool IsValidMiningTarget(LocalTargetInfo target)
+        {
+            return target.HasThing
+                   && target.IsValid
+                   && IsValidMiningTarget(target.Thing as Mineable );
+        }
+
+        public bool IsValidMiningTarget(Mineable target)
+        {
+            // mineable
+            return target != null
+                   && target.def.mineable
+
+                   // allowed
+                   && AllowedMineral( target.def )
+
+                   // discovered 
+                   // NOTE: also in IsReachable, but we expect a lot of fogged tiles, so move this check up a bit.
+                   && !target.Position.Fogged( manager.map )
+
+                   // not yet designated
+                   && manager.map.designationManager.DesignationOn( target ) == null
+
+                   // matches settings
+                   && IsInAllowedArea( target )
+                   && IsRelevantMiningTarget( target )
+                   && !IsARoomDivider( target )
+                   && !IsARoofSupport_Basic( target ) // note, returns true if advanced checking is enabled - checks will then be done before designating
+
+                   // can be reached
+                   && IsReachable( target );
+        }
+
+        public bool IsRelevantDeconstructionTarget( Building target )
+        {
+            return target.def.building.IsDeconstructible
+                   && target.def.resourcesFractionWhenDeconstructed > 0
+                   && target.def.CostListAdjusted( target.Stuff )
+                       .Any( tc => Trigger.ThresholdFilter.Allows( tc.thingDef ) );
+        }
+
+        public bool IsRelevantMiningTarget( Mineable target )
+        {
+            return GetCountInMineral( target ) > 0;
+        }
+
+        public bool IsValidDeconstructionTarget(Building target)
+        {
+            return target != null
+                   && target.Spawned
+
+                   // not ours
+                   && target.Faction != Faction.OfPlayer
+
+                   // not already designated
+                   && manager.map.designationManager.DesignationOn( target ) == null
+
+                   // allowed
+                   && !target.IsForbidden( Faction.OfPlayer )
+                   && AllowedBuilding( target.def )
+
+                   // drops things we want
+                   && IsRelevantDeconstructionTarget( target )
+
+                   // in allowed area & reachable
+                   && IsInAllowedArea( target )
+                   && IsReachable( target )
+
+                   // doesn't create safety hazards
+                   && !IsARoofSupport_Basic( target )
+                   && !IsARoomDivider( target );
+        }
 
 
-//        private void AddDesignation( Thing target, DesignationDef designationDef )
-//        {
-//            AddDesignation( new Designation( target, designationDef ) );
-//        }
 
-//        public void RefreshAllowedMinerals()
-//        {
-//            TODO_IMPLEMENT_ME();
-//        }
-//    }
-//}
+        public bool IsInAllowedArea(Thing target)
+        {
+            return MiningArea == null || MiningArea.ActiveCells.Contains(target.Position);
+        }
+
+        public bool IsARoofSupport_Basic( Building building )
+        {
+            if ( !CheckRoofSupport || CheckRoofSupportAdvanced )
+                return false;
+
+            // simply check location, leaving a grid of pillars
+            return IsARoofSupport_Basic( building.Position );
+        }
+
+        public bool IsARoofSupport_Basic( IntVec3 cell )
+        {
+            return cell.x % RoofSupportGridSpacing == 0 && cell.z % RoofSupportGridSpacing == 0;
+        }
+
+        public bool IsARoofSupport_Advanced( Building building )
+        {
+            if ( !CheckRoofSupport || !CheckRoofSupportAdvanced )
+                return false;
+
+            // check if any cell in roofing range would collapse if this cell were to be removed
+            for ( int i = RoofCollapseUtility.RoofSupportRadialCellsCount - 1; i >= 0; i-- )
+                if ( WouldCollapseIfSupportDestroyed( GenRadial.RadialPattern[i] + building.Position, building.Position, manager.map ) )
+                    return true;
+            return false;
+        }
+
+        // largely copypasta from RoofCollapseUtility.WithinRangeOfRoofHolder
+        // TODO: PERFORMANCE; maintain a cellgrid of 'safe' supported areas.
+        private static bool WouldCollapseIfSupportDestroyed( IntVec3 position, IntVec3 support, Map map )
+        {
+            if ( !position.InBounds( map) || !position.Roofed( map ))
+                return false;
+
+            // cell indexes and buildings on map indexed by cellIndex
+            CellIndices cellIndices = map.cellIndices;
+            Building[] innerArray = map.edificeGrid.InnerArray;
+
+            for (int i = 0; i < RoofCollapseUtility.RoofSupportRadialCellsCount; i++)
+            {
+                Logger.Debug( i.ToString() );
+                IntVec3 candidate = position + GenRadial.RadialPattern[i];
+                if ( candidate != support && candidate.InBounds(map))
+                {
+                    Building building = innerArray[cellIndices.CellToIndex( candidate )];
+#if DEBUG
+                    map.debugDrawer.FlashCell(candidate, DebugSolidColorMats.MaterialOf( new Color( 0f, 0f, 1f, .1f )), ".", 500 );
+#endif
+                    if (building != null && building.def.holdsRoof && !IsDesignatedForRemoval( building, map ) )
+                    {
+#if DEBUG
+                        map.debugDrawer.FlashCell( candidate, DebugSolidColorMats.MaterialOf(new Color(0f, 1f, 0f, .1f)), "!", 500 );
+                        map.debugDrawer.FlashCell( position, DebugSolidColorMats.MaterialOf(new Color(0f, 1f, 0f, .1f)), "V", 500 );
+#endif
+                        return false;
+                    }
+                }
+            }
+#if DEBUG
+            map.debugDrawer.FlashCell( position, DebugSolidColorMats.MaterialOf( Color.red ), "X" );
+#endif
+            return true;
+        }
+
+        public static bool IsDesignatedForRemoval( Building building, Map map )
+        {
+            var designation = map.designationManager.DesignationOn( building );
+
+            return designation != null && ( designation.def == DesignationDefOf.Mine ||
+                                            designation.def == DesignationDefOf.Deconstruct );
+        }
+
+        public bool IsARoomDivider(Thing target)
+        {
+            if (!CheckRoomDivision)
+                return false;
+
+            var adjacent = GenAdjFast.AdjacentCells8Way( target.Position )
+                .Where( c => c.InBounds( manager.map )
+                             && !c.Fogged( manager.map )
+                             && !c.Impassable( manager.map ) )
+                .ToArray();
+
+            // check if there are more than two rooms in the surrounding cells.
+            var rooms = adjacent.Select( c => c.GetRoom( manager.map, RegionType.Normal ) )
+                .Where( r => r != null )
+                .Distinct()
+                .ToList();
+
+            if ( rooms.Count() >= 2 )
+            {
+                return true;
+            }
+
+            // check if any adjacent region is more than x regions from any other region
+            for ( int i = 0; i < adjacent.Count(); i++ )
+            {
+                for ( int j = i + 1; j < adjacent.Count(); j++ )
+                {
+                    
+                    var path = manager.map.pathFinder.FindPath( adjacent[i], adjacent[j],
+                        TraverseParms.For( TraverseMode.NoPassClosedDoors, Danger.Some ) );
+                    var cost = path.TotalCost;
+                    path.ReleaseToPool();
+
+                    Logger.Debug( $"from {adjacent[i]} to {adjacent[j]}: {cost}" );
+                    if (cost > MaxPathCost )
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool RegionsAreClose( Region start, Region end, int depth = 0 )
+        {
+            if ( depth > MaxRegionDistance )
+                return false;
+
+            var neighbours = start.Neighbors;
+            if (neighbours.Contains( end ) )
+                return true;
+
+            return neighbours.Any( n => RegionsAreClose( n, end, depth + 1 ) );
+        }
+
+        public bool IsValidDeconstructionTarget(LocalTargetInfo target)
+        {
+            return target.HasThing
+                   && target.IsValid
+                   && target.Thing is Building
+                   && IsValidDeconstructionTarget(target.Thing);
+        }
+        
+        public void AddDesignation(Designation designation)
+        {
+            manager.map.designationManager.AddDesignation(designation);
+            Designations.Add(designation);
+        }
+
+
+        private void AddDesignation(Thing target, DesignationDef designationDef)
+        {
+            if ( designationDef == DesignationDefOf.Deconstruct )
+            {
+                var building = target as Building;
+                if ( building?.ClaimableBy( Faction.OfPlayer )?? false )
+                {
+                    building.SetFaction( Faction.OfPlayer );
+                }
+            }
+                
+            AddDesignation(new Designation(target, designationDef));
+        }
+
+        public void RefreshAllowedMinerals()
+        {
+            var deconstructibleDefs = manager.map.listerThings.AllThings.OfType<Building>()
+                .Where( b => b.Faction != Faction.OfPlayer
+                             && !b.Position.Fogged( manager.map )
+                             && b.def.building.IsDeconstructible
+                             && !b.CostListAdjusted().NullOrEmpty()
+                             && b.def.resourcesFractionWhenDeconstructed > 0 )
+                .Select( b => b.def )
+                .Distinct()
+                .OrderBy( b => b.LabelCap )
+                .ToDictionary( d => d, AllowedBuilding );
+
+            AllowedBuildings = deconstructibleDefs;
+
+            var mineralDefs = DefDatabase<ThingDef>.AllDefsListForReading
+                .Where( d => d.building != null
+                             && d.building.isNaturalRock)
+                .OrderBy(d => d.LabelCap)
+                .ToDictionary( d => d, AllowedMineral );
+
+            AllowedMinerals = mineralDefs;
+        }
+
+        public void Notify_ThresholdFilterChanged()
+        {
+            Logger.Debug( "Threshold changed." );
+            if ( !SyncFilterAndAllowed || Sync == SyncDirection.AllowedToFilter )
+                return;
+
+            foreach ( var building in new List<ThingDef>( AllowedBuildings.Keys ) )
+            {
+                AllowedBuildings[building] = GetMaterialsInBuilding( building )
+                    .Any( m => Trigger.ThresholdFilter.Allows( m ) );
+            }
+            foreach ( var mineral in new List<ThingDef>( AllowedMinerals.Keys ) )
+            {
+                AllowedMinerals[mineral] = GetMaterialsInMineral( mineral )
+                    .Any( m => Trigger.ThresholdFilter.Allows( m ) );
+            }
+        }
+    }
+}

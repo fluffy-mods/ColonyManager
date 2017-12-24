@@ -2,6 +2,7 @@
 // Trigger_PawnKind.cs
 // 2016-12-09
 
+using System;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -89,7 +90,7 @@ namespace FluffyManager
         #region Methods
 
         public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false,
-                                                string label = null, string tooltip = null )
+                                                string label = null, string tooltip = null, Action onClick = null )
         {
         }
 

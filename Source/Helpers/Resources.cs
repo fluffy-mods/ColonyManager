@@ -35,7 +35,7 @@ namespace FluffyManager
             IconForaging = ContentFinder<Texture2D>.Get( "UI/Icons/Foraging" ),
             IconPower = ContentFinder<Texture2D>.Get( "UI/Icons/Power" ),
             IconTrading = ContentFinder<Texture2D>.Get( "UI/Icons/Power" ),
-            // IconMining = ContentFinder<Texture2D>.Get( "UI/Icons/Mining" ),
+            IconMining = ContentFinder<Texture2D>.Get( "UI/Icons/mining" ),
 
             // misc
             SlightlyDarkBackground = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .2f ),
@@ -59,7 +59,7 @@ namespace FluffyManager
             MeatIcon = ContentFinder<Texture2D>.Get( "UI/Icons/meat" ),
             UnkownIcon = ContentFinder<Texture2D>.Get( "UI/Icons/unknown" );
 
-
+        public static readonly Color Orange = new Color( 1f, 144 / 255f, 0f );
         //public static Texture2D[] LifeStages = {StageA, StageB, StageC};
 
         public static Texture2D LifeStages( int lifeStageIndex )

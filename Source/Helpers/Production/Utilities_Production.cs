@@ -47,7 +47,7 @@
 //        public static int CountPerWorker( this ManagerJob_Production job, int workerIndex )
 //        {
 //            int n = job.BillGivers.CurBillGiverCount;
-//            int diff = job.Trigger.Count - job.Trigger.CurCount;
+//            int diff = job.Trigger.Count - job.Trigger.CurrentCount;
 
 //            int bills;
 

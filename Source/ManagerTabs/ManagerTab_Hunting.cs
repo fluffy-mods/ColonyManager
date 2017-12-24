@@ -126,7 +126,7 @@ namespace FluffyManager
             var start = pos; 
 
             // target count (1)
-            int currentCount = _selected.Trigger.CurCount;
+            int currentCount = _selected.Trigger.CurrentCount;
             int corpseCount = _selected.GetMeatInCorpses();
             int designatedCount = _selected.GetMeatInDesignations();
             int targetCount = _selected.Trigger.TargetCount;
@@ -138,19 +138,16 @@ namespace FluffyManager
                     designatedCount, targetCount));
 
             // allow human & insect meat (2)
-            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            Utilities.DrawToggle(rowRect, "FMH.AllowHumanMeat".Translate(),
-                _selected.Trigger.ThresholdFilter.Allows(Utilities_Hunting.HumanMeat),
+            Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), ref _selected.PathBasedDistance, true );
+            Utilities.DrawReachabilityToggle( ref pos, width, ref _selected.CheckReachable);
+            Utilities.DrawToggle( ref pos, width, "FMH.AllowHumanMeat".Translate(),
+                _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.HumanMeat ),
                 () => _selected.AllowHumanLikeMeat = true,
-                () => _selected.AllowHumanLikeMeat = false);
-            pos.y += ListEntryHeight;
-
-            rowRect.y += ListEntryHeight;
-            Utilities.DrawToggle(rowRect, "FMH.AllowInsectMeat".Translate(),
-                _selected.Trigger.ThresholdFilter.Allows(Utilities_Hunting.InsectMeat),
+                () => _selected.AllowHumanLikeMeat = false );
+            Utilities.DrawToggle( ref pos, width, "FMH.AllowInsectMeat".Translate(),
+                _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.InsectMeat ),
                 () => _selected.AllowInsectMeat = true,
-                () => _selected.AllowInsectMeat = false);
-            pos.y += ListEntryHeight;
+                () => _selected.AllowInsectMeat = false );
 
             return pos.y - start.y;
         }
@@ -165,13 +162,9 @@ namespace FluffyManager
 
         public float DrawHuntingGrounds( Vector2 pos, float width )
         {
-            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            AreaAllowedGUI.DoAllowedAreaSelectors(rowRect, ref _selected.HuntingGrounds, manager);
-
-            rowRect.y += ListEntryHeight;
-            Utilities.DrawReachabilityToggle(rowRect, ref _selected.CheckReachable);
-
-            return rowRect.yMax - pos.y;
+            var start = pos;
+            AreaAllowedGUI.DoAllowedAreaSelectors(ref pos, width, ref _selected.HuntingGrounds, manager);
+            return pos.y - start.y;
         }
 
         public float DrawAnimalShortcuts( Vector2 pos, float width )

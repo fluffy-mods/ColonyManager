@@ -11,10 +11,6 @@ using Verse;
 using Verse.Sound;
 using static FluffyManager.Constants;
 
-#if RELOADER
-using Reloader;
-#endif
-
 namespace FluffyManager
 {
     public class ManagerJob_Livestock : ManagerJob
@@ -242,10 +238,7 @@ namespace FluffyManager
                 }
             }
         }
-
-#if RELOADER
-        [ReloadMethod]
-#endif
+        
         public void DoFollowSettings( ref bool actionTaken )
         {
             foreach ( var animal in Trigger.pawnKind.GetTame( manager ) )
@@ -460,10 +453,7 @@ namespace FluffyManager
                         continue;
 
                     animals =
-                        animals.OrderBy(
-                                        p =>
-                                        p.ageTracker.AgeBiologicalTicks /
-                                        ( p.Position.DistanceToSquared( position ) * 2 ) ).ToList();
+                        animals.OrderBy( p => p.ageTracker.AgeBiologicalTicks / Distance( p, position ) ).ToList();
 
 #if DEBUG_LIFESTOCK
                     Log.Message( "Wild: " + animals.Count );

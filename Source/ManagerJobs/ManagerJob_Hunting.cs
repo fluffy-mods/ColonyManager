@@ -322,7 +322,7 @@ namespace FluffyManager
 
         public override void Tick()
         {
-            History.Update( Trigger.CurCount, GetMeatInCorpses(), GetMeatInDesignations() );
+            History.Update( Trigger.CurrentCount, GetMeatInCorpses(), GetMeatInDesignations() );
         }
 
         public override bool TryDoJob()
@@ -340,7 +340,7 @@ namespace FluffyManager
             AddRelevantGameDesignations();
 
             // get the total count of meat in storage, expected meat in corpses and expected meat in designations.
-            int totalCount = Trigger.CurCount + GetMeatInCorpses() + GetMeatInDesignations();
+            int totalCount = Trigger.CurrentCount + GetMeatInCorpses() + GetMeatInDesignations();
 
             // get a list of huntable animals sorted by distance (ignoring obstacles) and expected meat count.
             // note; attempt to balance cost and benefit, current formula: value = meat / ( distance ^ 2)
@@ -439,16 +439,10 @@ namespace FluffyManager
             // get the 'home' position
             IntVec3 position = manager.map.GetBaseCenter();
 
-            // get a list of alive animals that are not designated in the hunting grounds and are reachable, sorted by meat / distance * 2
-            List<Pawn> list = manager.map.mapPawns.AllPawns.Where( p => IsValidHuntingTarget( p ) )
-
-                                     // OrderBy defaults to ascending, switch sign on estimated meat count to get descending
-                                     .OrderBy(
-                                              p =>
-                                              -p.EstimatedMeatCount() /
-                                              ( Math.Sqrt( position.DistanceToSquared( p.Position ) ) * 2 ) ).ToList();
-
-            return list;
+            return manager.map.mapPawns.AllPawns
+                .Where( IsValidHuntingTarget )
+                .OrderBy( p => -p.EstimatedMeatCount() / Distance( p, position ) )
+                .ToList();
         }
 
         private bool IsValidHuntingTarget( LocalTargetInfo t )
@@ -460,22 +454,6 @@ namespace FluffyManager
 
         private bool IsValidHuntingTarget( Pawn target )
         {
-            Logger.Debug(target.LabelShort);
-            Logger.Debug("\tAnimal: " + target.RaceProps.Animal);
-            Logger.Debug("\tAlive: " + !target.health.Dead);
-            Logger.Debug("\tSpawned: " + target.Spawned);
-            Logger.Debug("\tWild: " + (target.Faction != Faction.OfPlayer));
-            Logger.Debug("\tListed: " + AllowedAnimals.ContainsKey(target.kindDef));
-            //if (!AllowedAnimals.ContainsKey(target.kindDef))
-            //    return false;
-            Logger.Debug("\tAllowed: " + AllowedAnimals[target.kindDef]);
-            Logger.Debug("\tNot designated: " + (manager.map.designationManager.DesignationOn(target) == null));
-            Logger.Debug("\tIn hunting grounds: " + (HuntingGrounds == null || HuntingGrounds.ActiveCells.Contains(target.Position)));
-            Logger.Debug("\tFogged: " + !target.Position.Fogged(manager.map));
-            Logger.Debug("\tReachable: " +
-                          manager.map.mapPawns.FreeColonistsSpawned.Any(p => p.CanReach(p, PathEndMode.Touch,
-                             Danger.Some)));
-
             return target.RaceProps.Animal
                    && !target.health.Dead
                    && target.Spawned

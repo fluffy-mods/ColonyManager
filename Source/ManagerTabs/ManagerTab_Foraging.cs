@@ -123,7 +123,7 @@ namespace FluffyManager
 
         public float DrawThreshold( Vector2 pos, float width )
         {
-            int currentCount = _selected.Trigger.CurCount;
+            int currentCount = _selected.Trigger.CurrentCount;
             int designatedCount = _selected.CurrentDesignatedCount;
             int targetCount = _selected.Trigger.TargetCount;
             var start = pos;
@@ -131,6 +131,10 @@ namespace FluffyManager
             _selected.Trigger.DrawTriggerConfig(ref pos, width, ListEntryHeight, false,
                 "FMG.TargetCount".Translate(currentCount, designatedCount, targetCount),
                 "FMG.TargetCountTooltip".Translate(currentCount, designatedCount, targetCount));
+
+            Utilities.DrawReachabilityToggle(ref pos, width, ref _selected.CheckReachable);
+            Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), ref _selected.PathBasedDistance,
+                true );
 
             return pos.y - start.y;
         }
@@ -146,13 +150,9 @@ namespace FluffyManager
 
         public float DrawAreaRestriction( Vector2 pos, float width )
         {
-            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            AreaAllowedGUI.DoAllowedAreaSelectors(rowRect, ref _selected.ForagingArea, manager );
-
-            rowRect.y += ListEntryHeight;
-            Utilities.DrawReachabilityToggle(rowRect, ref _selected.CheckReachable);
-
-            return rowRect.yMax - pos.y;
+            var start = pos;
+            AreaAllowedGUI.DoAllowedAreaSelectors(ref pos, width, ref _selected.ForagingArea, manager);
+            return pos.y - start.y;
         }
 
         public float DrawPlantShortcuts( Vector2 pos, float width )

@@ -187,7 +187,7 @@ namespace FluffyManager
 
         public override void Tick()
         {
-            History.Update( Trigger.CurCount, CurrentDesignatedCount );
+            History.Update( Trigger.CurrentCount, CurrentDesignatedCount );
         }
 
         public override bool TryDoJob()
@@ -205,7 +205,7 @@ namespace FluffyManager
             AddRelevantGameDesignations();
 
             // designate plants until trigger is met.
-            int count = Trigger.CurCount + CurrentDesignatedCount;
+            int count = Trigger.CurrentCount + CurrentDesignatedCount;
             if ( count < Trigger.TargetCount )
             {
                 List<Plant> targets = GetValidForagingTargetsSorted();
@@ -257,7 +257,7 @@ namespace FluffyManager
 
                           // OrderBy defaults to ascending, switch sign on current yield to get descending
                           .Select( p => p as Plant )
-                          .OrderBy( p => -p.YieldNow() / position.DistanceToSquared( p.Position ) )
+                          .OrderBy( p => -p.YieldNow() / Distance( p, position ) )
                           .ToList();
         }
 

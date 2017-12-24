@@ -58,27 +58,31 @@ namespace FluffyManager
             // we need to define a 'base' position to calculate distances.
             // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
             IntVec3 position = IntVec3.Zero;
-            Building managerStation = map.listerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().FirstOrDefault();
+            Building managerStation = map.listerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>()
+                .FirstOrDefault();
             if ( managerStation != null )
             {
-                position = managerStation.Position;
+                return managerStation.InteractionCell;
             }
 
             // otherwise, use the average of the home area. Not ideal, but it'll do.
-            else
+            List<IntVec3> homeCells = map.areaManager.Get<Area_Home>().ActiveCells.ToList();
+            for ( var i = 0; i < homeCells.Count; i++ )
             {
-                List<IntVec3> homeCells = map.areaManager.Get<Area_Home>().ActiveCells.ToList();
-                for ( var i = 0; i < homeCells.Count; i++ )
-                {
-                    position += homeCells[i];
-                }
-
-                position.x /= homeCells.Count;
-                position.y /= homeCells.Count;
-                position.z /= homeCells.Count;
+                position += homeCells[i];
             }
 
-            return position;
+            position.x /= homeCells.Count;
+            position.y /= homeCells.Count;
+            position.z /= homeCells.Count;
+            var standableCell = position;
+
+            // find the closest traversable cell to the center
+            for ( int i = 0; !standableCell.Walkable( map ); i++ )
+            {
+                standableCell = position + GenRadial.RadialPattern[i];
+            }
+            return standableCell;
         }
 
         //public static string Summary( this ThingFilter filter )
@@ -363,27 +367,25 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public static void DrawReachabilityToggle( Rect rect, ref bool reachability )
+        public static void DrawToggle( ref Vector2 pos, float width, string label, ref bool checkOn,
+            bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small,
+            bool wrap = true )
         {
-            DrawToggle( rect, "FM.CheckReachability".Translate(), ref reachability );
-
-            var iconRect = new Rect(
-                rect.xMax - ( SmallIconSize + Margin ) * 2,
-                0f,
-                SmallIconSize,
-                SmallIconSize ).CenteredOnYIn( rect );
-            TooltipHandler.TipRegion( iconRect, "FM.CheckReachability.Tip".Translate() );
-            GUI.color = Color.grey;
-            GUI.DrawTexture( iconRect, Resources.Stopwatch );
-            GUI.color = Color.white;
+            Rect toggleRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                ListEntryHeight );
+            pos.y += ListEntryHeight;
+            DrawToggle( toggleRect, label, ref checkOn, expensive, size, margin, font, wrap );
         }
 
-        public static void DrawToggle( Rect rect, string label, ref bool checkOn, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small, bool wrap = true )
+        public static void DrawToggle( Rect rect, string label, ref bool checkOn, bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small, bool wrap = true )
         {
             // set up rects
             Rect labelRect = rect;
             labelRect.xMax -= size + margin * 2;
-            var checkRect = new Rect( rect.xMax - size - margin, 0f, size, size ).CenteredOnYIn(labelRect);
+            var iconRect = new Rect( rect.xMax - size - margin, 0f, size, size ).CenteredOnYIn(labelRect);
 
             // draw label
             Label( labelRect, label, TextAnchor.MiddleLeft, font, margin: margin, wrap: wrap );
@@ -391,11 +393,21 @@ namespace FluffyManager
             // draw check
             if ( checkOn )
             {
-                GUI.DrawTexture( checkRect, Widgets.CheckboxOnTex );
+                GUI.DrawTexture( iconRect, Widgets.CheckboxOnTex );
             }
             else
             {
-                GUI.DrawTexture( checkRect, Widgets.CheckboxOffTex );
+                GUI.DrawTexture( iconRect, Widgets.CheckboxOffTex );
+            }
+
+            // draw expensive icon
+            if (expensive)
+            {
+                iconRect.x -= size + margin;
+                TooltipHandler.TipRegion(iconRect, "FM.Expensive.Tip".Translate());
+                GUI.color = checkOn ? Resources.Orange : Color.grey;
+                GUI.DrawTexture(iconRect, Resources.Stopwatch);
+                GUI.color = Color.white;
             }
 
             // interactivity
@@ -406,38 +418,76 @@ namespace FluffyManager
             }
         }
 
-        public static void DrawToggle( Rect rect, string label, bool checkOn, Action on, Action off,
-            float size = SmallIconSize, float margin = Margin, bool wrap = true )
+        public static void DrawToggle(ref Vector2 pos, float width, string label, bool checkOn, Action on, Action off,
+            bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small,
+            bool wrap = true)
         {
-            DrawToggle( rect, label, checkOn, !checkOn, on, off, size, margin, wrap );
+            Rect toggleRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                ListEntryHeight);
+            pos.y += ListEntryHeight;
+            DrawToggle(toggleRect, label, checkOn, on, off, expensive, size, margin, wrap);
         }
 
-        public static void DrawToggle( Rect rect, string label, bool checkOn, bool checkOff, Action on, Action off, float size = SmallIconSize, float margin = Margin, bool wrap = true )
+        public static void DrawToggle(ref Vector2 pos, float width, string label, bool checkOn, bool checkOff, Action on, Action off,
+            bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small,
+            bool wrap = true)
+        {
+            Rect toggleRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                ListEntryHeight);
+            pos.y += ListEntryHeight;
+            DrawToggle(toggleRect, label, checkOn, checkOff, on, off, expensive, size, margin, wrap);
+        }
+
+        public static void DrawToggle( Rect rect, string label, bool checkOn, Action on, Action off,
+            bool expensive = false, float size = SmallIconSize, float margin = Margin, bool wrap = true )
+        {
+            DrawToggle( rect, label, checkOn, !checkOn, on, off, expensive, size, margin, wrap );
+        }
+
+
+        public static void DrawToggle( Rect rect, string label, bool checkOn, bool checkOff, Action on,
+            Action off, bool expensive = false, float size = SmallIconSize, float margin = Margin, bool wrap = true )
         {
             // set up rects
             Rect labelRect = rect;
-            var checkRect = new Rect( rect.xMax - size - margin, 0f, size, size );
-            labelRect.xMax = checkRect.xMin - Margin / 2f;
+            var iconRect = new Rect( rect.xMax - size - margin, 0f, size, size );
+            labelRect.xMax = iconRect.xMin - Margin / 2f;
 
             // finetune rects
-            checkRect = checkRect.CenteredOnYIn( labelRect );
+            iconRect = iconRect.CenteredOnYIn( labelRect );
 
             // draw label
             Label( rect, label, TextAnchor.MiddleLeft, GameFont.Small, margin: margin, wrap: wrap );
 
-            // draw check
 
+            // draw check
             if ( checkOn )
             {
-                GUI.DrawTexture( checkRect, Widgets.CheckboxOnTex );
+                GUI.DrawTexture( iconRect, Widgets.CheckboxOnTex );
             }
             else if ( checkOff )
             {
-                GUI.DrawTexture( checkRect, Widgets.CheckboxOffTex );
+                GUI.DrawTexture( iconRect, Widgets.CheckboxOffTex );
             }
             else
             {
-                GUI.DrawTexture( checkRect, Widgets.CheckboxPartialTex );
+                GUI.DrawTexture( iconRect, Widgets.CheckboxPartialTex );
+            }
+
+            // draw expensive icon
+            if (expensive)
+            {
+                iconRect.x -= size + margin;
+                TooltipHandler.TipRegion( iconRect, "FM.Expensive.Tip".Translate() );
+                GUI.color = checkOn ? Resources.Orange : Color.grey;
+                GUI.DrawTexture( iconRect, Resources.Stopwatch );
+                GUI.color = Color.white;
             }
 
             // interactivity
@@ -455,10 +505,15 @@ namespace FluffyManager
             }
         }
 
-        public static void DrawToggle( Rect rect, string label, bool checkOn, Action toggle, float size = SmallIconSize,
-                                       float margin = Margin )
+        public static void DrawToggle( Rect rect, string label, bool checkOn, Action toggle, bool expensive = false,
+                                       float size = SmallIconSize, float margin = Margin )
         {
-            DrawToggle( rect, label, checkOn, toggle, toggle, size );
+            DrawToggle( rect, label, checkOn, toggle, toggle, expensive, size );
+        }
+
+        public static void DrawReachabilityToggle( ref Vector2 pos, float width, ref bool reachability)
+        {
+            DrawToggle( ref pos, width, "FM.CheckReachability".Translate(), ref reachability, true );
         }
 
         public static bool TryGetPrivateField( Type type, object instance, string fieldName, out object value,
@@ -551,8 +606,8 @@ namespace FluffyManager
         {
             private T _cached;
             private T _default;
-            public int timeSet;
-            public int updateInterval;
+            private int timeSet;
+            private int updateInterval;
 
             public CachedValue( T value = default( T ), int updateInterval = 250 )
             {

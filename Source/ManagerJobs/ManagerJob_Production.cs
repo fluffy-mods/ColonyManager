@@ -693,7 +693,7 @@
 //                    Bill.allowedSkillRange = new IntRange( highestSkill, highestSkill );
 //                }
 //            }
-//            History.Update( Trigger.CurCount );
+//            History.Update( Trigger.CurrentCount );
 //        }
 
 //        public struct BillTablePriority

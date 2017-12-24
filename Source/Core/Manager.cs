@@ -2,10 +2,8 @@
 // Manager.cs
 // 2016-12-09
 
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Verse;
 
 namespace FluffyManager
@@ -41,6 +39,7 @@ namespace FluffyManager
                               new ManagerTab_Forestry( this ),
                               new ManagerTab_Livestock( this ),
                               new ManagerTab_Foraging( this ),
+                              new ManagerTab_Mining( this ),
                               new ManagerTab_Power( this )
                           };
 

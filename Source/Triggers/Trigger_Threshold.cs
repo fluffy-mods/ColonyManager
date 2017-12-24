@@ -72,22 +72,22 @@ namespace FluffyManager
             ThresholdFilter.SetDisallowAll();
         }
 
-        //public Trigger_Threshold( ManagerJob_Mining job ) : base( job.manager )
-        //{
-        //    Op = Ops.LowerThan;
-        //    MaxUpperThreshold = DefaultMaxUpperThreshold;
-        //    TargetCount = DefaultCount;
-        //    ThresholdFilter = new ThingFilter();
-        //    ThresholdFilter.SetDisallowAll();
+        public Trigger_Threshold(ManagerJob_Mining job) : base(job.manager)
+        {
+            Op = Ops.LowerThan;
+            MaxUpperThreshold = DefaultMaxUpperThreshold;
+            TargetCount = DefaultCount;
+            ThresholdFilter = new ThingFilter( job.Notify_ThresholdFilterChanged );
+            ThresholdFilter.SetDisallowAll();
 
-        //    // limit selection to stone, chunks, minerals and components only.
-        //    ParentFilter = new ThingFilter();
-        //    ParentFilter.SetDisallowAll();
-        //    ParentFilter.SetAllow( ThingCategoryDefOf.Chunks, true);
-        //    ParentFilter.SetAllow( ThingCategoryDefOf.ResourcesRaw, true );
-        //    ParentFilter.SetAllow( ThingCategoryDefOf.PlantMatter, false );
-        //    ParentFilter.SetAllow( ThingDefOf.Component, true );
-        //}
+            // limit selection to stone, chunks, minerals and components only.
+            ParentFilter = new ThingFilter();
+            ParentFilter.SetDisallowAll();
+            ParentFilter.SetAllow(ThingCategoryDefOf.Chunks, true);
+            ParentFilter.SetAllow(ThingCategoryDefOf.ResourcesRaw, true);
+            ParentFilter.SetAllow(ThingCategoryDefOf.PlantMatter, false);
+            ParentFilter.SetAllow(ThingDefOf.Component, true);
+        }
 
         #endregion Constructors
 
@@ -104,7 +104,7 @@ namespace FluffyManager
 
         #endregion Enums
 
-        public int CurCount => manager.map.CountProducts( ThresholdFilter, stockpile );
+        public int CurrentCount => manager.map.CountProducts( ThresholdFilter, stockpile );
 
         public WindowTriggerThresholdDetails DetailsWindow
         {
@@ -153,13 +153,13 @@ namespace FluffyManager
                 switch ( Op )
                 {
                     case Ops.LowerThan:
-                        return CurCount < TargetCount;
+                        return CurrentCount < TargetCount;
 
                     case Ops.Equals:
-                        return CurCount == TargetCount;
+                        return CurrentCount == TargetCount;
 
                     case Ops.HigherThan:
-                        return CurCount > TargetCount;
+                        return CurrentCount > TargetCount;
 
                     default:
                         Log.Warning( "Trigger_ThingThreshold was defined without a correct operator" );
@@ -170,13 +170,13 @@ namespace FluffyManager
 
         public override string StatusTooltip
         {
-            get { return "FMP.ThresholdCount".Translate( CurCount, TargetCount ); }
+            get { return "FMP.ThresholdCount".Translate( CurrentCount, TargetCount ); }
         }
 
         public override void DrawProgressBar( Rect rect, bool active )
         {
             // bar always goes a little beyond the actual target
-            int max = Math.Max( (int)( TargetCount * 1.2f ), CurCount );
+            int max = Math.Max( (int)( TargetCount * 1.2f ), CurrentCount );
 
             // draw a box for the bar
             GUI.color = Color.gray;
@@ -187,7 +187,7 @@ namespace FluffyManager
             Rect barRect = rect.ContractedBy( 2f );
             float unit = barRect.height / max;
             float markHeight = barRect.yMin + ( max - TargetCount ) * unit;
-            barRect.yMin += ( max - CurCount ) * unit;
+            barRect.yMin += ( max - CurrentCount ) * unit;
 
             // draw the bar
             // if the job is active and pending, make the bar blueish green - otherwise white.
@@ -203,7 +203,7 @@ namespace FluffyManager
         }
 
         public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false,
-                                                string label = null, string tooltip = null )
+                                                string label = null, string tooltip = null, Action onClick = null )
         {
             // target threshold
             var thresholdLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
@@ -214,12 +214,12 @@ namespace FluffyManager
             Widgets.DrawHighlightIfMouseover( thresholdLabelRect );
             if ( label.NullOrEmpty() )
             {
-                label = "FMP.ThresholdCount".Translate( CurCount, TargetCount ) + ":";
+                label = "FMP.ThresholdCount".Translate( CurrentCount, TargetCount ) + ":";
             }
             if ( tooltip.NullOrEmpty() )
             {
                 // TODO: Re-implement filter summary method.
-                tooltip = "FMP.ThresholdCountTooltip".Translate( CurCount, TargetCount );
+                tooltip = "FMP.ThresholdCountTooltip".Translate( CurrentCount, TargetCount );
             }
 
             Widgets_Labels.Label( thresholdLabelRect, label, tooltip );
@@ -237,6 +237,7 @@ namespace FluffyManager
             cur.y += entryHeight;
             if ( Widgets.ButtonInvisible( thresholdLabelRect ) )
             {
+                onClick?.Invoke();
                 Find.WindowStack.Add( DetailsWindow );
             }
 

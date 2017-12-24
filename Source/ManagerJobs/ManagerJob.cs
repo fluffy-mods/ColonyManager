@@ -24,6 +24,9 @@ namespace FluffyManager
     {
         #region Fields
 
+        public bool CheckReachable = true;
+        public bool PathBasedDistance = false;
+
         public static float LastUpdateRectWidth = 50f,
                             ProgressRectWidth = 10f,
                             StatusRectWidth = LastUpdateRectWidth + ProgressRectWidth;
@@ -57,7 +60,6 @@ namespace FluffyManager
         #endregion Constructors
 
 
-
         #region Properties
 
         public abstract bool Completed { get; }
@@ -71,7 +73,21 @@ namespace FluffyManager
                    && ( !CheckReachable || manager.map.mapPawns.FreeColonistsSpawned.Any( p => p.CanReach( target, PathEndMode.Touch, Danger.Some ) ) );
         }
 
-        public bool CheckReachable = true;
+        public virtual float Distance( Thing target, IntVec3 source )
+        {
+            if ( PathBasedDistance )
+            {
+                var path = target.Map.pathFinder.FindPath( source, target,
+                    TraverseParms.For( TraverseMode.PassDoors, Danger.Some ), PathEndMode.Touch );
+                var cost = path.TotalCost;
+                path.ReleaseToPool();
+                return cost * 2;
+            }
+
+            return Mathf.Sqrt( source.DistanceToSquared( target.Position ) ) * 2;
+        }
+
+
         public virtual bool ShouldDoNow => Managed && !Suspended && !Completed && lastAction + ActionInterval < Find.TickManager.TicksGame;
 
         public virtual SkillDef SkillDef { get; } = null;
@@ -105,6 +121,7 @@ namespace FluffyManager
             Scribe_Values.Look( ref lastAction, "lastAction" );
             Scribe_Values.Look( ref priority, "priority" );
             Scribe_Values.Look( ref CheckReachable, "CheckReachable", true );
+            Scribe_Values.Look( ref PathBasedDistance, "PathBasedDistance", false );
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit || Manager.LoadSaveMode == Manager.Modes.ImportExport )
             {

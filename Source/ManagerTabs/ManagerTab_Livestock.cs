@@ -255,10 +255,10 @@ namespace FluffyManager
                 var followRect = rowRect;
                 followRect.width /= 2f;
                 DrawToggle( followRect, "FM.Livestock.FollowDrafted".Translate(), ref _selectedCurrent.FollowDrafted,
-                    SmallIconSize, font: GameFont.Tiny );
+                    font: GameFont.Tiny );
                 followRect.x += followRect.width;
                 DrawToggle( followRect, "FM.Livestock.FollowFieldwork".Translate(),
-                    ref _selectedCurrent.FollowFieldwork, SmallIconSize, font: GameFont.Tiny );
+                    ref _selectedCurrent.FollowFieldwork, font: GameFont.Tiny );
             }
 
             // follow when training
@@ -453,7 +453,7 @@ namespace FluffyManager
                 if (visible && report.Accepted)
                 {
                     bool checkOn = _selectedCurrent.Training[keys[i]];
-                    DrawToggle( cell, keys[i].LabelCap, ref checkOn, 16f, Margin, GameFont.Tiny, false );
+                    DrawToggle( cell, keys[i].LabelCap, ref checkOn, size: 16f, font: GameFont.Tiny, wrap: false );
                     _selectedCurrent.Training[keys[i]] = checkOn;
                 }
                 else if (visible)
@@ -480,15 +480,15 @@ namespace FluffyManager
                 var butcherOptionRect = new Rect(pos.x, pos.y, cellWidth, ListEntryHeight);
 
                 DrawToggle(butcherOptionRect, "FML.ButcherTrained".Translate(),
-                    ref _selectedCurrent.ButcherTrained, 16f, Margin, GameFont.Tiny, false );
+                    ref _selectedCurrent.ButcherTrained, font: GameFont.Tiny, wrap: false );
                 butcherOptionRect.x += cellWidth + Margin;
 
-                DrawToggle(butcherOptionRect, "FML.ButcherPregnant".Translate(),
-                    ref _selectedCurrent.ButcherPregnant, 16f, Margin, GameFont.Tiny, false );
+                DrawToggle( butcherOptionRect, "FML.ButcherPregnant".Translate(),
+                    ref _selectedCurrent.ButcherPregnant, font: GameFont.Tiny, wrap: false );
                 butcherOptionRect.x += cellWidth + Margin;
 
                 DrawToggle(butcherOptionRect, "FML.ButcherBonded".Translate(),
-                    ref _selectedCurrent.ButcherBonded, 16f, Margin, GameFont.Tiny, false );
+                    ref _selectedCurrent.ButcherBonded, font: GameFont.Tiny, wrap: false );
 
                 pos.y += ListEntryHeight;
             }
@@ -498,21 +498,18 @@ namespace FluffyManager
 
         private float DrawTamingSection( Vector2 pos, float width )
         {
-            // try tame more?
-            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            DrawToggle(rowRect, "FML.TameMore".Translate(), ref _selectedCurrent.TryTameMore);
+            var start = pos;
+            DrawToggle(ref pos, width, "FML.TameMore".Translate(), ref _selectedCurrent.TryTameMore);
 
             // area to tame from (if taming more);
             if (_selectedCurrent.TryTameMore)
             {
-                rowRect.y += ListEntryHeight;
-                AreaAllowedGUI.DoAllowedAreaSelectors(rowRect, ref _selectedCurrent.TameArea, manager );
-
-                rowRect.y += ListEntryHeight;
-                DrawReachabilityToggle( rowRect, ref _selectedCurrent.CheckReachable );
+                AreaAllowedGUI.DoAllowedAreaSelectors(ref pos, width, ref _selectedCurrent.TameArea, manager );
+                DrawReachabilityToggle( ref pos, width, ref _selectedCurrent.CheckReachable );
+                DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), ref _selectedCurrent.PathBasedDistance, true );
             }
 
-            return rowRect.yMax - pos.y;
+            return pos.y - start.y;
         }
 
         private float DrawTamedAnimalSection( Vector2 pos, float width )

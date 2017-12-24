@@ -26,6 +26,17 @@ namespace FluffyManager
         }
 
         // RimWorld.AreaAllowedGUI
+        public static void DoAllowedAreaSelectors( ref Vector2 pos, float width, ref Area area, Map map, AllowedAreaMode mode = AllowedAreaMode.Humanlike, float margin = 0 )
+        {
+            var rect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                Constants.ListEntryHeight );
+            pos.y += Constants.ListEntryHeight;
+            DoAllowedAreaSelectors( rect, ref area, map, mode, margin );
+        }
+
         public static void DoAllowedAreaSelectors( Rect rect,
                                                    ref Area area,
                                                    Map map,

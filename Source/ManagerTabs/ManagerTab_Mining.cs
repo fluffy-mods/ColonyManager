@@ -1,207 +1,397 @@
-﻿//// ManagerTab_Mining.cs
-//// Copyright Karel Kroeze, 2017-2017
+﻿// ManagerTab_Mining.cs
+// Copyright Karel Kroeze, 2017-2017
 
-//using System.Collections.Generic;
-//using UnityEngine;
-//using Verse;
-//using static FluffyManager.Constants;
+using System.Collections.Generic;
+using System.Linq;
+using Reloader;
+using RimWorld;
+using UnityEngine;
+using Verse;
+using static FluffyManager.Constants;
 
-//namespace FluffyManager
-//{
-//    public class ManagerTab_Mining : ManagerTab
-//    {
-//        private float _jobListHeight;
-//        private Vector2 _jobListScrollPosition = Vector2.zero;
-//        private ManagerJob_Mining _selected;
+namespace FluffyManager
+{
+    public class ManagerTab_Mining : ManagerTab
+    {
+        private float _jobListHeight;
+        private Vector2 _jobListScrollPosition = Vector2.zero;
+        private ManagerJob_Mining _selected;
 
-//        public List<ManagerJob_Mining> Jobs;
+        public List<ManagerJob_Mining> Jobs;
 
-//        public ManagerTab_Mining( Manager manager ) : base( manager )
-//        {
-//            _selected = new ManagerJob_Mining( manager );
-//        }
+        public ManagerTab_Mining(Manager manager) : base(manager)
+        {
+            _selected = new ManagerJob_Mining(manager);
+        }
 
-//        public override Texture2D Icon => Resources.IconMining;
-//        public override IconAreas IconArea => IconAreas.Middle;
-//        public override string Label => "FM.Mining".Translate();
-//        public override ManagerJob Selected { get; set; }
-//        public override void DoWindowContents( Rect canvas )
-//        {
-//            var jobListRect = new Rect(
-//                canvas.xMin,
-//                canvas.yMin,
-//                DefaultLeftRowSize,
-//                canvas.height );
-//            var jobDetailsRect = new Rect(
-//                jobListRect.xMax + Margin,
-//                canvas.yMin,
-//                canvas.width - jobListRect.width - Margin,
-//                canvas.height );
+        public override Texture2D Icon => Resources.IconMining;
+        public override IconAreas IconArea => IconAreas.Middle;
+        public override string Label => "FM.Mining".Translate();
+        public override ManagerJob Selected { get => _selected; set => _selected = value as ManagerJob_Mining; }
+        public override void DoWindowContents(Rect canvas)
+        {
+            var jobListRect = new Rect(
+                0,
+                0,
+                DefaultLeftRowSize,
+                canvas.height);
+            var jobDetailsRect = new Rect(
+                jobListRect.xMax + Margin,
+                0,
+                canvas.width - jobListRect.width - Margin,
+                canvas.height);
 
-//            DoJobList( jobListRect );
-//            DoJobDetails( jobDetailsRect );
-//        }
+            DoJobList(jobListRect);
+            if (Selected != null )
+                DoJobDetails(jobDetailsRect);
+        }
 
-//        private void DoJobDetails( Rect rect )
-//        {            // layout: settings | animals
-//            // draw background
-//            Widgets.DrawMenuSection(rect);
+        [ReloadMethod]
+        private void DoJobDetails(Rect rect)
+        {
+            Widgets.DrawMenuSection(rect);
 
-//            // rects
-//            var optionsColumnRect = new Rect(
-//                rect.xMin,
-//                rect.yMin,
-//                rect.width * 3 / 5f,
-//                rect.height - Margin - ButtonSize.y);
-//            var mineralsColumnRect = new Rect(
-//                optionsColumnRect.xMax,
-//                rect.yMin,
-//                rect.width * 2 / 5f,
-//                rect.height - Margin - ButtonSize.y);
-//            var buttonRect = new Rect(
-//                rect.xMax - ButtonSize.x,
-//                rect.yMax - ButtonSize.y,
-//                ButtonSize.x - Margin,
-//                ButtonSize.y - Margin);
+            // rects
+            var optionsColumnRect = new Rect(
+                rect.xMin,
+                rect.yMin,
+                rect.width * 3 / 5f,
+                rect.height - Margin - ButtonSize.y);
+            var mineralsColumnRect = new Rect(
+                optionsColumnRect.xMax,
+                rect.yMin,
+                rect.width * 2 / 5f,
+                rect.height - Margin - ButtonSize.y);
+            var buttonRect = new Rect(
+                rect.xMax - ButtonSize.x,
+                rect.yMax - ButtonSize.y,
+                ButtonSize.x - Margin,
+                ButtonSize.y - Margin);
 
-//            Vector2 position;
-//            float width;
+            Vector2 position;
+            float width;
 
-//            // options
-//            Widgets_Section.BeginSectionColumn(optionsColumnRect, "Mining.Options", out position, out width);
+            // options
+            Widgets_Section.BeginSectionColumn(optionsColumnRect, "Mining.Options", out position, out width);
+            Widgets_Section.Section( ref position, width, DrawThresholdSettings, "FM.Threshold".Translate() );
+            Widgets_Section.Section( ref position, width, DrawDeconstructBuildings );
+            Widgets_Section.Section( ref position, width, DrawMiningArea, "FM.Mining.MiningArea".Translate() );
+            Widgets_Section.Section( ref position, width, DrawRoofRoomChecks, "FM.Mining.HealthAndSafety".Translate());
+            Widgets_Section.EndSectionColumn("Mining.Options", position);
 
-//            Widgets_Section.EndSectionColumn("Mining.Options", position);
+            // minerals
+            Widgets_Section.BeginSectionColumn(mineralsColumnRect, "Mining.Minerals", out position, out width);
+            var refreshRect = new Rect(
+                position.x + width - SmallIconSize - 2 * Margin,
+                position.y + Margin,
+                SmallIconSize,
+                SmallIconSize);
+            if (Widgets.ButtonImage(refreshRect, Resources.Refresh, Color.grey))
+                _selected.RefreshAllowedMinerals();
+            Widgets_Section.Section(ref position, width, DrawAllowedMineralsShortcuts,
+                "FM.Mining.AllowedMinerals".Translate());
+            Widgets_Section.Section(ref position, width, DrawAllowedMinerals);
+            Widgets_Section.Section(ref position, width, DrawAllowedBuildingsShortcuts,
+                "FM.Mining.AllowedBuildings".Translate());
+            Widgets_Section.Section(ref position, width, DrawAllowedBuildings);
+            Widgets_Section.EndSectionColumn("Mining.Minerals", position);
 
-//            // animals
-//            Widgets_Section.BeginSectionColumn(mineralsColumnRect, "Mining.Minerals", out position, out width);
-//            var refreshRect = new Rect(
-//                position.x + width - SmallIconSize - 2 * Margin,
-//                position.y + Margin,
-//                SmallIconSize,
-//                SmallIconSize);
-//            if (Widgets.ButtonImage(refreshRect, Resources.Refresh, Color.grey))
-//                _selected.RefreshAllowedMinerals();
+            // do the button
+            if ( Event.current.control && Widgets.ButtonInvisible( buttonRect ) )
+            {
+                Find.WindowStack.Add( new Dialog_MiningDebugOptions( _selected ) );
+            }
+            if (!_selected.Managed)
+            {
+                if (Widgets.ButtonText(buttonRect, "FM.Manage".Translate()))
+                {
+                    // activate job, add it to the stack
+                    _selected.Managed = true;
+                    Manager.For(manager).JobStack.Add(_selected);
 
-//            Widgets_Section.EndSectionColumn("Mining.Minerals", position);
+                    // refresh source list
+                    Refresh();
+                }
+            }
+            else
+            {
+                if (Widgets.ButtonText(buttonRect, "FM.Delete".Translate()))
+                {
+                    // inactivate job, remove from the stack.
+                    Manager.For(manager).JobStack.Delete(_selected);
 
-//            // do the button
-//            if (!_selected.Managed)
-//            {
-//                if (Widgets.ButtonText(buttonRect, "FM.Manage".Translate()))
-//                {
-//                    // activate job, add it to the stack
-//                    _selected.Managed = true;
-//                    Manager.For(manager).JobStack.Add(_selected);
+                    // remove content from UI
+                    _selected = null;
 
-//                    // refresh source list
-//                    Refresh();
-//                }
-//            }
-//            else
-//            {
-//                if (Widgets.ButtonText(buttonRect, "FM.Delete".Translate()))
-//                {
-//                    // inactivate job, remove from the stack.
-//                    Manager.For(manager).JobStack.Delete(_selected);
+                    // refresh source list
+                    Refresh();
+                }
+            }
+        }
 
-//                    // remove content from UI
-//                    _selected = null;
+        public float DrawThresholdSettings( Vector2 pos, float width )
+        {
+            var start = pos;
 
-//                    // refresh source list
-//                    Refresh();
-//                }
-//            }
-//        }
+            var currentCount = _selected.Trigger.CurrentCount;
+            var chunkCount = _selected.GetCountInChunks();
+            var designatedCount = _selected.GetCountInDesignations();
+            var targetCount = _selected.Trigger.TargetCount;
 
-//        private void DoJobList( Rect rect )
-//        {
-//            Widgets.DrawMenuSection(rect);
+            _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight, false,
+                "FM.Mining.TargetCount".Translate( currentCount, chunkCount, designatedCount, targetCount ),
+                "FM.Mining.TargetCount.Tip".Translate( currentCount, chunkCount, designatedCount, targetCount ),
+                onClick: delegate { _selected.Sync = ManagerJob_Mining.SyncDirection.FilterToAllowed; } );
 
-//            // content
-//            float height = _jobListHeight;
-//            var scrollView = new Rect(0f, 0f, rect.width, height);
-//            if (height > rect.height)
-//                scrollView.width -= ScrollbarWidth;
+            Utilities.DrawToggle( ref pos, width, "FM.Mining.SyncFilterAndAllowed".Translate(), ref _selected.SyncFilterAndAllowed );
+            Utilities.DrawReachabilityToggle(ref pos, width, ref _selected.CheckReachable);
+            Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), ref _selected.PathBasedDistance,
+                true );
 
-//            Widgets.BeginScrollView(rect, ref _jobListScrollPosition, scrollView);
-//            Rect scrollContent = scrollView;
+            return pos.y - start.y;
+        }
 
-//            GUI.BeginGroup(scrollContent);
-//            Vector2 cur = Vector2.zero;
-//            var i = 0;
+        public float DrawMiningArea(Vector2 pos, float width)
+        {
+            var start = pos;
+            AreaAllowedGUI.DoAllowedAreaSelectors(ref pos, width, ref _selected.MiningArea, manager);
+            return pos.y - start.y;
+        }
 
-//            foreach (var job in Jobs)
-//            {
-//                var row = new Rect(0f, cur.y, scrollContent.width, LargeListEntryHeight);
-//                Widgets.DrawHighlightIfMouseover(row);
-//                if (_selected == job)
-//                {
-//                    Widgets.DrawHighlightSelected(row);
-//                }
+        public float DrawDeconstructBuildings( Vector2 pos, float width )
+        {
+            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            Utilities.DrawToggle( rowRect, "FM.Mining.DeconstructBuildings".Translate(), ref _selected.DeconstructBuildings );
+            return ListEntryHeight;
+        }
 
-//                if (i++ % 2 == 1)
-//                {
-//                    Widgets.DrawAltRect(row);
-//                }
+        public float DrawRoofRoomChecks( Vector2 pos, float width )
+        {
+            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            TooltipHandler.TipRegion(rowRect, "FM.Mining.CheckRoofSupport.Tip".Translate());
+            Utilities.DrawToggle( rowRect, "FM.Mining.CheckRoofSupport".Translate(), ref _selected.CheckRoofSupport );
 
-//                Rect jobRect = row;
+            rowRect.y += ListEntryHeight;
+            if ( _selected.CheckRoofSupport )
+            {
+                TooltipHandler.TipRegion( rowRect, "FM.Mining.CheckRoofSupportAdvanced.Tip".Translate() );
+                Utilities.DrawToggle( rowRect, "FM.Mining.CheckRoofSupportAdvanced".Translate(),
+                    ref _selected.CheckRoofSupportAdvanced, true );
+            }
+            else
+            {
+                Widgets_Labels.Label( rowRect, "FM.Mining.CheckRoofSupportAdvanced".Translate(),
+                    "FM.Mining.CheckRoofSupportAdvanced.DisabledTip".Translate(), TextAnchor.MiddleLeft, margin: Margin,
+                    color: Color.grey );
+            }
 
-//                if (ManagerTab_Overview.DrawOrderButtons(new Rect(row.xMax - 50f, row.yMin, 50f, 50f), manager, job))
-//                {
-//                    Refresh();
-//                }
-//                jobRect.width -= 50f;
+            rowRect.y += ListEntryHeight;
+            TooltipHandler.TipRegion(rowRect, "FM.Mining.CheckRoomDivision.Tip".Translate());
+            Utilities.DrawToggle(rowRect, "FM.Mining.CheckRoomDivision".Translate(), ref _selected.CheckRoomDivision, true );
 
-//                job.DrawListEntry(jobRect, false, true);
-//                if (Widgets.ButtonInvisible(jobRect))
-//                {
-//                    _selected = job;
-//                }
+            return rowRect.yMax - pos.y;
+        }
 
-//                cur.y += LargeListEntryHeight;
-//            }
+        public float DrawAllowedMineralsShortcuts(Vector2 pos, float width)
+        {
+            var start = pos;
 
-//            // row for new job.
-//            var newRect = new Rect(0f, cur.y, scrollContent.width, LargeListEntryHeight);
-//            Widgets.DrawHighlightIfMouseover(newRect);
+            // list of keys in allowed animals list (all animals in biome + visible animals on map)
+            var allowedMinerals = _selected.AllowedMinerals;
+            var minerals = new List<ThingDef>(allowedMinerals.Keys);
 
-//            if (i++ % 2 == 1)
-//            {
-//                Widgets.DrawAltRect(newRect);
-//            }
+            // toggle all
+            Utilities.DrawToggle( ref pos, width, "<i>" + "FM.All".Translate() + "</i>",
+                _selected.AllowedMinerals.Values.All( v => v ),
+                _selected.AllowedMinerals.Values.All( v => !v ),
+                () => minerals.ForEach( p => _selected.SetAllowMineral( p, true ) ),
+                () => minerals.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
 
-//            Text.Anchor = TextAnchor.MiddleCenter;
-//            Widgets.Label(newRect, "<" + "FMH.NewHuntingJob".Translate() + ">");
-//            Text.Anchor = TextAnchor.UpperLeft;
+            // toggle stone
+            var stone = minerals.Where(m => !m.building.isResourceRock ).ToList();
+            Utilities.DrawToggle( ref pos, width, "<i>" + "FM.Mining.Stone".Translate() + "</i>",
+                stone.All( p => allowedMinerals[p] ),
+                stone.All( p => !allowedMinerals[p] ),
+                () => stone.ForEach( p => _selected.SetAllowMineral( p, true ) ),
+                () => stone.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
 
-//            if (Widgets.ButtonInvisible(newRect))
-//            {
-//                Selected = new ManagerJob_Hunting(manager);
-//            }
+            // toggle metal
+            var metal = minerals.Where(m => m.building.isResourceRock && IsMetal( m.building.mineableThing ) )
+                .ToList();
+            Utilities.DrawToggle( ref pos, width, "<i>" + "FM.Mining.Metal".Translate() + "</i>",
+                metal.All( p => allowedMinerals[p] ),
+                metal.All( p => !allowedMinerals[p] ),
+                () => metal.ForEach( p => _selected.SetAllowMineral( p, true ) ),
+                () => metal.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
 
-//            TooltipHandler.TipRegion(newRect, "FMH.NewHuntingJobTooltip".Translate());
+            // toggle precious
+            var precious = minerals.Where( m => m.building.isResourceRock && m.building.mineableThing.smallVolume )
+                .ToList();
+            Utilities.DrawToggle( ref pos, width, "<i>" + "FM.Mining.Precious".Translate() + "</i>",
+                precious.All( p => allowedMinerals[p] ),
+                precious.All( p => !allowedMinerals[p] ),
+                () => precious.ForEach( p => _selected.SetAllowMineral( p, true ) ),
+                () => precious.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
 
-//            cur.y += LargeListEntryHeight;
+            return pos.y - start.y;
+        }
 
-//            _jobListHeight = cur.y;
-//            GUI.EndGroup();
-//            Widgets.EndScrollView();
-//        }
+        public static HashSet<ThingDef> _metals = new HashSet<ThingDef>( DefDatabase<ThingDef>.AllDefsListForReading
+            .Where( td => td.IsStuff
+                          && td.stuffProps.categories.Contains( StuffCategoryDefOf.Metallic ) ) );
+            
+        public bool IsMetal( ThingDef def )
+        {
+            return _metals.Contains( def );
+        }
 
-//        public override void PreOpen()
-//        {
-//            Refresh();
-//        }
+        public float DrawAllowedMinerals(Vector2 pos, float width)
+        {
+            var start = pos;
+            // list of keys in allowed animals list (all animals in biome + visible animals on map)
+            var allowedMinerals = _selected.AllowedMinerals;
+            var minerals = new List<ThingDef>(allowedMinerals.Keys);
 
-//        public void Refresh()
-//        {
-//            // upate our list of jobs
-//            Jobs = Manager.For(manager).JobStack.FullStack<ManagerJob_Mining>();
+            // toggle for each animal
+            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            foreach (var mineral in minerals)
+            {
+                // draw the toggle
+                Utilities.DrawToggle( rowRect, mineral.LabelCap, _selected.AllowedMinerals[mineral],
+                    () => _selected.SetAllowMineral( mineral, !_selected.AllowedMinerals[mineral] ) );
+                rowRect.y += ListEntryHeight;
+            }
 
-//            // update pawnkind options
-//            foreach (var job in Jobs)
-//                job.RefreshAllowedMinerals();
-//            _selected?.RefreshAllowedMinerals();
-//        }
-//    }
-//}
+            return rowRect.yMin - start.y;
+        }
+
+
+        public float DrawAllowedBuildingsShortcuts(Vector2 pos, float width)
+        {
+            var start = pos;
+
+            // list of keys in allowed animals list (all animals in biome + visible animals on map)
+            var allowedBuildings = _selected.AllowedBuildings;
+            var buildings = new List<ThingDef>(allowedBuildings.Keys);
+
+            // toggle all
+            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            Utilities.DrawToggle( rowRect, "<i>" + "FM.All".Translate() + "</i>",
+                allowedBuildings.Values.All( v => v ),
+                allowedBuildings.Values.All( v => !v ),
+                () => buildings.ForEach( b => _selected.SetAllowBuilding( b, true ) ),
+                () => buildings.ForEach( b => _selected.SetAllowBuilding( b, false ) ) );
+            
+            return rowRect.yMax - start.y;
+        }
+
+        public float DrawAllowedBuildings(Vector2 pos, float width)
+        {
+            var start = pos;
+
+            var allowedBuildings = _selected.AllowedBuildings;
+            var buildings = new List<ThingDef>(allowedBuildings.Keys);
+
+            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            foreach (var building in buildings)
+            {
+                Utilities.DrawToggle( rowRect, building.LabelCap, allowedBuildings[building],
+                    () => _selected.SetAllowBuilding( building, !allowedBuildings[building] ) );
+                rowRect.y += ListEntryHeight;
+            }
+
+            return rowRect.yMin - start.y;
+        }
+
+        private void DoJobList(Rect rect)
+        {
+            Widgets.DrawMenuSection(rect);
+
+            // content
+            var height = _jobListHeight;
+            var scrollView = new Rect(0f, 0f, rect.width, height);
+            if (height > rect.height)
+                scrollView.width -= ScrollbarWidth;
+
+            Widgets.BeginScrollView(rect, ref _jobListScrollPosition, scrollView);
+            var scrollContent = scrollView;
+
+            GUI.BeginGroup(scrollContent);
+            var cur = Vector2.zero;
+            var i = 0;
+
+            foreach (var job in Jobs)
+            {
+                var row = new Rect(0f, cur.y, scrollContent.width, LargeListEntryHeight);
+                Widgets.DrawHighlightIfMouseover(row);
+                if (_selected == job)
+                {
+                    Widgets.DrawHighlightSelected(row);
+                }
+
+                if (i++ % 2 == 1)
+                {
+                    Widgets.DrawAltRect(row);
+                }
+
+                var jobRect = row;
+
+                if (ManagerTab_Overview.DrawOrderButtons(new Rect(row.xMax - 50f, row.yMin, 50f, 50f), manager, job))
+                {
+                    Refresh();
+                }
+                jobRect.width -= 50f;
+
+                job.DrawListEntry(jobRect, false, true);
+                if (Widgets.ButtonInvisible(jobRect))
+                {
+                    _selected = job;
+                }
+
+                cur.y += LargeListEntryHeight;
+            }
+
+            // row for new job.
+            var newRect = new Rect(0f, cur.y, scrollContent.width, LargeListEntryHeight);
+            Widgets.DrawHighlightIfMouseover(newRect);
+
+            if (i++ % 2 == 1)
+            {
+                Widgets.DrawAltRect(newRect);
+            }
+
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(newRect, "<" + "FM.Mining.NewJob".Translate() + ">");
+            Text.Anchor = TextAnchor.UpperLeft;
+
+            if (Widgets.ButtonInvisible(newRect))
+            {
+                Selected = new ManagerJob_Mining(manager);
+            }
+
+            TooltipHandler.TipRegion(newRect, "FM.Mining.NewJob.Tip".Translate());
+
+            cur.y += LargeListEntryHeight;
+
+            _jobListHeight = cur.y;
+            GUI.EndGroup();
+            Widgets.EndScrollView();
+        }
+
+        public override void PreOpen()
+        {
+            Refresh();
+        }
+
+        public void Refresh()
+        {
+            // upate our list of jobs
+            Jobs = Manager.For(manager).JobStack.FullStack<ManagerJob_Mining>();
+
+            // update pawnkind options
+            foreach (var job in Jobs)
+                job.RefreshAllowedMinerals();
+            _selected?.RefreshAllowedMinerals();
+        }
+    }
+}
