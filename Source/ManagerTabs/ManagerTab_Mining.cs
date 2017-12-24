@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Reloader;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -46,7 +45,6 @@ namespace FluffyManager
                 DoJobDetails(jobDetailsRect);
         }
 
-        [ReloadMethod]
         private void DoJobDetails(Rect rect)
         {
             Widgets.DrawMenuSection(rect);
