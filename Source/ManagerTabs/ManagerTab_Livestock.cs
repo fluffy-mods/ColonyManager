@@ -308,7 +308,7 @@ namespace FluffyManager
             switch ( _selectedCurrent.Masters )
             {
                 case MasterMode.Specific:
-                    return _selectedCurrent.Master.LabelShort;
+                    return _selectedCurrent.Master?.LabelShort ?? "FM.None".Translate();
                 default:
                     return $"FM.Livestock.MasterMode.{_selectedCurrent.Masters}".Translate();
             }

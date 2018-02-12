@@ -28,6 +28,7 @@
   <FM.Expensive.Tip>Enabling this setting may decrease performance, particularly on large maps, mountainous maps, jobs with many potential targets, and colonies with high numbers of colonists.</FM.Expensive.Tip>
   <FM.PathBasedDistance>Calculate distance based on actual path</FM.PathBasedDistance>
   <FM.PathBasedDistance.Tip>If enabled, distances will be calculated based on real paths. If disabled, distances will be calculated 'as the crow flies'.</FM.PathBasedDistance.Tip>
+  <FM.None>None</FM.None>
 
   <!-- time periods for update interval -->
   <FM.DefaultUpdateInterval>Default update interval</FM.DefaultUpdateInterval>
