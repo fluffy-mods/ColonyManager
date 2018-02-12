@@ -194,7 +194,7 @@ namespace FluffyManager
             if ( suffixes == null )
                 suffixes = new[] { "", "k", "M", "G" };
             var i = 0;
-            while ( x > unit / 10 && i < suffixes.Length )
+            while ( x > unit && i < suffixes.Length )
             {
                 x /= unit;
                 i++;
