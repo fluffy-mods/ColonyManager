@@ -91,12 +91,10 @@ namespace FluffyManager
         public static MasterMode GetMasterMode( this Pawn pawn )
         {
             var mode = MasterMode.Default;
-
-            // TODO: Add getter to co-exist with WorkTab
+            
             if ( pawn.workSettings.WorkIsActive( WorkTypeDefOf.Hunting ) )
                 mode = mode | MasterMode.Hunters;
 
-            // TODO: Add getter to co-exist with WorkTab
             if ( pawn.workSettings.WorkIsActive( WorkTypeDefOf.Handling ) )
                 mode = mode | MasterMode.Trainers;
 

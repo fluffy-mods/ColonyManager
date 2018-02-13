@@ -15,7 +15,6 @@
 //    {
 //        #region Fields
 
-//        // TODO: use properties to cache all the DefDatabase<> calls.
 //        // ingredients are set by the recipe, and are given by a thingfilter and a count.
 //        // we create an ingredientSelector for each ingredient, which allows selecting an ingredient from the filter. (or sets it, if there's only one thingdef allowed).
 //        public static List<IngredientSelector> ingredients;

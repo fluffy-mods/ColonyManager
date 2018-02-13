@@ -280,7 +280,6 @@
 //                Vector2 cur = Vector2.zero;
 //                try
 //                {
-//                    // TODO: Scrollable
 //                    var i = 1;
 //                    foreach ( SaveFileInfo file in _saveFiles )
 //                    {
@@ -409,7 +408,6 @@
 
 //        private void TryImport( SaveFileInfo file )
 //        {
-//            // TODO some basic checks?
 //            DoImport( file );
 //        }
 

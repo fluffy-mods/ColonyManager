@@ -111,7 +111,6 @@ namespace FluffyManager
         public override void ExposeData()
         {
             base.ExposeData();
-            // TODO: migrate HelpShown to HugsLib invisible setting.
             Scribe_Values.Look( ref id, "id", -1, true );
             Scribe_Values.Look( ref HelpShown, "HelpShown", false );
             Scribe_Deep.Look( ref _stack, "JobStack", this );

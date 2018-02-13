@@ -24,10 +24,11 @@ namespace FluffyManager
 
         #region Fields
 
-        public ForestryJobType type = ForestryJobType.Logging;
+        private ForestryJobType _type = ForestryJobType.Logging;
         public Dictionary<ThingDef, bool> AllowedTrees = new Dictionary<ThingDef, bool>();
         public bool AllowSaplings;
         public Dictionary<Area, bool> ClearAreas = new Dictionary<Area, bool>();
+        public bool ClearWindCells = false;
         public List<Designation> Designations = new List<Designation>();
         public History History;
         public Area LoggingArea;
@@ -36,6 +37,10 @@ namespace FluffyManager
         private List<bool> _clearAreas_allowed;
         private List<Area> _clearAreas_areas;
         private Utilities.CachedValue<int> _designatedWoodCachedValue = new Utilities.CachedValue<int>();
+
+        // backwards compatibility for new clear jobs
+        // TODO: REMOVE ON NEXT BREAKING VERSION!
+        private bool _newClearJobs;
 
         #endregion Fields
 
@@ -46,7 +51,7 @@ namespace FluffyManager
             // populate the trigger field, set the root category to wood.
             Trigger = new Trigger_Threshold( this );
             Trigger.ThresholdFilter.SetDisallowAll();
-            Trigger.ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
+            Trigger.ThresholdFilter.SetAllow( ThingDefOf.WoodLog, true );
 
             // initialize clearAreas list with current areas
             UpdateClearAreas();
@@ -66,11 +71,21 @@ namespace FluffyManager
 
         #region Properties
 
+        public ForestryJobType Type
+        {
+            get => _type;
+            set
+            {
+                _type = value;
+                RefreshAllowedTrees();
+            }
+        }
+
         public override bool Completed
         {
             get
             {
-                switch ( type )
+                switch ( Type )
                 {
                     case ForestryJobType.Logging:
                         return !Trigger.State;
@@ -87,16 +102,21 @@ namespace FluffyManager
 
         public string SubLabel( Rect rect )
         {
-            switch ( type )
+            string sublabel;
+            switch ( Type )
                 {
                     case ForestryJobType.Logging:
-                        var sublabel = string.Join(", ", Targets);
+                        sublabel = string.Join(", ", Targets);
                         if (sublabel.Fits(rect))
                             return sublabel.Italic();
                         else
                             return "multiple".Translate().Italic();
                     default:
-                        return ( "FMF.JobType." + type ).Translate().Italic();
+                        sublabel = "FMF.Clear".Translate( string.Join(", ", Targets) );
+                        if ( sublabel.Fits( rect ) )
+                            return sublabel.Italic();
+                        else
+                            return "FMF.Clear".Translate( "multiple".Translate() ).Italic();
             }
         }
 
@@ -109,7 +129,20 @@ namespace FluffyManager
         {
             get
             {
-                return AllowedTrees.Keys.Where( key => AllowedTrees[key] ).Select( tree => tree.LabelCap ).ToArray();
+                switch ( Type )
+                {
+                    case ForestryJobType.Logging:
+                        return AllowedTrees.Keys.Where(key => AllowedTrees[key]).Select(tree => tree.LabelCap).ToArray();
+                    default:
+                        var targets = ClearAreas
+                            .Where( ca => ca.Value )
+                            .Select( ca => ca.Key.Label );
+                        if ( ClearWindCells )
+                            targets = targets.Concat( "FMF.TurbineArea".Translate() );
+                        if ( !targets.Any() )
+                            return new[] { "FM.None".Translate() };
+                        return targets.ToArray();
+                }
             }
         }
 
@@ -157,7 +190,7 @@ namespace FluffyManager
             Designations.Clear();
         }
 
-        public void DoClearAreaDesignations( IEnumerable<IntVec3> cells, bool allPlants, ref bool workDone )
+        public void DoClearAreaDesignations( IEnumerable<IntVec3> cells, ref bool workDone )
         {
             var map = manager.map;
             var designationManager = map.designationManager;
@@ -168,11 +201,11 @@ namespace FluffyManager
                 Plant plant = cell.GetPlant( map );
 
                 // if there is no plant, or there is already a designation here, bail out
-                if (plant == null || !designationManager.AllDesignationsOn(plant).ToList().NullOrEmpty())
+                if (plant == null || designationManager.AllDesignationsOn(plant).Any())
                     continue;
-                
-                // if the plant is not a tree, and allPlants is not set, bail.
-                if ( !( allPlants || plant.def.plant.IsTree ) )
+
+                // if the plant is not in the allowed filter
+                if ( !AllowedTrees[plant.def] )
                     continue;
                 
                 // we don't cut stuff in growing zones
@@ -233,8 +266,13 @@ namespace FluffyManager
             Scribe_References.Look( ref LoggingArea, "LoggingArea" );
             Scribe_Deep.Look( ref Trigger, "trigger", manager );
             Scribe_Collections.Look( ref AllowedTrees, "AllowedTrees", LookMode.Def, LookMode.Value );
-            Scribe_Values.Look( ref type, "type", ForestryJobType.Logging );
+            Scribe_Values.Look( ref _type, "type", ForestryJobType.Logging );
             Scribe_Values.Look( ref AllowSaplings, "AllowSaplings", false );
+            Scribe_Values.Look( ref ClearWindCells, "ClearWindCells", false );
+
+            // backwards compatibility for clearing jobs
+            // TODO: REMOVE ON NEXT BREAKING VERSION!
+            Scribe_Values.Look( ref _newClearJobs, "NEW_CLEAR_JOBS", false );
 
             // clearing areas list
             if ( Scribe.mode == LoadSaveMode.Saving )
@@ -266,6 +304,39 @@ namespace FluffyManager
             {
                 // scribe history
                 Scribe_Deep.Look( ref History, "History" );
+            }
+
+            // backwards compatibility for wind areas
+            // TODO: REMOVE ON NEXT BREAKING VERSION!
+            if ( !_newClearJobs )
+            {
+                Log.Message( "Colony Manager :: Loading old save - updating job parameters."  );
+                if ( Type == ForestryJobType.ClearWind )
+                {
+                    Log.Message("Colony Manager :: Loading old save - clear wind.");
+                    _type = ForestryJobType.ClearArea;
+                    ClearWindCells = true;
+                    var trees = AllowedTrees.Keys.ToList();
+                    foreach ( var tree in trees )
+                    {
+                        AllowedTrees[tree] = false;
+                    }
+                    foreach ( var tree in trees.Where( tree => tree.blockWind ) )
+                    {
+                        AllowedTrees[tree] = true;
+                    }
+                }
+                else if ( Type == ForestryJobType.ClearArea )
+                {
+                    Log.Message("Colony Manager :: Loading old save - clear area.");
+                    var trees = AllowedTrees.Keys.ToList();
+                    foreach (var tree in trees)
+                    {
+                        AllowedTrees[tree] = true;
+                    }
+                }
+                Log.Message("Colony Manager ::  Loading old save - done.");
+                _newClearJobs = true;
             }
         }
 
@@ -308,17 +379,16 @@ namespace FluffyManager
             // clean dead designations
             CleanDesignations();
 
-            switch ( type )
+            switch ( Type )
             {
                     case ForestryJobType.Logging:
                         DoLoggingJob( ref workDone );
                         break;
-                    case ForestryJobType.ClearWind:
-                        DoClearAreaDesignations( GetWindCells(), false, ref workDone );
-                        break;
                     case ForestryJobType.ClearArea:
+                        if ( ClearWindCells )
+                            DoClearAreaDesignations( GetWindCells(), ref workDone );
                         if ( ClearAreas.Any() )
-                            DoClearAreas( ref workDone );
+                                DoClearAreas( ref workDone );
                         break;
             }
             
@@ -415,7 +485,7 @@ namespace FluffyManager
             foreach ( KeyValuePair<Area, bool> area in ClearAreas )
             {
                 if ( area.Value )
-                    DoClearAreaDesignations( area.Key.ActiveCells, true, ref workDone );
+                    DoClearAreaDesignations( area.Key.ActiveCells, ref workDone );
             }
         }
 
@@ -492,17 +562,52 @@ namespace FluffyManager
 
         public void RefreshAllowedTrees()
         {
-            // A tree is defined as any plant that yields wood or has a wood harvesting tag.
-            var options = manager.map.Biome.AllWildPlants.Where(
-                                                                pd =>
-                                                                    pd.plant.harvestTag == "Wood" ||
-                                                                    pd.plant.harvestedThingDef == Utilities_Forestry.Wood );
+            Logger.Debug("Refreshing allowed trees");
 
+            // all plants
+            var options = manager.map.Biome.AllWildPlants
+
+                // cave plants (shrooms)
+                .Concat( DefDatabase<ThingDef>.AllDefsListForReading
+                    .Where( td => td.plant?.cavePlant ?? false ) )
+
+                // ambrosia
+                .Concat( ThingDefOf.PlantAmbrosia )
+
+                // and anything on the map that is not in a plant zone/planter
+                .Concat( manager.map.listerThings.AllThings.OfType<Plant>()
+                    .Where( p => p.Spawned &&
+                                 !( manager.map.zoneManager.ZoneAt( p.Position ) is IPlantToGrowSettable ) &&
+                                 manager.map.thingGrid.ThingsAt( p.Position )
+                                     .FirstOrDefault( t => t is Building_PlantGrower ) == null )
+                    .Select( p => p.def ) )
+
+                // add stuff in the current list
+                .Concat( AllowedTrees.Keys.ToList() )
+
+                // if type == logging, remove things that do not yield wood
+                .Where( td => Type == ForestryJobType.ClearArea ||
+                              ( td.plant.harvestTag == "Wood" || td.plant.harvestedThingDef == ThingDefOf.WoodLog ) )
+
+                .Distinct();
+
+            // remove stuff not in new list
+            foreach ( ThingDef tree in AllowedTrees.Keys.ToList() )
+            {
+                if ( !options.Contains( tree ) )
+                    AllowedTrees.Remove( tree );
+            }
+
+            // add stuff not in current list
             foreach ( ThingDef tree in options )
             {
                 if (!AllowedTrees.ContainsKey( tree ))
                     AllowedTrees.Add( tree, false );
             }
+
+            // sort
+            AllowedTrees = AllowedTrees.OrderBy( at => at.Key.LabelCap )
+                .ToDictionary( at => at.Key, at => at.Value );
         }
     }
 }

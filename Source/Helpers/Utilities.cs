@@ -84,68 +84,7 @@ namespace FluffyManager
             }
             return standableCell;
         }
-
-        //public static string Summary( this ThingFilter filter )
-        //{
-        //    string label = filter._mainSummary();
-
-        //    if ( filter.allowedHitPointsConfigurable &&
-        //         ( filter.AllowedHitPointsPercents.TrueMax != 1 ||
-        //           filter.AllowedHitPointsPercents.TrueMin != 0 ) )
-        //    {
-        //        label += " (" + "FM.FilterDescriptionHitPoints".Translate( filter.AllowedHitPointsPercents.TrueMin,
-        //                                                                   filter.AllowedHitPointsPercents.TrueMax )
-        //                 + ")";
-        //    }
-
-        //    if ( filter.allowedQualitiesConfigurable &&
-        //         ( filter.AllowedQualityLevels.min != QualityCategory.Awful ||
-        //           filter.AllowedQualityLevels.max != QualityCategory.Legendary ) )
-        //    {
-        //        label += " (" +
-        //                 "FM.FilterDescriptionQuality".Translate( filter.AllowedQualityLevels.min.ToString(),
-        //                                                          filter.AllowedQualityLevels.max.ToString() ) +
-        //                 ")";
-        //    }
-
-        //    return label;
-        //}
-
-        //private static string _mainSummary( this ThingFilter filter )
-        //{
-        //    // special cases: 1 category (almost) fully allowed (only works if filter is actually limited to that category?)
-        //    if ( filter.categories?.Count == 1 &&
-        //         filter.exceptedThingDefs.Count < 2 )
-        //    {
-        //        string label = filter.categories.First();
-        //        if ( filter.exceptedThingDefs.Count == 1 )
-        //        {
-        //            label += ", " + "FM.FilterDescriptionException".Translate() +
-        //                     filter.exceptedThingDefs.First().LabelCap;
-        //        }
-        //        return label;
-        //    }
-
-        //    // special cases: 1-3 thingdefs allowed;
-        //    if ( filter.AllowedThingDefs?.Count() < 4 )
-        //    {
-        //        return string.Join( ", ", filter.AllowedThingDefs.Select( td => td.LabelCap ).ToArray() );
-        //    }
-
-        //    // TODO: main routine
-        //    // NOTE: when I can be arsed to care enough.
-        //    // get list of allowed thingdefs.
-        //    // get list of categories.
-        //    // from the top category downwards, enqueue all categories.
-        //    // for each category, check if all thingdefs are allowed, if so, add category - delete thingdefs.
-        //    // if not, if only one is not allowed, add category with exception clause - delete thingdefs
-        //    // else, add thingdefs
-
-        //    TreeNode_ThingCategory root = filter.DisplayRootCategory;
-        //    return string.Empty;
-        //}
-
-
+        
         private static bool TryGetCached( MapStockpileFilter mapStockpileFilter, out int count )
         {
             if ( CountCache.ContainsKey( mapStockpileFilter ) )

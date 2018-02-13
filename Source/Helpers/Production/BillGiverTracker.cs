@@ -155,7 +155,6 @@
 //            Scribe_References.Look( ref AreaRestriction, "AreaRestriction" );
 //            Scribe_Collections.Look( ref _assignedBillsScribeID, "AssignedBills", LookMode.Value );
 //            Scribe_Collections.Look( ref _assignedWorkersScribeID, "AssignedWorkers", LookMode.Value );
-//            // TODO: Validate ref
 //            Scribe_Collections.Look( ref SpecificBillGivers, "SpecificBillGivers", LookMode.Reference );
 
 //            // rather complicated post-load workaround to find buildings by unique ID, since the scribe won't do things the simple way.

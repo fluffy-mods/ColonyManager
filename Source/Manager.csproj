@@ -85,7 +85,6 @@
     <Compile Include="Core\JobStack.cs" />
     <Compile Include="Triggers\Trigger.cs" />
     <Compile Include="JobDrivers\JobDriver_ManagingAtManagingStation.cs" />
-    <Compile Include="Helpers\Forestry\Utilities_Forestry.cs" />
     <Compile Include="WorkGivers\WorkGiver_Manager.cs" />
     <Compile Include="ManagerTabs\ManagerTab_Overview.cs" />
     <Compile Include="Triggers\Trigger_Threshold.cs" />

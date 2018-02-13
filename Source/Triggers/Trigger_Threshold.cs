@@ -60,7 +60,7 @@ namespace FluffyManager
             TargetCount = DefaultCount;
             ThresholdFilter = new ThingFilter();
             ThresholdFilter.SetDisallowAll();
-            ThresholdFilter.SetAllow( Utilities_Forestry.Wood, true );
+            ThresholdFilter.SetAllow( ThingDefOf.WoodLog, true );
         }
 
         public Trigger_Threshold( ManagerJob_Foraging job ) : base( job.manager )
@@ -218,7 +218,6 @@ namespace FluffyManager
             }
             if ( tooltip.NullOrEmpty() )
             {
-                // TODO: Re-implement filter summary method.
                 tooltip = "FMP.ThresholdCountTooltip".Translate( CurrentCount, TargetCount );
             }
 

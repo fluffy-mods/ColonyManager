@@ -118,7 +118,6 @@
 //            y += 6f;
 
 //            // Specific billgivers
-//            // todo; add scrolling region.
 //            var specific = new Rect( x, y, contentRect.width, 30f );
 //            var specificLabel = new Rect( 36f, y, contentRect.width - 36f, 30f );
 //            y += 30;

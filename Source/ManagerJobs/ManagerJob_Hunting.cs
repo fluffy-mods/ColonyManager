@@ -220,7 +220,7 @@ namespace FluffyManager
             // scribe base things
             base.ExposeData();
 
-            // references first, because of the stupid bug in CrossRefResolver.
+            // references first, reasons
             Scribe_References.Look( ref HuntingGrounds, "HuntingGrounds" );
 
             // must be after references, because reasons.

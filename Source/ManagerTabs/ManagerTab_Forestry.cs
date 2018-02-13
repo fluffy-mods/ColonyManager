@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 using static FluffyManager.Constants;
@@ -86,12 +87,12 @@ namespace FluffyManager
             Widgets_Section.BeginSectionColumn( optionsColumnRect, "Forestry.Options", out position, out width );
             Widgets_Section.Section( ref position, width, DrawJobType, "FMF.JobType".Translate() );
 
-            if ( _selected.type == ManagerJob_Forestry.ForestryJobType.ClearArea )
+            if ( _selected.Type == ManagerJob_Forestry.ForestryJobType.ClearArea )
             {
                 Widgets_Section.Section( ref position, width, DrawClearArea, "FMF.JobType.ClearArea".Translate() );
             }
 
-            if ( _selected.type == ManagerJob_Forestry.ForestryJobType.Logging )
+            if ( _selected.Type == ManagerJob_Forestry.ForestryJobType.Logging )
             {
                 Widgets_Section.Section( ref position, width, DrawThreshold, "FM.Threshold".Translate() );
                 Widgets_Section.Section( ref position, width, DrawAreaRestriction, "FMF.LoggingArea".Translate() );
@@ -99,23 +100,9 @@ namespace FluffyManager
             }
             Widgets_Section.EndSectionColumn( "Forestry.Options", position );
 
-
             Widgets_Section.BeginSectionColumn( treesColumnRect, "Forestry.Trees", out position, out width );
-
-            switch ( _selected.type )
-            {
-                case ManagerJob_Forestry.ForestryJobType.ClearArea:
-                    Widgets_Section.Section(ref position, width, DrawEmpty_ClearArea, "FMF.Trees".Translate());
-                    break;
-                case ManagerJob_Forestry.ForestryJobType.ClearWind:
-                    Widgets_Section.Section(ref position, width, DrawEmpty_ClearWind, "FMF.Trees".Translate());
-                    break;
-                case ManagerJob_Forestry.ForestryJobType.Logging:
-                    Widgets_Section.Section( ref position, width, DrawTreeShortcuts, "FMF.Trees".Translate() );
-                    Widgets_Section.Section( ref position, width, DrawTreeList );
-                    break;
-            }
-
+            Widgets_Section.Section( ref position, width, DrawTreeShortcuts, "FMF.Trees".Translate() );
+            Widgets_Section.Section( ref position, width, DrawTreeList );
             Widgets_Section.EndSectionColumn( "Forestry.Trees", position );
 
             // do the button
@@ -150,8 +137,13 @@ namespace FluffyManager
         public float DrawJobType( Vector2 pos, float width )
         {
             // type of job;
-            // clear wind cells | clear area | logging
+            // clear clear area | logging
             var types = Enum.GetValues( typeof( ManagerJob_Forestry.ForestryJobType ) ) as ManagerJob_Forestry.ForestryJobType[];
+
+            // backwards compatibility for wind areas
+            // TODO: REMOVE ON NEXT BREAKING VERSION!
+            types = types.Where( type => type != ManagerJob_Forestry.ForestryJobType.ClearWind ).ToArray();
+
             var cellWidth = width / types.Length;
 
             Rect cellRect = new Rect(
@@ -165,8 +157,8 @@ namespace FluffyManager
                 Utilities.DrawToggle( 
                     cellRect, 
                     $"FMF.JobType.{type}".Translate(),
-                    _selected.type == type,
-                    () => _selected.type = type,
+                    _selected.Type == type,
+                    () => _selected.Type = type,
                     () => {}, 
                     wrap: false );
                 cellRect.x += cellWidth;
@@ -177,13 +169,17 @@ namespace FluffyManager
 
         public float DrawClearArea( Vector2 pos, float width )
         {
+            var start = pos;
             var rowRect = new Rect(
                 pos.x,
                 pos.y,
                 width,
                 ListEntryHeight );
             AreaAllowedGUI.DoAllowedAreaSelectorsMC( rowRect, ref _selected.ClearAreas );
-            return ListEntryHeight;
+            pos.y += ListEntryHeight;
+            Utilities.DrawToggle( ref pos, width, "FMF.ClearWindCells".Translate(), ref _selected.ClearWindCells  );
+
+            return pos.y - start.y;
         }
 
         public float DrawThreshold( Vector2 pos, float width )
@@ -200,7 +196,6 @@ namespace FluffyManager
             Utilities.DrawReachabilityToggle(ref pos, width, ref _selected.CheckReachable);
             Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), ref _selected.PathBasedDistance,
                 true );
-
 
             return pos.y - start.y;
         }
@@ -237,15 +232,72 @@ namespace FluffyManager
                 width,
                 ListEntryHeight);
             var allowedTrees = _selected.AllowedTrees;
-            var trees = new List<ThingDef>(allowedTrees.Keys);
+            var plants = new List<ThingDef>(allowedTrees.Keys);
 
             // toggle all
-            var toggleAllRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            Utilities.DrawToggle( toggleAllRect, "<i>" + "FM.All".Translate() + "</i>",
+            Utilities.DrawToggle( rowRect, "FM.All".Translate().Italic(),
                 _selected.AllowedTrees.Values.All( v => v ),
                 _selected.AllowedTrees.Values.All( v => !v ),
-                () => trees.ForEach( t => allowedTrees[t] = true ),
-                () => trees.ForEach( t => allowedTrees[t] = false ) );
+                () => plants.ForEach( t => allowedTrees[t] = true ),
+                () => plants.ForEach( t => allowedTrees[t] = false ) );
+
+            if ( _selected.Type == ManagerJob_Forestry.ForestryJobType.ClearArea )
+            {
+
+                rowRect.y += ListEntryHeight;
+                // trees (anything that drops wood, or has the correct harvest tag).
+                var trees = plants.Where( tree => tree.plant.harvestTag == "Wood" ||
+                                                  tree.plant.harvestedThingDef == ThingDefOf.WoodLog ).ToList();
+                Utilities.DrawToggle( rowRect, "FMF.Trees".Translate().Italic(),
+                    trees.All( t => allowedTrees[t] ),
+                    trees.All( t => !allowedTrees[t] ),
+                    () => trees.ForEach( t => _selected.AllowedTrees[t] = true ),
+                    () => trees.ForEach( t => _selected.AllowedTrees[t] = false ) );
+                rowRect.y += ListEntryHeight;
+
+                // flammable (probably all - might be modded stuff).
+                var flammable = plants.Where( tree => tree.BaseFlammability > 0 ).ToList();
+                if ( flammable.Count != plants.Count )
+                {
+                    Utilities.DrawToggle( rowRect, "FMF.Flammable".Translate().Italic(),
+                        flammable.All( t => allowedTrees[t] ),
+                        flammable.All( t => !allowedTrees[t] ),
+                        () => flammable.ForEach( t => _selected.AllowedTrees[t] = true ),
+                        () => flammable.ForEach( t => _selected.AllowedTrees[t] = false ) );
+                    rowRect.y += ListEntryHeight;
+                }
+
+                // ugly (possibly none - modded stuff).
+                var ugly = plants.Where( tree => tree.statBases.GetStatValueFromList( StatDefOf.Beauty, 0 ) < 0 ).ToList();
+                if ( !ugly.NullOrEmpty() )
+                {
+                    Utilities.DrawToggle( rowRect, "FMF.Ugly".Translate().Italic(),
+                        ugly.All( t => allowedTrees[t] ),
+                        ugly.All( t => !allowedTrees[t] ),
+                        () => ugly.ForEach( t => _selected.AllowedTrees[t] = true ),
+                        () => ugly.ForEach( t => _selected.AllowedTrees[t] = false ) );
+                    rowRect.y += ListEntryHeight;
+                }
+
+                // provides cover
+                var cover = plants.Where( tree => tree.Fillage == FillCategory.Full ||
+                                                  ( tree.Fillage == FillCategory.Partial && tree.fillPercent > 0 ) )
+                    .ToList();
+                Utilities.DrawToggle( rowRect, "FMF.ProvidesCover".Translate().Italic(),
+                    cover.All( t => allowedTrees[t] ),
+                    cover.All( t => !allowedTrees[t] ),
+                    () => cover.ForEach( t => _selected.AllowedTrees[t] = true ),
+                    () => cover.ForEach( t => _selected.AllowedTrees[t] = false ) );
+                rowRect.y += ListEntryHeight;
+
+                // blocks wind
+                var wind = plants.Where( tree => tree.blockWind ).ToList();
+                Utilities.DrawToggle( rowRect, "FMF.BlocksWind".Translate().Italic(),
+                    wind.All( t => allowedTrees[t] ),
+                    wind.All( t => !allowedTrees[t] ),
+                    () => wind.ForEach( t => _selected.AllowedTrees[t] = true ),
+                    () => wind.ForEach( t => _selected.AllowedTrees[t] = false ) );
+            }
 
             return rowRect.yMax - start.y;
         }
@@ -271,17 +323,7 @@ namespace FluffyManager
 
             return rowRect.yMin - start.y;
         }
-
-        public float DrawEmpty_ClearArea(Vector2 pos, float width)
-        {
-            return DrawEmpty("FMF.ClearArea.TreesExplanation".Translate(), pos, width);
-        }
-
-        public float DrawEmpty_ClearWind(Vector2 pos, float width)
-        {
-            return DrawEmpty("FMF.ClearWind.TreesExplanation".Translate(), pos, width);
-        }
-
+        
         public float DrawEmpty( string label, Vector2 pos, float width )
         {
             var height = Mathf.Max( Text.CalcHeight( label, width ), ListEntryHeight );

@@ -10,9 +10,6 @@ namespace FluffyManager
 {
     public class Comp_ManagerStation : ThingComp
     {
-        // todo add automatic work setup.
-        // todo add research and more workstations.
-
         public CompProperties_ManagerStation Props => props as CompProperties_ManagerStation;
     }
 }
