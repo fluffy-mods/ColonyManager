@@ -205,7 +205,7 @@ namespace FluffyManager
                     continue;
 
                 // if the plant is not in the allowed filter
-                if ( !AllowedTrees[plant.def] )
+                if (!AllowedTrees.ContainsKey(plant.def) ||  !AllowedTrees[plant.def] )
                     continue;
                 
                 // we don't cut stuff in growing zones
