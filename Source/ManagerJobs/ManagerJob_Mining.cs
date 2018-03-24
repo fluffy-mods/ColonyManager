@@ -630,7 +630,7 @@ namespace FluffyManager
             return target.HasThing
                    && target.IsValid
                    && target.Thing is Building
-                   && IsValidDeconstructionTarget(target.Thing);
+                   && IsValidDeconstructionTarget( (Building) target.Thing );
         }
         
         public void AddDesignation(Designation designation)
