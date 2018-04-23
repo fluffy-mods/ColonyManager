@@ -128,12 +128,12 @@ namespace FluffyManager
             int targetCount = _selected.Trigger.TargetCount;
             var start = pos;
 
-            _selected.Trigger.DrawTriggerConfig(ref pos, width, ListEntryHeight, false,
+            _selected.Trigger.DrawTriggerConfig(ref pos, width, ListEntryHeight,
                 "FMG.TargetCount".Translate(currentCount, designatedCount, targetCount),
                 "FMG.TargetCountTooltip".Translate(currentCount, designatedCount, targetCount));
 
             Utilities.DrawReachabilityToggle(ref pos, width, ref _selected.CheckReachable);
-            Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), ref _selected.PathBasedDistance,
+            Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), "FM.PathBasedDistance.Tip".Translate(), ref _selected.PathBasedDistance,
                 true );
 
             return pos.y - start.y;
@@ -143,7 +143,7 @@ namespace FluffyManager
         {
             // Force mature plants only (2)
             var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            Utilities.DrawToggle( rowRect, "FMG.ForceMature".Translate(), ref _selected.ForceFullyMature );
+            Utilities.DrawToggle( rowRect, "FMG.ForceMature".Translate(), "FMG.ForceMature.Tip".Translate(), ref _selected.ForceFullyMature );
 
             return ListEntryHeight;
         }
@@ -173,6 +173,7 @@ namespace FluffyManager
             Utilities.DrawToggle(
                 rowRect,
                 "<i>" + "FM.All".Translate() + "</i>",
+                string.Empty,
                 allowedPlants.Values.All(p => p),
                 allowedPlants.Values.All(p => !p),
                 () => plants.ForEach(p => allowedPlants[p] = true),
@@ -184,6 +185,7 @@ namespace FluffyManager
             Utilities.DrawToggle(
                 rowRect,
                 "<i>" + "FM.Foraging.Edible".Translate() + "</i>",
+                "FM.Foraging.Edible.Tip".Translate(),
                 edible.All(p => allowedPlants[p]),
                 edible.All(p => !allowedPlants[p]),
                 () => edible.ForEach(p => allowedPlants[p] = true),
@@ -195,6 +197,7 @@ namespace FluffyManager
             Utilities.DrawToggle(
                 rowRect,
                 "<i>" + "FM.Foraging.Mushrooms".Translate() + "</i>",
+                "FM.Foraging.Mushrooms.Tip".Translate(),
                 shrooms.All(p => allowedPlants[p]),
                 shrooms.All(p => !allowedPlants[p]),
                 () => shrooms.ForEach(p => allowedPlants[p] = true),
@@ -220,7 +223,7 @@ namespace FluffyManager
             // toggle for each plant
             foreach ( ThingDef plant in plants.OrderBy( p => p.LabelCap ) )
             {
-                Utilities.DrawToggle( rowRect, plant.LabelCap, _selected.AllowedPlants[plant],
+                Utilities.DrawToggle( rowRect, plant.LabelCap, plant.description, _selected.AllowedPlants[plant],
                     () => _selected.AllowedPlants[plant] = !_selected.AllowedPlants[plant] );
                 rowRect.y += ListEntryHeight;
             }

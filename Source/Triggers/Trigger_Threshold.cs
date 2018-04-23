@@ -31,6 +31,8 @@ namespace FluffyManager
 
         public ThingFilter ParentFilter;
 
+        public bool countAllOnMap;
+
         #endregion Fields
 
         private string _stockpile_scribe;
@@ -104,7 +106,7 @@ namespace FluffyManager
 
         #endregion Enums
 
-        public int CurrentCount => manager.map.CountProducts( ThresholdFilter, stockpile );
+        public int CurrentCount => manager.map.CountProducts( ThresholdFilter, stockpile, countAllOnMap );
 
         public WindowTriggerThresholdDetails DetailsWindow
         {
@@ -202,15 +204,37 @@ namespace FluffyManager
             TooltipHandler.TipRegion( rect, StatusTooltip );
         }
 
-        public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false,
-                                                string label = null, string tooltip = null, Action onClick = null )
+        public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, string label = null, string tooltip = null, Action onClick = null )
         {
             // target threshold
-            var thresholdLabelRect = new Rect( cur.x, cur.y, width, entryHeight );
-            if ( alt )
-            {
-                Widgets.DrawAltRect( thresholdLabelRect );
-            }
+            var thresholdLabelRect = new Rect(
+                cur.x, 
+                cur.y, 
+                width, 
+                entryHeight );
+            var searchIconRect = new Rect( 
+                thresholdLabelRect.xMax - Margin - entryHeight, 
+                cur.y, 
+                entryHeight,
+                entryHeight );
+            searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - SmallIconSize ) / 2 );
+            cur.y += entryHeight;
+            
+            var thresholdRect = new Rect( 
+                cur.x, 
+                cur.y, 
+                width, 
+                SliderHeight );
+            cur.y += entryHeight;
+            
+            var useResourceListerToggleRect = new Rect(
+                cur.x,
+                cur.y,
+                width,
+                entryHeight );
+            cur.y += entryHeight;
+            
+
             Widgets.DrawHighlightIfMouseover( thresholdLabelRect );
             if ( label.NullOrEmpty() )
             {
@@ -224,29 +248,16 @@ namespace FluffyManager
             Widgets_Labels.Label( thresholdLabelRect, label, tooltip );
 
             // add a little icon to mark interactivity
-            var searchIconRect = new Rect( thresholdLabelRect.xMax - Margin - entryHeight, cur.y, entryHeight,
-                                           entryHeight );
-            if ( searchIconRect.height > SmallIconSize )
-            {
-                // center it.
-                searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - SmallIconSize ) / 2 );
-            }
             GUI.DrawTexture( searchIconRect, Resources.Search );
 
-            cur.y += entryHeight;
             if ( Widgets.ButtonInvisible( thresholdLabelRect ) )
             {
                 onClick?.Invoke();
                 Find.WindowStack.Add( DetailsWindow );
             }
-
-            var thresholdRect = new Rect( cur.x, cur.y, width, SliderHeight );
-            if ( alt )
-            {
-                Widgets.DrawAltRect( thresholdRect );
-            }
+            
+            Utilities.DrawToggle( useResourceListerToggleRect, "FM.CountAllOnMap".Translate(), "FM.CountAllOnMap.Tip".Translate(), ref countAllOnMap, true );
             TargetCount = (int)GUI.HorizontalSlider( thresholdRect, TargetCount, 0, MaxUpperThreshold );
-            cur.y += SliderHeight;
         }
 
         public override void ExposeData()
@@ -256,6 +267,7 @@ namespace FluffyManager
             Scribe_Values.Look( ref MaxUpperThreshold, "MaxUpperThreshold" );
             Scribe_Values.Look( ref Op, "Operator" );
             Scribe_Deep.Look( ref ThresholdFilter, "ThresholdFilter" );
+            Scribe_Values.Look( ref countAllOnMap, "CountAllOnMap" );
 
             // stockpile needs special treatment - is not referenceable.
             if ( Scribe.mode == LoadSaveMode.Saving )
@@ -266,9 +278,8 @@ namespace FluffyManager
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
             {
                 stockpile =
-                    manager.map.zoneManager.AllZones.FirstOrDefault(
-                                                                    z =>
-                                                                    z is Zone_Stockpile && z.label == _stockpile_scribe )
+                    manager.map.zoneManager.AllZones.FirstOrDefault( z => z is Zone_Stockpile && 
+                                                                          z.label == _stockpile_scribe )
                     as Zone_Stockpile;
             }
         }

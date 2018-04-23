@@ -1,6 +1,7 @@
 ﻿// ManagerTab_Mining.cs
 // Copyright Karel Kroeze, 2017-2017
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -136,14 +137,20 @@ namespace FluffyManager
             var designatedCount = _selected.GetCountInDesignations();
             var targetCount = _selected.Trigger.TargetCount;
 
-            _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight, false,
+            _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight,
                 "FM.Mining.TargetCount".Translate( currentCount, chunkCount, designatedCount, targetCount ),
                 "FM.Mining.TargetCount.Tip".Translate( currentCount, chunkCount, designatedCount, targetCount ),
                 onClick: delegate { _selected.Sync = ManagerJob_Mining.SyncDirection.FilterToAllowed; } );
 
-            Utilities.DrawToggle( ref pos, width, "FM.Mining.SyncFilterAndAllowed".Translate(), ref _selected.SyncFilterAndAllowed );
+            Utilities.DrawToggle( ref pos, width, 
+                "FM.Mining.SyncFilterAndAllowed".Translate(),
+                "FM.Mining.SyncFilterAndAllowed.Tip".Translate(),
+                ref _selected.SyncFilterAndAllowed );
             Utilities.DrawReachabilityToggle(ref pos, width, ref _selected.CheckReachable);
-            Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), ref _selected.PathBasedDistance,
+            Utilities.DrawToggle( ref pos, width, 
+                "FM.PathBasedDistance".Translate(),
+                "FM.PathBasedDistance.Tip".Translate(),
+                ref _selected.PathBasedDistance,
                 true );
 
             return pos.y - start.y;
@@ -159,33 +166,34 @@ namespace FluffyManager
         public float DrawDeconstructBuildings( Vector2 pos, float width )
         {
             var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            Utilities.DrawToggle( rowRect, "FM.Mining.DeconstructBuildings".Translate(), ref _selected.DeconstructBuildings );
+            Utilities.DrawToggle( rowRect, 
+                "FM.Mining.DeconstructBuildings".Translate(),
+                "FM.Mining.DeconstructBuildings.Tip".Translate(),
+                ref _selected.DeconstructBuildings );
             return ListEntryHeight;
         }
 
         public float DrawRoofRoomChecks( Vector2 pos, float width )
         {
             var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            TooltipHandler.TipRegion(rowRect, "FM.Mining.CheckRoofSupport.Tip".Translate());
-            Utilities.DrawToggle( rowRect, "FM.Mining.CheckRoofSupport".Translate(), ref _selected.CheckRoofSupport );
+            Utilities.DrawToggle( rowRect, "FM.Mining.CheckRoofSupport".Translate(),"FM.Mining.CheckRoofSupport.Tip".Translate(), ref _selected.CheckRoofSupport );
 
             rowRect.y += ListEntryHeight;
             if ( _selected.CheckRoofSupport )
             {
-                TooltipHandler.TipRegion( rowRect, "FM.Mining.CheckRoofSupportAdvanced.Tip".Translate() );
                 Utilities.DrawToggle( rowRect, "FM.Mining.CheckRoofSupportAdvanced".Translate(),
+                    "FM.Mining.CheckRoofSupportAdvanced.Tip".Translate(),
                     ref _selected.CheckRoofSupportAdvanced, true );
             }
             else
             {
                 Widgets_Labels.Label( rowRect, "FM.Mining.CheckRoofSupportAdvanced".Translate(),
-                    "FM.Mining.CheckRoofSupportAdvanced.DisabledTip".Translate(), TextAnchor.MiddleLeft, margin: Margin,
+                    "FM.Mining.CheckRoofSupportAdvanced.Disabled.Tip".Translate(), TextAnchor.MiddleLeft, margin: Margin,
                     color: Color.grey );
             }
 
             rowRect.y += ListEntryHeight;
-            TooltipHandler.TipRegion(rowRect, "FM.Mining.CheckRoomDivision.Tip".Translate());
-            Utilities.DrawToggle(rowRect, "FM.Mining.CheckRoomDivision".Translate(), ref _selected.CheckRoomDivision, true );
+            Utilities.DrawToggle(rowRect, "FM.Mining.CheckRoomDivision".Translate(), "FM.Mining.CheckRoomDivision.Tip".Translate(), ref _selected.CheckRoomDivision, true );
 
             return rowRect.yMax - pos.y;
         }
@@ -199,7 +207,9 @@ namespace FluffyManager
             var minerals = new List<ThingDef>(allowedMinerals.Keys);
 
             // toggle all
-            Utilities.DrawToggle( ref pos, width, "<i>" + "FM.All".Translate() + "</i>",
+            Utilities.DrawToggle( ref pos, width, 
+                "FM.All".Translate().Italic(),
+                string.Empty,
                 _selected.AllowedMinerals.Values.All( v => v ),
                 _selected.AllowedMinerals.Values.All( v => !v ),
                 () => minerals.ForEach( p => _selected.SetAllowMineral( p, true ) ),
@@ -207,7 +217,9 @@ namespace FluffyManager
 
             // toggle stone
             var stone = minerals.Where(m => !m.building.isResourceRock ).ToList();
-            Utilities.DrawToggle( ref pos, width, "<i>" + "FM.Mining.Stone".Translate() + "</i>",
+            Utilities.DrawToggle( ref pos, width, 
+            "FM.Mining.Stone".Translate().Italic(),
+                "FM.Mining.Stone.Tip".Translate(),
                 stone.All( p => allowedMinerals[p] ),
                 stone.All( p => !allowedMinerals[p] ),
                 () => stone.ForEach( p => _selected.SetAllowMineral( p, true ) ),
@@ -216,7 +228,9 @@ namespace FluffyManager
             // toggle metal
             var metal = minerals.Where(m => m.building.isResourceRock && IsMetal( m.building.mineableThing ) )
                 .ToList();
-            Utilities.DrawToggle( ref pos, width, "<i>" + "FM.Mining.Metal".Translate() + "</i>",
+            Utilities.DrawToggle( ref pos, width, 
+                "FM.Mining.Metal".Translate().Italic(),
+                "FM.Mining.Metal.Tip".Translate(),
                 metal.All( p => allowedMinerals[p] ),
                 metal.All( p => !allowedMinerals[p] ),
                 () => metal.ForEach( p => _selected.SetAllowMineral( p, true ) ),
@@ -225,7 +239,9 @@ namespace FluffyManager
             // toggle precious
             var precious = minerals.Where( m => m.building.isResourceRock && m.building.mineableThing.smallVolume )
                 .ToList();
-            Utilities.DrawToggle( ref pos, width, "<i>" + "FM.Mining.Precious".Translate() + "</i>",
+            Utilities.DrawToggle( ref pos, width, 
+                "FM.Mining.Precious".Translate().Italic(),
+                "FM.Mining.Precious.Tip".Translate(),
                 precious.All( p => allowedMinerals[p] ),
                 precious.All( p => !allowedMinerals[p] ),
                 () => precious.ForEach( p => _selected.SetAllowMineral( p, true ) ),
@@ -255,7 +271,7 @@ namespace FluffyManager
             foreach (var mineral in minerals)
             {
                 // draw the toggle
-                Utilities.DrawToggle( rowRect, mineral.LabelCap, _selected.AllowedMinerals[mineral],
+                Utilities.DrawToggle( rowRect, mineral.LabelCap, mineral.description, _selected.AllowedMinerals[mineral],
                     () => _selected.SetAllowMineral( mineral, !_selected.AllowedMinerals[mineral] ) );
                 rowRect.y += ListEntryHeight;
             }
@@ -274,7 +290,9 @@ namespace FluffyManager
 
             // toggle all
             var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            Utilities.DrawToggle( rowRect, "<i>" + "FM.All".Translate() + "</i>",
+            Utilities.DrawToggle( rowRect, 
+                "FM.All".Translate().Italic(),
+                String.Empty, 
                 allowedBuildings.Values.All( v => v ),
                 allowedBuildings.Values.All( v => !v ),
                 () => buildings.ForEach( b => _selected.SetAllowBuilding( b, true ) ),
@@ -293,7 +311,7 @@ namespace FluffyManager
             var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
             foreach (var building in buildings)
             {
-                Utilities.DrawToggle( rowRect, building.LabelCap, allowedBuildings[building],
+                Utilities.DrawToggle( rowRect, building.LabelCap, building.description, allowedBuildings[building],
                     () => _selected.SetAllowBuilding( building, !allowedBuildings[building] ) );
                 rowRect.y += ListEntryHeight;
             }

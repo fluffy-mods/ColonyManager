@@ -25,7 +25,7 @@ namespace FluffyManager
         {
         }
 
-        public abstract void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, bool alt = false,
+        public abstract void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, 
                                                 string label = null, string tooltip = null, Action onClick = null );
 
         public virtual void ExposeData()

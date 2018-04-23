@@ -121,7 +121,7 @@ namespace FluffyManager
             return s;
         }
 
-        public static int CountProducts( this Map map, ThingFilter filter, Zone_Stockpile stockpile = null )
+        public static int CountProducts( this Map map, ThingFilter filter, Zone_Stockpile stockpile = null, bool countAllOnMap = false )
         {
             var count = 0;
 
@@ -131,26 +131,19 @@ namespace FluffyManager
                 return count;
             }
 
-            var key = new MapStockpileFilter( map, filter, stockpile );
+            var key = new MapStockpileFilter( map, filter, stockpile, countAllOnMap );
             if ( TryGetCached( key, out count ) )
             {
                 return count;
             }
 
-#if DEBUG_COUNTS
-            Log.Message("Obtaining new count");
-#endif
-
             foreach ( ThingDef td in filter.AllowedThingDefs )
             {
                 // if it counts as a resource and we're not limited to a single stockpile, use the ingame counter (e.g. only steel in stockpiles.)
-                if ( td.CountAsResource &&
+                if ( !countAllOnMap &&
+                     td.CountAsResource &&
                      stockpile == null )
                 {
-#if DEBUG_COUNTS
-                        Log.Message(td.LabelCap + ", " + Find.ResourceCounter.GetCount(td));
-#endif
-
                     // we don't need to bother with quality / hitpoints as these are non-existant/irrelevant for resources.
                     count += map.resourceCounter.GetCount( td );
                 }
@@ -167,6 +160,10 @@ namespace FluffyManager
                     }
                     foreach ( Thing t in thingList )
                     {
+                        if ( t.IsForbidden( Faction.OfPlayer ) || 
+                             t.Position.Fogged( map ) )
+                            continue;
+                        
                         QualityCategory quality;
                         if ( t.TryGetQuality( out quality ) )
                         {
@@ -180,6 +177,7 @@ namespace FluffyManager
                         {
                             continue;
                         }
+                        
 
 #if DEBUG_COUNTS
                             Log.Message(t.LabelCap + ": " + CountProducts(t));
@@ -306,7 +304,7 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public static void DrawToggle( ref Vector2 pos, float width, string label, ref bool checkOn,
+        public static void DrawToggle( ref Vector2 pos, float width, string label, string tooltip, ref bool checkOn,
             bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small,
             bool wrap = true )
         {
@@ -316,10 +314,10 @@ namespace FluffyManager
                 width,
                 ListEntryHeight );
             pos.y += ListEntryHeight;
-            DrawToggle( toggleRect, label, ref checkOn, expensive, size, margin, font, wrap );
+            DrawToggle( toggleRect, label, tooltip, ref checkOn, expensive, size, margin, font, wrap );
         }
 
-        public static void DrawToggle( Rect rect, string label, ref bool checkOn, bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small, bool wrap = true )
+        public static void DrawToggle( Rect rect, string label, string tooltip, ref bool checkOn, bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small, bool wrap = true )
         {
             // set up rects
             Rect labelRect = rect;
@@ -328,6 +326,12 @@ namespace FluffyManager
 
             // draw label
             Label( labelRect, label, TextAnchor.MiddleLeft, font, margin: margin, wrap: wrap );
+            
+            // tooltip
+            if ( !tooltip.NullOrEmpty() )
+            {
+                TooltipHandler.TipRegion( rect, tooltip );
+            }
 
             // draw check
             if ( checkOn )
@@ -357,7 +361,7 @@ namespace FluffyManager
             }
         }
 
-        public static void DrawToggle(ref Vector2 pos, float width, string label, bool checkOn, Action on, Action off,
+        public static void DrawToggle(ref Vector2 pos, float width, string label, string tooltip, bool checkOn, Action on, Action off,
             bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small,
             bool wrap = true)
         {
@@ -367,10 +371,10 @@ namespace FluffyManager
                 width,
                 ListEntryHeight);
             pos.y += ListEntryHeight;
-            DrawToggle(toggleRect, label, checkOn, on, off, expensive, size, margin, wrap);
+            DrawToggle(toggleRect, label, tooltip, checkOn, on, off, expensive, size, margin, wrap);
         }
 
-        public static void DrawToggle(ref Vector2 pos, float width, string label, bool checkOn, bool checkOff, Action on, Action off,
+        public static void DrawToggle(ref Vector2 pos, float width, string label, string tooltip, bool checkOn, bool checkOff, Action on, Action off,
             bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small,
             bool wrap = true)
         {
@@ -380,17 +384,17 @@ namespace FluffyManager
                 width,
                 ListEntryHeight);
             pos.y += ListEntryHeight;
-            DrawToggle(toggleRect, label, checkOn, checkOff, on, off, expensive, size, margin, wrap);
+            DrawToggle(toggleRect, label, tooltip, checkOn, checkOff, on, off, expensive, size, margin, wrap);
         }
 
-        public static void DrawToggle( Rect rect, string label, bool checkOn, Action on, Action off,
+        public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, Action on, Action off,
             bool expensive = false, float size = SmallIconSize, float margin = Margin, bool wrap = true )
         {
-            DrawToggle( rect, label, checkOn, !checkOn, on, off, expensive, size, margin, wrap );
+            DrawToggle( rect, label, tooltip, checkOn, !checkOn, on, off, expensive, size, margin, wrap );
         }
 
 
-        public static void DrawToggle( Rect rect, string label, bool checkOn, bool checkOff, Action on,
+        public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, bool checkOff, Action on,
             Action off, bool expensive = false, float size = SmallIconSize, float margin = Margin, bool wrap = true )
         {
             // set up rects
@@ -404,6 +408,11 @@ namespace FluffyManager
             // draw label
             Label( rect, label, TextAnchor.MiddleLeft, GameFont.Small, margin: margin, wrap: wrap );
 
+            // tooltip
+            if ( !tooltip.NullOrEmpty() )
+            {
+                TooltipHandler.TipRegion( rect, tooltip );
+            }
 
             // draw check
             if ( checkOn )
@@ -444,15 +453,15 @@ namespace FluffyManager
             }
         }
 
-        public static void DrawToggle( Rect rect, string label, bool checkOn, Action toggle, bool expensive = false,
+        public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, Action toggle, bool expensive = false,
                                        float size = SmallIconSize, float margin = Margin )
         {
-            DrawToggle( rect, label, checkOn, toggle, toggle, expensive, size );
+            DrawToggle( rect, label, tooltip, checkOn, toggle, toggle, expensive, size );
         }
 
         public static void DrawReachabilityToggle( ref Vector2 pos, float width, ref bool reachability)
         {
-            DrawToggle( ref pos, width, "FM.CheckReachability".Translate(), ref reachability, true );
+            DrawToggle( ref pos, width, "FM.CheckReachability".Translate(), "FM.CheckReachability.Tip".Translate(), ref reachability, true );
         }
 
         public static bool TryGetPrivateField( Type type, object instance, string fieldName, out object value,
@@ -532,12 +541,14 @@ namespace FluffyManager
             private ThingFilter filter;
             private Zone_Stockpile stockpile;
             private Map map;
+            private bool countAllOnMap;
 
-            public MapStockpileFilter( Map map, ThingFilter filter, Zone_Stockpile stockpile )
+            public MapStockpileFilter( Map map, ThingFilter filter, Zone_Stockpile stockpile, bool countAllOnMap = false )
             {
                 this.map = map;
                 this.filter = filter;
                 this.stockpile = stockpile;
+                this.countAllOnMap = countAllOnMap;
             }
         }
 

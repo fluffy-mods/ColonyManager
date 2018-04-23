@@ -221,7 +221,7 @@ namespace FluffyManager
                 .CenteredOnYIn(rowRect);
 
             // master selection
-            Label( rowRect, "FM.Livestock.MasterDefault".Translate(), "FM.Livestock.MasterDefaultTip".Translate(),
+            Label( rowRect, "FM.Livestock.MasterDefault".Translate(), "FM.Livestock.MasterDefault.Tip".Translate(),
                 TextAnchor.MiddleLeft, margin: Margin );
             if ( Widgets.ButtonText( buttonRect, GetMasterLabel() ) )
             {
@@ -246,31 +246,39 @@ namespace FluffyManager
 
             // default follow
             rowRect.y += ListEntryHeight;
-            TooltipHandler.TipRegion( rowRect, "FM.Livestock.FollowTip".Translate() );
-            DrawToggle( rowRect, "FM.Livestock.Follow".Translate(), ref _selectedCurrent.SetFollow );
+            DrawToggle( rowRect, "FM.Livestock.Follow".Translate(), "FM.Livestock.Follow.Tip".Translate(), ref _selectedCurrent.SetFollow );
 
             if ( _selectedCurrent.SetFollow )
             {
                 rowRect.y += ListEntryHeight;
                 var followRect = rowRect;
                 followRect.width /= 2f;
-                DrawToggle( followRect, "FM.Livestock.FollowDrafted".Translate(), ref _selectedCurrent.FollowDrafted,
+                DrawToggle( followRect, 
+                    "FM.Livestock.FollowDrafted".Translate(),
+                    "FM.Livestock.FollowDrafted.Tip".Translate(),
+                    ref _selectedCurrent.FollowDrafted,
                     font: GameFont.Tiny );
                 followRect.x += followRect.width;
-                DrawToggle( followRect, "FM.Livestock.FollowFieldwork".Translate(),
-                    ref _selectedCurrent.FollowFieldwork, font: GameFont.Tiny );
+                DrawToggle( followRect, 
+                    "FM.Livestock.FollowFieldwork".Translate(),
+                    "FM.Livestock.FollowFieldwork.Tip".Translate(),
+                    ref _selectedCurrent.FollowFieldwork, 
+                    font: GameFont.Tiny );
             }
 
             // follow when training
             rowRect.y += ListEntryHeight;
-            TooltipHandler.TipRegion( rowRect, "FM.Livestock.FollowTrainingTip".Translate() );
-            DrawToggle( rowRect, "FM.Livestock.FollowTraining".Translate(), ref _selectedCurrent.FollowTraining );
+            TooltipHandler.TipRegion( rowRect, "FM.Livestock.FollowTraining.Tip".Translate() );
+            DrawToggle( rowRect, 
+                "FM.Livestock.FollowTraining".Translate(),
+                "FM.Livestock.FollowTraining.Tip".Translate(),
+                ref _selectedCurrent.FollowTraining );
 
             // master selection
             if ( _selectedCurrent.FollowTraining )
             {
                 rowRect.y += ListEntryHeight;
-                Label( rowRect, "FM.Livestock.MasterTraining".Translate(), "FM.Livestock.MasterTrainingTip".Translate(),
+                Label( rowRect, "FM.Livestock.MasterTraining".Translate(), "FM.Livestock.MasterTraining.Tip".Translate(),
                     TextAnchor.MiddleLeft, margin: Margin );
 
                 buttonRect = buttonRect.CenteredOnYIn( rowRect );
@@ -331,7 +339,9 @@ namespace FluffyManager
             // restrict to area
             var restrictAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
 
-            DrawToggle(restrictAreaRect, "FML.RestrictToArea".Translate(),
+            DrawToggle(restrictAreaRect, 
+                "FML.RestrictToArea".Translate(),
+                "FML.RestrictToArea.Tip".Translate(),
                 ref _selectedCurrent.RestrictToArea);
             pos.y += ListEntryHeight;
 
@@ -377,7 +387,9 @@ namespace FluffyManager
             pos.y += ListEntryHeight;
             if ( _selectedCurrent.ButcherExcess )
             {
-                DrawToggle( sendToSlaughterAreaRect, "FML.SendToSlaughterArea".Translate(),
+                DrawToggle( sendToSlaughterAreaRect, 
+                    "FML.SendToSlaughterArea".Translate(),
+                    "FML.SendToSlaughterArea.Tip".Translate(),
                     ref _selectedCurrent.SendToSlaughterArea );
 
                 if ( _selectedCurrent.SendToSlaughterArea )
@@ -400,7 +412,9 @@ namespace FluffyManager
             pos.y += ListEntryHeight;
             if (_selectedCurrent.Training.Any)
             {
-                DrawToggle(sendToTrainingAreaRect, "FML.SendToTrainingArea".Translate(),
+                DrawToggle(sendToTrainingAreaRect, 
+                    "FML.SendToTrainingArea".Translate(),
+                    "FML.SendToTrainingArea.Tip".Translate(),
                     ref _selectedCurrent.SendToTrainingArea);
 
                 if (_selectedCurrent.SendToTrainingArea)
@@ -431,7 +445,10 @@ namespace FluffyManager
             if (_selectedCurrent.Training.Any)
             {
                 var trainYoungRect = new Rect( pos.x, pos.y + height, width, ListEntryHeight );
-                DrawToggle(trainYoungRect, "FML.TrainYoung".Translate(), ref _selectedCurrent.Training.TrainYoung);
+                DrawToggle(trainYoungRect, 
+                    "FML.TrainYoung".Translate(),
+                    "FML.TrainYoung.Tip".Translate(),
+                    ref _selectedCurrent.Training.TrainYoung);
                 height += ListEntryHeight;
             }
 
@@ -453,7 +470,7 @@ namespace FluffyManager
                 if (visible && report.Accepted)
                 {
                     bool checkOn = _selectedCurrent.Training[keys[i]];
-                    DrawToggle( cell, keys[i].LabelCap, ref checkOn, size: 16f, font: GameFont.Tiny, wrap: false );
+                    DrawToggle( cell, keys[i].LabelCap, keys[i].description, ref checkOn, size: 16f, font: GameFont.Tiny, wrap: false );
                     _selectedCurrent.Training[keys[i]] = checkOn;
                 }
                 else if (visible)
@@ -471,7 +488,10 @@ namespace FluffyManager
 
             // butchery stuff
             var butcherExcessRect = new Rect( pos.x, pos.y, width, ListEntryHeight);
-            DrawToggle(butcherExcessRect, "FML.ButcherExcess".Translate(), ref _selectedCurrent.ButcherExcess);
+            DrawToggle(butcherExcessRect, 
+                "FML.ButcherExcess".Translate(),
+                "FML.ButcherExcess.Tip".Translate(),
+                ref _selectedCurrent.ButcherExcess);
             pos.y += ListEntryHeight;
 
             if (_selectedCurrent.ButcherExcess)
@@ -479,15 +499,21 @@ namespace FluffyManager
                 var cellWidth = ( width - Margin * 2 ) / 3f;
                 var butcherOptionRect = new Rect(pos.x, pos.y, cellWidth, ListEntryHeight);
 
-                DrawToggle(butcherOptionRect, "FML.ButcherTrained".Translate(),
+                DrawToggle(butcherOptionRect, 
+                    "FML.ButcherTrained".Translate(),
+                    "FML.ButcherTrained.Tip".Translate(),
                     ref _selectedCurrent.ButcherTrained, font: GameFont.Tiny, wrap: false );
                 butcherOptionRect.x += cellWidth + Margin;
 
-                DrawToggle( butcherOptionRect, "FML.ButcherPregnant".Translate(),
+                DrawToggle( butcherOptionRect, 
+                    "FML.ButcherPregnant".Translate(),
+                    "FML.ButcherPregnant.Tip".Translate(),
                     ref _selectedCurrent.ButcherPregnant, font: GameFont.Tiny, wrap: false );
                 butcherOptionRect.x += cellWidth + Margin;
 
-                DrawToggle(butcherOptionRect, "FML.ButcherBonded".Translate(),
+                DrawToggle(butcherOptionRect, 
+                    "FML.ButcherBonded".Translate(),
+                    "FML.ButcherBonded.Tip".Translate(),
                     ref _selectedCurrent.ButcherBonded, font: GameFont.Tiny, wrap: false );
 
                 pos.y += ListEntryHeight;
@@ -499,14 +525,20 @@ namespace FluffyManager
         private float DrawTamingSection( Vector2 pos, float width )
         {
             var start = pos;
-            DrawToggle(ref pos, width, "FML.TameMore".Translate(), ref _selectedCurrent.TryTameMore);
+            DrawToggle(ref pos, width, 
+                "FML.TameMore".Translate(),
+                "FML.TameMore.Tip".Translate(),
+                ref _selectedCurrent.TryTameMore);
 
             // area to tame from (if taming more);
             if (_selectedCurrent.TryTameMore)
             {
                 AreaAllowedGUI.DoAllowedAreaSelectors(ref pos, width, ref _selectedCurrent.TameArea, manager );
                 DrawReachabilityToggle( ref pos, width, ref _selectedCurrent.CheckReachable );
-                DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), ref _selectedCurrent.PathBasedDistance, true );
+                DrawToggle( ref pos, width, 
+                    "FM.PathBasedDistance".Translate(),
+                    "FM.PathBasedDistance.Tip".Translate(),
+                    ref _selectedCurrent.PathBasedDistance, true );
             }
 
             return pos.y - start.y;
