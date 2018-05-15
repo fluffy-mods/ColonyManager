@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+   <Managing.labelShort>Gerenciando</Managing.labelShort>
+   <Managing.pawnLabel>Gerenciar</Managing.pawnLabel>
+   <Managing.gerundLabel>Gerenciamento</Managing.gerundLabel>
+   <Managing.description>Os gerentes definem tarefas e gerenciam a colônia.</Managing.description>
+   <Managing.verb>Gerencia em</Managing.verb>
+
+
+</LanguageData>
