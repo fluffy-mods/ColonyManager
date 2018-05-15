@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <ManagingSoftware.label>Programa de gerenciamento básico</ManagingSoftware.label>
+  <ManagingSoftware.description>Desenvolvimento de software básico para gerenciamento de colônias. Permite que você crie o local de trabalho do gerente e do computador no qual o software para gerenciar a colônia está instalado.</ManagingSoftware.description>
+
+  <AdvancedManagingSoftware.label>Programa de gerenciamento melhorado</AdvancedManagingSoftware.label>
+  <AdvancedManagingSoftware.description>Desenvolvimento de software aprimorado para gerenciar a colônia. IA melhorada e novas tecnologias de computador permitem construir supercomputadores rodando o sistema operacional FluffyOS. Alguns colonos relatam abertura arbitrária e fechamento de portas, falha de sistemas de ar condicionado e inclusões súbitas de fusão elétrica. No entanto, o fabricante garante (TM) que o FluffyOS não está programado para matar colonos.</AdvancedManagingSoftware.description>
+
+  <PowerManagement.label>Gerenciamento de energia</PowerManagement.label>
+  <PowerManagement.description>Desenvolvimento de software para monitorar o consumo de energia.</PowerManagement.description>
+
+
+</LanguageData>
