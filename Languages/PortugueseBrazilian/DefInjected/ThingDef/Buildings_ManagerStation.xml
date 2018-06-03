@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <!-- Mesas de trabalho -->
+
+  <FM_BasicManagerStation.label>Tabela base do gerenciador</FM_BasicManagerStation.label>
+  <FM_BasicManagerStation.description>Uma tabela simples com o mais necessário para o gerente.</FM_BasicManagerStation.description>
+
+  <FM_ManagerStation.label>Tabela do gerente</FM_ManagerStation.label>
+  <FM_ManagerStation.description>Uma tabela com um computador e todo o necessário para que o gerenciador funcione.</FM_ManagerStation.description>
+
+  <FM_AIManager.label>AI Manager</FM_AIManager.label>
+  <FM_AIManager.description>Um supercomputador capaz de controlar independentemente uma colônia. As alegações de que a AI tem uma sub-rotina de um psicopata malicioso são inimigas. Nós garantimos sua segurança!</FM_AIManager.description>
+
+
+</LanguageData>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+   <ManagingSpeed.label>Velocidade de gerenciamento</ManagingSpeed.label>
+   <ManagingSpeed.description>Multiplicador de velocidade com o qual o gerenciador pode gerenciar efetivamente.</ManagingSpeed.description>
+
+
+</LanguageData>
