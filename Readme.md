@@ -50,6 +50,7 @@ In theory there is no real limit to the number of manager jobs that can be creat
  - Lauri7x3:	German translation
  - Well-sp:	Russian translation (update)
  - Alex TD:	Bugfix in forestry jobs
+ - Firty:	Portuguese (Brazilian) translation
 
 # Think you found a bug? 
 Please read [this guide](http://steamcommunity.com/sharedfiles/filedetails/?id=725234314) before creating a bug report,
@@ -70,4 +71,4 @@ Show your appreciation by buying me a coffee (or contribute towards a nice singl
 [![Buy Me a Coffee](http://i.imgur.com/EjWiUwx.gif)](https://ko-fi.com/fluffymods)
 
 # Version
-This is version v0.18.3.7
+This is version v0.18.3.8
