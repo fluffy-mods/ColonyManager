@@ -88,7 +88,7 @@ namespace FluffyManager
             ParentFilter.SetAllow(ThingCategoryDefOf.Chunks, true);
             ParentFilter.SetAllow(ThingCategoryDefOf.ResourcesRaw, true);
             ParentFilter.SetAllow(ThingCategoryDefOf.PlantMatter, false);
-            ParentFilter.SetAllow(ThingDefOf.Component, true);
+            ParentFilter.SetAllow(ThingDefOf.ComponentIndustrial, true);
         }
 
         #endregion Constructors

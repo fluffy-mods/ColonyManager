@@ -357,9 +357,9 @@ namespace FluffyManager
             return AllowedBuildings.ContainsKey(thingDef) && AllowedBuildings[thingDef];
         }
 
-        public bool Counted( ThingCountClass thingCount )
+        public bool Counted( ThingDefCountClass thingDefCount )
         {
-            return Counted( thingCount.thingDef );
+            return Counted( thingDefCount.thingDef );
         }
 
         public bool Counted( ThingDef thingDef )
@@ -629,8 +629,8 @@ namespace FluffyManager
         {
             return target.HasThing
                    && target.IsValid
-                   && target.Thing is Building
-                   && IsValidDeconstructionTarget( (Building) target.Thing );
+                   && target.Thing is Building building
+                   && IsValidDeconstructionTarget( building );
         }
         
         public void AddDesignation(Designation designation)

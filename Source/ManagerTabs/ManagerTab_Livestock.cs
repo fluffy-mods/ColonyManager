@@ -371,13 +371,13 @@ namespace FluffyManager
 
                 // do the selectors
                 _selectedCurrent.RestrictArea[0] = AreaAllowedGUI.DoAllowedAreaSelectors(areaRects[1, 1],
-                    _selectedCurrent.RestrictArea[0], manager, AllowedAreaMode.Animal, Margin);
+                    _selectedCurrent.RestrictArea[0], manager, Margin);
                 _selectedCurrent.RestrictArea[1] = AreaAllowedGUI.DoAllowedAreaSelectors(areaRects[2, 1],
-                    _selectedCurrent.RestrictArea[1], manager, AllowedAreaMode.Animal, Margin);
+                    _selectedCurrent.RestrictArea[1], manager, Margin);
                 _selectedCurrent.RestrictArea[2] = AreaAllowedGUI.DoAllowedAreaSelectors(areaRects[1, 2],
-                    _selectedCurrent.RestrictArea[2], manager, AllowedAreaMode.Animal, Margin);
+                    _selectedCurrent.RestrictArea[2], manager, Margin);
                 _selectedCurrent.RestrictArea[3] = AreaAllowedGUI.DoAllowedAreaSelectors(areaRects[2, 2],
-                    _selectedCurrent.RestrictArea[3], manager, AllowedAreaMode.Animal, Margin);
+                    _selectedCurrent.RestrictArea[3], manager, Margin);
 
                 Text.Anchor = TextAnchor.UpperLeft; // DoAllowedAreaMode leaves the anchor in an incorrect state.
                 pos.y += 3 * ListEntryHeight;
@@ -395,8 +395,7 @@ namespace FluffyManager
                 if ( _selectedCurrent.SendToSlaughterArea )
                 {
                     var slaughterAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-                    AreaAllowedGUI.DoAllowedAreaSelectors( slaughterAreaRect, ref _selectedCurrent.SlaughterArea,
-                        manager, AllowedAreaMode.Animal );
+                    AreaAllowedGUI.DoAllowedAreaSelectors( slaughterAreaRect, ref _selectedCurrent.SlaughterArea, manager );
                     pos.y += ListEntryHeight;
                 }
             }
@@ -420,8 +419,7 @@ namespace FluffyManager
                 if (_selectedCurrent.SendToTrainingArea)
                 {
                     var trainingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-                    AreaAllowedGUI.DoAllowedAreaSelectors(trainingAreaRect, ref _selectedCurrent.TrainingArea,
-                        manager, AllowedAreaMode.Animal);
+                    AreaAllowedGUI.DoAllowedAreaSelectors(trainingAreaRect, ref _selectedCurrent.TrainingArea, manager );
                     pos.y += ListEntryHeight;
                 }
             }

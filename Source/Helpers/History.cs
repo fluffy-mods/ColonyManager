@@ -90,7 +90,7 @@ namespace FluffyManager
             _chaptersShown.AddRange( _chapters );
         }
 
-        public History( ThingCount[] thingCounts, Color[] colors = null )
+        public History( ThingDefCount[] thingCounts, Color[] colors = null )
         {
             // get range of colors if not set
             if ( colors == null )
@@ -111,7 +111,7 @@ namespace FluffyManager
             // create a chapter for each label
             for ( var i = 0; i < thingCounts.Length; i++ )
             {
-                _chapters.Add( new Chapter( new ThingCountClass( thingCounts[i].ThingDef, thingCounts[i].Count ), Size,
+                _chapters.Add( new Chapter( new ThingDefCountClass( thingCounts[i].ThingDef, thingCounts[i].Count ), Size,
                                             colors[i % colors.Length] ) );
             }
 
@@ -225,7 +225,7 @@ namespace FluffyManager
 
             for ( var i = 0; i < counts.Length; i++ )
             {
-                _chapters[i].ThingCount.count = counts[i];
+                _chapters[i].ThingDefCount.count = counts[i];
             }
         }
 
@@ -251,10 +251,10 @@ namespace FluffyManager
 
             for ( var i = 0; i < maxes.Length; i++ )
             {
-                if ( _chapters[i].ThingCount.count != counts[i] )
+                if ( _chapters[i].ThingDefCount.count != counts[i] )
                 {
                     _chapters[i].TrueMax = maxes[i];
-                    _chapters[i].ThingCount.count = counts[i];
+                    _chapters[i].ThingDefCount.count = counts[i];
                 }
             }
         }
@@ -519,7 +519,7 @@ namespace FluffyManager
                 GUI.BeginGroup( viewRect );
 
                 // if DrawIcons and a thing is set, draw the icon.
-                ThingDef thing = ChaptersOrdered[i].ThingCount.thingDef;
+                ThingDef thing = ChaptersOrdered[i].ThingDefCount.thingDef;
                 if ( DrawIcons && thing != null )
                 {
                     // draw the icon in correct proportions
@@ -529,7 +529,7 @@ namespace FluffyManager
                     // draw counts in upper left corner
                     if ( DrawCounts )
                     {
-                        Utilities.LabelOutline( icon, ChaptersOrdered[i].ThingCount.count.ToString(), null,
+                        Utilities.LabelOutline( icon, ChaptersOrdered[i].ThingDefCount.count.ToString(), null,
                                                 TextAnchor.UpperLeft, 0f, GameFont.Tiny, Color.white, Color.black );
                     }
                 }
@@ -623,7 +623,7 @@ namespace FluffyManager
             public Color lineColor = DefaultLineColor;
             public Dictionary<Period, List<int>> pages = new Dictionary<Period, List<int>>();
             public int size = Size;
-            public ThingCountClass ThingCount = new ThingCountClass();
+            public ThingDefCountClass ThingDefCount = new ThingDefCountClass();
 
             public Chapter()
             {
@@ -639,10 +639,10 @@ namespace FluffyManager
                 lineColor = color;
             }
 
-            public Chapter( ThingCountClass thingCount, int size, Color color ) : this()
+            public Chapter( ThingDefCountClass thingDefCount, int size, Color color ) : this()
             {
-                label = thingCount.thingDef.LabelCap;
-                ThingCount = thingCount;
+                label = thingDefCount.thingDef.LabelCap;
+                ThingDefCount = thingDefCount;
                 this.size = size;
                 lineColor = color;
             }
@@ -677,8 +677,8 @@ namespace FluffyManager
                 Scribe_Values.Look( ref label, "label" );
                 Scribe_Values.Look( ref size, "size", 100 );
                 Scribe_Values.Look( ref lineColor, "color", Color.white );
-                Scribe_Values.Look( ref ThingCount.count, "thingCount_count" );
-                Scribe_Defs.Look( ref ThingCount.thingDef, "thingCount_def" );
+                Scribe_Values.Look( ref ThingDefCount.count, "thingCount_count" );
+                Scribe_Defs.Look( ref ThingDefCount.thingDef, "thingCount_def" );
 
                 var periods = new List<Period>( pages.Keys );
                 foreach ( Period period in periods )

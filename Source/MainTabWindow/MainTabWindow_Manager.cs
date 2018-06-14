@@ -21,7 +21,7 @@ namespace FluffyManager
             }
         }
 
-        public static ManagerTab DefaultTab => Manager.For( Find.VisibleMap ).Tabs[0];
+        public static ManagerTab DefaultTab => Manager.For( Find.CurrentMap ).Tabs[0];
 
         public static void GoTo( ManagerTab tab, ManagerJob job = null )
         {
@@ -48,15 +48,15 @@ namespace FluffyManager
             // three areas of icons for tabs, left middle and right.
             var leftIcons = new Rect( 0f, 0f,
                                       Margin +
-                                      Manager.For( Find.VisibleMap ).ManagerTabsLeft.Count * ( LargeIconSize + Margin ),
+                                      Manager.For( Find.CurrentMap ).ManagerTabsLeft.Count * ( LargeIconSize + Margin ),
                                       LargeIconSize );
             var middleIcons = new Rect( 0f, 0f,
                                         Margin +
-                                        Manager.For( Find.VisibleMap ).ManagerTabsMiddle.Count * ( LargeIconSize + Margin ),
+                                        Manager.For( Find.CurrentMap ).ManagerTabsMiddle.Count * ( LargeIconSize + Margin ),
                                         LargeIconSize );
             var rightIcons = new Rect( 0f, 0f,
                                        Margin +
-                                       Manager.For( Find.VisibleMap ).ManagerTabsRight.Count * ( LargeIconSize + Margin ),
+                                       Manager.For( Find.CurrentMap ).ManagerTabsRight.Count * ( LargeIconSize + Margin ),
                                        LargeIconSize );
 
             // finetune rects
@@ -66,7 +66,7 @@ namespace FluffyManager
             // left icons (probably only overview, but hey...)
             GUI.BeginGroup( leftIcons );
             var cur = new Vector2( Margin, 0f );
-            foreach ( ManagerTab tab in Manager.For( Find.VisibleMap ).ManagerTabsLeft )
+            foreach ( ManagerTab tab in Manager.For( Find.CurrentMap ).ManagerTabsLeft )
             {
                 var iconRect = new Rect( cur.x, cur.y, LargeIconSize, LargeIconSize );
                 DrawTabIcon( iconRect, tab );
@@ -78,7 +78,7 @@ namespace FluffyManager
             // middle icons (the bulk of icons)
             GUI.BeginGroup( middleIcons );
             cur = new Vector2( Margin, 0f );
-            foreach ( ManagerTab tab in Manager.For( Find.VisibleMap ).ManagerTabsMiddle )
+            foreach ( ManagerTab tab in Manager.For( Find.CurrentMap ).ManagerTabsMiddle )
             {
                 var iconRect = new Rect( cur.x, cur.y, LargeIconSize, LargeIconSize );
                 DrawTabIcon( iconRect, tab );
@@ -90,7 +90,7 @@ namespace FluffyManager
             // right icons (probably only import/export, possbile settings?)
             GUI.BeginGroup( rightIcons );
             cur = new Vector2( Margin, 0f );
-            foreach ( ManagerTab tab in Manager.For( Find.VisibleMap ).ManagerTabsRight )
+            foreach ( ManagerTab tab in Manager.For( Find.CurrentMap ).ManagerTabsRight )
             {
                 var iconRect = new Rect( cur.x, cur.y, LargeIconSize, LargeIconSize );
                 DrawTabIcon( iconRect, tab );
@@ -160,14 +160,14 @@ namespace FluffyManager
             base.PreOpen();
 
             // TODO: reimplement help dialog
-            //if ( !Manager.For( Find.VisibleMap ).HelpShown )
+            //if ( !Manager.For( Find.CurrentMap ).HelpShown )
             //{
             //    Find.WindowStack.Add( new Dialog_Message( "FM.HelpMessage".Translate(), "FM.HelpTitle".Translate() ) );
-            //    Manager.For( Find.VisibleMap ).HelpShown = true;
+            //    Manager.For( Find.CurrentMap ).HelpShown = true;
             //}
 
             // make sure the currently open tab is for this map
-            if ( CurrentTab.manager.map != Find.VisibleMap )
+            if ( CurrentTab.manager.map != Find.CurrentMap )
                 CurrentTab = DefaultTab;
             CurrentTab.PreOpen();
         }

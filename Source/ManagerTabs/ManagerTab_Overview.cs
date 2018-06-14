@@ -259,7 +259,7 @@ namespace FluffyManager
                     cur.y += 50f;
                 }
 
-                GUI.EndScrollView();
+                Widgets.EndScrollView();
                 GUI.EndGroup();
 
                 OverviewHeight = cur.y;
@@ -315,7 +315,8 @@ namespace FluffyManager
                 catch // pawn death, etc.
                 {
                     // rehresh the list and skip drawing untill the next GUI tick.
-                    RefreshWorkers();
+                    RefreshWorkers();            
+                    Widgets.EndScrollView();
                     return;
                 }
 
@@ -359,7 +360,7 @@ namespace FluffyManager
                     Find.Selector.Select( pawn );
                 }
             }
-            Widgets_Labels.Label( nameRect, pawn.NameStringShort, "FM.ClickToJumpTo".Translate( pawn.LabelCap ),
+            Widgets_Labels.Label( nameRect, pawn.Name.ToStringShort, "FM.ClickToJumpTo".Translate( pawn.LabelCap ),
                              TextAnchor.MiddleLeft, margin: Margin );
 
             // current activity (if curDriver != null)

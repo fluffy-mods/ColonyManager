@@ -35,18 +35,18 @@ namespace FluffyManager
 
         public override AlertReport GetReport()
         {
-            return Manager.For( Find.VisibleMap ).JobStack.FullStack().Count > 0 && !AnyConsciousManagerPawn();
+            return Manager.For( Find.CurrentMap ).JobStack.FullStack().Count > 0 && !AnyConsciousManagerPawn();
         }
 
         private bool AnyConsciousManagerPawn()
         {
             return
-                Find.VisibleMap.mapPawns.FreeColonistsSpawned.Any(
+                Find.CurrentMap.mapPawns.FreeColonistsSpawned.Any(
                                                                   pawn => !pawn.health.Dead && !pawn.Downed &&
                                                                           pawn.workSettings.WorkIsActive(
                                                                                                          Utilities
                                                                                                              .WorkTypeDefOf_Managing ) ) ||
-                Find.VisibleMap.listerBuildings.ColonistsHaveBuilding( DefDatabase<ThingDef>.GetNamed( "FM_AIManager" ) );
+                Find.CurrentMap.listerBuildings.ColonistsHaveBuilding( DefDatabase<ThingDef>.GetNamed( "FM_AIManager" ) );
         }
 
         #endregion Methods
@@ -78,12 +78,12 @@ namespace FluffyManager
 
         public override AlertReport GetReport()
         {
-            return Manager.For( Find.VisibleMap ).JobStack.FullStack().Count > 0 && !AnyManagerTable();
+            return Manager.For( Find.CurrentMap ).JobStack.FullStack().Count > 0 && !AnyManagerTable();
         }
 
         private bool AnyManagerTable()
         {
-            return Find.VisibleMap.listerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().Any();
+            return Find.CurrentMap.listerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>().Any();
         }
 
         #endregion Methods

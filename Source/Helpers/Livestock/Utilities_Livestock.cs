@@ -197,7 +197,7 @@ namespace FluffyManager
             cached = pawn.MapHeld.mapPawns.PawnsInFaction( pawn.Faction )
                 .Where(p => !p.Dead &&
                             p.RaceProps.Animal &&
-                            p.playerSettings.master == pawn
+                            p.playerSettings.Master == pawn
                 );
 
             // update if key exists

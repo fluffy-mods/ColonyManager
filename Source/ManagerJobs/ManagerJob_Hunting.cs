@@ -263,7 +263,7 @@ namespace FluffyManager
                 {
                     // check to see if it's buried.
                     var buried = false;
-                    SlotGroup slotGroup = manager.map.slotGroupManager.SlotGroupAt( corpse.Position );
+                    SlotGroup slotGroup = manager.map.haulDestinationManager.SlotGroupAt( corpse.Position );
                     var building_Storage = slotGroup?.parent as Building_Storage;
 
                     // Sarcophagus inherits grave

@@ -17,16 +17,15 @@ namespace FluffyManager
         public static Area DoAllowedAreaSelectors( Rect rect,
                                                    Area areaIn,
                                                    Map map,
-                                                   AllowedAreaMode mode = AllowedAreaMode.Humanlike,
                                                    float lrMargin = 0 )
         {
             Area areaIO = areaIn;
-            DoAllowedAreaSelectors( rect, ref areaIO, map, mode, lrMargin );
+            DoAllowedAreaSelectors( rect, ref areaIO, map, lrMargin );
             return areaIO;
         }
 
         // RimWorld.AreaAllowedGUI
-        public static void DoAllowedAreaSelectors( ref Vector2 pos, float width, ref Area area, Map map, AllowedAreaMode mode = AllowedAreaMode.Humanlike, float margin = 0 )
+        public static void DoAllowedAreaSelectors( ref Vector2 pos, float width, ref Area area, Map map, float margin = 0 )
         {
             var rect = new Rect(
                 pos.x,
@@ -34,13 +33,12 @@ namespace FluffyManager
                 width,
                 Constants.ListEntryHeight );
             pos.y += Constants.ListEntryHeight;
-            DoAllowedAreaSelectors( rect, ref area, map, mode, margin );
+            DoAllowedAreaSelectors( rect, ref area, map, margin );
         }
 
         public static void DoAllowedAreaSelectors( Rect rect,
                                                    ref Area area,
                                                    Map map,
-                                                   AllowedAreaMode mode = AllowedAreaMode.Humanlike,
                                                    float lrMargin = 0 )
         {
             if ( lrMargin > 0 )
@@ -53,7 +51,7 @@ namespace FluffyManager
             var areaCount = 1;
             for ( var i = 0; i < allAreas.Count; i++ )
             {
-                if ( allAreas[i].AssignableAsAllowed( mode ) )
+                if ( allAreas[i].AssignableAsAllowed() )
                 {
                     areaCount++;
                 }
@@ -67,7 +65,7 @@ namespace FluffyManager
             var areaIndex = 1;
             for ( var j = 0; j < allAreas.Count; j++ )
             {
-                if ( allAreas[j].AssignableAsAllowed( mode ) )
+                if ( allAreas[j].AssignableAsAllowed() )
                 {
                     float xOffset = areaIndex * widthPerArea;
                     var areaRect = new Rect( rect.x + xOffset, rect.y, widthPerArea, rect.height );
@@ -126,7 +124,7 @@ namespace FluffyManager
                     area.MarkForDraw();
                 if ( Widgets.ButtonInvisible( rect ) )
                 {
-                    SoundDefOf.DesignateDragStandardChanged.PlayOneShotOnCamera();
+                    SoundDefOf.Designate_DragStandard_Changed.PlayOneShotOnCamera();
                     return !status;
                 }
             }
@@ -160,7 +158,7 @@ namespace FluffyManager
                      areaAllowed != area )
                 {
                     areaAllowed = area;
-                    SoundDefOf.DesignateDragStandardChanged.PlayOneShotOnCamera();
+                    SoundDefOf.Designate_DragStandard_Changed.PlayOneShotOnCamera();
                 }
             }
             TooltipHandler.TipRegion( rect, text );

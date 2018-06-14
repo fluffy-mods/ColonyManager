@@ -53,7 +53,7 @@ namespace FluffyManager
                 new History(
                     _traderDefs.Select(
                                        def =>
-                                       new ThingCount( def,
+                                       new ThingDefCount( def,
                                                        manager.map.listerBuildings.AllBuildingsColonistOfDef( def )
                                                               .Count() ) )
                                .ToArray() )

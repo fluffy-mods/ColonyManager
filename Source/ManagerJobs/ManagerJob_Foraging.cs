@@ -313,7 +313,7 @@ namespace FluffyManager
                     .Where( td => td.plant?.cavePlant ?? false ) )
 
                 // ambrosia
-                .Concat( ThingDefOf.PlantAmbrosia )
+                .Concat( ThingDefOf.Plant_Ambrosia )
 
                 // and anything on the map that is not in a plant zone/planter
                 .Concat( manager.map.listerThings.AllThings.OfType<Plant>()

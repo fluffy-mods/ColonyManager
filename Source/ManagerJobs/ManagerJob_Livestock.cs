@@ -6,6 +6,7 @@ using System;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -39,6 +40,13 @@ namespace FluffyManager
         public Pawn Master;
         public MasterMode Trainers;
         public Pawn Trainer;
+
+        static ManagerJob_Livestock()
+        {
+            SetWanted_MI = typeof( Pawn_TrainingTracker ).GetMethod( "SetWanted", BindingFlags.NonPublic | BindingFlags.Instance );
+            if ( SetWanted_MI == null )
+                throw new NullReferenceException( "Could not find Pawn_TrainingTracker.SetWanted()" );
+        }
 
         public ManagerJob_Livestock( Manager manager ) : base( manager )
         {
@@ -288,7 +296,7 @@ namespace FluffyManager
 
         public Pawn GetMaster( Pawn animal, MasterMode mode )
         {
-            var master = animal.playerSettings.master;
+            var master = animal.playerSettings.Master;
             var options = animal.kindDef.GetMasterOptions( manager, mode );
 
             Logger.Follow( $"Getting master for {animal.LabelShort}:\n\tcurrent: {master?.LabelShort ?? "None"}\n\toptions:\n"  );
@@ -321,9 +329,9 @@ namespace FluffyManager
         public void SetMaster( Pawn animal, Pawn master, ref bool actionTaken )
         {
             Logger.Follow( $"Current: {master?.LabelShort ?? "None"}, New: {master?.LabelShort ?? "None"}"  );
-            if ( animal.playerSettings.master != master )
+            if ( animal.playerSettings.Master != master )
             {
-                animal.playerSettings.master = master;
+                animal.playerSettings.Master = master;
                 actionTaken = true;
             }
         }
@@ -383,8 +391,8 @@ namespace FluffyManager
             manager.map.designationManager.AddDesignation( des );
         }
 
-
-
+        private static MethodInfo SetWanted_MI;
+        
         internal void DoTrainingJobs( ref bool actionTaken, bool assign = true )
         {
             actionTaken = false;
@@ -400,7 +408,7 @@ namespace FluffyManager
                     foreach ( TrainableDef def in Training.Defs )
                     {
                         bool dump;
-                        if ( !animal.training.IsCompleted( def ) &&
+                        if ( !animal.training.HasLearned( def ) &&
 
                              // only train if allowed.
                              animal.training.CanAssignToTrain( def, out dump ).Accepted &&
@@ -409,8 +417,7 @@ namespace FluffyManager
                              animal.training.GetWanted( def ) != Training[def] &&
                              Training[def] )
                         {
-                            if ( assign )
-                                animal.training.SetWanted( def, Training[def] );
+                            if ( assign ) SetWanted_MI.Invoke( animal.training, new object[] {def, Training[def]} );
                             actionTaken = true;
                         }
                     }
@@ -519,7 +526,7 @@ namespace FluffyManager
                     List<Pawn> animals = Trigger.pawnKind.GetTame( manager, ageSex )
                                                 .Where(
                                                        p => manager.map.designationManager.DesignationOn( p, DesignationDefOf.Slaughter ) == null
-                                                       && ( ButcherTrained || !p.training.IsCompleted( TrainableDefOf.Obedience ) )
+                                                       && ( ButcherTrained || !p.training.HasLearned( TrainableDefOf.Obedience ) )
                                                        && ( ButcherPregnant || !p.VisiblyPregnant() )
                                                        && ( ButcherBonded || !p.BondedWithColonist() ) )
                                                 .OrderBy(
@@ -657,12 +664,12 @@ namespace FluffyManager
                 return new AcceptanceReport( "CannotTrainTooSmall".Translate( (object)pawnKind.LabelCap ) );
             }
 
-            if ( pawnKind.RaceProps.TrainableIntelligence.intelligenceOrder < td.requiredTrainableIntelligence.intelligenceOrder )
+            if ( pawnKind.RaceProps.trainability.intelligenceOrder < td.requiredTrainability.intelligenceOrder )
             {
                 visible = true;
                 return
                     new AcceptanceReport(
-                        "CannotTrainNotSmartEnough".Translate( (object)td.requiredTrainableIntelligence ) );
+                        "CannotTrainNotSmartEnough".Translate( (object)td.requiredTrainability ) );
             }
 
             visible = true;
@@ -721,7 +728,7 @@ namespace FluffyManager
                 TrainingTargets[td] = wanted;
                 if ( wanted )
                 {
-                    SoundDefOf.CheckboxTurnedOn.PlayOneShotOnCamera();
+                    SoundDefOf.Checkbox_TurnedOn.PlayOneShotOnCamera();
                     if ( td.prerequisites != null )
                     {
                         foreach ( TrainableDef trainable in td.prerequisites )
@@ -732,7 +739,7 @@ namespace FluffyManager
                 }
                 else
                 {
-                    SoundDefOf.CheckboxTurnedOff.PlayOneShotOnCamera();
+                    SoundDefOf.Checkbox_TurnedOff.PlayOneShotOnCamera();
                     IEnumerable<TrainableDef> enumerable = from t in DefDatabase<TrainableDef>.AllDefsListForReading
                                                            where
                                                                t.prerequisites != null && t.prerequisites.Contains( td )

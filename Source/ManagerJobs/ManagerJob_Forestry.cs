@@ -424,16 +424,12 @@ namespace FluffyManager
             // init list of areas
             if ( ClearAreas == null || ClearAreas.Count == 0 )
                 ClearAreas =
-                    manager.map.areaManager.AllAreas.Where(
-                                                           area => area.AssignableAsAllowed( AllowedAreaMode.Humanlike ) )
+                    manager.map.areaManager.AllAreas.Where( area => area.AssignableAsAllowed() )
                            .ToDictionary( a => a, v => false );
             else
             {
                 // iterate over areas, add new areas.
-                foreach (
-                    Area area in
-                        manager.map.areaManager.AllAreas.Where( a => a.AssignableAsAllowed( AllowedAreaMode.Humanlike ) )
-                    )
+                foreach ( Area area in manager.map.areaManager.AllAreas.Where( a => a.AssignableAsAllowed() ) )
                 {
                     if ( !ClearAreas.ContainsKey( area ) )
                         ClearAreas.Add( area, false );
@@ -572,7 +568,7 @@ namespace FluffyManager
                     .Where( td => td.plant?.cavePlant ?? false ) )
 
                 // ambrosia
-                .Concat( ThingDefOf.PlantAmbrosia )
+                .Concat( ThingDefOf.Plant_Ambrosia )
 
                 // and anything on the map that is not in a plant zone/planter
                 .Concat( manager.map.listerThings.AllThings.OfType<Plant>()

@@ -22,7 +22,7 @@ namespace FluffyManager
         {
             DebugToolMap("IsValidMiningTarget", delegate
             {
-                foreach (var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Mineable>())
+                foreach (var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Mineable>())
                 {
                     Messages.Message((job.IsValidMiningTarget(thing)).ToString(), MessageTypeDefOf.SilentInput);
                 }
@@ -31,7 +31,7 @@ namespace FluffyManager
 
             DebugToolMap("IsValidDeconstructionTarget", delegate
             {
-                foreach (var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
+                foreach (var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
                 {
                     Messages.Message((job.IsValidDeconstructionTarget(thing)).ToString(), MessageTypeDefOf.SilentInput);
                 }
@@ -39,7 +39,7 @@ namespace FluffyManager
 
             DebugToolMap("Faction", delegate
             {
-                foreach (var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
+                foreach (var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
                 {
                     Messages.Message( thing.Faction.ToStringSafe(), MessageTypeDefOf.SilentInput);
                 }
@@ -47,7 +47,7 @@ namespace FluffyManager
 
             DebugToolMap("AllowedBuilding", delegate
             {
-                foreach (var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
+                foreach (var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
                 {
                     Messages.Message(job.AllowedBuilding(thing.def).ToString(), MessageTypeDefOf.SilentInput);
                 }
@@ -56,7 +56,7 @@ namespace FluffyManager
 
             DebugToolMap("AllowedMineral", delegate
             {
-                foreach (var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Mineable>())
+                foreach (var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Mineable>())
                 {
                     Messages.Message(job.AllowedMineral(thing.def).ToString(), MessageTypeDefOf.SilentInput);
                 }
@@ -65,7 +65,7 @@ namespace FluffyManager
 
             DebugToolMap("IsRelevantDeconstructionTarget", delegate
             {
-                foreach (var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
+                foreach (var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
                 {
                     Messages.Message(job.IsRelevantDeconstructionTarget(thing).ToString(), MessageTypeDefOf.SilentInput);
                 }
@@ -73,7 +73,7 @@ namespace FluffyManager
 
             DebugToolMap("IsRelevantMiningTarget", delegate
             {
-                foreach (var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Mineable>())
+                foreach (var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Mineable>())
                 {
                     Messages.Message(job.IsRelevantMiningTarget(thing).ToString(), MessageTypeDefOf.SilentInput);
                 }
@@ -81,7 +81,7 @@ namespace FluffyManager
 
             DebugToolMap( "IsInAllowedArea", delegate
             {
-                foreach (var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
+                foreach (var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
                 {
                     Messages.Message(job.IsInAllowedArea(thing).ToString(), MessageTypeDefOf.SilentInput);
                 }
@@ -89,7 +89,7 @@ namespace FluffyManager
 
             DebugToolMap("IsReachable", delegate
             {
-                foreach (var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
+                foreach (var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
                 {
                     Messages.Message((job.IsReachable(thing)).ToString(), MessageTypeDefOf.SilentInput);
                 }
@@ -97,7 +97,7 @@ namespace FluffyManager
 
             DebugToolMap("IsRoomDivider", delegate
             {
-                foreach ( var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>() )
+                foreach ( var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>() )
                 {
                     Messages.Message( (job.IsARoomDivider( thing )).ToString(), MessageTypeDefOf.SilentInput );
                 }
@@ -105,7 +105,7 @@ namespace FluffyManager
 
             DebugToolMap("IsRoofSupport: basic", delegate
             {
-                foreach (var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
+                foreach (var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
                 {
                     Messages.Message((job.IsARoofSupport_Basic(thing)).ToString(), MessageTypeDefOf.SilentInput);
                 }
@@ -113,7 +113,7 @@ namespace FluffyManager
 
             DebugToolMap("IsRoofSupport: advanced", delegate
             {
-                foreach (var thing in Find.VisibleMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
+                foreach (var thing in Find.CurrentMap.thingGrid.ThingsAt(UI.MouseCell()).OfType<Building>())
                 {
                     Messages.Message((job.IsARoofSupport_Advanced(thing)).ToString(), MessageTypeDefOf.SilentInput);
                 }

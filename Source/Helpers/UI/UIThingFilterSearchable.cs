@@ -84,7 +84,7 @@ namespace FluffyManager
             }
 
             // draw the actual thing
-            listingTreeThingFilter.DoCategoryChildren( node, 0, openMask, true );
+            listingTreeThingFilter.DoCategoryChildren( node, 0, openMask, Find.CurrentMap, true );
             listingTreeThingFilter.End();
 
             // update height.

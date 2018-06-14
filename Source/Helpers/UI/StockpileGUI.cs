@@ -103,7 +103,7 @@ namespace FluffyManager
                      zoneAllowed != zone )
                 {
                     zoneAllowed = zone;
-                    SoundDefOf.DesignateDragStandardChanged.PlayOneShotOnCamera();
+                    SoundDefOf.Designate_DragStandard_Changed.PlayOneShotOnCamera();
                 }
             }
             TooltipHandler.TipRegion( rect, label );
