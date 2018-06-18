@@ -1,4 +1,4 @@
-[![RimWorld Alpha 18](https://img.shields.io/badge/RimWorld-Alpha%2018-brightgreen.svg)](http://rimworldgame.com/)
+[![RimWorld Alpha undefined](https://img.shields.io/badge/RimWorld-Alpha%20undefined-brightgreen.svg)](http://rimworldgame.com/)
 
 Colony Manager allows you to make colonists do the more tedious parts of managing a colony, making sure you're never out of vital resources again*. 
 
@@ -71,4 +71,4 @@ Show your appreciation by buying me a coffee (or contribute towards a nice singl
 [![Buy Me a Coffee](http://i.imgur.com/EjWiUwx.gif)](https://ko-fi.com/fluffymods)
 
 # Version
-This is version v0.18.3.8
+This is version 3.9.344, for RimWorld 1.0.1937.
