@@ -71,4 +71,4 @@ Show your appreciation by buying me a coffee (or contribute towards a nice singl
 [![Buy Me a Coffee](http://i.imgur.com/EjWiUwx.gif)](https://ko-fi.com/fluffymods)
 
 # Version
-This is version 3.9.344, for RimWorld 1.0.1937.
+This is version 3.9.345, for RimWorld 1.0.1970.
