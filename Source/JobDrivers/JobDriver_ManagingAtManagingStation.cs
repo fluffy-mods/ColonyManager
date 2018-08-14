@@ -14,7 +14,7 @@ namespace FluffyManager
         private float workNeeded;
         private float workDone;
 
-        public override bool TryMakePreToilReservations()
+        public override bool TryMakePreToilReservations( bool errorOnFailed )
         {
             return pawn.Reserve( job.targetA, job );
         }
