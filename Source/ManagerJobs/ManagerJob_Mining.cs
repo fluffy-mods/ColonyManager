@@ -21,7 +21,8 @@ namespace FluffyManager
 
         public Dictionary<ThingDef, bool> AllowedMinerals = new Dictionary<ThingDef, bool>();
         public Dictionary<ThingDef, bool> AllowedBuildings = new Dictionary<ThingDef, bool>();
-        public List<Designation> Designations = new List<Designation>();
+        private List<Designation> _designations = new List<Designation>();
+        public List<Designation> Designations => new List<Designation>( _designations );
         public History History;
         public Area MiningArea;
         public new Trigger_Threshold Trigger;
@@ -63,10 +64,10 @@ namespace FluffyManager
         public override void CleanUp()
         {
             RemoveObsoleteDesignations();
-            foreach (var designation in Designations)
+            foreach (var designation in _designations)
                 designation.Delete();
 
-            Designations.Clear();
+            _designations.Clear();
         }
 
         private void RemoveObsoleteDesignations()
@@ -75,7 +76,7 @@ namespace FluffyManager
             var designations = manager.map.designationManager.allDesignations.Where(d =>
                (d.def == DesignationDefOf.Mine || d.def == DesignationDefOf.Deconstruct) &&
                (!d.target.HasThing || d.target.Thing.Map == manager.map)); // equates to SpawnedDesignationsOfDef, with two defs.
-            Designations = Designations.Intersect(designations).ToList();
+            _designations = _designations.Intersect(designations).ToList();
         }
 
         public override void DrawListEntry(Rect rect, bool overview = true, bool active = true)
@@ -198,11 +199,11 @@ namespace FluffyManager
                 return count;
 
             // deconstruction jobs
-            count += Designations.Where( d => d.def == DesignationDefOf.Deconstruct )
+            count += _designations.Where( d => d.def == DesignationDefOf.Deconstruct )
                 .Sum( d => GetCountInBuilding( d.target.Thing as Building ) );
 
             // mining jobs
-            var mineralCounts = Designations.Where( d => d.def == DesignationDefOf.Mine )
+            var mineralCounts = _designations.Where( d => d.def == DesignationDefOf.Mine )
                 .Select( d => manager.map.thingGrid.ThingsListAtFast( d.target.Cell ).FirstOrDefault()?.def )
                 .Where( d => d != null )
                 .GroupBy( d => d, d => d, ( d, g ) => new {def = d, count = g.Count()} )
@@ -244,7 +245,7 @@ namespace FluffyManager
 
             // metals
             if ( Counted( resource ) )
-                return (int) ( rock.building.mineableYield * rock.building.mineableDropChance );
+                return (int) ( rock.building.mineableYield * Find.Storyteller.difficulty.mineYieldFactor * rock.building.mineableDropChance );
 
             return 0;
         }
@@ -406,14 +407,14 @@ namespace FluffyManager
         {
             foreach (Designation des in manager.map.designationManager
                 .SpawnedDesignationsOfDef(DesignationDefOf.Mine)
-                .Except(Designations)
+                .Except(_designations)
                 .Where(des => IsValidMiningTarget(des.target)))
             {
                 AddDesignation(des);
             }
             foreach (Designation des in manager.map.designationManager
                 .SpawnedDesignationsOfDef(DesignationDefOf.Deconstruct)
-                .Except(Designations)
+                .Except(_designations)
                 .Where(des => IsValidDeconstructionTarget(des.target)))
             {
                 AddDesignation(des);
@@ -633,10 +634,29 @@ namespace FluffyManager
                    && IsValidDeconstructionTarget( building );
         }
         
+        public string DesignationLabel( Designation designation ){
+            if ( designation.def == DesignationDefOf.Deconstruct ){
+                var building = designation.target.Thing;
+                return "Fluffy.Manager.DesignationLabel".Translate(
+                    building.LabelCap,
+                    Distance( building, manager.map.GetBaseCenter() ).ToString( "F0" ),
+                    "?", "?" );
+            }
+            if ( designation.def == DesignationDefOf.Mine ){
+                var mineable = designation.target.Cell.GetFirstMineable( manager.map );
+                return "Fluffy.Manager.DesignationLabel".Translate(
+                    mineable.LabelCap,
+                    Distance( mineable, manager.map.GetBaseCenter() ).ToString( "F0" ),
+                    GetCountInMineral( mineable ),
+                    GetMaterialsInMineral( mineable.def )?.First().LabelCap ?? "?" );
+            }
+            return string.Empty;
+        }
+
         public void AddDesignation(Designation designation)
         {
             manager.map.designationManager.AddDesignation(designation);
-            Designations.Add(designation);
+            _designations.Add(designation);
         }
 
 

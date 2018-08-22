@@ -132,10 +132,9 @@ namespace FluffyManager
             int targetCount = _selected.Trigger.TargetCount;
 
             _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight, 
-                "FMH.TargetCount".Translate(currentCount, corpseCount, designatedCount,
-                    targetCount),
-                "FMH.TargetCountTooltip".Translate(currentCount, corpseCount,
-                    designatedCount, targetCount));
+                "FMH.TargetCount".Translate(currentCount, corpseCount, designatedCount, targetCount),
+                "FMH.TargetCountTooltip".Translate(currentCount, corpseCount, designatedCount, targetCount),
+                _selected.Designations, null, _selected.DesignationLabel );
 
             // allow human & insect meat (2)
             Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), 

@@ -21,7 +21,8 @@ namespace FluffyManager
         public bool ButcherTrained;
         public bool ButcherPregnant;
         public bool ButcherBonded;
-        private List<Designation> Designations;
+        private List<Designation> _designations;
+        public List<Designation> Designations => new List<Designation>( _designations );
         public List<Area> RestrictArea;
         public bool RestrictToArea;
         public Area TameArea;
@@ -51,7 +52,7 @@ namespace FluffyManager
         public ManagerJob_Livestock( Manager manager ) : base( manager )
         {
             // init designations
-            Designations = new List<Designation>();
+            _designations = new List<Designation>();
 
             // start history tracker
             _history = new History( Utilities_Livestock.AgeSexArray.Select( ageSex => ageSex.ToString() ).ToArray() );
@@ -165,10 +166,10 @@ namespace FluffyManager
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
             {
                 // populate with all designations.
-                Designations.AddRange(
+                _designations.AddRange(
                                       manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Slaughter )
                                              .Where( des => ( (Pawn)des.target.Thing ).kindDef == Trigger.pawnKind ) );
-                Designations.AddRange(
+                _designations.AddRange(
                                       manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Tame )
                                              .Where( des => ( (Pawn)des.target.Thing ).kindDef == Trigger.pawnKind ) );
             }
@@ -189,7 +190,8 @@ namespace FluffyManager
             // intersect filters our list down to designations that exist both in our list and in the game state.
             // This should handle manual cancellations and natural completions.
             // it deliberately won't add new designations made manually.
-            Designations = Designations.Intersect( manager.map.designationManager.allDesignations ).ToList();
+            // Note that this also has the unfortunate side-effect of not re-adding designations after loading a game.
+            _designations = _designations.Intersect( manager.map.designationManager.allDesignations ).ToList();
 
             // handle butchery
             DoButcherJobs( ref actionTaken );
@@ -358,7 +360,7 @@ namespace FluffyManager
 
         public List<Designation> DesignationsOfOn( DesignationDef def, AgeAndSex ageSex )
         {
-            return Designations.Where( des => des.def == def
+            return _designations.Where( des => des.def == def
                                               && des.target.HasThing
                                               && des.target.Thing is Pawn
                                               && ( (Pawn)des.target.Thing ).PawnIsOfAgeSex( ageSex ) )
@@ -378,7 +380,7 @@ namespace FluffyManager
 
             // else, remove one from the game as well as our managed list. (delete last - this should be the youngest/oldest).
             var designation = currentDesignations.Last();
-            Designations.Remove(designation);
+            _designations.Remove(designation);
             designation.Delete();
             return true;
         }
@@ -387,7 +389,7 @@ namespace FluffyManager
         {
             // create and add designation to the game and our managed list.
             var des = new Designation( p, def );
-            Designations.Add( des );
+            _designations.Add( des );
             manager.map.designationManager.AddDesignation( des );
         }
 
@@ -567,12 +569,12 @@ namespace FluffyManager
 
         public override void CleanUp()
         {
-            foreach ( Designation des in Designations )
+            foreach ( Designation des in _designations )
             {
                 des.Delete();
             }
 
-            Designations.Clear();
+            _designations.Clear();
         }
 
         public override void DrawListEntry( Rect rect, bool overview = true, bool active = true )

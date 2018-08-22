@@ -4,6 +4,7 @@
 
 using RimWorld;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
@@ -204,20 +205,27 @@ namespace FluffyManager
             TooltipHandler.TipRegion( rect, StatusTooltip );
         }
 
-        public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, string label = null, string tooltip = null, Action onClick = null )
+        public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, string label = null, string tooltip = null, List<Designation> designations = null, Action onOpenFilterDetails = null, Func<Designation, string> designationLabelGetter = null )
         {
+            var hasTargets = !designations.NullOrEmpty();
+            
             // target threshold
             var thresholdLabelRect = new Rect(
                 cur.x, 
                 cur.y, 
-                width, 
+                width - ( hasTargets ? SmallIconSize + Margin * 2 : 0f ), 
                 entryHeight );
-            var searchIconRect = new Rect( 
-                thresholdLabelRect.xMax - Margin - entryHeight, 
-                cur.y, 
-                entryHeight,
-                entryHeight );
-            searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - SmallIconSize ) / 2 );
+            var detailsWindowButtonRect = new Rect( 
+                thresholdLabelRect.xMax - SmallIconSize - Margin, 
+                cur.y + ( entryHeight - SmallIconSize ) / 2f, 
+                SmallIconSize,
+                SmallIconSize );
+            var targetsButtonRect = new Rect( 
+                thresholdLabelRect.xMax + Margin,
+                cur.y + ( entryHeight - SmallIconSize ) / 2f,
+                SmallIconSize,
+                SmallIconSize
+            );
             cur.y += entryHeight;
             
             var thresholdRect = new Rect( 
@@ -248,12 +256,41 @@ namespace FluffyManager
             Widgets_Labels.Label( thresholdLabelRect, label, tooltip );
 
             // add a little icon to mark interactivity
-            GUI.DrawTexture( searchIconRect, Resources.Search );
-
+            GUI.color = Mouse.IsOver( detailsWindowButtonRect ) ? GenUI.MouseoverColor : Color.white;
+            GUI.DrawTexture( detailsWindowButtonRect, Resources.Cog );
+            GUI.color = Color.white;
             if ( Widgets.ButtonInvisible( thresholdLabelRect ) )
             {
-                onClick?.Invoke();
+                onOpenFilterDetails?.Invoke();
                 Find.WindowStack.Add( DetailsWindow );
+            }
+
+            // target list
+            if (hasTargets){
+                if( Widgets.ButtonImage( targetsButtonRect, Resources.Search ) ){
+                    List<FloatMenuOption> options = new List<FloatMenuOption>();
+                    foreach( var designation in designations ){
+                        string option = string.Empty;
+                        Action onClick = () => Find.WindowStack.TryRemove(typeof( MainTabWindow_Manager ), false );
+                        Action onHover = null;
+                        if ( designation.target.HasThing ){
+                            var thing = designation.target.Thing;
+                            option = designationLabelGetter?.Invoke( designation ) ?? thing.LabelCap;
+                            onClick += () => CameraJumper.TryJumpAndSelect( thing );
+                            onHover += () => CameraJumper.TryJump( thing );
+                        } else {
+                            var cell = designation.target.Cell;
+                            var map = Find.CurrentMap; 
+                            // designation.map would be better, but that's private. We should only ever be looking at jobs on the current map anyway,
+                            // so I suppose it doesn't matter -- Fluffy.
+                            option = designationLabelGetter?.Invoke( designation ) ?? cell.GetTerrain( map ).LabelCap;
+                            onClick += () => CameraJumper.TryJump( cell, map );
+                            onHover += () => CameraJumper.TryJump( cell, map );
+                        }
+                        options.Add( new FloatMenuOption( option, onClick, MenuOptionPriority.Default, onHover ) );
+                    }
+                    Find.WindowStack.Add( new FloatMenu( options ) );
+                }
             }
             
             Utilities.DrawToggle( useResourceListerToggleRect, "FM.CountAllOnMap".Translate(), "FM.CountAllOnMap.Tip".Translate(), ref countAllOnMap, true );

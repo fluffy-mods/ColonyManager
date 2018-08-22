@@ -18,7 +18,8 @@ namespace FluffyManager
         #region Fields
 
         public Dictionary<PawnKindDef, bool> AllowedAnimals = new Dictionary<PawnKindDef, bool>();
-        public List<Designation> Designations = new List<Designation>();
+        private List<Designation> _designations = new List<Designation>();
+        public List<Designation> Designations => new List<Designation>( _designations );
         public History History;
         public Area HuntingGrounds;
         public new Trigger_Threshold Trigger;
@@ -103,6 +104,7 @@ namespace FluffyManager
                 return
                     corpses.Where(
                                   thing => thing?.InnerPawn != null &&
+                                           ( HuntingGrounds == null || HuntingGrounds.ActiveCells.Contains( thing.Position ) ) &&
                                            AllowedAnimals.ContainsKey( thing.InnerPawn.kindDef ) &&
                                            AllowedAnimals[thing.InnerPawn.kindDef] ).ToList();
             }
@@ -153,6 +155,17 @@ namespace FluffyManager
 
 
         #region Methods
+
+        public string DesignationLabel( Designation designation ){
+            // label, dist, yield.
+            var thing = designation.target.Thing;
+            return "Fluffy.Manager.DesignationLabel".Translate( 
+                thing.LabelCap,
+                Distance(thing, manager.map.GetBaseCenter()).ToString( "F0" ), 
+                StatExtension.GetStatValue( thing, StatDefOf.MeatAmount ).ToString( "F0" ), 
+                thing.def.race.meatDef.LabelCap );
+        }
+
         /// <summary>
         /// Remove obsolete designations from the list.
         /// </summary>
@@ -161,7 +174,7 @@ namespace FluffyManager
             // get the intersection of bills in the game and bills in our list.
             List<Designation> GameDesignations =
                 manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Hunt ).ToList();
-            Designations = Designations.Intersect( GameDesignations ).ToList();
+            _designations = _designations.Intersect( GameDesignations ).ToList();
         }
 
         public override void CleanUp()
@@ -170,11 +183,11 @@ namespace FluffyManager
             CleanDesignations();
 
             // cancel outstanding designation
-            foreach ( Designation des in Designations )
+            foreach ( Designation des in _designations )
                 des.Delete();
 
             // clear the list completely
-            Designations.Clear();
+            _designations.Clear();
         }
 
         public override void DrawListEntry( Rect rect, bool overview = true, bool active = true )
@@ -300,15 +313,10 @@ namespace FluffyManager
             }
 
             // designated animals
-            foreach ( Designation des in manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Hunt ) )
+            foreach ( Designation des in _designations )
             {
-                // make sure target is a pawn, is an animal, is not forbidden and somebody can reach it.
-                // note: could be rolled into a fancy LINQ chain, but this is probably clearer.
                 var target = des.target.Thing as Pawn;
-                if ( target != null &&
-                     target.RaceProps.Animal &&
-                     !target.IsForbidden( Faction.OfPlayer ) &&
-                     manager.map.reachability.CanReachColony( target.Position ) )
+                if ( target != null )
                 {
                     count += target.EstimatedMeatCount();
                 }
@@ -363,13 +371,14 @@ namespace FluffyManager
             return workDone;
         }
 
-        private void AddDesignation( Designation des )
+        private void AddDesignation( Designation des, bool addToGame = true )
         {
             // add to game
-            manager.map.designationManager.AddDesignation( des );
+            if (addToGame)
+                manager.map.designationManager.AddDesignation( des );
 
             // add to internal list
-            Designations.Add( des );
+            _designations.Add( des );
         }
 
         private void AddDesignation( Pawn p )
@@ -386,10 +395,10 @@ namespace FluffyManager
             foreach (
                 Designation des in
                     manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Hunt )
-                           .Except( Designations )
-                           .Where( des => IsValidHuntingTarget( des.target ) ) )
+                           .Except( _designations )
+                           .Where( des => IsValidHuntingTarget( des.target, true ) ) )
             {
-                AddDesignation( des );
+                AddDesignation( des, false );
             }
         }
 
@@ -398,7 +407,7 @@ namespace FluffyManager
             // huntinggrounds of null denotes unrestricted
             if ( HuntingGrounds != null )
             {
-                foreach ( Designation des in Designations )
+                foreach ( Designation des in _designations )
                 {
                     if ( des.target.HasThing &&
                          !HuntingGrounds.ActiveCells.Contains( des.target.Thing.Position ) )
@@ -440,19 +449,19 @@ namespace FluffyManager
             IntVec3 position = manager.map.GetBaseCenter();
 
             return manager.map.mapPawns.AllPawns
-                .Where( IsValidHuntingTarget )
+                .Where( p => IsValidHuntingTarget( p, false ) )
                 .OrderBy( p => -p.EstimatedMeatCount() / Distance( p, position ) )
                 .ToList();
         }
 
-        private bool IsValidHuntingTarget( LocalTargetInfo t )
+        private bool IsValidHuntingTarget( LocalTargetInfo t, bool allowHunted )
         {
             return t.HasThing
                    && t.Thing is Pawn
-                   && IsValidHuntingTarget( (Pawn)t.Thing );
+                   && IsValidHuntingTarget( (Pawn)t.Thing, allowHunted );
         }
 
-        private bool IsValidHuntingTarget( Pawn target )
+        private bool IsValidHuntingTarget( Pawn target, bool allowHunted )
         {
             return target.RaceProps.Animal
                    && !target.health.Dead
@@ -464,7 +473,7 @@ namespace FluffyManager
                    // non-biome animals won't be on the list
                    && AllowedAnimals.ContainsKey( target.kindDef )
                    && AllowedAnimals[target.kindDef]
-                   && manager.map.designationManager.DesignationOn( target ) == null
+                   && ( allowHunted || manager.map.designationManager.DesignationOn( target ) == null )
                    && ( HuntingGrounds == null || HuntingGrounds.ActiveCells.Contains( target.Position ) )
                    && IsReachable( target );
         }

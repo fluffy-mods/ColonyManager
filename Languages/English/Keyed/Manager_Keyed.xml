@@ -32,6 +32,8 @@
   <FM.CountAllOnMap>Count all on map</FM.CountAllOnMap>
   <FM.CountAllOnMap.Tip>If enabled, counts all items allowed by the threshold filter on the map. If disabled, counts only those in stockpiles and storage buildings.</FM.CountAllOnMap.Tip>
   <FM.None>None</FM.None>
+  <!-- 0: target (thing), 1: distance (int), 2: yield amount (int), 3: yield type (def) -->
+  <Fluffy.Manager.DesignationLabel>{0}\n  distance: {1}\n  yield: {2}x {3}</Fluffy.Manager.DesignationLabel>
 
   <!-- time periods for update interval -->
   <FM.DefaultUpdateInterval>Default update interval</FM.DefaultUpdateInterval>

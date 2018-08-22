@@ -17,8 +17,7 @@ namespace FluffyManager
 
         public static int EstimatedMeatCount( this Pawn p )
         {
-            // StatDef MeatAmount
-            return (int)( StatDefOf.MeatAmount.defaultBaseValue * p.BodySize );
+            return (int)( StatExtension.GetStatValue( p, StatDefOf.MeatAmount ) );
         }
 
         public static int EstimatedMeatCount( this Corpse c )

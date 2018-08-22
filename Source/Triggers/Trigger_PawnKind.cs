@@ -90,7 +90,7 @@ namespace FluffyManager
         #region Methods
 
         public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight,
-                                                string label = null, string tooltip = null, Action onClick = null )
+                                                string label = null, string tooltip = null, List<Designation> targets = null, Action onOpenFilterDetails = null, Func<Designation, string> designationLabelGetter = null )
         {
         }
 

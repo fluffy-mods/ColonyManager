@@ -3,6 +3,7 @@
 // 2016-12-09
 
 using System;
+using System.Collections.Generic;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -26,7 +27,7 @@ namespace FluffyManager
         }
 
         public abstract void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, 
-                                                string label = null, string tooltip = null, Action onClick = null );
+                                                string label = null, string tooltip = null, List<Designation> targets = null, Action onOpenFilterDetails = null, Func<Designation, string> designationLabelGetter = null );
 
         public virtual void ExposeData()
         {

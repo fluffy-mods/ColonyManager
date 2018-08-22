@@ -24,7 +24,9 @@ namespace FluffyManager
         public new Trigger_Threshold Trigger;
         private Utilities.CachedValue<int> _cachedCurrentDesignatedCount = new Utilities.CachedValue<int>( 0, 250 );
 
-        private List<Designation> Designations = new List<Designation>();
+        private List<Designation> _designations = new List<Designation>();
+
+        public List<Designation> Designations => new List<Designation>( _designations );
 
         #endregion Fields
 
@@ -61,7 +63,7 @@ namespace FluffyManager
                     return count;
 
                 // fetch count
-                foreach ( Designation des in Designations )
+                foreach ( Designation des in _designations )
                 {
                     if ( !des.target.HasThing )
                         continue;
@@ -94,12 +96,22 @@ namespace FluffyManager
 
         #region Methods
 
+        public string DesignationLabel( Designation designation ){
+            // label, dist, yield.
+            var plant = designation.target.Thing as Plant;
+            return "Fluffy.Manager.DesignationLabel".Translate( 
+                plant.LabelCap, 
+                Distance(plant, manager.map.GetBaseCenter()).ToString( "F0" ), 
+                plant.YieldNow(), 
+                plant.def.plant.harvestedThingDef.LabelCap );
+        }
+
         public void AddRelevantGameDesignations()
         {
             // get list of game designations not managed by this job that could have been assigned by this job.
             foreach (
                 Designation des in manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.HarvestPlant )
-                                          .Except( Designations )
+                                          .Except( _designations )
                                           .Where( des => IsValidForagingTarget( des.target ) ) )
             {
                 AddDesignation( des );
@@ -113,7 +125,7 @@ namespace FluffyManager
         {
             IEnumerable<Designation> _gameDesignations =
                 manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.HarvestPlant );
-            Designations = Designations.Intersect( _gameDesignations ).ToList();
+            _designations = _designations.Intersect( _gameDesignations ).ToList();
         }
 
         /// <summary>
@@ -122,12 +134,12 @@ namespace FluffyManager
         public override void CleanUp()
         {
             CleanDeadDesignations();
-            foreach ( Designation des in Designations )
+            foreach ( Designation des in _designations )
             {
                 des.Delete();
             }
 
-            Designations.Clear();
+            _designations.Clear();
         }
 
         public override void DrawListEntry( Rect rect, bool overview = true, bool active = true )
@@ -228,12 +240,12 @@ namespace FluffyManager
             manager.map.designationManager.AddDesignation( des );
 
             // add to internal list
-            Designations.Add( des );
+            _designations.Add( des );
         }
 
         private void CleanAreaDesignations()
         {
-            foreach ( Designation des in Designations )
+            foreach ( Designation des in _designations )
             {
                 if ( !des.target.HasThing )
                 {

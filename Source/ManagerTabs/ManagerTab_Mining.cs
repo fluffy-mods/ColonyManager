@@ -140,7 +140,9 @@ namespace FluffyManager
             _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight,
                 "FM.Mining.TargetCount".Translate( currentCount, chunkCount, designatedCount, targetCount ),
                 "FM.Mining.TargetCount.Tip".Translate( currentCount, chunkCount, designatedCount, targetCount ),
-                onClick: delegate { _selected.Sync = ManagerJob_Mining.SyncDirection.FilterToAllowed; } );
+                _selected.Designations,
+                delegate { _selected.Sync = ManagerJob_Mining.SyncDirection.FilterToAllowed; },
+                _selected.DesignationLabel );
 
             Utilities.DrawToggle( ref pos, width, 
                 "FM.Mining.SyncFilterAndAllowed".Translate(),

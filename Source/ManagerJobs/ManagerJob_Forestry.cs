@@ -29,7 +29,8 @@ namespace FluffyManager
         public bool AllowSaplings;
         public Dictionary<Area, bool> ClearAreas = new Dictionary<Area, bool>();
         public bool ClearWindCells = false;
-        public List<Designation> Designations = new List<Designation>();
+        private List<Designation> _designations = new List<Designation>();
+        public List<Designation> Designations => new List<Designation>( _designations );
         public History History;
         public Area LoggingArea;
         public new Trigger_Threshold Trigger;
@@ -154,11 +155,20 @@ namespace FluffyManager
 
         #region Methods
 
+        public string DesignationLabel( Designation designation ){
+            // label, dist, yield.
+            var plant = designation.target.Thing as Plant;
+            return "Fluffy.Manager.DesignationLabel".Translate( 
+                plant.LabelCap, 
+                Distance(plant, manager.map.GetBaseCenter()).ToString( "F0" ),
+                plant.YieldNow(),
+                plant.def.plant.harvestedThingDef.LabelCap );
+        }
         public void AddRelevantGameDesignations()
         {
             // get list of game designations not managed by this job that could have been assigned by this job.
             foreach ( Designation des in manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.CutPlant )
-                                                .Except( Designations )
+                                                .Except( _designations )
                                                 .Where( des => IsValidForestryTarget( des.target ) ) )
             {
                 AddDesignation( des );
@@ -172,7 +182,7 @@ namespace FluffyManager
         {
             // get the intersection of bills in the game and bills in our list.
             List<Designation> gameDesignations = manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.HarvestPlant ).ToList();
-            Designations = Designations.Intersect( gameDesignations ).ToList();
+            _designations = _designations.Intersect( gameDesignations ).ToList();
         }
 
         public override void CleanUp()
@@ -181,13 +191,13 @@ namespace FluffyManager
             CleanDesignations();
 
             // cancel outstanding designation
-            foreach ( Designation des in Designations )
+            foreach ( Designation des in _designations )
             {
                 des.Delete();
             }
 
             // clear the list completely
-            Designations.Clear();
+            _designations.Clear();
         }
 
         public void DoClearAreaDesignations( IEnumerable<IntVec3> cells, ref bool workDone )
@@ -350,7 +360,7 @@ namespace FluffyManager
                 return count;
             }
 
-            foreach ( Designation des in Designations )
+            foreach ( Designation des in _designations )
             {
                 if ( des.target.HasThing &&
                      des.target.Thing is Plant )
@@ -453,7 +463,7 @@ namespace FluffyManager
             manager.map.designationManager.AddDesignation( des );
 
             // add to internal list
-            Designations.Add( des );
+            _designations.Add( des );
         }
 
         private void AddDesignation( Plant p, DesignationDef def = null )
@@ -467,7 +477,7 @@ namespace FluffyManager
 
         private void CleanAreaDesignations()
         {
-            foreach ( Designation des in Designations )
+            foreach ( Designation des in _designations )
             {
                 if ( !des.target.HasThing )
                     des.Delete();

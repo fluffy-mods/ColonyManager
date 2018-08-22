@@ -129,8 +129,9 @@ namespace FluffyManager
             var start = pos;
 
             _selected.Trigger.DrawTriggerConfig(ref pos, width, ListEntryHeight,
-                "FMG.TargetCount".Translate(currentCount, designatedCount, targetCount),
-                "FMG.TargetCountTooltip".Translate(currentCount, designatedCount, targetCount));
+                "FMG.TargetCount".Translate( currentCount, designatedCount, targetCount ),
+                "FMG.TargetCountTooltip".Translate( currentCount, designatedCount, targetCount ),
+                _selected.Designations, null, _selected.DesignationLabel );
 
             Utilities.DrawReachabilityToggle(ref pos, width, ref _selected.CheckReachable);
             Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), "FM.PathBasedDistance.Tip".Translate(), ref _selected.PathBasedDistance,

@@ -197,7 +197,8 @@ namespace FluffyManager
 
             _selected.Trigger.DrawTriggerConfig(ref pos, width, ListEntryHeight, 
                 "FMF.TargetCount".Translate(currentCount, designatedCount, targetCount),
-                "FMF.TargetCountTooltip".Translate(currentCount, designatedCount, targetCount));
+                "FMF.TargetCountTooltip".Translate(currentCount, designatedCount, targetCount),
+                _selected.Designations, null, _selected.DesignationLabel );
 
             Utilities.DrawReachabilityToggle(ref pos, width, ref _selected.CheckReachable);
             Utilities.DrawToggle( 
