@@ -256,7 +256,7 @@ namespace FluffyManager
             Widgets_Labels.Label( thresholdLabelRect, label, tooltip );
 
             // add a little icon to mark interactivity
-            GUI.color = Mouse.IsOver( detailsWindowButtonRect ) ? GenUI.MouseoverColor : Color.white;
+            GUI.color = Mouse.IsOver( thresholdLabelRect ) ? GenUI.MouseoverColor : Color.white;
             GUI.DrawTexture( detailsWindowButtonRect, Resources.Cog );
             GUI.color = Color.white;
             if ( Widgets.ButtonInvisible( thresholdLabelRect ) )
