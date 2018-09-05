@@ -239,7 +239,7 @@ namespace FluffyManager
                 () => metal.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
 
             // toggle precious
-            var precious = minerals.Where( m => m.building.isResourceRock && m.building.mineableThing.smallVolume )
+            var precious = minerals.Where( m => m.building.isResourceRock && ( m.building.mineableThing?.smallVolume ?? false ) )
                 .ToList();
             Utilities.DrawToggle( ref pos, width, 
                 "FM.Mining.Precious".Translate().Italic(),
@@ -258,7 +258,7 @@ namespace FluffyManager
             
         public bool IsMetal( ThingDef def )
         {
-            return _metals.Contains( def );
+            return def != null && _metals.Contains( def );
         }
 
         public float DrawAllowedMinerals(Vector2 pos, float width)
