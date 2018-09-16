@@ -49,6 +49,7 @@
     <Compile Include="Core\Alerts.cs" />
     <Compile Include="Core\Controller.cs" />
     <Compile Include="Core\Settings.cs" />
+    <Compile Include="GetBuildingCost.cs" />
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\Extensions\CompGlower_Extensions.cs" />
     <Compile Include="Helpers\Extensions\String_Extensions.cs" />
