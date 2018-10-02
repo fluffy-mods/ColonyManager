@@ -42,5 +42,5 @@ using Verse;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("3.19.395")]
-[assembly: AssemblyFileVersion("3.19.395")]
+[assembly: AssemblyVersion("3.20.396")]
+[assembly: AssemblyFileVersion("3.20.396")]
