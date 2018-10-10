@@ -210,39 +210,28 @@ namespace FluffyManager
 
         public static void DrawStatusForListEntry<T>( this T job, Rect rect, Trigger trigger ) where T : ManagerJob
         {
-            if ( job.Completed || job.Suspended )
+            var stampRect = new Rect( rect.x, 0f, Constants.MediumIconSize, Constants.MediumIconSize );
+
+            // center stamp in available space
+            stampRect = stampRect.CenteredOnYIn( rect );
+
+            // draw it.
+            if ( job.Completed )
             {
-                // put a stamp on it
-                var stampRect = new Rect( 0f, 0f, Constants.MediumIconSize, Constants.MediumIconSize );
+                GUI.DrawTexture( stampRect, Resources.StampCompleted );
+                TooltipHandler.TipRegion( stampRect, "FM.JobCompletedTooltip".Translate() );
+                return;
+            }
 
-                // center stamp in available space
-                stampRect = stampRect.CenteredOnXIn( rect ).CenteredOnYIn( rect );
+            if ( Widgets.ButtonImage(stampRect, job.Suspended ? Resources.StampStart : Resources.StampSuspended) )
+            {
+                job.Suspended = !job.Suspended;
+            }
 
-                // draw it.
-                if ( job.Completed )
-                {
-                    GUI.DrawTexture( stampRect, Resources.StampCompleted );
-                    TooltipHandler.TipRegion( stampRect, "FM.JobCompletedTooltip".Translate() );
-                    return;
-                }
-
-                if ( job.Suspended )
-                {
-                    // allow activating the job from here.
-                    if ( !Mouse.IsOver( stampRect ) )
-                    {
-                        GUI.DrawTexture( stampRect, Resources.StampSuspended );
-                    }
-                    else
-                    {
-                        if ( Widgets.ButtonImage( stampRect, Resources.StampStart ) )
-                        {
-                            job.Suspended = false;
-                        }
-                        TooltipHandler.TipRegion( stampRect, "FM.JobSuspendedTooltip".Translate() );
-                    }
-                    return;
-                }
+            if ( job.Suspended )
+            {
+                TooltipHandler.TipRegion(stampRect, "FM.JobSuspendedTooltip".Translate());
+                return;
             }
 
             if ( trigger == null )
@@ -252,7 +241,7 @@ namespace FluffyManager
             }
 
             // set up rects
-            Rect progressRect = new Rect( Margin, 0f, ManagerJob.ProgressRectWidth, rect.height ),
+            Rect progressRect = new Rect( Margin + ManagerJob.SuspendStampWidth, 0f, ManagerJob.ProgressRectWidth, rect.height ),
                  lastUpdateRect = new Rect( progressRect.xMax + Margin, 0f, ManagerJob.LastUpdateRectWidth, rect.height );
 
             // set drawing canvas
