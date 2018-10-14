@@ -220,11 +220,9 @@ namespace FluffyManager
                     foreach ( Pawn p in Trigger.pawnKind.GetTame( manager, Utilities_Livestock.AgeSexArray[i] ) )
                     {
                         // slaughter
-                        if ( SendToSlaughterArea 
-                            && p.playerSettings.AreaRestriction != SlaughterArea
-                            && manager.map.designationManager.DesignationOn( p, DesignationDefOf.Slaughter ) != null )
+                        if ( SendToSlaughterArea && manager.map.designationManager.DesignationOn( p, DesignationDefOf.Slaughter ) != null )
                         {
-                            actionTaken = true;
+                            actionTaken = p.playerSettings.AreaRestriction != SlaughterArea;
                             p.playerSettings.AreaRestriction = SlaughterArea;
                         }
 
