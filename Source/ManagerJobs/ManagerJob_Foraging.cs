@@ -147,10 +147,12 @@ namespace FluffyManager
             // (detailButton) | name | (bar | last update)/(stamp) -> handled in Utilities.DrawStatusForListEntry
 
             // set up rects
-            Rect labelRect = new Rect( Margin, Margin, rect.width -
-                                                         ( active ? StatusRectWidth + 4 * Margin : 2 * Margin ),
-                                       rect.height - 2 * Margin ),
-                 statusRect = new Rect( labelRect.xMax + Margin, Margin, StatusRectWidth, rect.height - 2 * Margin );
+            Rect labelRect = new Rect(
+                Margin, 
+                Margin,
+                rect.width - ( active ? StatusRectWidth + 4 * Margin : 2 * Margin ),
+                rect.height - 2 * Margin );
+            Rect statusRect = new Rect( labelRect.xMax + Margin, Margin, StatusRectWidth, rect.height - 2 * Margin );
 
             // create label string
             string text = Label + "\n";

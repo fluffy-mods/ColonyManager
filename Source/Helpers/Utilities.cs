@@ -2,11 +2,11 @@
 // Utilities.cs
 // 2016-12-09
 
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using RimWorld;
 using UnityEngine;
 using Verse;
 using static FluffyManager.Constants;
@@ -210,63 +210,62 @@ namespace FluffyManager
 
         public static void DrawStatusForListEntry<T>( this T job, Rect rect, Trigger trigger ) where T : ManagerJob
         {
-            var stampRect = new Rect( rect.x, 0f, Constants.MediumIconSize, Constants.MediumIconSize );
+            // set up rects
+            Rect stampRect = new Rect(
+                rect.xMax - ManagerJob.SuspendStampWidth - Margin,
+                rect.yMin,
+                ManagerJob.SuspendStampWidth,
+                ManagerJob.SuspendStampWidth ).CenteredOnYIn( rect );
+            Rect lastUpdateRect = new Rect(
+                stampRect.xMin - Margin - ManagerJob.LastUpdateRectWidth,
+                rect.yMin,
+                ManagerJob.LastUpdateRectWidth,
+                rect.height );
+            Rect progressRect = new Rect(
+                lastUpdateRect.xMin - Margin - ManagerJob.ProgressRectWidth,
+                rect.yMin,
+                ManagerJob.ProgressRectWidth,
+                rect.height );
 
-            // center stamp in available space
-            stampRect = stampRect.CenteredOnYIn( rect );
-
-            // draw it.
-            if ( job.Completed )
-            {
-                GUI.DrawTexture( stampRect, Resources.StampCompleted );
-                TooltipHandler.TipRegion( stampRect, "FM.JobCompletedTooltip".Translate() );
-                return;
-            }
-
-            if ( Widgets.ButtonImage(stampRect, job.Suspended ? Resources.StampStart : Resources.StampSuspended) )
+            // draw stamp
+            if ( Widgets.ButtonImage(stampRect, job.Completed ? Resources.StampCompleted : job.Suspended ? Resources.StampStart : Resources.StampSuspended))
             {
                 job.Suspended = !job.Suspended;
             }
-
-            if ( job.Suspended )
+            if (job.Suspended)
             {
-                TooltipHandler.TipRegion(stampRect, "FM.JobSuspendedTooltip".Translate());
+                TooltipHandler.TipRegion(stampRect, "FM.UnsuspendJobTooltip".Translate());
+                return;
+            } 
+            if (job.Completed)
+            {
+                TooltipHandler.TipRegion(stampRect, "FM.JobCompletedTooltip".Translate());
                 return;
             }
+            TooltipHandler.TipRegion(stampRect, "FM.SuspendJobTooltip".Translate());
 
+            // should never happen?
             if ( trigger == null )
-            {
-                Log.Message( "Trigger NULL" );
                 return;
-            }
-
-            // set up rects
-            Rect progressRect = new Rect( Margin + ManagerJob.SuspendStampWidth, 0f, ManagerJob.ProgressRectWidth, rect.height ),
-                 lastUpdateRect = new Rect( progressRect.xMax + Margin, 0f, ManagerJob.LastUpdateRectWidth, rect.height );
-
-            // set drawing canvas
-            GUI.BeginGroup( rect );
 
             // draw progress bar
             trigger.DrawProgressBar( progressRect, true );
+            TooltipHandler.TipRegion(progressRect, trigger.StatusTooltip);
 
             // draw time since last action
             Text.Anchor = TextAnchor.MiddleCenter;
-            var lastUpdate = (Find.TickManager.TicksGame - job.lastAction);
+            var lastUpdate = Find.TickManager.TicksGame - job.lastAction;
 
             // set color by how timely we've been
             if ( lastUpdate < job.ActionInterval )
                 GUI.color = Color.green;
             if ( lastUpdate > job.ActionInterval )
                 GUI.color = Color.white;
-            if ( lastUpdate > job.ActionInterval * 2 )
+            if ( lastUpdate > job.ActionInterval * 1.5f )
                 GUI.color = Color.red;
             
             Widgets.Label( lastUpdateRect, lastUpdate.TimeString() );
             GUI.color = Color.white;
-
-            // set tooltips
-            TooltipHandler.TipRegion( progressRect, trigger.StatusTooltip );
             TooltipHandler.TipRegion( lastUpdateRect,
                                       "FM.LastUpdateTooltip".Translate( 
                                           lastUpdate.TimeString(),
@@ -280,17 +279,10 @@ namespace FluffyManager
                 {
                     var label = period.Key;
                     var time = period.Value;
-                    options.Add( new FloatMenuOption( label, delegate
-                                                                      {
-                                                                          job.ActionInterval = time;
-                                                                      }
-                                                    ) );
+                    options.Add( new FloatMenuOption( label, () => job.ActionInterval = time ) );
                 }
-
                 Find.WindowStack.Add( new FloatMenu( options ) );
             }
-
-            GUI.EndGroup();
         }
 
         public static void DrawToggle( ref Vector2 pos, float width, string label, string tooltip, ref bool checkOn,

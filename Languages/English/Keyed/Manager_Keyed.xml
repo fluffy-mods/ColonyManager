@@ -63,8 +63,9 @@
   <FM.Enabled>Work</FM.Enabled>
   <FM.Priority>Work</FM.Priority>
   <FM.ClickToJumpTo>Click to jump to {0}</FM.ClickToJumpTo>
-  <FM.JobCompletedTooltip>Job threshold has been reached.</FM.JobCompletedTooltip>
-  <FM.JobSuspendedTooltip>Job has been suspended.\n\nClick to unsuspend.</FM.JobSuspendedTooltip>
+  <FM.JobCompletedTooltip>Job threshold has been reached.\n\nClick to suspend this job.</FM.JobCompletedTooltip>
+  <FM.UnsuspendJobTooltip>Job has been suspended.\n\nClick to unsuspend.</FM.UnsuspendJobTooltip>
+  <FM.SuspendJobTooltip>Click to suspend this job.</FM.SuspendJobTooltip>
   <FM.PluralSuffix>s</FM.PluralSuffix>
   
   <!--Import/Export Tab-->
