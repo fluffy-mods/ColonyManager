@@ -27,9 +27,10 @@ namespace FluffyManager
         public bool CheckReachable = true;
         public bool PathBasedDistance = false;
 
-        public static float LastUpdateRectWidth = 50f,
+        public static float SuspendStampWidth = Constants.MediumIconSize,
+                            LastUpdateRectWidth = 50f,
                             ProgressRectWidth = 10f,
-                            StatusRectWidth = LastUpdateRectWidth + ProgressRectWidth;
+                            StatusRectWidth = SuspendStampWidth + LastUpdateRectWidth + ProgressRectWidth;
 
         private int _actionInterval = Settings.DefaultUpdateInterval;
 
