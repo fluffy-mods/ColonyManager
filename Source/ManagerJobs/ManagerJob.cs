@@ -26,6 +26,7 @@ namespace FluffyManager
 
         public bool CheckReachable = true;
         public bool PathBasedDistance = false;
+        public bool Suspended = false;
 
         public static float SuspendStampWidth = Constants.MediumIconSize,
                             LastUpdateRectWidth = 50f,
@@ -92,7 +93,6 @@ namespace FluffyManager
         public virtual bool ShouldDoNow => Managed && !Suspended && !Completed && lastAction + ActionInterval < Find.TickManager.TicksGame;
 
         public virtual SkillDef SkillDef { get; } = null;
-        public virtual bool Suspended { get; set; } = false;
         public abstract ManagerTab Tab { get; }
         public abstract string[] Targets { get; }
         public abstract WorkTypeDef WorkTypeDef { get; }
@@ -123,6 +123,7 @@ namespace FluffyManager
             Scribe_Values.Look( ref priority, "priority" );
             Scribe_Values.Look( ref CheckReachable, "CheckReachable", true );
             Scribe_Values.Look( ref PathBasedDistance, "PathBasedDistance", false );
+            Scribe_Values.Look( ref Suspended, "Suspended", false );
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit || Manager.LoadSaveMode == Manager.Modes.ImportExport )
             {
