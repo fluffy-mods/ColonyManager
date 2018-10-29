@@ -92,7 +92,8 @@ namespace FluffyManager
         public virtual bool ShouldDoNow => Managed && !Suspended && !Completed && lastAction + ActionInterval < Find.TickManager.TicksGame;
 
         public virtual SkillDef SkillDef { get; } = null;
-        public virtual bool Suspended { get; set; } = false;
+        private bool _suspended = false;
+        public virtual bool Suspended { get => _suspended; set => _suspended = value; }
         public abstract ManagerTab Tab { get; }
         public abstract string[] Targets { get; }
         public abstract WorkTypeDef WorkTypeDef { get; }
@@ -123,6 +124,7 @@ namespace FluffyManager
             Scribe_Values.Look( ref priority, "priority" );
             Scribe_Values.Look( ref CheckReachable, "CheckReachable", true );
             Scribe_Values.Look( ref PathBasedDistance, "PathBasedDistance", false );
+            Scribe_Values.Look( ref _suspended, "Suspended", false );
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit || Manager.LoadSaveMode == Manager.Modes.ImportExport )
             {
