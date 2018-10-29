@@ -33,14 +33,6 @@ namespace FluffyManager
             updateIntervalOptions[ "FM.Monthly".Translate() ] = GenDate.TicksPerTwelfth;
             updateIntervalOptions[ "FM.Yearly".Translate() ] = GenDate.TicksPerYear;
         }
-
-        public static Rect CenteredIn( this Rect inner, Rect outer, float x = 0f, float y = 0f )
-        {
-            inner = inner.CenteredOnXIn( outer ).CenteredOnYIn( outer );
-            inner.x += x;
-            inner.y += y;
-            return inner;
-        }
         
         public static bool HasCompOrChildCompOf( this ThingDef def, Type compType )
         {
@@ -204,8 +196,7 @@ namespace FluffyManager
 
         public static bool IsInt( this string text )
         {
-            int num;
-            return int.TryParse( text, out num );
+            return int.TryParse( text, out int num );
         }
 
         public static void DrawStatusForListEntry<T>( this T job, Rect rect, Trigger trigger ) where T : ManagerJob

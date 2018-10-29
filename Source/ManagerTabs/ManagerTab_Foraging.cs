@@ -73,7 +73,7 @@ namespace FluffyManager
 
             Vector2 position;
             float width;
-            Widgets_Section.BeginSectionColumn(optionsColumnRect, "Foraging.Options", out position, out width);
+            Widgets_Section.BeginSectionColumn( optionsColumnRect, "Foraging.Options", out position, out width );
             Widgets_Section.Section( ref position, width, DrawThreshold, "FM.Threshold".Translate() );
             Widgets_Section.Section( ref position, width, DrawAreaRestriction, "FMG.ForagingArea".Translate() );
             Widgets_Section.Section( ref position, width, DrawMaturePlants );

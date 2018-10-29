@@ -13,26 +13,25 @@ namespace FluffyManager
     {
         private static Dictionary<string, float> _columnHeights = new Dictionary<string, float>();
         private static Dictionary<string, Vector2> _columnScrollPositions = new Dictionary<string, Vector2>();
-        private static Dictionary<string, Vector2> _startingPosition = new Dictionary<string, Vector2>();
 
         public static void BeginSectionColumn( Rect canvas, string identifier, out Vector2 position, out float width )
         {
             var height = GetHeight( identifier );
             var scrollPosition = GetScrollPosition( identifier );
-            var outRect = canvas.ContractedBy( Margin );
+            var outRect = canvas.ContractedBy( Margin ).RoundToInt();
             var viewRect = new Rect( outRect.xMin, outRect.yMin, outRect.width, height );
             if ( viewRect.height > outRect.height )
                 viewRect.width -= ScrollbarWidth + Margin / 2f;
+            viewRect = viewRect.RoundToInt();
 
             Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
             GUI.BeginGroup( viewRect );
             viewRect = viewRect.AtZero();
 
-            position = new Vector2(viewRect.xMin, viewRect.yMin);
+            position = Vector2.zero;
             width = viewRect.width;
 
             _columnScrollPositions[identifier] = scrollPosition;
-            _startingPosition[identifier] = position;
         }
 
         public static void EndSectionColumn( string identifier, Vector2 position )
@@ -40,7 +39,7 @@ namespace FluffyManager
             GUI.EndGroup();
             Widgets.EndScrollView();
 
-            _columnHeights[identifier] = position.y - _startingPosition[identifier].y;
+            _columnHeights[identifier] = position.y;
         }
 
         private static float GetHeight(string identifier)
@@ -73,7 +72,7 @@ namespace FluffyManager
             // header
             if ( hasHeader )
             {
-                Rect headerRect = new Rect( position.x, position.y, width, SectionHeaderHeight );
+                Rect headerRect = new Rect( position.x, position.y, width, SectionHeaderHeight ).RoundToInt();
                 Widgets_Labels.Label( headerRect, header, TextAnchor.LowerLeft, GameFont.Tiny, margin: 3 * Margin );
                 position.y += SectionHeaderHeight;
             }
@@ -83,7 +82,7 @@ namespace FluffyManager
                 position.x,
                 position.y,
                 width,
-                GetHeight( id ) + 2 * Margin );
+                GetHeight( id ) + 2 * Margin ).RoundToInt();
 
             // NOTE: we're updating height _after_ drawing, so the background is technically always one frame behind.
             GUI.DrawTexture( contentRect, Resources.SlightlyDarkBackground );

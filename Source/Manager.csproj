@@ -52,6 +52,7 @@
     <Compile Include="GetBuildingCost.cs" />
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\Extensions\CompGlower_Extensions.cs" />
+    <Compile Include="Helpers\Extensions\Rect_Extensions.cs" />
     <Compile Include="Helpers\Extensions\String_Extensions.cs" />
     <Compile Include="Helpers\Livestock\Utilities_Livestock.cs" />
     <Compile Include="Helpers\Color\HSV_Helper.cs" />
