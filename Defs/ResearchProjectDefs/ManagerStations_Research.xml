@@ -9,6 +9,7 @@
         <techLevel>Industrial</techLevel>
         <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
         <prerequisites></prerequisites>
+		<tab>ManagerTab</tab>
     </ResearchProjectDef>
 
     <ResearchProjectDef>
@@ -21,6 +22,7 @@
         <prerequisites>
             <li>ManagingSoftware</li>
         </prerequisites>
+		<tab>ManagerTab</tab>
     </ResearchProjectDef>
 
     <ResearchProjectDef>
@@ -33,6 +35,7 @@
         <prerequisites>
             <li>ManagingSoftware</li>
         </prerequisites>
+		<tab>ManagerTab</tab>
         <researchMods>
           <li Class="FluffyManager.UnlockPowerTab" />
         </researchMods>
