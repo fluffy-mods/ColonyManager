@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
   <!-- Main Manager Tab -->
   <FM.Manager>Manager</FM.Manager>
@@ -6,6 +6,7 @@
   <FM.Manage>Manage!</FM.Manage>
   <FM.Delete>Lösche</FM.Delete>
   <FM.All>Alles</FM.All>
+  <FM.TabDisabledBecause>(deaktiviert: {0})</FM.TabDisabledBecause>
 
   <!-- Help and alert messages for the lexically challenged. -->
   <FM.HelpTitle>Colony Manager V2</FM.HelpTitle>
@@ -16,23 +17,44 @@
   <FM.AlertNoManager>Manageraufträge sind angeordnet, aber niemand ist Manager</FM.AlertNoManager>
 
   <!-- Common -->
-  <FM.LastUpdateTooltip>Dieser Auftrag wurde zuletzt vor {0} erneuert.</FM.LastUpdateTooltip>
-  <FM.OrderUp>Erhöhe Auftragswichtigkeit</FM.OrderUp>
-  <FM.OrderDown>Senke Auftragswichtigkeit</FM.OrderDown>
-  <FM.OrderTop>Maximale Auftragswichtigkeit</FM.OrderTop>
-  <FM.OrderBottom>Minimale Auftragswichtigkeit</FM.OrderBottom>
+  <FM.LastUpdateTooltip>Dieser Auftrag wurde zuletzt vor {0} erneuert und ist eingeplant alle {1} upgedated zu werden.\n\nKlick um das Updateinterval zu ändern.</FM.LastUpdateTooltip>
+  <FM.OrderUp>Erhöhe Auftragspriorität</FM.OrderUp>
+  <FM.OrderDown>Senke Auftragspriorität</FM.OrderDown>
+  <FM.OrderTop>Maximale Priorität</FM.OrderTop>
+  <FM.OrderBottom>Minimale Priorität</FM.OrderBottom>
   <multiple>[multiple]</multiple>
+  <FM.Threshold>Schwellwert</FM.Threshold>
+  <FM.CheckReachability>Prüfe ob die Ziele erreichbar sind</FM.CheckReachability>
+  <FM.CheckReachability.Tip>Berechnet bevor es einen Auftrag erstellt, ob ein Pfad zum Ziel (für einen Kolonisten) existiert.</FM.CheckReachability.Tip>
+  <FM.Expensive.Tip>Die Aktivierung dieser Einstellung kann die Leistung beeinträchtigen, insbesondere bei großen Karten, Gebirgskarten, Jobs mit vielen potenziellen Zielen und Kolonien mit einer hohen Anzahl von Kolonisten.</FM.Expensive.Tip>
+  <FM.PathBasedDistance>Berechne die Entfernung</FM.PathBasedDistance>
+  <FM.PathBasedDistance.Tip>Wenn aktiviert, werden Entfernungen basierend auf realen Pfaden berechnet. Wenn diese Option deaktiviert ist, werden die Entfernungen "in der Luftlinie" berechnet.\n\nHINWEIS: Das Aktivieren dieser Option für Jobs mit einer großen Anzahl möglicher Ziele kann zu erheblichen Verzögerungen führen.</FM.PathBasedDistance.Tip>
+  <FM.CountAllOnMap>Zähle alle auf der Karte</FM.CountAllOnMap>
+  <FM.CountAllOnMap.Tip>Wenn diese Option aktiviert ist, werden alle vom Schwellenwertfilter auf der Karte zulässigen Elemente gezählt. Wenn deaktiviert, werden nur die Lagerbestände und Lagergebäude gezählt.</FM.CountAllOnMap.Tip>
+  <FM.None>Keiner</FM.None>
+  <!-- 0: target (thing), 1: distance (int), 2: yield amount (int), 3: yield type (def) -->
+  <Fluffy.Manager.DesignationLabel>{0}\n  Entfernung: {1}\n  Ausbeute: {2}x {3}</Fluffy.Manager.DesignationLabel>
+
+  <!-- time periods for update interval -->
+  <FM.DefaultUpdateInterval>Standardaktualisierungsintervall</FM.DefaultUpdateInterval>
+  <FM.Hourly>Jede Stunde</FM.Hourly>
+  <FM.MultiHourly>Jede {0} Stunde</FM.MultiHourly>
+  <FM.Daily>Täglich</FM.Daily>
+  <FM.Monthly>Monatlich</FM.Monthly>
+  <FM.Yearly>Jährlich</FM.Yearly>
 
   <!-- History graphs -->
   <FM.HistoryPeriod>Periode</FM.HistoryPeriod>
-  <FM.HistoryShowHideLegend>Öffne/Schließe Legende</FM.HistoryShowHideLegend>
-  <FM.HistoryClickToEnable>\n\nClick für {0} {1} in Geschichte.\nRight Klick nur für {1}.</FM.HistoryClickToEnable>
-  <FM.HistoryNoChapters>Nichts zu sehen!</FM.HistoryNoChapters>
+  <FM.HistoryShowHideLegend>Öffnen/Schließen Legende</FM.HistoryShowHideLegend>
+  <FM.HistoryClickToEnable>\n\nKlick für {0} {1} in Graph.\nRechtsklick um nur {1} zusehen.</FM.HistoryClickToEnable>
+  <FM.HistoryNoChapters>Hier gibt es nichts zu sehen! Bitte weiter gehen.</FM.HistoryNoChapters>
 
   <!-- Power Tab (E for energy) -->
   <FME.PeriodShown>Periode: {0}</FME.PeriodShown>
-  <FME.PeriodShownTooltip>Zeigt Energiegewinn- und verbrauch {0}.\n\nClick um Periode zu ändern.</FME.PeriodShownTooltip>
+  <FME.PeriodShownTooltip>Momentan werden Stromerzeugung und -verbrauch für die letzte {0} angezeigt.\n\nKlick um den Zeitraum zu ändern.</FME.PeriodShownTooltip>
   <FME.Power>Energie</FME.Power>
+  <FME.NotResearched>Power Management wurde noch nicht erforscht</FME.NotResearched>
+  <FME.NoPoweredStation>Kein Managertisch hat Strom</FME.NoPoweredStation>
   
   <!-- Overview Tab -->
   <FM.Overview>Übersicht</FM.Overview>
@@ -41,15 +63,16 @@
   <FM.Enabled>Arbeit</FM.Enabled>
   <FM.Priority>Arbeit</FM.Priority>
   <FM.ClickToJumpTo>Klick umzu {0} zu springen</FM.ClickToJumpTo>
-  <FM.JobCompletedTooltip>Auftragslimit erreicht.</FM.JobCompletedTooltip>
-  <FM.JobSuspendedTooltip>Auftrag wurde gesperrt.\n\nClick um zu entsperren.</FM.JobSuspendedTooltip>
+  <FM.JobCompletedTooltip>Auftragslimit erreicht.\n\nKlick um diesen Job aussetzen.</FM.JobCompletedTooltip>
+  <FM.UnsuspendJobTooltip>Auftrag wurde gesperrt.\n\nKlick um zu entsperren.</FM.UnsuspendJobTooltip>
+  <FM.SuspendJobTooltip>Klick um den Auftrag zu sperren.</FM.SuspendJobTooltip>
   <FM.PluralSuffix>s</FM.PluralSuffix>
   
   <!--Import/Export Tab-->
   <FM.ImportExport>Importieren &amp; Exportieren</FM.ImportExport>
   <FM.CurrentJobs>Momentane Aufträge:</FM.CurrentJobs>
-  <FM.Export>Exportieren</FM.Export>
-  <FM.ConfirmOverwrite>{0} existiert.\n\nWillst du wirklioch überschreiben?</FM.ConfirmOverwrite>
+  <FM.Export>Exportiere</FM.Export>
+  <FM.ConfirmOverwrite>{0} existiert.\n\nWillst du wirklich überschreiben?</FM.ConfirmOverwrite>
   <FM.JobsExported>{0} Aufträge exportiert</FM.JobsExported>
   <FM.JobsImported>{0} Aufträge importiert</FM.JobsImported>
   <FM.InvalidJobsDeleted>{0} ungültige Aufträge gelöscht</FM.InvalidJobsDeleted>
@@ -61,25 +84,55 @@
   <FMH.NewHuntingJob>Neuer Auftrag</FMH.NewHuntingJob>
   <FMH.NewHuntingJobTooltip>Erstelle einen neuen Jagdauftrag</FMH.NewHuntingJobTooltip>
   <FMH.AllowHumanMeat>Erlaube Menschenfleisch</FMH.AllowHumanMeat>
+  <FMH.AllowHumanMeat.Tip>Soll menschliches Fleisch gezählt werden?\n\nHinweis: Dies ist eine Abkürzung für das Umschalten von humanoiden Fleisch im Schwellwertfilter. Sie können weitere Optionen in den Schwellendetails festlegen.</FMH.AllowHumanMeat.Tip>
+  <FMH.AllowInsectMeat>Erlaube Insektenfleisch</FMH.AllowInsectMeat>
+  <FMH.AllowInsectMeat.Tip>Soll Insektenfleisch gezählt werden?\n\nHinweis: Dies ist eine Abkürzung für das Umschalten von Insektenfleisch im Schwellwertfilter. Sie können weitere Optionen in den Schwellendetails festlegen.</FMH.AllowInsectMeat.Tip>
   <FMH.UnforbidCorpses>Erlaube Leichen</FMH.UnforbidCorpses>
-  <FMH.HuntingGrounds>Erlaube Jagd in:</FMH.HuntingGrounds>
-  <FMH.Options>Optionen</FMH.Options>
+  <FMH.UnforbidCorpses.Tip>Automatisch Verbot von (frischen) Tierleichen aufheben.</FMH.UnforbidCorpses.Tip>
   <FMH.Animals>Erlaubte Tiere</FMH.Animals>
   <FMH.TargetCount>Zielanzahl: {0}+{1}+{2}/{3}</FMH.TargetCount>
-  <FMH.TargetCountTooltip>Ziel: {3}\n{0} im Lager\n{1} nach dem schlachten erwartet\n{2} mit Ausnahme von momentanen Bestimmungen.</FMH.TargetCountTooltip>
+  <FMH.TargetCountTooltip>Ziel: {3}\n{0} im Lager\n{1} nach dem Schlachten erwartet\n{2} mit Ausnahme von momentanen Festlegungen.</FMH.TargetCountTooltip>
+  <FM.Hunting.Predators>Raubtiere</FM.Hunting.Predators>
+  <FM.Hunting.Predators.Tip>Toggel alle Raubtiere</FM.Hunting.Predators.Tip>
+  <FM.Hunting.HerdAnimals>Herdentiere</FM.Hunting.HerdAnimals>
+  <FM.Hunting.HerdAnimals.Tip>Toggel alle Herdentiere</FM.Hunting.HerdAnimals.Tip>
+  <FM.Hunting.Exploding>Explodieren</FM.Hunting.Exploding>
+  <FM.Hunting.Exploding.Tip>Toogel alle explodierenden Tiere</FM.Hunting.Exploding.Tip>
+  <FM.Hunting.AreaRestriction>Beschränke die Jagt auf</FM.Hunting.AreaRestriction>
 
   <!-- Forestry Tab -->
   <FMF.Forestry>Försterei</FMF.Forestry>
   <FMF.NewForestryJob>Neuer Auftrag</FMF.NewForestryJob>
-  <FMF.NewForestryJobTooltip>Erstelle neuen Forstauftrag</FMF.NewForestryJobTooltip>
+  <FMF.NewForestryJobTooltip>Erstelle ein neuen Forstauftrag</FMF.NewForestryJobTooltip>
   <FMF.Options>Optionen</FMF.Options>
-  <FMF.Trees>Erlaube Bäume</FMF.Trees>
-  <FMF.ClearWindCells>Räume Windturbinenflächen</FMF.ClearWindCells>
-  <FMF.AllowSaplings>Erlaube das fällen von nicht ausgewachsenen Bäumen</FMF.AllowSaplings>
+  <FMF.ClearWindCells>Windenergieanlagen freihalten</FMF.ClearWindCells>
+  <FMF.ClearWindCells.Tip>Entferne alle Pflanzen die sich im Einzugsgebiet von Windkraftanlagen befinden</FMF.ClearWindCells.Tip>
+  <FMF.AllowSaplings>Nur voll ausgewachsene Bäume</FMF.AllowSaplings>
+  <FMF.AllowSaplings.Tip>Soll die Forstwirtschaft auf reife Bäume beschränkt sein?</FMF.AllowSaplings.Tip>
   <FMF.LoggingArea>Erlaube Rodung in:</FMF.LoggingArea>
   <FMF.TargetCount>Zielanzahl: {0}+{1}/{2}</FMF.TargetCount>
-  <FMF.TargetCountTooltip>Ziel: {2}\n{0} im Lager\n{1} mit Ausnahme von momentanen Bestimmungen.</FMF.TargetCountTooltip>
+  <FMF.TargetCountTooltip>Ziel: {2}\n{0} im Lager\n{1} mit Ausnahme von momentanen Festlegungen.</FMF.TargetCountTooltip>
   <FMF.ClearAreas>Säubere Gebiet von sämtlicher Vegetation:</FMF.ClearAreas>
+  <FMF.JobType>Auftragstyp</FMF.JobType>
+  <FMF.JobType.ClearArea>Säubere Gebiet</FMF.JobType.ClearArea>
+  <FMF.JobType.ClearArea.Tip>Räumung von Bereichen, damit Windkraftanlagen reibungslos funktionieren und Feinden jede mögliche Deckung auf den Schlachtfeldern entfernt ist.</FMF.JobType.ClearArea.Tip>
+  <FMF.JobType.Logging>Holzernte</FMF.JobType.Logging>
+  <FMF.JobType.Logging.Tip>Bäume für Holz hacken</FMF.JobType.Logging.Tip>
+  
+  <FMF.Clear>Frei {0}</FMF.Clear>
+  <FMF.TurbineArea>Windanlagen</FMF.TurbineArea>
+
+  <FMF.Trees>Bäume</FMF.Trees>
+  <FMF.Trees.Tip>Selektiert alle Bäume</FMF.Trees.Tip>
+  <FMF.Flammable>Brennbar</FMF.Flammable>
+  <FMF.Flammable.Tip>Selektiert alle brennbaren Pflanzen</FMF.Flammable.Tip>
+  <FMF.Ugly>Häßlich</FMF.Ugly>
+  <FMF.Ugly.Tip>Selektiert alle häßlichen Pflanzen</FMF.Ugly.Tip>
+  <FMF.ProvidesCover>Deckungsschutz</FMF.ProvidesCover>
+  <FMF.ProvidesCover.Tip>Selektiert alle Pflanzen die Deckungsschutz bieten können</FMF.ProvidesCover.Tip>
+  <FMF.BlocksWind>Blockiert Wind</FMF.BlocksWind>
+  <FMF.BlocksWind.Tip>Selektiert alle Pflanzen die Wind blockieren</FMF.BlocksWind.Tip>
+
 
   <!-- Foraging (Gathering) tab -->
   <FMG.Foraging>Sammeln</FMG.Foraging>
@@ -87,71 +140,24 @@
   <FMG.NewForagingJobTooltip>Erstelle neuen Sammlerauftrag</FMG.NewForagingJobTooltip>
   <FMG.Options>Optionen</FMG.Options>
   <FMG.TargetCount>Zielanzahl: {0}+{1}/{2}</FMG.TargetCount>
-  <FMG.TargetCountTooltip>Ziel: {2}\n{0}  im Lager\n{1} mit Ausnahme von momentanen Bestimmungen.</FMG.TargetCountTooltip>
+  <FMG.TargetCountTooltip>Ziel: {2}\n{0} im Lager\n{1} mit Ausnahme von momentanen Festlegungen.</FMG.TargetCountTooltip>
   <FMG.ForceMature>Nur komplett ausgewachsene Pflanzen</FMG.ForceMature>
+  <FMG.ForceMature.Tip>Soll das Sammeln auf ausgewachsene Pflanzen beschränkt sein?</FMG.ForceMature.Tip>
   <FMG.ForagingArea>Erlaube sammeln in:</FMG.ForagingArea>
   <FMG.Plants>Erlaube Pflanzen</FMG.Plants>
-
-
-  <!-- Production Tab -->
-  <!-- Miscelaneous -->
-  <FMP.Production>Produktion</FMP.Production>
-  <FMP.ManageBillTooltip>Weise diese Vorlage einem Manager zum arbeiten zu.</FMP.ManageBillTooltip>
-  <FMP.DeleteBillTooltip>Stoppe managing dieser Vorlage und leere ausstehende Vorlagen</FMP.DeleteBillTooltip>
-  <FMP.FilterDesc>Tippe einige Buchstaben um die Liste zu filtern</FMP.FilterDesc>
-  <FMP.ClearFilterDesc>Leere momentanen Filter</FMP.ClearFilterDesc>
-  <FMP.MainProduct>Hauptprodukt: {0} x{1}</FMP.MainProduct>
-  <FMP.NoThreshold>Keine Grenzschwelle</FMP.NoThreshold>
-  <FMP.NoThresholdTooltip>Keine Grenzschwelle gesetzt</FMP.NoThresholdTooltip>
-  <FMP.SnapToHighestSkill>Auf fähigste(n) Kollonisten beschränken</FMP.SnapToHighestSkill>
-  <FMP.Options>Optionen</FMP.Options>
-  <FMP.Bill>Vorlage</FMP.Bill>
-  <FMP.Recipe>Rezept</FMP.Recipe>
-  <FMP.AllowedIngredients>Erlaube Zutaten:</FMP.AllowedIngredients>
-  <FMP.AllowedSkillRange>Erlaube Fähigkeitsspanne:</FMP.AllowedSkillRange>
-  <FMP.PrioritizeManual>Bevorzuge manuelle Vorlagen</FMP.PrioritizeManual>
-  <FMP.OtherRecipeAvailable>Andere Rezepte vorhanden</FMP.OtherRecipeAvailable>
-  <FMP.OtherRecipeAvailableTooltip>Andere Rezepte, welche dasselbe Produkt erschafft sind vorhanden.\nKlicke um die Vorlage zur anderen Vorlage zu ändern.</FMP.OtherRecipeAvailableTooltip>
+  <FM.Foraging.Edible>Essbare Pflanzen</FM.Foraging.Edible>
+  <FM.Foraging.Edible.Tip>Selektiere alle essbaren Pflanzen</FM.Foraging.Edible.Tip>
+  <FM.Foraging.Mushrooms>Pilze</FM.Foraging.Mushrooms>
+  <FM.Foraging.Mushrooms.Tip>Selektiere alle Pilze</FM.Foraging.Mushrooms.Tip>
 
   <!-- Thresholds -->
-  <FMP.ThresholdCount>Grenzschwelle: {0}/{1}</FMP.ThresholdCount>
-  <FMP.ThresholdCountTooltip>Klicke um Grenzschwellendetails zu öffnen.\n\nTarget: {1}\nIn produktion: {0}</FMP.ThresholdCountTooltip>
-  <FMP.ThresholdDetails>Grenzschwellendetails</FMP.ThresholdDetails>
-
-  <!-- BillGivers -->
-  <FMP.BillGiversCount>Arbeitsstation ({0}/{1}/{2})</FMP.BillGiversCount>
-  <FMP.BillGiversTooltip>Klicke um ausgewählte Auftraggeber zu ändern.\n\nVorhanden:\n{0}\n\nAusgewählt:\n{1}\n\nBeauftragt:\n{2}</FMP.BillGiversTooltip>
-  <FMP.BillGiversDetails>Wähle Arbeitsstation</FMP.BillGiversDetails>
-
-  <!-- BillGiversDetailsWindow -->
-  <FMP.AllWorkstations>Alle Arbeitsstationen</FMP.AllWorkstations>
-  <FMP.AllWorkstationsTooltip>Wähle den Manager um diesen Auftrag auf alle möglichen Arbeitsstationen zu übertragen</FMP.AllWorkstationsTooltip>
-  <FMP.ByAreaAndCount>Nach Gebiet / Anzahl</FMP.ByAreaAndCount>
-  <FMP.ByAreaAndCountTooltip>Wähle den Manager um diesen Auftrag auf eine bestimmte Arbeitsstation, in einem bestimmten Gebiet zu übertragen</FMP.ByAreaAndCountTooltip>
-  <FMP.AllowedAreas>Gebiet:</FMP.AllowedAreas>
-  <FMP.AllowedWorkstationCount>Max:</FMP.AllowedWorkstationCount>
-  <FMP.SpecificWorkstations>Setze Arbeitsstation</FMP.SpecificWorkstations>
-  <FMP.SpecificWorkstationsTooltip>Wähle den Manager um diesen Auftrag auf bestimmte Arbeitsstationen zu übertragen.</FMP.SpecificWorkstationsTooltip>
+  <FMP.ThresholdCount>Schwellwert: {0}/{1}</FMP.ThresholdCount>
+  <FMP.ThresholdCountTooltip>Klicke um Schwellwertdetails zu öffnen.\n\nTarget: {1}\nIn Produktion: {0}</FMP.ThresholdCountTooltip>
+  <FMP.ThresholdDetails>Schwellwertdetails</FMP.ThresholdDetails>
 
   <!-- Tab headers -->
-  <FMP.Current>Momentan</FMP.Current>
+  <FMP.Current>Aktuell</FMP.Current>
   <FMP.Available>Verfügbar</FMP.Available>
-
-  <!-- Recursive job creator -->
-  <FMP.IngredientDialogTitle>Erstelle Aufträge für Rohstoffe</FMP.IngredientDialogTitle>
-  <FMP.SelectRecipe>Wähle...</FMP.SelectRecipe>
-  <FMP.SelectRecipeTooltip>Klicke um Rezept für {0} auszuwählen</FMP.SelectRecipeTooltip>
-  <FMP.SelectRecipeTooltipSelected>\n\nMomentanes Rezept erfordert:</FMP.SelectRecipeTooltipSelected>
-  <FMP.DoNotUseRecipe>(nichts)</FMP.DoNotUseRecipe>
-  <FMP.SelectIngredient>Wähle...</FMP.SelectIngredient>
-  <FMP.SelectIngredientTooltip>Klicke um Rohstoff für {0} auszuwählen (benötigt {1})</FMP.SelectIngredientTooltip>
-  <FMP.IngredientCount>\n{0} ({1})</FMP.IngredientCount>
-  <FMP.RawResource>(roher Rohstoff)</FMP.RawResource>
-  <FMP.RawResourceTooltip>{0} ist ein roher Rohstoff (kein Rezept mit festgelegter Leistung für {0} gefunden)</FMP.RawResourceTooltip>
-  <FMP.AddIngredientBills>Erstelle Auftrag</FMP.AddIngredientBills>
-  <FMP.IncreasedThreshold>Erhöhe Grenzschwelle für {0} um {1}.</FMP.IncreasedThreshold>
-  <FMP.AddedJob>Auftag erstellt {0}.</FMP.AddedJob>
-  <FMP.CouldNotAddJob>Auftrag erstellen fehlgeschlagen {0}.</FMP.CouldNotAddJob>
 
   <!-- Livestock tab -->
   <FML.Livestock>Viehbestand</FML.Livestock>
@@ -159,23 +165,69 @@
   <FML.Adult>Erwachsen</FML.Adult>
   <FML.Juvenile>Jugendlich</FML.Juvenile>
   <FML.Training>Training</FML.Training>
-  <FML.RestrictToArea>Tiere auf Gebiet beschränken?</FML.RestrictToArea>
-  <FML.ButcherExcess>Überschüßigen Viehbestand schlachten</FML.ButcherExcess>
-  <FML.ButcherTrained>Überschüßigen trainierten Viehbestand schlachten</FML.ButcherTrained>
-  <FML.TameMore>Tiere zum automatischen Zähmen zuorndnen</FML.TameMore>
+  <FML.RestrictToArea>Tiere auf ein Gebiet beschränken?</FML.RestrictToArea>
+  <FML.RestrictToArea.Tip>Tiere auf ein Gebiet beschränken, optional auch getrennt nach Geschlecht und Lebensabschnitt.</FML.RestrictToArea.Tip>
+  <FML.ButcherExcess>Überschüssigen Viehbestand schlachten</FML.ButcherExcess>
+  <FML.ButcherExcess.Tip>Soll überschüssiges Vieh für Fleisch geschlachtet werden?</FML.ButcherExcess.Tip>
+  <FML.ButcherTrained>Trainiert</FML.ButcherTrained>
+  <FML.ButcherTrained.Tip>Dürfen ausgebildete Tiere geschlachtet werden?</FML.ButcherTrained.Tip>
+  <FML.ButcherPregnant>Schwanger</FML.ButcherPregnant>
+  <FML.ButcherPregnant.Tip>Dürfen trächtige Tiere geschlachtet werden?</FML.ButcherPregnant.Tip>
+  <FML.ButcherBonded>Gebunden</FML.ButcherBonded>
+  <FML.ButcherBonded.Tip>Dürfen mit Kolonisten verbundene Tiere geschlachtet werden?</FML.ButcherBonded.Tip>
+  <FML.TameMore>Automatisch Tiere zum Zähmen kennzeichnen</FML.TameMore>
+  <FML.TameMore.Tip>Soll der Manager wilde Tiere zum Zähmen markieren?</FML.TameMore.Tip>
   <FML.TameArea>Erlaube Zähmen in:</FML.TameArea>
-  <FML.Animals>Tiere</FML.Animals>
   <FML.ListEntryTooltip>{0}s:\n{1}/{5} erwachsene Weibchen\n{2}/{6} erwachsene Männchen\n{3}/{7} jugendliche Weibchen\n{4}/{8} jugendliche Männchen</FML.ListEntryTooltip>
-  <FML.TameWildCount>{0} gezämht, {1} in Wildbahn.</FML.TameWildCount>
-  <FML.Tame>zähmen</FML.Tame>
-  <FML.Wild>Wildbahn</FML.Wild>
-  <FML.NoAnimals>keine {0} Tiere</FML.NoAnimals>
+  <FML.TameWildCount>{0} gezähmt, {1} in der Wildnis.</FML.TameWildCount>
+  <FML.NoAnimals>kein {0} {1}</FML.NoAnimals>
   <FML.GenderHeader>Geschlecht</FML.GenderHeader>
   <FML.AgeHeader>Alter (Lebensabschnitt)</FML.AgeHeader>
-  <FML.MeatHeader>Erwartete Fleischmenge, wenn geschlachtet</FML.MeatHeader>
-  <FML.MilkHeader>Fortschritt bis zum nächsten melken</FML.MilkHeader>
-  <FML.WoolHeader>Fortschritt bis zum nächsten scheren</FML.WoolHeader>
-  <FML.Yields>Gewinne {0} x{1}</FML.Yields>
-  <FML.TrainYoung>Trainiere junges Tier</FML.TrainYoung>
+  <FML.MeatHeader>Erwartete Fleischmenge beim Schlachten</FML.MeatHeader>
+  <FML.MilkHeader>Fortschritt bis zum nächsten Melken</FML.MilkHeader>
+  <FML.WoolHeader>Fortschritt bis zum nächsten Scheren</FML.WoolHeader>
+  <FML.Yields>Erwartete Ausbeute: {0} x{1}</FML.Yields>
+  <FML.TrainYoung>Junge Tiere trainieren</FML.TrainYoung>
+  <FML.SendToSlaughterArea>Tiere zum Schlachten auf ein Gebiet beschränken</FML.SendToSlaughterArea>
+  <FML.SendToSlaughterArea.Tip>Sollen Tiere zum Schlachten auf ein bestimmtes Gebiet beschränkt werden?</FML.SendToSlaughterArea.Tip>
+  <FM.Livestock.TargetCountsHeader>Zielanzahl</FM.Livestock.TargetCountsHeader>
+  <FM.Livestock.AreaRestrictionsHeader>Gebietseinschränkungen</FM.Livestock.AreaRestrictionsHeader>
+  <FM.Livestock.TrainingHeader>Training</FM.Livestock.TrainingHeader>
+  <FM.Livestock.ButcherHeader>Schlachten</FM.Livestock.ButcherHeader>
+  <FM.Livestock.TamingHeader>Zähmung</FM.Livestock.TamingHeader>
+  <FML.Tame>zähmen</FML.Tame>
+  <FML.Wild>Wildnis</FML.Wild>
+  <FM.Livestock.AnimalsHeader>{0} {1}</FM.Livestock.AnimalsHeader>
+  <FM.Livestock.SelectPawnKind>Kein Job ausgewählt</FM.Livestock.SelectPawnKind>
+  <FM.Livestock.DisabledBecauseSlaughterExcessDisabled>Deaktiviert, damit nicht übermäßig viel Vieh geschlachtet wird.</FM.Livestock.DisabledBecauseSlaughterExcessDisabled>
+  <FML.SendToTrainingArea>Tiere zum Trainieren auf ein Gebiet beschränken</FML.SendToTrainingArea>
+  <FML.SendToTrainingArea.Tip>Sollen Tiere zum Trainieren auf ein bestimmtes Gebiet beschränkt werden?</FML.SendToTrainingArea.Tip>
+  <FM.Livestock.DisabledBecauseNoTrainingSet>Deaktiviert, da kein Trainingsziel festgelegt ist.</FM.Livestock.DisabledBecauseNoTrainingSet>
+
+  <!-- following -->
+  <FM.Livestock.FollowHeader>Anhang</FM.Livestock.FollowHeader>
+  <FM.Livestock.MasterDefault>Meister zuweisen</FM.Livestock.MasterDefault>
+  <FM.Livestock.MasterDefault.Tip>Weise Tiere einem Meister oder einer Gruppe von Kolonisten zu. Kann Benutzereinstellungen überschreiben, wenn aktiviert.</FM.Livestock.MasterDefault.Tip>
+  <FM.Livestock.Follow>Setzt Meister folgen</FM.Livestock.Follow>
+  <FM.Livestock.FollowTip>Legt die Meister-Folgen-Einstellung fest. Die Benutzereinstellungen werden überschrieben, wenn dies aktiviert ist. Wenn deaktiviert, können Master manuell zugewiesen werden.</FM.Livestock.FollowTip>
+  <FM.Livestock.FollowDrafted>Verfasst</FM.Livestock.FollowDrafted>
+  <FM.Livestock.FollowDrafted.Tip>Sollten Tiere ihren zugewiesenen Meister folgen, wenn dieser eingezogen wird?</FM.Livestock.FollowDrafted.Tip>
+  <FM.Livestock.FollowFieldwork>Feldarbeit</FM.Livestock.FollowFieldwork>
+  <FM.Livestock.FollowFieldwork.Tip>Sollen Tiere ihren zugewiesenen Meistern folgen, wenn dieser Feldarbeit verrichtet (z.B. jagen)?</FM.Livestock.FollowFieldwork.Tip>
+  <FM.Livestock.FollowTraining>Folgt dem Trainer</FM.Livestock.FollowTraining>
+  <FM.Livestock.FollowTraining.Tip>Tiere die zum Trainieren markiert sind, versuchen ihrem Trainer zu folgen.</FM.Livestock.FollowTraining.Tip>
+  <FM.Livestock.MasterTraining>Trainer zuweisen</FM.Livestock.MasterTraining>
+  <FM.Livestock.MasterTraining.Tip>Weise die zum Training markierten Tiere einem bestimmten Meister (Trainer) oder allen Trainern zu. Kann Benutzereinstellungen überschreiben, wenn aktiviert.</FM.Livestock.MasterTraining.Tip>
+  <FM.Livestock.Master>{0} ({1})</FM.Livestock.Master> <!-- 0; pawn name, 1; skill level -->
+
+  <!-- MasterMode enum -->
+  <FM.Livestock.MasterMode.Default>Manuell</FM.Livestock.MasterMode.Default>
+  <FM.Livestock.MasterMode.Hunters>Jäger</FM.Livestock.MasterMode.Hunters>
+  <FM.Livestock.MasterMode.Trainers>Trainer</FM.Livestock.MasterMode.Trainers>
+  <FM.Livestock.MasterMode.Melee>Nahkampf</FM.Livestock.MasterMode.Melee>
+  <FM.Livestock.MasterMode.Ranged>Fernkampf</FM.Livestock.MasterMode.Ranged>
+  <FM.Livestock.MasterMode.Violent>Gewalttätig</FM.Livestock.MasterMode.Violent>
+  <FM.Livestock.MasterMode.NonViolent>Gewaltfrei</FM.Livestock.MasterMode.NonViolent>
+  <FM.Livestock.MasterMode.All>Alle</FM.Livestock.MasterMode.All>
 
 </LanguageData>

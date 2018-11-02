@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <FM.Mining>Bergbau</FM.Mining>
+    <FM.Mining.MiningArea>Bergbaugebiet</FM.Mining.MiningArea>
+    <FM.Mining.HealthAndSafety>Gesundheit und Sicherheit</FM.Mining.HealthAndSafety>
+    <FM.Mining.AllowedMinerals>Mineralien</FM.Mining.AllowedMinerals>
+    <FM.Mining.AllowedBuildings>Gebäude</FM.Mining.AllowedBuildings>
+    <FM.Mining.DeconstructBuildings>Gebäude abreißen</FM.Mining.DeconstructBuildings>
+    <FM.Mining.DeconstructBuildings.Tip>Sollten nicht beanspruchte Gebäude für den Bergbau abgerissen werden?</FM.Mining.DeconstructBuildings.Tip>
+    <FM.Mining.CheckRoofSupport>Dachstützen erhalten</FM.Mining.CheckRoofSupport>
+    <FM.Mining.CheckRoofSupport.Tip>Die Manager lassen die Stützsäulen in regelmäßigen Abständen stehen.\n\nHINWEIS: Die Position der Säulen ist vorberechnet, Einstürze und Dachzusammenbruch können immer noch vorkommen!</FM.Mining.CheckRoofSupport.Tip>
+    <FM.Mining.CheckRoofSupportAdvanced>Überprüfe die Dachstützen</FM.Mining.CheckRoofSupportAdvanced>
+    <FM.Mining.CheckRoofSupportAdvanced.Tip>Die Manager berechnen die Unterstützung für das Dach, bevor sie Bergbau- und Dekonstruktionsaufgaben festlegen, wodurch das Risiko von Einstürzen und Dachkollapsen drastisch reduziert wird.</FM.Mining.CheckRoofSupportAdvanced.Tip>
+    <FM.Mining.CheckRoofSupportAdvanced.DisabledTip>Deaktiviert, da die Dachunterstützung nicht aktiviert ist.</FM.Mining.CheckRoofSupportAdvanced.DisabledTip>
+    <FM.Mining.CheckRoomDivision>Überprüfe die Raumgrenzen</FM.Mining.CheckRoomDivision>
+    <FM.Mining.CheckRoomDivision.Tip>Manager versuchen zu verhindern, dass Wände durchbrochen werden, durch die Räume getrennt werden, oder dass Verknüpfungen entstehen.</FM.Mining.CheckRoomDivision.Tip>
+    <FM.Mining.SyncFilterAndAllowed>Schwellenwert synchronisieren</FM.Mining.SyncFilterAndAllowed>
+    <FM.Mining.SyncFilterAndAllowed.Tip>Wenn Sie diese Option aktivieren, wird versucht, die gezählten Materialien im Schwellenwertfilter mit den für Bergbau/Dekonstruktion zugelassenen Gesteinen und Gebäuden zu synchronisieren und umgekehrt.</FM.Mining.SyncFilterAndAllowed.Tip>
+
+    <!-- cur, chunks, designated, target -->
+    <FM.Mining.TargetCount>Zielanzahl: {0}+{1}+{2}/{3}</FM.Mining.TargetCount>
+    <FM.Mining.TargetCount.Tip>Ziel: {3}\n{0} im Lager\n{1} erwartet vom Steinschleifen\n{2} mit Ausnahme von momentanen Festlegungen.</FM.Mining.TargetCount.Tip>
+  
+    <!-- Jobs -->
+    <FM.Mining.NewJob>Neuer Job</FM.Mining.NewJob>
+    <FM.Mining.NewJob.Tip>Erstelle einen neuen Bergbau-Job</FM.Mining.NewJob.Tip>
+
+    <!-- shortcuts -->
+    <FM.Mining.Stone>Stein</FM.Mining.Stone>
+    <FM.Mining.Stone.Tip>Toggelt alle um, die Steinbrocken ergeben</FM.Mining.Stone.Tip>
+    <FM.Mining.Metal>Metall</FM.Mining.Metal>
+    <FM.Mining.Metal.Tip>Toggelt alle um, die Metall ergeben</FM.Mining.Metal.Tip>
+    <FM.Mining.Precious>Kostbar</FM.Mining.Precious>
+    <FM.Mining.Precious.Tip>Toggelt alle um, die Kostbares ergeben</FM.Mining.Precious.Tip>
+</LanguageData>
