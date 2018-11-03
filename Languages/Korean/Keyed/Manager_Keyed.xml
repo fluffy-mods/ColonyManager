@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+  <!-- Main Manager Tab -->
+  <FM.Manager>관리자</FM.Manager>
+  <FM.Details>세부</FM.Details>
+  <FM.Manage>관리!</FM.Manage>
+  <FM.Delete>삭제</FM.Delete>
+  <FM.All>모두</FM.All>
+  <FM.TabDisabledBecause>(비활성됨: {0})</FM.TabDisabledBecause>
+
+  <!-- Help and alert messages for the lexically challenged. -->
+  <FM.HelpTitle>Colony Manager V2</FM.HelpTitle>
+  <FM.HelpMessage>Welcome to the Colony Manager V2!\n\nThe colony manager allows you to set targets for production, hunting, logging and animal husbandry. Each of these can be set through the various manager screens, and accessed through the buttons at the top of the window, as well as some other handy screens. \n\nWhen you set a target, a pawn with the manager job enabled will occasionally review your targets and the colony's stockpiles at a manager's desk, and update bills and designations accordingly.\n\nIn order for the mod to work, you need two things:\n    - A pawn with the manager job enabled.\n    - A manager's desk.\n\nHappy hunting!</FM.HelpMessage>
+  <FM.AlertNoTableLabel>관리자의 책상 필요</FM.AlertNoTableLabel>
+  <FM.AlertNoTable>관리 목표가 설정되었으나, 사용가능한 관리자 책상이 없습니다.</FM.AlertNoTable>
+  <FM.AlertNoManagerLabel>관리자 필요</FM.AlertNoManagerLabel>
+  <FM.AlertNoManager>관리 목표가 설정되었으나, 관리 작업에 할당된 림이 없습니다.</FM.AlertNoManager>
+
+  <!-- Common -->
+  <FM.LastUpdateTooltip>이 작업은 {0} 전에 마지막으로 업데이트 되었습니다, 그리고 매 {1} 마다 업데이트 됩니다.\n\n클릭해서 업데이트 간격을 변경하세요.</FM.LastUpdateTooltip>
+  <FM.OrderUp>작업 우선순위 증가</FM.OrderUp>
+  <FM.OrderDown>작업 우선순위 감소</FM.OrderDown>
+  <FM.OrderTop>최대 우선순위</FM.OrderTop>
+  <FM.OrderBottom>최소 우선순위</FM.OrderBottom>
+  <multiple>[다중]</multiple>
+  <FM.Threshold>임계값</FM.Threshold>
+  <FM.CheckReachability>목표에 도달할 수 있는지 확인</FM.CheckReachability>
+  <FM.CheckReachability.Tip>목표를 지정하기 전에 목표에 도달할 수 있는 경로가 존재하는지 (아무 림에 대해) 계산합니다.</FM.CheckReachability.Tip>
+  <FM.Expensive.Tip>별히 큰 맵이나 산지 맵, 많은 목표들이 있는 작업 또는 많은 수의 정착민이 있는 정착지에서 이 설정을 활성화 하면 성능이 떨어질 수 있습니다.</FM.Expensive.Tip>
+  <FM.PathBasedDistance>실제 경로를 기반으로 거리 계산</FM.PathBasedDistance>
+  <FM.PathBasedDistance.Tip>활성화 되면 거리가 실제 경로를 기반으로 계산됩니다. 비활성화 되면 거리가 '일직선'으로 계산됩니다.\n\n노트: 이 옵션을 켜면 많은 수의 목표가 있는 작업에서 심각한 렉을 유발할 수 있습니다.</FM.PathBasedDistance.Tip>
+  <FM.CountAllOnMap>지도 전체 계수</FM.CountAllOnMap>
+  <FM.CountAllOnMap.Tip>활성화 되면 맵 전체에 있는 아이템을 계수해서 임계 필터를 적용합니다. 비활성화 되면 창고에 있는 아이템만 계수됩니다.</FM.CountAllOnMap.Tip>
+  <FM.None>None</FM.None>
+  <!-- 0: target (thing), 1: distance (int), 2: yield amount (int), 3: yield type (def) -->
+  <Fluffy.Manager.DesignationLabel>{0}\n  거리: {1}\n  산출량: {2}x {3}</Fluffy.Manager.DesignationLabel>
+
+  <!-- time periods for update interval -->
+  <FM.DefaultUpdateInterval>기본 업데이트 간격</FM.DefaultUpdateInterval>
+  <FM.Hourly>매 시간</FM.Hourly>
+  <FM.MultiHourly>매 {0} 시간</FM.MultiHourly>
+  <FM.Daily>매일</FM.Daily>
+  <FM.Monthly>매월</FM.Monthly>
+  <FM.Yearly>매년</FM.Yearly>
+
+  <!-- History graphs -->
+  <FM.HistoryPeriod>주기</FM.HistoryPeriod>
+  <FM.HistoryShowHideLegend>범례 보기/숨기기</FM.HistoryShowHideLegend>
+  <FM.HistoryClickToEnable>\n\클릭해서 {0} {1} 그래프 그리기.\n오른쪽 클릭으로 {1}만 보기.</FM.HistoryClickToEnable>
+  <FM.HistoryNoChapters>보여줄 것이 없습니다!</FM.HistoryNoChapters>
+
+  <!-- Power Tab (E for energy) -->
+  <FME.PeriodShown>주기: {0}</FME.PeriodShown>
+  <FME.PeriodShownTooltip>{0} 동안 전력 생산과 소비량을 보여줍니다.\n\n클릭해서 주기를 변경할 수 있습니다.</FME.PeriodShownTooltip>
+  <FME.Power>전력</FME.Power>
+  <FME.NotResearched>전력 관리가 연구되지 않았습니다.</FME.NotResearched>
+  <FME.NoPoweredStation>관리 스테이션에 전력이 없습니다.</FME.NoPoweredStation>
+  
+  <!-- Overview Tab -->
+  <FM.Overview>요약</FM.Overview>
+  <FM.NoJobs>작업이 설정되지 않음.</FM.NoJobs>
+  <FM.Activity>현재 활동</FM.Activity>
+  <FM.Enabled>작업</FM.Enabled>
+  <FM.Priority>작업</FM.Priority>
+  <FM.ClickToJumpTo>클릭하여 이동 {0}</FM.ClickToJumpTo>
+  <FM.JobCompletedTooltip>작업이 임계값에 도달했습니다.\n\n클릭해서 이 작업을 일시정지 합니다.</FM.JobCompletedTooltip>
+  <FM.UnsuspendJobTooltip>작업이 일시정지 되었습니다.\n\n클릭해서 재개합니다.</FM.UnsuspendJobTooltip>
+  <FM.SuspendJobTooltip>클릭해서 이 작업을 일시정지 합니다.</FM.SuspendJobTooltip>
+  <FM.PluralSuffix>들</FM.PluralSuffix>
+  
+  <!--Import/Export Tab-->
+  <FM.ImportExport>가져오기 &amp; 내보내기</FM.ImportExport>
+  <FM.CurrentJobs>현재 작업:</FM.CurrentJobs>
+  <FM.Export>내보내기</FM.Export>
+  <FM.ConfirmOverwrite>{0}이/가 존재합니다.\n\n덮어씌울까요?</FM.ConfirmOverwrite>
+  <FM.JobsExported>{0} 작업 내보냄</FM.JobsExported>
+  <FM.JobsImported>{0} 작업 가져옴</FM.JobsImported>
+  <FM.InvalidJobsDeleted>{0} 사용 불가능한 작업 제거됨</FM.InvalidJobsDeleted>
+  <FM.Import>가져오기</FM.Import>
+  <FM.NoSaves>내보낸 파일 찾을 수 없음.</FM.NoSaves>
+
+  <!-- Hunting Tab -->
+  <FMH.Hunting>사냥</FMH.Hunting>
+  <FMH.NewHuntingJob>새 작업</FMH.NewHuntingJob>
+  <FMH.NewHuntingJobTooltip>새 사냥 작업을 추가합니다.</FMH.NewHuntingJobTooltip>
+  <FMH.AllowHumanMeat>인육 포함</FMH.AllowHumanMeat>
+  <FMH.AllowHumanMeat.Tip>인육도 포함시킬까요? \n\n메모: 이 단축키는 인육을 임계 필터에 포함시킬지 토글합니다. 임계값 세부 항목에서 다양한 설정을 수정할 수 있습니다.</FMH.AllowHumanMeat.Tip>
+  <FMH.AllowInsectMeat>곤충 고기 포함</FMH.AllowInsectMeat>
+  <FMH.AllowInsectMeat.Tip>곤충 고기를 포함시킬까요? \n\n메모: 이 단축키는 곤충 고기를 임계 필터에 포함시킬지 토글합니다. 임계값 세부 항목에서 다양한 설정을 수정할 수 있습니다.</FMH.AllowInsectMeat.Tip>
+  <FMH.UnforbidCorpses>금지된 시체</FMH.UnforbidCorpses>
+  <FMH.UnforbidCorpses.Tip>자동으로 금지된(신선한) 동물의 시체를 사냥하도록 설정합니다.</FMH.UnforbidCorpses.Tip>
+  <FMH.Animals>허가된 동물</FMH.Animals>
+  <FMH.TargetCount>목표 재고: {0}+{1}+{2}/{3}</FMH.TargetCount>
+  <FMH.TargetCountTooltip>재고: {3}\n{0} 창고\n{1} 예상 도축\n{2} 현재 지정된 사냥감 예상</FMH.TargetCountTooltip>
+  <FM.Hunting.Predators>포식자</FM.Hunting.Predators>
+  <FM.Hunting.Predators.Tip>모든 포식자를 토글합니다</FM.Hunting.Predators.Tip>
+  <FM.Hunting.HerdAnimals>동물 무리</FM.Hunting.HerdAnimals>
+  <FM.Hunting.HerdAnimals.Tip>모든 동물 무리를 토글합니다</FM.Hunting.HerdAnimals.Tip>
+  <FM.Hunting.Exploding>폭발</FM.Hunting.Exploding>
+  <FM.Hunting.Exploding.Tip>모든 폭발하는 동물을 토글합니다</FM.Hunting.Exploding.Tip>
+  <FM.Hunting.AreaRestriction>사냥 구역 제한</FM.Hunting.AreaRestriction>
+
+  <!-- Forestry Tab -->
+  <FMF.Forestry>벌목</FMF.Forestry>
+  <FMF.NewForestryJob>새 작업</FMF.NewForestryJob>
+  <FMF.NewForestryJobTooltip>새 벌목 작업을 추가합니다.</FMF.NewForestryJobTooltip>
+  <FMF.Options>설정</FMF.Options>
+  <FMF.ClearWindCells>풍력 터빈 구역 청소</FMF.ClearWindCells>
+  <FMF.ClearWindCells.Tip>풍력 터빈이 필요로 하는 모든 공간을 비웁니다.</FMF.ClearWindCells.Tip>
+  <FMF.AllowSaplings>완전히 성장한 나무만 허용</FMF.AllowSaplings>
+  <FMF.AllowSaplings.Tip>완전히 성장한 나무만 벌목하도록 할까요?</FMF.AllowSaplings.Tip>
+  <FMF.LoggingArea>벌목이 허용된 구역:</FMF.LoggingArea>
+  <FMF.TargetCount>목표 재고: {0}+{1}/{2}</FMF.TargetCount>
+  <FMF.TargetCountTooltip>재고: {2}\n{0} 창고\n{1} 현재 지정된 벌목 예상</FMF.TargetCountTooltip>
+  <FMF.ClearAreas>Clear areas of all vegetation:</FMF.ClearAreas>
+  <FMF.JobType>작업 종류</FMF.JobType>
+  <FMF.JobType.ClearArea>지역 청소</FMF.JobType.ClearArea>
+  <FMF.JobType.ClearArea.Tip>풍력 발전을 원활하게 할 수 있도록 지역을 정리하고 킬존에서 적들이 엄폐하지 못하도록 합니다.</FMF.JobType.ClearArea.Tip>
+  <FMF.JobType.Logging>나무 벌목</FMF.JobType.Logging>
+  <FMF.JobType.Logging.Tip>나무를 잘라 목재를 만듭니다.</FMF.JobType.Logging.Tip>
+  
+  <FMF.Clear>Clear {0}</FMF.Clear>
+  <FMF.TurbineArea>풍력 발전지역</FMF.TurbineArea>
+
+  <FMF.Trees>나무</FMF.Trees>
+  <FMF.Trees.Tip>전체 나무 선택</FMF.Trees.Tip>
+  <FMF.Flammable>불에 탈 수 있음</FMF.Flammable>
+  <FMF.Flammable.Tip>모든 불에 탈 수 있는 작물을 선택합니다</FMF.Flammable.Tip>
+  <FMF.Ugly>못생긴</FMF.Ugly>
+  <FMF.Ugly.Tip>모든 못생긴 작물을 선택합니다.</FMF.Ugly.Tip>
+  <FMF.ProvidesCover>엄폐</FMF.ProvidesCover>
+  <FMF.ProvidesCover.Tip>엄폐를 제공하는 모든 작물을 선택합니다.</FMF.ProvidesCover.Tip>
+  <FMF.BlocksWind>풍력 발전 방해</FMF.BlocksWind>
+  <FMF.BlocksWind.Tip>풍력 발전을 방해하는 모든 작물을 선택합니다.</FMF.BlocksWind.Tip>
+
+
+  <!-- Foraging (Gathering) tab -->
+  <FMG.Foraging>수확</FMG.Foraging>
+  <FMG.NewForagingJob>새 작업</FMG.NewForagingJob>
+  <FMG.NewForagingJobTooltip>새 수확 작업을 추가합니다.</FMG.NewForagingJobTooltip>
+  <FMG.Options>설정</FMG.Options>
+  <FMG.TargetCount>목표 재고: {0}+{1}/{2}</FMG.TargetCount>
+  <FMG.TargetCountTooltip>재고: {2}\n{0} 창고\n{1} 현재 지정된 수확 예상</FMG.TargetCountTooltip>
+  <FMG.ForceMature>완전히 성장한 작물만 허용</FMG.ForceMature>
+  <FMG.ForceMature.Tip>완전히 성장한 작물만 수확을 허용토록 할까요?</FMG.ForceMature.Tip>
+  <FMG.ForagingArea>수확이 허용된 구역:</FMG.ForagingArea>
+  <FMG.Plants>허용된 작물</FMG.Plants>
+  <FM.Foraging.Edible>먹을 수 있는 작물</FM.Foraging.Edible>
+  <FM.Foraging.Edible.Tip>모든 먹을 수 있는 작물류를 선택합니다.</FM.Foraging.Edible.Tip>
+  <FM.Foraging.Mushrooms>버섯</FM.Foraging.Mushrooms>
+  <FM.Foraging.Mushrooms.Tip>모든 버섯류를 선택합니다.</FM.Foraging.Mushrooms.Tip>
+
+  <!-- Thresholds -->
+  <FMP.ThresholdCount>임계값: {0}/{1}</FMP.ThresholdCount>
+  <FMP.ThresholdCountTooltip>클릭해서 임계값 세부 정보창을 봅니다.\n\n재고: {1}\n생산중: {0}</FMP.ThresholdCountTooltip>
+  <FMP.ThresholdDetails>임계값 세부 정보</FMP.ThresholdDetails>
+
+  <!-- Tab headers -->
+  <FMP.Current>현재</FMP.Current>
+  <FMP.Available>사용 가능</FMP.Available>
+
+  <!-- Livestock tab -->
+  <FML.Livestock>생물 재고</FML.Livestock>
+  <FML.TargetCounts>목표 재고</FML.TargetCounts>
+  <FML.Adult>성체</FML.Adult>
+  <FML.Juvenile>어린</FML.Juvenile>
+  <FML.Training>훈련</FML.Training>
+  <FML.RestrictToArea>동물의 구역을 제한하시겠습니까?</FML.RestrictToArea>
+  <FML.RestrictToArea.Tip>동물의 구역을 특정 지역으로 제한할 수 있습니다. 선택적으로 성별과 자란 정도에 따라 구분할 수 있습니다.</FML.RestrictToArea.Tip>
+  <FML.ButcherExcess>생물 재고를 초과하면 도살합니다.</FML.ButcherExcess>
+  <FML.ButcherExcess.Tip>목표 재고를 초과한 경우 고기로 도축할까요?</FML.ButcherExcess.Tip>
+  <FML.ButcherTrained>훈련됨</FML.ButcherTrained>
+  <FML.ButcherTrained.Tip>훈련된 동물의 도축을 허용할까요?</FML.ButcherTrained.Tip>
+  <FML.ButcherPregnant>임신</FML.ButcherPregnant>
+  <FML.ButcherPregnant.Tip>임신한 동물의 도축을 허용할까요?</FML.ButcherPregnant.Tip>
+  <FML.ButcherBonded>각별</FML.ButcherBonded>
+  <FML.ButcherBonded.Tip>각별한 동물의 도축을 허용할까요?</FML.ButcherBonded.Tip>
+  <FML.TameMore>동물 자동으로 길들이기</FML.TameMore>
+  <FML.TameMore.Tip>관리자가 야생 동물을 길들이도록 지정할까요?</FML.TameMore.Tip>
+  <FML.TameArea>Allow taming in:</FML.TameArea>
+  <FML.ListEntryTooltip>{0}s:\n{1}/{5} 암컷 성체\n{2}/{6} 수컷 성체\n{3}/{7} 어린 암컷\n{4}/{8} 어린 수컷</FML.ListEntryTooltip>
+  <FML.TameWildCount>길들여짐 {0}마리, 야생 {1}마리.</FML.TameWildCount>
+  <FML.NoAnimals>{0} {1} 없음</FML.NoAnimals>
+  <FML.GenderHeader>성별</FML.GenderHeader>
+  <FML.AgeHeader>나이 (Lifestage)</FML.AgeHeader>
+  <FML.MeatHeader>도축시 예상되는 고기 양.</FML.MeatHeader>
+  <FML.MilkHeader>다음 착유까지 진행도</FML.MilkHeader>
+  <FML.WoolHeader>다음 털 깎기까지 진행도</FML.WoolHeader>
+  <FML.Yields>Expected yield: {0} x{1}</FML.Yields>
+  <FML.TrainYoung>어린 동물 훈련</FML.TrainYoung>
+  <FML.SendToSlaughterArea>도축 표시된 동물의 구역을 제한합니다.</FML.SendToSlaughterArea>
+  <FML.SendToSlaughterArea.Tip>도축 표시된 동물을 특정 구역으로 제한합니다.</FML.SendToSlaughterArea.Tip>
+  <FM.Livestock.TargetCountsHeader>목표 재고</FM.Livestock.TargetCountsHeader>
+  <FM.Livestock.AreaRestrictionsHeader>구역 제한</FM.Livestock.AreaRestrictionsHeader>
+  <FM.Livestock.TrainingHeader>훈련 목표</FM.Livestock.TrainingHeader>
+  <FM.Livestock.ButcherHeader>도축</FM.Livestock.ButcherHeader>
+  <FM.Livestock.TamingHeader>길들임</FM.Livestock.TamingHeader>
+  <FML.Tame>길들여진</FML.Tame>
+  <FML.Wild>야생</FML.Wild>
+  <FM.Livestock.AnimalsHeader>{0} {1}</FM.Livestock.AnimalsHeader>
+  <FM.Livestock.SelectPawnKind>선택된 작업 없음</FM.Livestock.SelectPawnKind>
+  <FM.Livestock.DisabledBecauseSlaughterExcessDisabled>생물 재고가 초과되었지만 도축되지 않으므로 비활성되었습니다.</FM.Livestock.DisabledBecauseSlaughterExcessDisabled>
+  <FML.SendToTrainingArea>훈련 표시된 동물의 구역을 제한합니다.</FML.SendToTrainingArea>
+  <FML.SendToTrainingArea.Tip>훈련 표시된 동물을 특정 구역으로 제한합니다.</FML.SendToTrainingArea.Tip>
+  <FM.Livestock.DisabledBecauseNoTrainingSet>훈련 목표가 설정되지 않았으므로 비활성되었습니다.</FM.Livestock.DisabledBecauseNoTrainingSet>
+
+  <!-- following -->
+  <FM.Livestock.FollowHeader>따라가기</FM.Livestock.FollowHeader>
+  <FM.Livestock.MasterDefault>주인 할당</FM.Livestock.MasterDefault>
+  <FM.Livestock.MasterDefault.Tip>동물을 특정 림 혹은 그룹으로 할당합니다. 활성화 되면 사용자 설정을 덮어쓸 수도 있습니다.</FM.Livestock.MasterDefault.Tip>
+  <FM.Livestock.Follow>주인 따라가기</FM.Livestock.Follow>
+  <FM.Livestock.FollowTip>주인을 따라가도록 설정합니다. 활성화 되면 사용자 설정을 덮어쓸 수도 있습니다. 비활성화 되어있는 경우 수동으로 활성화 가능합니다.</FM.Livestock.FollowTip>
+  <FM.Livestock.FollowDrafted>소집</FM.Livestock.FollowDrafted>
+  <FM.Livestock.FollowDrafted.Tip>주인이 소집되면 동물을 따라다니게 할까요?</FM.Livestock.FollowDrafted.Tip>
+  <FM.Livestock.FollowFieldwork>외부 작업</FM.Livestock.FollowFieldwork>
+  <FM.Livestock.FollowFieldwork.Tip>주인이 외부 작업을 하게 되면 동물이 따라다니게 할까요? (예., 사냥)?</FM.Livestock.FollowFieldwork.Tip>
+  <FM.Livestock.FollowTraining>조련사 따라가기</FM.Livestock.FollowTraining>
+  <FM.Livestock.FollowTraining.Tip>조련을 하도록 표시된 동물이 조련사를 따라다닙니다.</FM.Livestock.FollowTraining.Tip>
+  <FM.Livestock.MasterTraining>조련사 할당</FM.Livestock.MasterTraining>
+  <FM.Livestock.MasterTraining.Tip>특정한 주인(조련사) 를 할당합니다. 활성화 되면 사용자 설정을 덮어쓸 수도 있습니다.</FM.Livestock.MasterTraining.Tip>
+  <FM.Livestock.Master>{0} ({1})</FM.Livestock.Master> <!-- 0; pawn name, 1; skill level -->
+
+  <!-- MasterMode enum -->
+  <FM.Livestock.MasterMode.Default>수동</FM.Livestock.MasterMode.Default>
+  <FM.Livestock.MasterMode.Hunters>사냥꾼</FM.Livestock.MasterMode.Hunters>
+  <FM.Livestock.MasterMode.Trainers>조련사</FM.Livestock.MasterMode.Trainers>
+  <FM.Livestock.MasterMode.Melee>근접</FM.Livestock.MasterMode.Melee>
+  <FM.Livestock.MasterMode.Ranged>원거리</FM.Livestock.MasterMode.Ranged>
+  <FM.Livestock.MasterMode.Violent>폭력적</FM.Livestock.MasterMode.Violent>
+  <FM.Livestock.MasterMode.NonViolent>비폭력적</FM.Livestock.MasterMode.NonViolent>
+  <FM.Livestock.MasterMode.All>모두</FM.Livestock.MasterMode.All>
+
+</LanguageData>

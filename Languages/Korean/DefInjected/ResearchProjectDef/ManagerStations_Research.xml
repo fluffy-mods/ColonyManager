@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>\
+  <ManagingSoftware.label>기본 관리 소프트웨어</ManagingSoftware.label>
+  <ManagingSoftware.description>기본 정착지 관리 프로그램을 개발합니다.\n\n컴퓨터가 있는 건물 관리 관리자 책상 건설이 가능하고, 미리 설치된 버그 없는 관리 소프트웨어를 제공합니다.</ManagingSoftware.description>
+
+  <AdvancedManagingSoftware.label>개선된 관리 소프트웨어</AdvancedManagingSoftware.label>
+  <AdvancedManagingSoftware.description>개선된 정착지 관리 프로그램을 개발합니다.\n\nAdvancements in AI and colony-aware computers allow the building of Colony Aware Supercomputers, preinstalled with FluffyOS. Some colonists have reported doors opening and closing, airconditioning systems going haywire, and electric smelters suddenly turning on. Nevertheless, the manufacturer guarantees(tm) that FluffyOS is not programmed to kill colonists.</AdvancedManagingSoftware.description>
+
+  <PowerManagement.label>전력 관리</PowerManagement.label>
+  <PowerManagement.description>정착지의 전력 사용량을 모니터할 수 있는 관리 소프트웨어를 만듭니다.</PowerManagement.description>
+</LanguageData>
