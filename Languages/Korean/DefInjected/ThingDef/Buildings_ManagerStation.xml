@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <!-- Work tables -->
+
+  <FM_BasicManagerStation.label>기본 관리 책상</FM_BasicManagerStation.label>
+  <FM_BasicManagerStation.description>관리자가 일을 하기 위해 필요한 모든 것들이 있는 필요한 간단한 책상입니다.</FM_BasicManagerStation.description>
+
+  <FM_ManagerStation.label>관리 책상</FM_ManagerStation.label>
+  <FM_ManagerStation.description>관리자가 효과적으로 일을 하기 위해 컴퓨터와 필요한 모든 것들이 있는 책상입니다.</FM_ManagerStation.description>
+
+  <FM_AIManager.label>AI 관리자</FM_AIManager.label>
+  <FM_AIManager.description>슈퍼 컴퓨터가 정착지 관리를 자동화 합니다. 인공지능이 악의적인 서브루틴을 포함한다는 주장은 완전히 거짓입니다. 우리가 보증합니다.</FM_AIManager.description>
+
+</LanguageData>

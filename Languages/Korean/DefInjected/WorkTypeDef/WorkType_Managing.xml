@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <Managing.label>관리</Managing.label>
+  <Managing.description>관리자가 작업을 할당하고 정착지에 명령을 내립니다.</Managing.description>
+  <Managing.labelShort>관리</Managing.labelShort>
+  <Managing.pawnLabel>관리자</Managing.pawnLabel>
+  <Managing.gerundLabel>관리</Managing.gerundLabel>
+  <Managing.verb>관리중</Managing.verb>
+
+</LanguageData>

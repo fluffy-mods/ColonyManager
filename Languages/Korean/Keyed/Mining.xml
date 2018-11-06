@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <FM.Mining>채광</FM.Mining>
+    <FM.Mining.MiningArea>채광 지역</FM.Mining.MiningArea>
+    <FM.Mining.HealthAndSafety>건강 및 안전</FM.Mining.HealthAndSafety>
+    <FM.Mining.AllowedMinerals>광물</FM.Mining.AllowedMinerals>
+    <FM.Mining.AllowedBuildings>건물</FM.Mining.AllowedBuildings>
+    <FM.Mining.DeconstructBuildings>건물 해체</FM.Mining.DeconstructBuildings>
+    <FM.Mining.DeconstructBuildings.Tip>폐품을 회수하기 위해 점거되지 않은 건물을 해체할까요?</FM.Mining.DeconstructBuildings.Tip>
+    <FM.Mining.CheckRoofSupport>지붕 지지 남김</FM.Mining.CheckRoofSupport>
+    <FM.Mining.CheckRoofSupport.Tip>관리자는 적당한 간격마다 지지대를 남깁니다.\n\n노트: 지지대의 위치는 미리 계산되어 있습니다. 하지만 동굴 붕괴는 여전히 발생합니다!</FM.Mining.CheckRoofSupport.Tip>
+    <FM.Mining.CheckRoofSupportAdvanced>지붕 지지 확인</FM.Mining.CheckRoofSupportAdvanced>
+    <FM.Mining.CheckRoofSupportAdvanced.Tip>관리자는 채광 및 건물 해체 작업 전에 지붕 지지대 위치를 계산하여 동굴 붕괴와 지붕 붕괴에 대한 리스크를 현저히 줄여줍니다.</FM.Mining.CheckRoofSupportAdvanced.Tip>    <FM.Mining.CheckRoofSupportAdvanced.DisabledTip>Disabled because checking for roof support is disabled.</FM.Mining.CheckRoofSupportAdvanced.DisabledTip>
+    <FM.Mining.CheckRoomDivision>방 경계 확인</FM.Mining.CheckRoomDivision>
+    <FM.Mining.CheckRoomDivision.Tip>메니져는 벽으로 구분되어 있는 방을 부수지 않도록 노력하거나 지름길을 만듭니다.</FM.Mining.CheckRoomDivision.Tip>
+    <FM.Mining.SyncFilterAndAllowed>임계값 동기화</FM.Mining.SyncFilterAndAllowed>
+    <FM.Mining.SyncFilterAndAllowed.Tip>이 설정을 활성화 함으로써 채광 또는 건물 해체를 위한 임계값 필터에 대해 재료의 개수를 동기화 하려 할 것입니다. 반대의 경우도 마찬가지 입니다.</FM.Mining.SyncFilterAndAllowed.Tip>
+
+    <!-- cur, chunks, designated, target -->
+    <FM.Mining.TargetCount>목표 재고: {0}+{1}+{2}/{3}</FM.Mining.TargetCount>
+    <FM.Mining.TargetCount.Tip>재고: {3}\n{0} 창고\n{1} 돌 자르기로 예상되는\n{2} 예상되는 현재 지정된 채석</FM.Mining.TargetCount.Tip>
+  
+    <!-- Jobs -->
+    <FM.Mining.NewJob>새 작업</FM.Mining.NewJob>
+    <FM.Mining.NewJob.Tip>새 채광 작업을 만듭니다</FM.Mining.NewJob.Tip>
+
+    <!-- shortcuts -->
+    <FM.Mining.Stone>돌</FM.Mining.Stone>
+    <FM.Mining.Stone.Tip>돌 조각을 산출하는 모든 채광 가능한 항목 토글</FM.Mining.Stone.Tip>
+    <FM.Mining.Metal>금속</FM.Mining.Metal>
+    <FM.Mining.Metal.Tip>금속 조각을 산출하는 모든 채광 가능한 항목 토글</FM.Mining.Metal.Tip>
+    <FM.Mining.Precious>귀금속</FM.Mining.Precious>
+    <FM.Mining.Precious.Tip>귀중한 재료를 산출하는 모든 채광 가능한 항목 토글</FM.Mining.Precious.Tip>
+</LanguageData>
