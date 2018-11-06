@@ -10,6 +10,8 @@
         <requiredResearchBuilding>HiTechResearchBench</requiredResearchBuilding>
         <prerequisites></prerequisites>
 		<tab>ManagerTab</tab>
+        <researchViewX>0.16</researchViewX>
+        <researchViewY>0.16</researchViewY>
     </ResearchProjectDef>
 
     <ResearchProjectDef>
@@ -23,6 +25,8 @@
             <li>ManagingSoftware</li>
         </prerequisites>
 		<tab>ManagerTab</tab>
+        <researchViewX>1.15</researchViewX>
+        <researchViewY>0.65</researchViewY>
     </ResearchProjectDef>
 
     <ResearchProjectDef>
@@ -36,6 +40,8 @@
             <li>ManagingSoftware</li>
         </prerequisites>
 		<tab>ManagerTab</tab>
+        <researchViewX>1.16</researchViewX>
+        <researchViewY>0.18</researchViewY>
         <researchMods>
           <li Class="FluffyManager.UnlockPowerTab" />
         </researchMods>
