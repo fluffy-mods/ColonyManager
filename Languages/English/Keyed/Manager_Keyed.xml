@@ -59,7 +59,7 @@
   <!-- Overview Tab -->
   <FM.Overview>Overview</FM.Overview>
   <FM.NoJobs>No jobs set.</FM.NoJobs>
-  <FM.Activity>Current activiy</FM.Activity>
+  <FM.Activity>Current activity</FM.Activity>
   <FM.Enabled>Work</FM.Enabled>
   <FM.Priority>Work</FM.Priority>
   <FM.ClickToJumpTo>Click to jump to {0}</FM.ClickToJumpTo>

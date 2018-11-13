@@ -11,10 +11,10 @@ namespace FluffyManager
         public static Rect RoundToInt( this Rect rect )
         {
             return new Rect( 
-                Mathf.Round( rect.xMin ), 
-                Mathf.Round( rect.yMin ), 
-                Mathf.Round( rect.width ),
-                Mathf.Round( rect.height ) );
+                Mathf.RoundToInt( rect.xMin ), 
+                Mathf.RoundToInt( rect.yMin ), 
+                Mathf.RoundToInt( rect.width ),
+                Mathf.RoundToInt( rect.height ) );
         }
 
         public static Rect CenteredIn(this Rect inner, Rect outer, float x = 0f, float y = 0f)

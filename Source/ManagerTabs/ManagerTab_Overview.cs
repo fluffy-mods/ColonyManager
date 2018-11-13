@@ -175,12 +175,12 @@ namespace FluffyManager
 
         public override void DoWindowContents( Rect canvas )
         {
-            var overviewRect = new Rect( 0f, 0f, OverviewWidthRatio * canvas.width, canvas.height );
+            var overviewRect = new Rect( 0f, 0f, OverviewWidthRatio * canvas.width, canvas.height ).RoundToInt();
             var sideRectUpper = new Rect( overviewRect.xMax + Margin, 0f,
                                           ( 1 - OverviewWidthRatio ) * canvas.width - Margin,
-                                          ( canvas.height - Margin ) / 2 );
+                                          ( canvas.height - Margin ) / 2 ).RoundToInt();
             var sideRectLower = new Rect( overviewRect.xMax + Margin, sideRectUpper.yMax + Margin, sideRectUpper.width,
-                                          sideRectUpper.height - 1 );
+                                          sideRectUpper.height - 1 ).RoundToInt();
 
             // draw the listing of current jobs.
             Widgets.DrawMenuSection( overviewRect );
@@ -269,8 +269,8 @@ namespace FluffyManager
         public void DrawPawnOverview( Rect rect )
         {
             // table body viewport
-            var tableOutRect = new Rect( 0f, ListEntryHeight, rect.width, rect.height - ListEntryHeight );
-            var tableViewRect = new Rect( 0f, ListEntryHeight, rect.width, Workers.Count * ListEntryHeight );
+            var tableOutRect = new Rect( 0f, ListEntryHeight, rect.width, rect.height - ListEntryHeight ).RoundToInt();
+            var tableViewRect = new Rect( 0f, ListEntryHeight, rect.width, Workers.Count * ListEntryHeight ).RoundToInt();
             if ( tableViewRect.height > tableOutRect.height )
                 tableViewRect.width -= ScrollbarWidth;
 
@@ -278,9 +278,9 @@ namespace FluffyManager
             float colWidth = tableViewRect.width / 4 - Margin;
 
             // column headers
-            var nameColumnHeaderRect = new Rect( colWidth * 0, 0f, colWidth, ListEntryHeight );
-            var activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth * 2.5f, ListEntryHeight );
-            var priorityColumnHeaderRect = new Rect( colWidth * 3.5f, 0f, colWidth * .5f, ListEntryHeight );
+            var nameColumnHeaderRect = new Rect( colWidth * 0, 0f, colWidth, ListEntryHeight ).RoundToInt();
+            var activityColumnHeaderRect = new Rect( colWidth * 1, 0f, colWidth * 2.5f, ListEntryHeight ).RoundToInt();
+            var priorityColumnHeaderRect = new Rect( colWidth * 3.5f, 0f, colWidth * .5f, ListEntryHeight ).RoundToInt();
 
             // label for priority column
             string workLabel = Find.PlaySettings.useWorkPriorities
@@ -342,9 +342,9 @@ namespace FluffyManager
             float colWidth = rect.width / 4 - Margin;
 
             // cell rects
-            var nameRect = new Rect( colWidth * 0, rect.yMin, colWidth, ListEntryHeight );
-            var activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2.5f, ListEntryHeight );
-            var priorityRect = new Rect( colWidth * 3.5f, rect.yMin, colWidth * .5f, ListEntryHeight );
+            var nameRect = new Rect( colWidth * 0, rect.yMin, colWidth, ListEntryHeight ).RoundToInt();
+            var activityRect = new Rect( colWidth * 1, rect.yMin, colWidth * 2.5f, ListEntryHeight ).RoundToInt();
+            var priorityRect = new Rect( colWidth * 3.5f, rect.yMin, colWidth * .5f, ListEntryHeight ).RoundToInt();
 
             // name
             Widgets.DrawHighlightIfMouseover( nameRect );
@@ -369,8 +369,7 @@ namespace FluffyManager
                 TextAnchor.MiddleCenter, margin: Margin, font: GameFont.Tiny );
 
             // priority button
-            Rect priorityPosition = new Rect( 0f, 0f, 24f, 24f ).CenteredOnXIn( priorityRect )
-                                                                .CenteredOnYIn( priorityRect );
+            Rect priorityPosition = new Rect( 0f, 0f, 24f, 24f ).CenteredIn( priorityRect ).RoundToInt();
             Text.Font = GameFont.Medium;
             WidgetsWork.DrawWorkBoxFor( priorityPosition.xMin, priorityPosition.yMin, pawn, WorkTypeDef, false );
             Text.Font = GameFont.Small;
