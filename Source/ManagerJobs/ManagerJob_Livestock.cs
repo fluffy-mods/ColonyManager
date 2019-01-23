@@ -671,15 +671,14 @@ namespace FluffyManager
             if ( pawnKind.RaceProps.baseBodySize < (double)td.minBodySize )
             {
                 visible = true;
-                return new AcceptanceReport( "CannotTrainTooSmall".Translate( (object)pawnKind.LabelCap ) );
+                return new AcceptanceReport( "FM.Livestock.CannotTrainTooSmall".Translate( (object)pawnKind.GetLabelPlural() ) );
             }
 
             if ( pawnKind.RaceProps.trainability.intelligenceOrder < td.requiredTrainability.intelligenceOrder )
             {
                 visible = true;
                 return
-                    new AcceptanceReport(
-                        "CannotTrainNotSmartEnough".Translate( (object)td.requiredTrainability ) );
+                    new AcceptanceReport( "CannotTrainNotSmartEnough".Translate( (object)td.requiredTrainability ) );
             }
 
             visible = true;

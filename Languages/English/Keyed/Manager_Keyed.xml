@@ -203,6 +203,7 @@
   <FML.SendToTrainingArea>Restrict animals marked for training</FML.SendToTrainingArea>
   <FML.SendToTrainingArea.Tip>Restrict animals designated for training to a specific area.</FML.SendToTrainingArea.Tip>
   <FM.Livestock.DisabledBecauseNoTrainingSet>Disabled because no training target is set.</FM.Livestock.DisabledBecauseNoTrainingSet>
+  <FM.Livestock.CannotTrainTooSmall>{0} are too small to train this.</FM.Livestock.CannotTrainTooSmall>
 
   <!-- following -->
   <FM.Livestock.FollowHeader>Following</FM.Livestock.FollowHeader>
