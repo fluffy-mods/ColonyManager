@@ -119,8 +119,8 @@ namespace FluffyManager
                     _humanLikeMeatDefs =
                         DefDatabase<ThingDef>.AllDefsListForReading
                                              .Where( def => def.category == ThingCategory.Pawn &&
-                                                            def.race.Humanlike &&
-                                                            def.race.IsFlesh )
+                                                            ( def.race?.Humanlike ?? false ) &&
+                                                            ( def.race?.IsFlesh ?? false ) )
                                              .Select( pk => pk.race.meatDef )
                                              .Distinct()
                                              .ToList();
