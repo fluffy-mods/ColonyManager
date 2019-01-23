@@ -247,10 +247,20 @@ namespace FluffyManager
 
             // respect bonds?
             rowRect.y += ListEntryHeight;
-            DrawToggle( rowRect,
-                "FM.Livestock.RespectBonds".Translate(),
-                "FM.Livestock.RespectBonds.Tip".Translate(),
-                ref _selectedCurrent.RespectBonds );
+            if ( _selectedCurrent.Masters != MasterMode.Default && _selectedCurrent.Masters != MasterMode.Specific )
+            {
+                DrawToggle( rowRect,
+                    "FM.Livestock.RespectBonds".Translate(),
+                    "FM.Livestock.RespectBonds.Tip".Translate(),
+                    ref _selectedCurrent.RespectBonds );
+            }
+            else
+            {
+                Label( rowRect,
+                    "FM.Livestock.RespectBonds".Translate(),
+                    "FM.Livestock.RespectBonds.DisabledBecauseMastersNotSet".Translate(),
+                    color: Color.grey, margin: Margin );
+            }
 
             // default follow
             rowRect.y += ListEntryHeight;

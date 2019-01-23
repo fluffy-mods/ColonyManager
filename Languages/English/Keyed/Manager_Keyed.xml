@@ -211,6 +211,7 @@
   <FM.Livestock.MasterDefault.Tip>Assign animals to a specific master, or to groups of colonists. May overwrite user settings when enabled.</FM.Livestock.MasterDefault.Tip>
   <FM.Livestock.RespectBonds>Respect bonds</FM.Livestock.RespectBonds>
   <FM.Livestock.RespectBonds.Tip>If enabled, always assigns animals that have bonded with a colonist to that colonist. If disabled, bonds are ignored.</FM.Livestock.RespectBonds.Tip>
+  <FM.Livestock.RespectBonds.DisabledBecauseMastersNotSet>Disabled because master is set to a specific pawn, or set manually.</FM.Livestock.RespectBonds.DisabledBecauseMastersNotSet>
   <FM.Livestock.Follow>Set master following</FM.Livestock.Follow>
   <FM.Livestock.FollowTip>Set master follow settings, will overwrite user settings when enabled. If disabled, follow settings can be assigned manually.</FM.Livestock.FollowTip>
   <FM.Livestock.FollowDrafted>Drafted</FM.Livestock.FollowDrafted>
