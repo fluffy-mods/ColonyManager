@@ -6,6 +6,7 @@ using System;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using Verse;
 using static FluffyManager.Constants;
@@ -244,9 +245,19 @@ namespace FluffyManager
                 Find.WindowStack.Add( new FloatMenu( options ) );
             }
 
+            // respect bonds?
+            rowRect.y += ListEntryHeight;
+            DrawToggle( rowRect,
+                "FM.Livestock.RespectBonds".Translate(),
+                "FM.Livestock.RespectBonds.Tip".Translate(),
+                ref _selectedCurrent.RespectBonds );
+
             // default follow
             rowRect.y += ListEntryHeight;
-            DrawToggle( rowRect, "FM.Livestock.Follow".Translate(), "FM.Livestock.Follow.Tip".Translate(), ref _selectedCurrent.SetFollow );
+            DrawToggle( rowRect,
+                "FM.Livestock.Follow".Translate(), 
+                "FM.Livestock.Follow.Tip".Translate(),
+                ref _selectedCurrent.SetFollow );
 
             if ( _selectedCurrent.SetFollow )
             {

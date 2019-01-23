@@ -41,6 +41,7 @@ namespace FluffyManager
         public Pawn Master;
         public MasterMode Trainers;
         public Pawn Trainer;
+        public bool RespectBonds = true;
 
         static ManagerJob_Livestock()
         {
@@ -161,6 +162,7 @@ namespace FluffyManager
             Scribe_Values.Look( ref FollowTraining, "FollowTraining", false );
             Scribe_Values.Look( ref Masters, "Masters", MasterMode.Default );
             Scribe_Values.Look( ref Trainers, "Trainers", MasterMode.Default );
+            Scribe_Values.Look( ref RespectBonds, "RespectBonds", true );
 
             // our current designations
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
@@ -298,6 +300,14 @@ namespace FluffyManager
         {
             var master = animal.playerSettings.Master;
             var options = animal.kindDef.GetMasterOptions( manager, mode );
+
+            // if the animal is bonded, and we care about bonds, there's no discussion
+            if ( RespectBonds )
+            {
+                var bondee = animal.relations.GetFirstDirectRelationPawn( PawnRelationDefOf.Bond, p => !p.Dead );
+                if ( bondee != null )
+                    return bondee;
+            }
 
             Logger.Follow( $"Getting master for {animal.LabelShort}:\n\tcurrent: {master?.LabelShort ?? "None"}\n\toptions:\n"  );
 #if DEBUG_FOLLOW

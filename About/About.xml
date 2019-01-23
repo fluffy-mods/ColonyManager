@@ -3,7 +3,6 @@
   <name>Colony Manager</name>
   <author>Fluffy</author>
   <url>https://ludeon.com/forums/index.php?topic=16120.0</url>
-  <targetVersion>1.0.2059</targetVersion>
   <description>Colony Manager allows you to make colonists do the more tedious parts of managing a colony, making sure you’re never out of vital resources again*. 
 
 &lt;size=24&gt;Important&lt;/size&gt;
@@ -70,7 +69,10 @@ harrisongarya:    Research tab
 rw-chaos:    German translation (update)
 
 &lt;size=24&gt;Version&lt;/size&gt;
-This is version 4.4.423, for RimWorld 1.0.2059.
+This is version 4.4.430, for RimWorld 1.0.2150.
 
 </description>
+  <supportedVersions>
+    <li>1.0</li>
+  </supportedVersions>
 </ModMetaData>

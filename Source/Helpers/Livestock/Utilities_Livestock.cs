@@ -30,7 +30,7 @@ namespace FluffyManager
         Violent = 16,
         NonViolent = 32,
         All = Hunters | Trainers | Melee | Ranged | Violent | NonViolent,
-        Specific = 64 
+        Specific = 64
     }
 
     public static class Utilities_Livestock
