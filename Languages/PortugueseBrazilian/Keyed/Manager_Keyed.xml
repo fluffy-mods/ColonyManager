@@ -8,7 +8,7 @@
   <FM.All>Todos</FM.All>
   <FM.TabDisabledBecause>(desligado: {0})</FM.TabDisabledBecause>
 
-  <!-- Ajuda e mensagens de alerta para os lexicamente desafiados. -->
+  <!-- Ajuda e mensagens de alerta para os lexicalmente desafiados. -->
   <FM.HelpTitle>Gerenciador de colônia</FM.HelpTitle>
   <FM.HelpMessage>Bem-vindo ao Gerenciador de Colônia.\n\nO Gerenciador de Colônia permite que você defina metas para produção, caça, registro e criação de gado. Essas tarefas são configuradas em telas diferentes e são acessíveis através dos botões na parte superior da tela, além de outras telas convenientes. \ N \ nKogda você configurar uma tarefa, um colono da habilidade do gerente de vez em quando para rever a definição de outros colonos, verificar os seus stocks e modificar tarefas executadas de acordo com os requisitos do modo de operação \ nPara \ n exigidos: \ n - Colono com a habilidade do gestor \ .. n - Tabela do gerente.</FM.HelpMessage>
   <FM.AlertNoTableLabel>Precisa de tabela de gerenciadores</FM.AlertNoTableLabel>
@@ -32,6 +32,8 @@
   <FM.CountAllOnMap>Conte tudo no mapa</FM.CountAllOnMap>
   <FM.CountAllOnMap.Tip>Se ativado, conta todos os itens permitidos pelo filtro de limite no mapa. Se desativado, conta apenas aqueles em estoques e edifícios de armazenamento.</FM.CountAllOnMap.Tip>
   <FM.None>Nada</FM.None>
+  <!-- 0: alvo (objeto), 1: distância (int), 2: quantidade de rendimento (int), 3: tipo de rendimento (def) -->
+  <Fluffy.Manager.DesignationLabel>{0}\n  distância: {1}\n  rendimento: {2}x {3}</Fluffy.Manager.DesignationLabel>
 
   <!-- período de tempo para o intervalo de atualização -->
   <FM.DefaultUpdateInterval>Intervalo de atualização padrão</FM.DefaultUpdateInterval>
@@ -42,12 +44,12 @@
   <FM.Yearly>Anualmente</FM.Yearly>
 
   <!-- Gráficos da história -->
-  <FM.HistoryPeriod>Period</FM.HistoryPeriod>
+  <FM.HistoryPeriod>Período</FM.HistoryPeriod>
   <FM.HistoryShowHideLegend>Mostrar/ocultar legenda</FM.HistoryShowHideLegend>
   <FM.HistoryClickToEnable>\n\nClique {0} {1} no gráfico\nO botão direito -. Mostrar só o {1}</FM.HistoryClickToEnable>.
   <FM.HistoryNoChapters>Nada a mostrar.</FM.HistoryNoChapters>
 
-  <!-- Power Tab (E para energia) -->
+  <!-- Guia de energia (E para energia) -->
   <FME.PeriodShown>Período: {0}</FME.PeriodShown>
   <FME.PeriodShownTooltip>Exibindo produção e consumo de energia ao longo da última {0}.\n\nClique para alterar o período.</FME.PeriodShownTooltip>
   <FME.Power>Energia</FME.Power>
@@ -61,12 +63,13 @@
   <FM.Enabled>On</FM.Enabled>
   <FM.Priority>Trabalhar</FM.Priority>
   <FM.ClickToJumpTo>Ir para {0}</FM.ClickToJumpTo>
-  <FM.JobCompletedTooltip>O limite de execução foi atingido.</FM.JobCompletedTooltip>
-  <FM.JobSuspendedTooltip>trabalho suspenso.\n\nClique para retomar.</FM.JobSuspendedTooltip>
+  <FM.JobCompletedTooltip>O limite de execução foi atingido.\n\nClique para suspender este trabalho.</FM.JobCompletedTooltip>
+  <FM.UnsuspendJobTooltip>O trabalho foi suspenso.\n\nClique para cancelar a suspensão.</FM.UnsuspendJobTooltip>
+  <FM.SuspendJobTooltip>Clique para suspender este trabalho.</FM.SuspendJobTooltip>
   <FM.PluralSuffix>s</FM.PluralSuffix>
   
-  <!-- Guia Importar / Exportar -->
-  <FM.ImportExport>Import &amp; Exportar</FM.ImportExport>
+  <!-- Guia Importar/Exportar -->
+  <FM.ImportExport>Importar &amp; Exportar</FM.ImportExport>
   <FM.CurrentJobs>Tarefas atuais:</FM.CurrentJobs>
   <FM.Export>Exportar</FM.Export>
   <FM.ConfirmOverwrite>{0} existe.\n\nDeseja substituir?</FM.ConfirmOverwrite>
@@ -86,10 +89,10 @@
   <FMH.AllowInsectMeat.Tip>A carne de insetos deve ser contada? \n\nNOTA: Este é um atalho para alternar a carne de insetos no filtro de limiar. Você pode definir mais opções nos detalhes do limite.</FMH.AllowInsectMeat.Tip>
   <FMH.UnforbidCorpses>Permitir selecionar cadáveres</FMH.UnforbidCorpses>
   <FMH.UnforbidCorpses.Tip>Cadáveres de tipos de animais, automaticamente não podres (frescos), devem ser caçados.</FMH.UnforbidCorpses.Tip>
-  <FMH.Animais>Animais permitidos</FMH.Animais>
-  <FMH.TargetCount>Valor de segmentação: {0} + {1} + {2}/{3}</FMH.TargetCount>
+  <FMH.Animals>Animais permitidos</FMH.Animals>
+  <FMH.TargetCount>Valor de segmentação: {0}+{1}+{2}/{3}</FMH.TargetCount>
   <FMH.TargetCountTooltip>Objectivo: {3}\n{0} em estoque\n{1} esperado de corte\n{2} é esperado a partir das tarefas atuais</FMH.TargetCountTooltip>.
-  <FM.Hunting.Predators>Predators</FM.Hunting.Predators>
+  <FM.Hunting.Predators>Predadores</FM.Hunting.Predators>
   <FM.Hunting.Predators.Tip>Alternar todos os predadores</FM.Hunting.Predators.Tip>
   <FM.Hunting.HerdAnimals>Rebanho animais</FM.Hunting.HerdAnimals>
   <FM.Hunting.HerdAnimals.Tip>Alternar todos os animais do rebanho</FM.Hunting.HerdAnimals.Tip>
@@ -97,7 +100,7 @@
   <FM.Hunting.Exploding.Tip>Alternar todos os animais explodindo</FM.Hunting.Exploding.Tip>
   <FM.Hunting.AreaRestriction>Restringir a caça a</FM.Hunting.AreaRestriction>
 
-<!-- Guia Florestal -->
+  <!-- Guia Florestal -->
   <FMF.Forestry>Silvicultura</FMF.Forestry>
   <FMF.NewForestryJob>Novo trabalho</FMF.NewForestryJob>
   <FMF.NewForestryJobTooltip>Adicionar nova tarefa de suprimento</FMF.NewForestryJobTooltip>
@@ -131,8 +134,8 @@
   <FMF.BlocksWind.Tip>Selecione todas as plantas que bloqueiam o vento</FMF.BlocksWind.Tip>
 
 
-  <!-- Guia Foraging (Gathering) -->
-  <FMG.Foraging>Collection</FMG.Foraging>
+  <!-- Guia Forrageamento (coleta) -->
+  <FMG.Foraging>Coleção</FMG.Foraging>
   <FMG.NewForagingJob>Novo trabalho</FMG.NewForagingJob>
   <FMG.NewForagingJobTooltip>Adicionar uma nova tarefa de coleta</FMG.NewForagingJobTooltip>
   <FMG.Options>Opções</FMG.Options>
@@ -147,12 +150,12 @@
   <FM.Foraging.Mushrooms>Cogumelos</FM.Foraging.Mushrooms>
   <FM.Foraging.Mushrooms.Tip>Selecione todos os cogumelos</FM.Foraging.Mushrooms.Tip>
 
-  <!-- Thresholds -->
+  <!-- Limites -->
   <FMP.ThresholdCount>Limite: {0}/{1}</FMP.ThresholdCount>
   <FMP.ThresholdCountTooltip>Clique para abrir os detalhes do limite. \n\nTarget: {1}\nEm produção: {0}</FMP.ThresholdCountTooltip>
   <FMP.ThresholdDetails>Detalhes doo limites</FMP.ThresholdDetails>
 
-  <!-- Tab headers -->
+  <!-- Cabeçalhos de abas -->
   <FMP.Current>Atual</FMP.Current>
   <FMP.Available>Acessível</FMP.Available>
 
@@ -177,7 +180,7 @@
   <FML.TameArea>Permitir domar:</FML.TameArea>
   <FML.ListEntryTooltip>{0}:\n{1}/{5} fêmeas adultas\n{2}/{6} machos adultos\n{3}/{7} fêmeas jovens\n{4}/{8 } jovens do sexo masculino</FML.ListEntryTooltip>
   <FML.TameWildCount>{0} domesticado, selvagem {1}</FML.TameWildCount>
-  <FML.NoAnimals>Nenhum animal: {0}</FML.NoAnimals>
+  <FML.NoAnimals>Nenhum animal: {0} {1}</FML.NoAnimals>
   <FML.GenderHeader>Sexo</FML.GenderHeader>
   <FML.AgeHeader>Idade</FML.AgeHeader>
   <FML.MeatHeader>Quantidade esperada de carne</FML.MeatHeader>
@@ -190,7 +193,7 @@
   <FM.Livestock.TargetCountsHeader>Contagens de alvo</FM.Livestock.TargetCountsHeader>
   <FM.Livestock.AreaRestrictionsHeader>Restrições de área</FM.Livestock.AreaRestrictionsHeader>
   <FM.Livestock.TrainingHeader>Treinamento</FM.Livestock.TrainingHeader>
-  <FM.Livestock.ButcherHeader>Butchering</FM.Livestock.ButcherHeader>
+  <FM.Livestock.ButcherHeader>Abater</FM.Livestock.ButcherHeader>
   <FM.Livestock.TamingHeader>Domar</FM.Livestock.TamingHeader>
   <FML.Tame>Domar</FML.Tame>
   <FML.Wild>Selvagem</FML.Wild>
@@ -200,11 +203,15 @@
   <FML.SendToTrainingArea>Restringir animais marcados para treinamento</FML.SendToTrainingArea>
   <FML.SendToTrainingArea.Tip>Restringir os animais designados para treinamento a uma área específica.</FML.SendToTrainingArea.Tip>
   <FM.Livestock.DisabledBecauseNoTrainingSet>Desabilitado porque nenhum destino de treinamento está definido.</FM.Livestock.DisabledBecauseNoTrainingSet>
-
-  <!-- following -->
+  <FM.Livestock.CannotTrainTooSmall>{0} são pequenos demais para treinar isso.</FM.Livestock.CannotTrainTooSmall>
+    
+  <!-- Seguir -->
   <FM.Livestock.FollowHeader>Segue</FM.Livestock.FollowHeader>
   <FM.Livestock.MasterDefault>Atribuir mestre(s)</FM.Livestock.MasterDefault>
   <FM.Livestock.MasterDefault.Tip>Atribua animais a um mestre específico ou a grupos de colonos. Pode sobrescrever as configurações do usuário quando ativado.</FM.Livestock.MasterDefault.Tip>
+  <FM.Livestock.RespectBonds>Respeitar ligações</FM.Livestock.RespectBonds>
+  <FM.Livestock.RespectBonds.Tip>Se habilitado, sempre atribui aos animais que se ligaram com um colono à esse colono. Se desativado, as ligações são ignoradas.</FM.Livestock.RespectBonds.Tip>
+  <FM.Livestock.RespectBonds.DisabledBecauseMastersNotSet>Desativado porque o mestre está definido para um peão específico ou definido manualmente.</FM.Livestock.RespectBonds.DisabledBecauseMastersNotSet>
   <FM.Livestock.Follow>Definir mestre seguindo</FM.Livestock.Follow>
   <FM.Livestock.FollowTip>Definir configurações de acompanhamento mestre, sobrescreverá as configurações do usuário quando ativado. Se desativado, os mestres podem ser atribuídos manualmente.</FM.Livestock.FollowTip>
   <FM.Livestock.FollowDrafted>Esboçado</FM.Livestock.FollowDrafted>
@@ -217,7 +224,7 @@
   <FM.Livestock.MasterTraining.Tip>Designe animais marcados para treinamento para um mestre específico (treinador) ou para todos os treinadores. Pode sobrescrever as configurações do usuário quando ativado.</FM.Livestock.MasterTraining.Tip>
   <FM.Livestock.Master>{0} ({1})</FM.Livestock.Master> <!-- 0; pawn name, 1; skill level -->
 
-  <!-- MasterMode enum -->
+  <!-- Enumeração do modo mestre -->
   <FM.Livestock.MasterMode.Default>Manual</FM.Livestock.MasterMode.Default>
   <FM.Livestock.MasterMode.Hunters>caçadores</FM.Livestock.MasterMode.Hunters>
   <FM.Livestock.MasterMode.Trainers>Treinadores</FM.Livestock.MasterMode.Trainers>
