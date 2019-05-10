@@ -305,7 +305,7 @@ namespace FluffyManager
             if ( RespectBonds )
             {
                 var bondee = animal.relations.GetFirstDirectRelationPawn( PawnRelationDefOf.Bond, p => !p.Dead );
-                if ( bondee != null )
+                if ( bondee != null && TrainableUtility.CanBeMaster( bondee, animal ) )
                     return bondee;
             }
 
