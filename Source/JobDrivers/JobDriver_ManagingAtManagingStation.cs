@@ -63,9 +63,7 @@ namespace FluffyManager
             toil.initAction = () =>
                                   {
                                       workDone = 0;
-                                      workNeeded = (int)
-                                          ( comp.Props.Speed *
-                                            ( 1 - pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) ) + .5 ) );
+                                      workNeeded = comp.Props.Speed;
                                   };
 
             toil.tickAction = () =>
@@ -75,7 +73,7 @@ namespace FluffyManager
                                                  .Learn( 0.11f );
 
                                       // update counter
-                                      workDone++;
+                                      workDone += pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) );
 
                                       // are we done yet?
                                       if ( workDone > workNeeded )
