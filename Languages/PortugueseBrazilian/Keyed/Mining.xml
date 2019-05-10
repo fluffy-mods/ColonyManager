@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <FM.Mining>Mineração</FM.Mining>
+    <FM.Mining.MiningArea>Área de mineração</FM.Mining.MiningArea>
+    <FM.Mining.HealthAndSafety>Saúde e segurança</FM.Mining.HealthAndSafety>
+    <FM.Mining.AllowedMinerals>Minerais</FM.Mining.AllowedMinerals>
+    <FM.Mining.AllowedBuildings>Construções</FM.Mining.AllowedBuildings>
+    <FM.Mining.DeconstructBuildings>Desconstruir construções</FM.Mining.DeconstructBuildings>
+    <FM.Mining.DeconstructBuildings.Tip>As construções não reclamadas devem ser desconstruídas para salvamento?</FM.Mining.DeconstructBuildings.Tip>
+    <FM.Mining.CheckRoofSupport>Deixe suportes de telhado</FM.Mining.CheckRoofSupport>
+    <FM.Mining.CheckRoofSupport.Tip>Os gerentes deixarão as colunas de suporte em intervalos regulares.\n\nNOTA: A posição das colunas é pré-calculada, os desmoronamentos e os colapsos de telhado ainda podem ocorrer!</FM.Mining.CheckRoofSupport.Tip>
+    <FM.Mining.CheckRoofSupportAdvanced>Verifique se há suportes de teto</FM.Mining.CheckRoofSupportAdvanced>
+    <FM.Mining.CheckRoofSupportAdvanced.Tip>Os gerentes calcularão o suporte do telhado antes de designar as tarefas de mineração e desconstrução, reduzindo drasticamente o risco de desmoronamento e colapsos de telhado.</FM.Mining.CheckRoofSupportAdvanced.Tip>
+    <FM.Mining.CheckRoofSupportAdvanced.DisabledTip>Desativado porque a verificação do suporte do telhado está desativada.</FM.Mining.CheckRoofSupportAdvanced.DisabledTip>
+    <FM.Mining.CheckRoomDivision>Verifique os limites da sala</FM.Mining.CheckRoomDivision>
+    <FM.Mining.CheckRoomDivision.Tip>Os gerentes tentarão impedir a violação de paredes que dividem as salas ou que criariam atalhos.</FM.Mining.CheckRoomDivision.Tip>
+    <FM.Mining.SyncFilterAndAllowed>Sincronizar Limite</FM.Mining.SyncFilterAndAllowed>
+    <FM.Mining.SyncFilterAndAllowed.Tip>Ativar isso tentará sincronizar os materiais contados no filtro de limite com as rochas e construções permitidas para mineração/desconstrução e vice-versa.</FM.Mining.SyncFilterAndAllowed.Tip>
+
+    <!-- cur, pedaços, designado, alvo -->
+    <FM.Mining.TargetCount>Contagem de alvos: {0}+{1}+{2}/{3}</FM.Mining.TargetCount>
+    <FM.Mining.TargetCount.Tip>Alvo: {3}\n{0} em armazenamento\n{1} esperado da lapidação\n{2} esperado das designações atuais.</FM.Mining.TargetCount.Tip>
+  
+    <!-- Empregos -->
+    <FM.Mining.NewJob>Novo emprego</FM.Mining.NewJob>
+    <FM.Mining.NewJob.Tip>Crie um novo trabalho de mineração</FM.Mining.NewJob.Tip>
+
+    <!-- atalhos -->
+    <FM.Mining.Stone>Pedra</FM.Mining.Stone>
+    <FM.Mining.Stone.Tip>Alternar todos os mineráveis que produzem pedaços de pedra</FM.Mining.Stone.Tip>
+    <FM.Mining.Metal>Metal</FM.Mining.Metal>
+    <FM.Mining.Metal.Tip>Alternar todos os mineráveis que produzem metal</FM.Mining.Metal.Tip>
+    <FM.Mining.Precious>Precioso</FM.Mining.Precious>
+    <FM.Mining.Precious.Tip>Alternar todos os mineráveis que produzem materiais preciosos</FM.Mining.Precious.Tip>
+</LanguageData>
