@@ -3,12 +3,10 @@
 // 2016-12-09
 
 using RimWorld;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
-using Verse.AI;
 using static FluffyManager.Constants;
 
 namespace FluffyManager
@@ -215,17 +213,15 @@ namespace FluffyManager
                     continue;
 
                 // if the plant is not in the allowed filter
-                if (!AllowedTrees.ContainsKey(plant.def) ||  !AllowedTrees[plant.def] )
+                if ( !AllowedTrees.ContainsKey(plant.def) ||  !AllowedTrees[plant.def] )
                     continue;
                 
                 // we don't cut stuff in growing zones
-                var zone = map.zoneManager.ZoneAt( cell ) as IPlantToGrowSettable;
-                if ( zone != null )
+                if ( map.zoneManager.ZoneAt( cell ) is IPlantToGrowSettable )
                     continue;
 
                 // nor in plant pots (or hydroponics)
-                var pot = map.thingGrid.ThingsListAt( cell ).FirstOrDefault( t => t is Building_PlantGrower );
-                if ( pot != null )
+                if ( map.thingGrid.ThingsListAt( cell ).Any( t => t is Building_PlantGrower ) )
                     continue;
 
                 // there's no reason not to cut it down, so cut it down.
@@ -391,17 +387,17 @@ namespace FluffyManager
 
             switch ( Type )
             {
-                    case ForestryJobType.Logging:
-                        DoLoggingJob( ref workDone );
-                        break;
-                    case ForestryJobType.ClearArea:
-                        if ( ClearWindCells )
-                            DoClearAreaDesignations( GetWindCells(), ref workDone );
-                        if ( ClearAreas.Any() )
-                                DoClearAreas( ref workDone );
-                        break;
+                case ForestryJobType.Logging:
+                    DoLoggingJob( ref workDone );
+                    break;
+                case ForestryJobType.ClearArea:
+                    if ( ClearWindCells )
+                        DoClearAreaDesignations( GetWindCells(), ref workDone );
+                    if ( ClearAreas.Any() )
+                        DoClearAreas( ref workDone );
+                    break;
             }
-            
+
             return workDone;
         }
 
@@ -503,10 +499,8 @@ namespace FluffyManager
             DeepProfiler.Start( "GetLoggableTreesSorted" );
 #endif
             List<Plant> list = manager.map.listerThings.AllThings.Where( IsValidForestryTarget )
-
-                                      // OrderBy defaults to ascending, switch sign on current yield to get descending
                                       .Select( p => p as Plant )
-                                      .OrderBy( p => -p.YieldNow() / Distance( p, position ) )
+                                      .OrderByDescending( p => p.YieldNow() / Distance( p, position ) )
                                       .ToList();
 
 #if DEBUG_PERFORMANCE
@@ -557,7 +551,7 @@ namespace FluffyManager
                    && manager.map.designationManager.DesignationOn( target ) == null
 
                    // cut only mature trees, or saplings that yield something right now.
-                   && ( ( AllowSaplings && target.YieldNow() > 1 ) || target.LifeStage == PlantLifeStage.Mature )
+                   && ( AllowSaplings || target.LifeStage == PlantLifeStage.Mature) && target.YieldNow() > 1
                    && ( LoggingArea == null || LoggingArea.ActiveCells.Contains( target.Position ) )
 
                    // reachable
@@ -593,7 +587,8 @@ namespace FluffyManager
 
                 // if type == logging, remove things that do not yield wood
                 .Where( td => Type == ForestryJobType.ClearArea ||
-                              ( td.plant.harvestTag == "Wood" || td.plant.harvestedThingDef == ThingDefOf.WoodLog ) )
+                              ( td.plant.harvestTag == "Wood" || td.plant.harvestedThingDef == ThingDefOf.WoodLog ) &&
+                              td.plant.harvestYield > 0 )
 
                 .Distinct();
 

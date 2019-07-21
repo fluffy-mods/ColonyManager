@@ -60,11 +60,9 @@ namespace FluffyManager
                 if ( !_state.TryGetValue( out state ) )
                 {
                     state =
-                        Utilities_Livestock.AgeSexArray.All(
-                                                            ageSex =>
-                                                            CountTargets[ageSex] ==
-                                                            pawnKind.GetTame( manager, ageSex ).Count ) &&
-                        AllTrainingWantedSet();
+                        Utilities_Livestock.AgeSexArray.All( ageSex
+                                                             => CountTargets[ageSex] == pawnKind.GetTame( manager, ageSex ).Count ) 
+                                                             && AllTrainingWantedSet();
                     _state.Update( state );
                 }
                 return state;
