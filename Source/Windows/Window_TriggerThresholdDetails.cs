@@ -2,7 +2,6 @@
 // Window_TriggerThresholdDetails.cs
 // 2016-12-09
 
-using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -11,26 +10,12 @@ namespace FluffyManager
 {
     public class WindowTriggerThresholdDetails : Window
     {
-        #region Fields
-
-        public Vector2 FilterScrollPosition = Vector2.zero;
-        public string Input;
-        public Trigger_Threshold Trigger;
-        private ThingFilterUI filterUI = new ThingFilterUI();
-
-        #endregion Fields
-
-
-
-        #region Properties
+        public           Vector2           FilterScrollPosition = Vector2.zero;
+        private readonly ThingFilterUI     filterUI             = new ThingFilterUI();
+        public           string            Input;
+        public           Trigger_Threshold Trigger;
 
         public override Vector2 InitialSize => new Vector2( 300f, 500 );
-
-        #endregion Properties
-
-
-
-        #region Methods
 
         public override void DoWindowContents( Rect inRect )
         {
@@ -43,7 +28,8 @@ namespace FluffyManager
                                        ( filterRect.width - Margin ) / 2f, Constants.ListEntryHeight );
 
             // draw thingfilter
-            filterUI.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter, Trigger.ParentFilter );
+            filterUI.DoThingFilterConfigWindow( filterRect, ref FilterScrollPosition, Trigger.ThresholdFilter,
+                                                Trigger.ParentFilter );
 
             // draw zone selector
             StockpileGUI.DoStockpileSelectors( zoneRect, ref Trigger.stockpile, Trigger.manager );
@@ -52,13 +38,13 @@ namespace FluffyManager
             if ( Widgets.ButtonText( buttonRect, Trigger.OpString ) )
             {
                 var list = new List<FloatMenuOption>
-                           {
-                               new FloatMenuOption( "Lower than",
-                                                    delegate { Trigger.Op = Trigger_Threshold.Ops.LowerThan; } ),
-                               new FloatMenuOption( "Equal to", delegate { Trigger.Op = Trigger_Threshold.Ops.Equals; } ),
-                               new FloatMenuOption( "Greater than",
-                                                    delegate { Trigger.Op = Trigger_Threshold.Ops.HigherThan; } )
-                           };
+                {
+                    new FloatMenuOption( "Lower than",
+                                         delegate { Trigger.Op = Trigger_Threshold.Ops.LowerThan; } ),
+                    new FloatMenuOption( "Equal to", delegate { Trigger.Op = Trigger_Threshold.Ops.Equals; } ),
+                    new FloatMenuOption( "Greater than",
+                                         delegate { Trigger.Op = Trigger_Threshold.Ops.HigherThan; } )
+                };
                 Find.WindowStack.Add( new FloatMenu( list ) );
             }
 
@@ -66,7 +52,7 @@ namespace FluffyManager
             buttonRect.x = buttonRect.xMax + Margin;
 
             // if current input is invalid color the element red
-            Color oldColor = GUI.color;
+            var oldColor = GUI.color;
             if ( !Input.IsInt() )
             {
                 GUI.color = new Color( 1f, 0f, 0f );
@@ -74,18 +60,15 @@ namespace FluffyManager
             else
             {
                 Trigger.TargetCount = int.Parse( Input );
-                if ( Trigger.TargetCount > Trigger.MaxUpperThreshold )
-                {
-                    Trigger.MaxUpperThreshold = Trigger.TargetCount;
-                }
+                if ( Trigger.TargetCount > Trigger.MaxUpperThreshold ) Trigger.MaxUpperThreshold = Trigger.TargetCount;
             }
 
             // draw the input field
-            Input = Widgets.TextField( buttonRect, Input );
+            Input     = Widgets.TextField( buttonRect, Input );
             GUI.color = oldColor;
 
             // close on enter
-            if ( Event.current.type == EventType.KeyDown &&
+            if ( Event.current.type    == EventType.KeyDown &&
                  Event.current.keyCode == KeyCode.Return )
             {
                 Event.current.Use();
@@ -98,7 +81,5 @@ namespace FluffyManager
             base.PreOpen();
             Input = Trigger.TargetCount.ToString();
         }
-
-        #endregion Methods
     }
 }

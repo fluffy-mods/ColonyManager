@@ -10,7 +10,7 @@ using Verse;
 
 namespace FluffyManager
 {
-    public class Settings: ModSettings
+    public class Settings : ModSettings
     {
         public static int DefaultUpdateInterval = GenDate.TicksPerHour;
 
@@ -22,37 +22,31 @@ namespace FluffyManager
             Text.Anchor = TextAnchor.LowerLeft;
             Widgets.Label( row, "FM.DefaultUpdateInterval".Translate() );
             Text.Anchor = TextAnchor.LowerRight;
-            Widgets.Label( row, Utilities.updateIntervalOptions.FirstOrDefault( p => p.Value == DefaultUpdateInterval ).Key );
+            Widgets.Label(
+                row, Utilities.updateIntervalOptions.FirstOrDefault( p => p.Value == DefaultUpdateInterval ).Key );
             Text.Anchor = TextAnchor.UpperLeft;
-            
+
             // interaction
             Widgets.DrawHighlightIfMouseover( row );
             if ( Widgets.ButtonInvisible( row ) )
             {
                 var options = new List<FloatMenuOption>();
-                foreach ( KeyValuePair<string, int> period in Utilities.updateIntervalOptions )
+                foreach ( var period in Utilities.updateIntervalOptions )
                 {
                     var label = period.Key;
-                    var time = period.Value;
-                    options.Add( new FloatMenuOption( label, delegate
-                                                                 {
-                                                                     DefaultUpdateInterval = time;
-                                                                 }
-                                                    ) );
+                    var time  = period.Value;
+                    options.Add( new FloatMenuOption( label, delegate { DefaultUpdateInterval = time; }
+                                 ) );
                 }
 
-                Find.WindowStack.Add(new FloatMenu(options));
+                Find.WindowStack.Add( new FloatMenu( options ) );
             }
         }
-
-        #region Overrides of ModSettings
 
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Values.Look( ref DefaultUpdateInterval, "defaultUpdateInterval", GenDate.TicksPerHour);
+            Scribe_Values.Look( ref DefaultUpdateInterval, "defaultUpdateInterval", GenDate.TicksPerHour );
         }
-
-        #endregion
     }
 }

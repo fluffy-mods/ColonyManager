@@ -16,31 +16,28 @@ namespace FluffyManager
 {
     public static class Utilities
     {
-
         public static Dictionary<MapStockpileFilter, FilterCountCache> CountCache =
             new Dictionary<MapStockpileFilter, FilterCountCache>();
 
-        public static Dictionary<string, int> updateIntervalOptions = new Dictionary<string, int>();
-        public static WorkTypeDef WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
+        public static Dictionary<string, int> updateIntervalOptions  = new Dictionary<string, int>();
+        public static WorkTypeDef             WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
 
         static Utilities()
         {
-            updateIntervalOptions[ "FM.Hourly".Translate() ] = GenDate.TicksPerHour;
-            updateIntervalOptions[ "FM.MultiHourly".Translate( 2 ) ] = GenDate.TicksPerHour * 2;
-            updateIntervalOptions[ "FM.MultiHourly".Translate( 4 ) ] = GenDate.TicksPerHour * 4;
-            updateIntervalOptions[ "FM.MultiHourly".Translate( 8 ) ] = GenDate.TicksPerHour * 8;
-            updateIntervalOptions[ "FM.Daily".Translate() ] = GenDate.TicksPerDay;
-            updateIntervalOptions[ "FM.Monthly".Translate() ] = GenDate.TicksPerTwelfth;
-            updateIntervalOptions[ "FM.Yearly".Translate() ] = GenDate.TicksPerYear;
+            updateIntervalOptions["FM.Hourly".Translate()]         = GenDate.TicksPerHour;
+            updateIntervalOptions["FM.MultiHourly".Translate( 2 )] = GenDate.TicksPerHour * 2;
+            updateIntervalOptions["FM.MultiHourly".Translate( 4 )] = GenDate.TicksPerHour * 4;
+            updateIntervalOptions["FM.MultiHourly".Translate( 8 )] = GenDate.TicksPerHour * 8;
+            updateIntervalOptions["FM.Daily".Translate()]          = GenDate.TicksPerDay;
+            updateIntervalOptions["FM.Monthly".Translate()]        = GenDate.TicksPerTwelfth;
+            updateIntervalOptions["FM.Yearly".Translate()]         = GenDate.TicksPerYear;
         }
-        
+
         public static bool HasCompOrChildCompOf( this ThingDef def, Type compType )
         {
             for ( var index = 0; index < def.comps.Count; ++index )
-            {
                 if ( compType.IsAssignableFrom( def.comps[index].compClass ) )
                     return true;
-            }
 
             return false;
         }
@@ -49,20 +46,15 @@ namespace FluffyManager
         {
             // we need to define a 'base' position to calculate distances.
             // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
-            IntVec3 position = IntVec3.Zero;
+            var position = IntVec3.Zero;
             Building managerStation = map.listerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>()
-                .FirstOrDefault();
-            if ( managerStation != null )
-            {
-                return managerStation.InteractionCell;
-            }
+                                         .FirstOrDefault();
+            if ( managerStation != null ) return managerStation.InteractionCell;
 
             // otherwise, use the average of the home area. Not ideal, but it'll do.
-            List<IntVec3> homeCells = map.areaManager.Get<Area_Home>().ActiveCells.ToList();
-            for ( var i = 0; i < homeCells.Count; i++ )
-            {
-                position += homeCells[i];
-            }
+            var homeCells =
+                map.areaManager.Get<Area_Home>().ActiveCells.ToList();
+            for ( var i = 0; i < homeCells.Count; i++ ) position += homeCells[i];
 
             position.x /= homeCells.Count;
             position.y /= homeCells.Count;
@@ -70,21 +62,19 @@ namespace FluffyManager
             var standableCell = position;
 
             // find the closest traversable cell to the center
-            for ( int i = 0; !standableCell.Walkable( map ); i++ )
-            {
+            for ( var i = 0; !standableCell.Walkable( map ); i++ )
                 standableCell = position + GenRadial.RadialPattern[i];
-            }
             return standableCell;
         }
-        
+
         private static bool TryGetCached( MapStockpileFilter mapStockpileFilter, out int count )
         {
             if ( CountCache.ContainsKey( mapStockpileFilter ) )
             {
-                FilterCountCache filterCountCache = CountCache[mapStockpileFilter];
+                var filterCountCache = CountCache[mapStockpileFilter];
                 if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 && // less than 250 ticks ago
-                     Find.TickManager.TicksGame > filterCountCache.TimeSet )
-                // cache is not from future (switching games without restarting could cause this).
+                     Find.TickManager.TicksGame                            > filterCountCache.TimeSet )
+                    // cache is not from future (switching games without restarting could cause this).
                 {
                     count = filterCountCache.Cache;
                     return true;
@@ -99,40 +89,32 @@ namespace FluffyManager
 
         public static string TimeString( this int ticks )
         {
-            int days = ticks / GenDate.TicksPerDay,
+            int days  = ticks                       / GenDate.TicksPerDay,
                 hours = ticks % GenDate.TicksPerDay / GenDate.TicksPerHour;
 
-            string s = string.Empty;
+            var s = string.Empty;
 
-            if ( days > 0 )
-            {
-                s += days + "LetterDay".Translate() + " ";
-            }
+            if ( days > 0 ) s += days + "LetterDay".Translate() + " ";
             s += hours + "LetterHour".Translate();
 
             return s;
         }
 
-        public static int CountProducts( this Map map, ThingFilter filter, Zone_Stockpile stockpile = null, bool countAllOnMap = false )
+        public static int CountProducts( this Map map, ThingFilter filter, Zone_Stockpile stockpile = null,
+                                         bool countAllOnMap = false )
         {
             var count = 0;
 
             // copout if filter is null
-            if ( filter == null )
-            {
-                return count;
-            }
+            if ( filter == null ) return count;
 
             var key = new MapStockpileFilter( map, filter, stockpile, countAllOnMap );
-            if ( TryGetCached( key, out count ) )
-            {
-                return count;
-            }
+            if ( TryGetCached( key, out count ) ) return count;
 
-            foreach ( ThingDef td in filter.AllowedThingDefs )
+            foreach ( var td in filter.AllowedThingDefs )
             {
                 // if it counts as a resource and we're not limited to a single stockpile, use the ingame counter (e.g. only steel in stockpiles.)
-                if ( !countAllOnMap &&
+                if ( !countAllOnMap     &&
                      td.CountAsResource &&
                      stockpile == null )
                 {
@@ -142,34 +124,28 @@ namespace FluffyManager
                 else
                 {
                     // otherwise, go look for stuff that matches our filters.
-                    List<Thing> thingList = map.listerThings.ThingsOfDef( td );
+                    var thingList = map.listerThings.ThingsOfDef( td );
 
                     // if filtered by stockpile, filter the thinglist accordingly.
                     if ( stockpile != null )
                     {
-                        SlotGroup areaSlotGroup = stockpile.slotGroup;
+                        var areaSlotGroup = stockpile.slotGroup;
                         thingList = thingList.Where( t => t.Position.GetSlotGroup( map ) == areaSlotGroup ).ToList();
                     }
-                    foreach ( Thing t in thingList )
+
+                    foreach ( var t in thingList )
                     {
-                        if ( t.IsForbidden( Faction.OfPlayer ) || 
+                        if ( t.IsForbidden( Faction.OfPlayer ) ||
                              t.Position.Fogged( map ) )
                             continue;
-                        
+
                         QualityCategory quality;
                         if ( t.TryGetQuality( out quality ) )
-                        {
                             if ( !filter.AllowedQualityLevels.Includes( quality ) )
-                            {
                                 continue;
-                            }
-                        }
 
-                        if ( filter.AllowedHitPointsPercents.IncludesEpsilon( t.HitPoints ) )
-                        {
-                            continue;
-                        }
-                        
+                        if ( filter.AllowedHitPointsPercents.IncludesEpsilon( t.HitPoints ) ) continue;
+
 
 #if DEBUG_COUNTS
                             Log.Message(t.LabelCap + ": " + CountProducts(t));
@@ -182,7 +158,7 @@ namespace FluffyManager
                 // update cache if exists.
                 if ( CountCache.ContainsKey( key ) )
                 {
-                    CountCache[key].Cache = count;
+                    CountCache[key].Cache   = count;
                     CountCache[key].TimeSet = Find.TickManager.TicksGame;
                 }
                 else
@@ -196,44 +172,46 @@ namespace FluffyManager
 
         public static bool IsInt( this string text )
         {
-            return int.TryParse( text, out int num );
+            return int.TryParse( text, out var num );
         }
 
         public static void DrawStatusForListEntry<T>( this T job, Rect rect, Trigger trigger ) where T : ManagerJob
         {
             // set up rects
-            Rect stampRect = new Rect(
+            var stampRect = new Rect(
                 rect.xMax - ManagerJob.SuspendStampWidth - Margin,
                 rect.yMin,
                 ManagerJob.SuspendStampWidth,
                 ManagerJob.SuspendStampWidth ).CenteredOnYIn( rect );
-            Rect lastUpdateRect = new Rect(
+            var lastUpdateRect = new Rect(
                 stampRect.xMin - Margin - ManagerJob.LastUpdateRectWidth,
                 rect.yMin,
                 ManagerJob.LastUpdateRectWidth,
                 rect.height );
-            Rect progressRect = new Rect(
+            var progressRect = new Rect(
                 lastUpdateRect.xMin - Margin - ManagerJob.ProgressRectWidth,
                 rect.yMin,
                 ManagerJob.ProgressRectWidth,
                 rect.height );
 
             // draw stamp
-            if ( Widgets.ButtonImage(stampRect, job.Completed ? Resources.StampCompleted : job.Suspended ? Resources.StampStart : Resources.StampSuspended))
+            if ( Widgets.ButtonImage(
+                stampRect,
+                job.Completed ? Resources.StampCompleted :
+                job.Suspended ? Resources.StampStart : Resources.StampSuspended ) ) job.Suspended = !job.Suspended;
+            if ( job.Suspended )
             {
-                job.Suspended = !job.Suspended;
-            }
-            if (job.Suspended)
-            {
-                TooltipHandler.TipRegion(stampRect, "FM.UnsuspendJobTooltip".Translate());
-                return;
-            } 
-            if (job.Completed)
-            {
-                TooltipHandler.TipRegion(stampRect, "FM.JobCompletedTooltip".Translate());
+                TooltipHandler.TipRegion( stampRect, "FM.UnsuspendJobTooltip".Translate() );
                 return;
             }
-            TooltipHandler.TipRegion(stampRect, "FM.SuspendJobTooltip".Translate());
+
+            if ( job.Completed )
+            {
+                TooltipHandler.TipRegion( stampRect, "FM.JobCompletedTooltip".Translate() );
+                return;
+            }
+
+            TooltipHandler.TipRegion( stampRect, "FM.SuspendJobTooltip".Translate() );
 
             // should never happen?
             if ( trigger == null )
@@ -241,7 +219,7 @@ namespace FluffyManager
 
             // draw progress bar
             trigger.DrawProgressBar( progressRect, true );
-            TooltipHandler.TipRegion(progressRect, trigger.StatusTooltip);
+            TooltipHandler.TipRegion( progressRect, trigger.StatusTooltip );
 
             // draw time since last action
             Text.Anchor = TextAnchor.MiddleCenter;
@@ -254,11 +232,11 @@ namespace FluffyManager
                 GUI.color = Color.white;
             if ( lastUpdate > job.ActionInterval * 1.5f )
                 GUI.color = Color.red;
-            
+
             Widgets.Label( lastUpdateRect, lastUpdate.TimeString() );
             GUI.color = Color.white;
             TooltipHandler.TipRegion( lastUpdateRect,
-                                      "FM.LastUpdateTooltip".Translate( 
+                                      "FM.LastUpdateTooltip".Translate(
                                           lastUpdate.TimeString(),
                                           job.ActionInterval.TimeString() ) );
 
@@ -266,21 +244,23 @@ namespace FluffyManager
             if ( Widgets.ButtonInvisible( lastUpdateRect ) )
             {
                 var options = new List<FloatMenuOption>();
-                foreach ( KeyValuePair<string, int> period in updateIntervalOptions )
+                foreach ( var period in updateIntervalOptions )
                 {
                     var label = period.Key;
-                    var time = period.Value;
+                    var time  = period.Value;
                     options.Add( new FloatMenuOption( label, () => job.ActionInterval = time ) );
                 }
+
                 Find.WindowStack.Add( new FloatMenu( options ) );
             }
         }
 
         public static void DrawToggle( ref Vector2 pos, float width, string label, string tooltip, ref bool checkOn,
-            bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small,
-            bool wrap = true )
+                                       bool expensive = false, float size = SmallIconSize, float margin = Margin,
+                                       GameFont font = GameFont.Small,
+                                       bool wrap = true )
         {
-            Rect toggleRect = new Rect(
+            var toggleRect = new Rect(
                 pos.x,
                 pos.y,
                 width,
@@ -289,89 +269,87 @@ namespace FluffyManager
             DrawToggle( toggleRect, label, tooltip, ref checkOn, expensive, size, margin, font, wrap );
         }
 
-        public static void DrawToggle( Rect rect, string label, string tooltip, ref bool checkOn, bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small, bool wrap = true )
+        public static void DrawToggle( Rect rect, string label, string tooltip, ref bool checkOn,
+                                       bool expensive = false, float size = SmallIconSize, float margin = Margin,
+                                       GameFont font = GameFont.Small, bool wrap = true )
         {
             // set up rects
-            Rect labelRect = rect;
+            var labelRect = rect;
             labelRect.xMax -= size + margin * 2;
-            var iconRect = new Rect( rect.xMax - size - margin, 0f, size, size ).CenteredOnYIn(labelRect);
+            var iconRect = new Rect( rect.xMax - size - margin, 0f, size, size ).CenteredOnYIn( labelRect );
 
             // draw label
             Label( labelRect, label, TextAnchor.MiddleLeft, font, margin: margin, wrap: wrap );
-            
+
             // tooltip
-            if ( !tooltip.NullOrEmpty() )
-            {
-                TooltipHandler.TipRegion( rect, tooltip );
-            }
+            if ( !tooltip.NullOrEmpty() ) TooltipHandler.TipRegion( rect, tooltip );
 
             // draw check
             if ( checkOn )
-            {
                 GUI.DrawTexture( iconRect, Widgets.CheckboxOnTex );
-            }
             else
-            {
                 GUI.DrawTexture( iconRect, Widgets.CheckboxOffTex );
-            }
 
             // draw expensive icon
-            if (expensive)
+            if ( expensive )
             {
                 iconRect.x -= size + margin;
-                TooltipHandler.TipRegion(iconRect, "FM.Expensive.Tip".Translate());
+                TooltipHandler.TipRegion( iconRect, "FM.Expensive.Tip".Translate() );
                 GUI.color = checkOn ? Resources.Orange : Color.grey;
-                GUI.DrawTexture(iconRect, Resources.Stopwatch);
+                GUI.DrawTexture( iconRect, Resources.Stopwatch );
                 GUI.color = Color.white;
             }
 
             // interactivity
             Widgets.DrawHighlightIfMouseover( rect );
-            if ( Widgets.ButtonInvisible( rect ) )
-            {
-                checkOn = !checkOn;
-            }
+            if ( Widgets.ButtonInvisible( rect ) ) checkOn = !checkOn;
         }
 
-        public static void DrawToggle(ref Vector2 pos, float width, string label, string tooltip, bool checkOn, Action on, Action off,
-            bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small,
-            bool wrap = true)
+        public static void DrawToggle( ref Vector2 pos, float width, string label, string tooltip, bool checkOn,
+                                       Action on, Action off,
+                                       bool expensive = false, float size = SmallIconSize, float margin = Margin,
+                                       GameFont font = GameFont.Small,
+                                       bool wrap = true )
         {
-            Rect toggleRect = new Rect(
+            var toggleRect = new Rect(
                 pos.x,
                 pos.y,
                 width,
-                ListEntryHeight);
+                ListEntryHeight );
             pos.y += ListEntryHeight;
-            DrawToggle(toggleRect, label, tooltip, checkOn, on, off, expensive, size, margin, wrap);
+            DrawToggle( toggleRect, label, tooltip, checkOn, on, off, expensive, size, margin, wrap );
         }
 
-        public static void DrawToggle(ref Vector2 pos, float width, string label, string tooltip, bool checkOn, bool checkOff, Action on, Action off,
-            bool expensive = false, float size = SmallIconSize, float margin = Margin, GameFont font = GameFont.Small,
-            bool wrap = true)
+        public static void DrawToggle( ref Vector2 pos, float width, string label, string tooltip, bool checkOn,
+                                       bool checkOff, Action on, Action off,
+                                       bool expensive = false, float size = SmallIconSize, float margin = Margin,
+                                       GameFont font = GameFont.Small,
+                                       bool wrap = true )
         {
-            Rect toggleRect = new Rect(
+            var toggleRect = new Rect(
                 pos.x,
                 pos.y,
                 width,
-                ListEntryHeight);
+                ListEntryHeight );
             pos.y += ListEntryHeight;
-            DrawToggle(toggleRect, label, tooltip, checkOn, checkOff, on, off, expensive, size, margin, wrap);
+            DrawToggle( toggleRect, label, tooltip, checkOn, checkOff, on, off, expensive, size, margin, wrap );
         }
 
         public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, Action on, Action off,
-            bool expensive = false, float size = SmallIconSize, float margin = Margin, bool wrap = true )
+                                       bool expensive = false, float size = SmallIconSize, float margin = Margin,
+                                       bool wrap = true )
         {
             DrawToggle( rect, label, tooltip, checkOn, !checkOn, on, off, expensive, size, margin, wrap );
         }
 
 
         public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, bool checkOff, Action on,
-            Action off, bool expensive = false, float size = SmallIconSize, float margin = Margin, bool wrap = true )
+                                       Action off, bool expensive = false, float size = SmallIconSize,
+                                       float margin = Margin, bool wrap = true )
         {
             // set up rects
-            Rect labelRect = rect;
-            var iconRect = new Rect( rect.xMax - size - margin, 0f, size, size );
+            var labelRect = rect;
+            var iconRect  = new Rect( rect.xMax - size - margin, 0f, size, size );
             labelRect.xMax = iconRect.xMin - Margin / 2f;
 
             // finetune rects
@@ -381,27 +359,18 @@ namespace FluffyManager
             Label( rect, label, TextAnchor.MiddleLeft, GameFont.Small, margin: margin, wrap: wrap );
 
             // tooltip
-            if ( !tooltip.NullOrEmpty() )
-            {
-                TooltipHandler.TipRegion( rect, tooltip );
-            }
+            if ( !tooltip.NullOrEmpty() ) TooltipHandler.TipRegion( rect, tooltip );
 
             // draw check
             if ( checkOn )
-            {
                 GUI.DrawTexture( iconRect, Widgets.CheckboxOnTex );
-            }
             else if ( checkOff )
-            {
                 GUI.DrawTexture( iconRect, Widgets.CheckboxOffTex );
-            }
             else
-            {
                 GUI.DrawTexture( iconRect, Widgets.CheckboxPartialTex );
-            }
 
             // draw expensive icon
-            if (expensive)
+            if ( expensive )
             {
                 iconRect.x -= size + margin;
                 TooltipHandler.TipRegion( iconRect, "FM.Expensive.Tip".Translate() );
@@ -415,31 +384,29 @@ namespace FluffyManager
             if ( Widgets.ButtonInvisible( rect ) )
             {
                 if ( !checkOn )
-                {
                     on();
-                }
                 else
-                {
                     off();
-                }
             }
         }
 
-        public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, Action toggle, bool expensive = false,
+        public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, Action toggle,
+                                       bool expensive = false,
                                        float size = SmallIconSize, float margin = Margin )
         {
             DrawToggle( rect, label, tooltip, checkOn, toggle, toggle, expensive, size );
         }
 
-        public static void DrawReachabilityToggle( ref Vector2 pos, float width, ref bool reachability)
+        public static void DrawReachabilityToggle( ref Vector2 pos, float width, ref bool reachability )
         {
-            DrawToggle( ref pos, width, "FM.CheckReachability".Translate(), "FM.CheckReachability.Tip".Translate(), ref reachability, true );
+            DrawToggle( ref pos, width, "FM.CheckReachability".Translate(), "FM.CheckReachability.Tip".Translate(),
+                        ref reachability, true );
         }
 
         public static bool TryGetPrivateField( Type type, object instance, string fieldName, out object value,
                                                BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance )
         {
-            FieldInfo field = type.GetField( fieldName, flags );
+            var field = type.GetField( fieldName, flags );
             value = field?.GetValue( instance );
             return value != null;
         }
@@ -448,23 +415,17 @@ namespace FluffyManager
                                                BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance )
         {
             // get field info
-            FieldInfo field = type.GetField( fieldName, flags );
+            var field = type.GetField( fieldName, flags );
 
             // failed?
-            if ( field == null )
-            {
-                return false;
-            }
+            if ( field == null ) return false;
 
             // try setting it.
             field.SetValue( instance, value );
 
             // test by fetching the field again. (this is highly, stupidly inefficient, but ok).
             object test;
-            if ( !TryGetPrivateField( type, instance, fieldName, out test, flags ) )
-            {
-                return false;
-            }
+            if ( !TryGetPrivateField( type, instance, fieldName, out test, flags ) ) return false;
 
             return test == value;
         }
@@ -480,12 +441,12 @@ namespace FluffyManager
                                          GameFont font, Color textColour, Color outlineColour )
         {
             // horribly inefficient way of getting an outline to show - draw 4 background coloured labels with a 1px offset, then draw the foreground on top.
-            int[] offsets = { -1, 0, 1 };
+            int[] offsets = {-1, 0, 1};
 
-            foreach ( int xOffset in offsets )
-                foreach ( int yOffset in offsets )
+            foreach ( var xOffset in offsets )
+                foreach ( var yOffset in offsets )
                 {
-                    Rect offsetIcon = icon;
+                    var offsetIcon = icon;
                     offsetIcon.x += xOffset;
                     offsetIcon.y += yOffset;
                     Label( offsetIcon, label, anchor, font, outlineColour, margin );
@@ -498,44 +459,41 @@ namespace FluffyManager
         {
             string text = null;
             if ( Scribe.mode == LoadSaveMode.Saving )
-            {
-                text = String.Join( ":", values.ConvertAll( i => i.ToString() ).ToArray() );
-            }
+                text = string.Join( ":", values.ConvertAll( i => i.ToString() ).ToArray() );
             Scribe_Values.Look( ref text, label );
             if ( Scribe.mode == LoadSaveMode.LoadingVars )
-            {
                 values = text.Split( ":".ToCharArray() ).ToList().ConvertAll( int.Parse );
-            }
         }
 
         public struct MapStockpileFilter
         {
-            private ThingFilter filter;
+            private ThingFilter    filter;
             private Zone_Stockpile stockpile;
-            private Map map;
-            private bool countAllOnMap;
+            private Map            map;
+            private bool           countAllOnMap;
 
-            public MapStockpileFilter( Map map, ThingFilter filter, Zone_Stockpile stockpile, bool countAllOnMap = false )
+            public MapStockpileFilter( Map map, ThingFilter filter, Zone_Stockpile stockpile,
+                                       bool countAllOnMap = false )
             {
-                this.map = map;
-                this.filter = filter;
-                this.stockpile = stockpile;
+                this.map           = map;
+                this.filter        = filter;
+                this.stockpile     = stockpile;
                 this.countAllOnMap = countAllOnMap;
             }
         }
 
         public class CachedValue<T>
         {
-            private T _cached;
-            private T _default;
-            private int timeSet;
-            private int updateInterval;
+            private          T   _cached;
+            private readonly T   _default;
+            private          int timeSet;
+            private readonly int updateInterval;
 
-            public CachedValue( T value = default( T ), int updateInterval = 250 )
+            public CachedValue( T value = default, int updateInterval = 250 )
             {
                 this.updateInterval = updateInterval;
-                _cached = _default = value;
-                timeSet = Find.TickManager.TicksGame;
+                _cached             = _default = value;
+                timeSet             = Find.TickManager.TicksGame;
             }
 
             public bool TryGetValue( out T value )
@@ -565,7 +523,7 @@ namespace FluffyManager
 
             public FilterCountCache( int count )
             {
-                Cache = count;
+                Cache   = count;
                 TimeSet = Find.TickManager.TicksGame;
             }
         }

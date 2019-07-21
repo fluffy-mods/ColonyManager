@@ -3,7 +3,6 @@
 // 2016-12-09
 
 using System;
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,33 +12,23 @@ namespace FluffyManager
 {
     public class Trigger_PawnKind : Trigger
     {
-        #region Fields
+        private readonly Utilities.CachedValue<bool> _state = new Utilities.CachedValue<bool>();
 
         public Dictionary<AgeAndSex, int> CountTargets;
-        public PawnKindDef pawnKind;
-        private Utilities.CachedValue<bool> _state = new Utilities.CachedValue<bool>();
-
-        #endregion Fields
-
-        #region Constructors
+        public PawnKindDef                pawnKind;
 
         public Trigger_PawnKind( Manager manager ) : base( manager )
         {
             CountTargets = Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => 5 );
         }
 
-        #endregion Constructors
-
-
-
-        #region Properties
-
         public int[] Counts
         {
             get
             {
                 // todo; figure out why this is excuciatingly slow.
-                return Utilities_Livestock.AgeSexArray.Select( ageSex => pawnKind.GetTame( manager, ageSex ).Count ).ToArray();
+                return Utilities_Livestock.AgeSexArray.Select( ageSex => pawnKind.GetTame( manager, ageSex ).Count )
+                                          .ToArray();
             }
         }
 
@@ -61,10 +50,12 @@ namespace FluffyManager
                 {
                     state =
                         Utilities_Livestock.AgeSexArray.All( ageSex
-                                                             => CountTargets[ageSex] == pawnKind.GetTame( manager, ageSex ).Count ) 
-                                                             && AllTrainingWantedSet();
+                                                                 => CountTargets[ageSex] ==
+                                                                    pawnKind.GetTame( manager, ageSex ).Count )
+                     && AllTrainingWantedSet();
                     _state.Update( state );
                 }
+
                 return state;
             }
         }
@@ -81,14 +72,10 @@ namespace FluffyManager
             }
         }
 
-        #endregion Properties
-
-
-
-        #region Methods
-
         public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight,
-                                                string label = null, string tooltip = null, List<Designation> targets = null, Action onOpenFilterDetails = null, Func<Designation, string> designationLabelGetter = null )
+                                                string label = null, string tooltip = null,
+                                                List<Designation> targets = null, Action onOpenFilterDetails = null,
+                                                Func<Designation, string> designationLabelGetter = null )
         {
         }
 
@@ -107,7 +94,5 @@ namespace FluffyManager
             Job.DoTrainingJobs( ref actionTaken, false );
             return actionTaken;
         }
-
-        #endregion Methods
     }
 }

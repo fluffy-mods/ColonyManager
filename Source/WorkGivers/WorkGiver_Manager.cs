@@ -2,10 +2,9 @@
 // WorkGiver_Manager.cs
 // 2016-12-09
 
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using RimWorld;
 using Verse;
 using Verse.AI;
 
@@ -13,16 +12,11 @@ namespace FluffyManager
 {
     internal class WorkGiver_Manage : WorkGiver_Scanner
     {
-        public override PathEndMode PathEndMode
-        {
-            get { return PathEndMode.InteractionCell; }
-        }
+        public override PathEndMode PathEndMode => PathEndMode.InteractionCell;
 
-        public override ThingRequest PotentialWorkThingRequest
-        {
-            get { return ThingRequest.ForGroup( ThingRequestGroup.PotentialBillGiver ); }
-        }
-        
+        public override ThingRequest PotentialWorkThingRequest =>
+            ThingRequest.ForGroup( ThingRequestGroup.PotentialBillGiver );
+
         public override bool HasJobOnThing( Pawn pawn, Thing t, bool forced )
         {
 #if DEBUG_WORKGIVER
@@ -35,40 +29,25 @@ namespace FluffyManager
             Log.Message( "Power" + ( powera == null || powera.PowerOn ) );
             Log.Message( "Job" + ( Manager.For( pawn.Map ).JobStack.NextJob != null ) );
 #endif
-            if ( !( t is Building_ManagerStation ) )
-            {
-                return false;
-            }
+            if ( !( t is Building_ManagerStation ) ) return false;
 
-            if ( t.TryGetComp<Comp_ManagerStation>() == null )
-            {
-                return false;
-            }
+            if ( t.TryGetComp<Comp_ManagerStation>() == null ) return false;
 
-            if ( pawn.Dead ||
-                 pawn.Downed ||
+            if ( pawn.Dead        ||
+                 pawn.Downed      ||
                  pawn.IsBurning() ||
                  t.IsBurning() )
-            {
                 return false;
-            }
 
             if ( !pawn.CanReserveAndReach( t, PathEndMode, Danger.Some, ignoreOtherReservations: forced ) )
-            {
                 return false;
-            }
 
             var power = t.TryGetComp<CompPowerTrader>();
             if ( power != null &&
                  !power.PowerOn )
-            {
                 return false;
-            }
 
-            if ( Manager.For( pawn.Map ).JobStack.NextJob != null )
-            {
-                return true;
-            }
+            if ( Manager.For( pawn.Map ).JobStack.NextJob != null ) return true;
 
             return false;
         }

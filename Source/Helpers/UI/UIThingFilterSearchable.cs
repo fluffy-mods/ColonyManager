@@ -2,7 +2,6 @@
 // UIThingFilterSearchable.cs
 // 2016-12-09
 
-using RimWorld;
 using UnityEngine;
 using Verse;
 using static FluffyManager.Constants;
@@ -11,15 +10,7 @@ namespace FluffyManager
 {
     public class ThingFilterUI
     {
-        #region Fields
-
         private float viewHeight;
-
-        #endregion Fields
-
-
-
-        #region Methods
 
         public void DoThingFilterConfigWindow( Rect canvas, ref Vector2 scrollPosition, ThingFilter filter,
                                                ThingFilter parentFilter = null, int openMask = 1,
@@ -31,16 +22,16 @@ namespace FluffyManager
 
             // set up buttons
             Text.Font = GameFont.Tiny;
-            float width = canvas.width - 2f;
-            var clearButtonRect = new Rect( canvas.x + 1f, canvas.y + 1f, width / 2f, 24f );
-            var allButtonRect = new Rect( clearButtonRect.xMax + 1f, clearButtonRect.y, width / 2f, 24f );
+            var width           = canvas.width - 2f;
+            var clearButtonRect = new Rect( canvas.x             + 1f, canvas.y + 1f, width     / 2f, 24f );
+            var allButtonRect   = new Rect( clearButtonRect.xMax + 1f, clearButtonRect.y, width / 2f, 24f );
 
             // offset canvas position for buttons.
             if ( buttonsAtBottom )
             {
-                clearButtonRect.y = canvas.height - clearButtonRect.height;
-                allButtonRect.y = canvas.height - clearButtonRect.height;
-                canvas.yMax -= clearButtonRect.height;
+                clearButtonRect.y =  canvas.height - clearButtonRect.height;
+                allButtonRect.y   =  canvas.height - clearButtonRect.height;
+                canvas.yMax       -= clearButtonRect.height;
             }
             else
             {
@@ -48,18 +39,12 @@ namespace FluffyManager
             }
 
             // draw buttons + logic
-            if ( Widgets.ButtonTextSubtle( clearButtonRect, "ClearAll".Translate() ) )
-            {
-                filter.SetDisallowAll();
-            }
-            if ( Widgets.ButtonTextSubtle( allButtonRect, "AllowAll".Translate() ) )
-            {
-                filter.SetAllowAll( parentFilter );
-            }
+            if ( Widgets.ButtonTextSubtle( clearButtonRect, "ClearAll".Translate() ) ) filter.SetDisallowAll();
+            if ( Widgets.ButtonTextSubtle( allButtonRect, "AllowAll".Translate() ) ) filter.SetAllowAll( parentFilter );
             Text.Font = GameFont.Small;
 
             // do list
-            var curY = 2f;
+            var curY     = 2f;
             var viewRect = new Rect( 0f, 0f, canvas.width - ScrollbarWidth, viewHeight );
 
             // scrollview
@@ -70,16 +55,13 @@ namespace FluffyManager
             DrawQualityFilterConfig( ref curY, viewRect.width, filter );
 
             // main listing
-            var listingRect = new Rect( 0f, curY, viewRect.width, 9999f );
+            var listingRect            = new Rect( 0f, curY, viewRect.width, 9999f );
             var listingTreeThingFilter = new Listing_TreeThingFilter( filter, parentFilter, null, null, null );
             listingTreeThingFilter.Begin( listingRect );
-            TreeNode_ThingCategory node = ThingCategoryNodeDatabase.RootNode;
+            var node = ThingCategoryNodeDatabase.RootNode;
             if ( parentFilter != null )
             {
-                if ( parentFilter.DisplayRootCategory == null )
-                {
-                    parentFilter.RecalculateDisplayRootCategory();
-                }
+                if ( parentFilter.DisplayRootCategory == null ) parentFilter.RecalculateDisplayRootCategory();
                 node = parentFilter.DisplayRootCategory;
             }
 
@@ -95,36 +77,28 @@ namespace FluffyManager
 
         private static void DrawHitPointsFilterConfig( ref float y, float width, ThingFilter filter )
         {
-            if ( !filter.allowedHitPointsConfigurable )
-            {
-                return;
-            }
+            if ( !filter.allowedHitPointsConfigurable ) return;
 
-            var rect = new Rect( 20f, y, width - 20f, 26f );
-            FloatRange allowedHitPointsPercents = filter.AllowedHitPointsPercents;
+            var rect                     = new Rect( 20f, y, width - 20f, 26f );
+            var allowedHitPointsPercents = filter.AllowedHitPointsPercents;
             Widgets.FloatRange( rect, 1, ref allowedHitPointsPercents, 0f, 1f, "HitPoints", ToStringStyle.PercentZero );
-            filter.AllowedHitPointsPercents = allowedHitPointsPercents;
-            y += 26f;
-            y += 5f;
-            Text.Font = GameFont.Small;
+            filter.AllowedHitPointsPercents =  allowedHitPointsPercents;
+            y                               += 26f;
+            y                               += 5f;
+            Text.Font                       =  GameFont.Small;
         }
 
         private static void DrawQualityFilterConfig( ref float y, float width, ThingFilter filter )
         {
-            if ( !filter.allowedQualitiesConfigurable )
-            {
-                return;
-            }
+            if ( !filter.allowedQualitiesConfigurable ) return;
 
-            var rect = new Rect( 20f, y, width - 20f, 26f );
-            QualityRange allowedQualityLevels = filter.AllowedQualityLevels;
+            var rect                 = new Rect( 20f, y, width - 20f, 26f );
+            var allowedQualityLevels = filter.AllowedQualityLevels;
             Widgets.QualityRange( rect, 2, ref allowedQualityLevels );
-            filter.AllowedQualityLevels = allowedQualityLevels;
-            y += 26f;
-            y += 5f;
-            Text.Font = GameFont.Small;
+            filter.AllowedQualityLevels =  allowedQualityLevels;
+            y                           += 26f;
+            y                           += 5f;
+            Text.Font                   =  GameFont.Small;
         }
-
-        #endregion Methods
     }
 }

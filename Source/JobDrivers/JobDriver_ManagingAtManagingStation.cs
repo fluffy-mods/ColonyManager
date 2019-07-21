@@ -2,8 +2,8 @@
 // JobDriver_ManagingAtManagingStation.cs
 // 2016-12-09
 
-using RimWorld;
 using System.Collections.Generic;
+using RimWorld;
 using Verse;
 using Verse.AI;
 
@@ -11,8 +11,8 @@ namespace FluffyManager
 {
     internal class JobDriver_ManagingAtManagingStation : JobDriver
     {
-        private float workNeeded;
         private float workDone;
+        private float workNeeded;
 
         public override bool TryMakePreToilReservations( bool errorOnFailed )
         {
@@ -25,22 +25,19 @@ namespace FluffyManager
             yield return Toils_Goto.GotoThing( TargetIndex.A, PathEndMode.InteractionCell );
             var manage = Manage( TargetIndex.A );
             yield return manage;
-            
-            // if made to by player, keep doing that untill we're out of jobs
-            yield return Toils_Jump.JumpIf( manage, () => GetActor().CurJob.playerForced && Manager.For(Map).JobStack.NextJob != null );
-        }
 
-        #region Overrides of JobDriver
+            // if made to by player, keep doing that untill we're out of jobs
+            yield return Toils_Jump.JumpIf(
+                manage, () => GetActor().CurJob.playerForced && Manager.For( Map ).JobStack.NextJob != null );
+        }
 
         public override void ExposeData()
         {
             base.ExposeData();
 
             Scribe_Values.Look( ref workNeeded, "WorkNeeded", 100 );
-            Scribe_Values.Look( ref workDone, "WorkDone", 0 );
+            Scribe_Values.Look( ref workDone, "WorkDone" );
         }
-
-        #endregion
 
         private Toil Manage( TargetIndex targetIndex )
         {
@@ -61,27 +58,27 @@ namespace FluffyManager
             var toil = new Toil();
             toil.defaultCompleteMode = ToilCompleteMode.Never;
             toil.initAction = () =>
-                                  {
-                                      workDone = 0;
-                                      workNeeded = comp.Props.Speed;
-                                  };
+            {
+                workDone   = 0;
+                workNeeded = comp.Props.Speed;
+            };
 
             toil.tickAction = () =>
-                                  {
-                                      // learn a bit
-                                      pawn.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Intellectual" ) )
-                                                 .Learn( 0.11f );
+            {
+                // learn a bit
+                pawn.skills.GetSkill( DefDatabase<SkillDef>.GetNamed( "Intellectual" ) )
+                    .Learn( 0.11f );
 
-                                      // update counter
-                                      workDone += pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) );
+                // update counter
+                workDone += pawn.GetStatValue( StatDef.Named( "ManagingSpeed" ) );
 
-                                      // are we done yet?
-                                      if ( workDone > workNeeded )
-                                      {
-                                          Manager.For( pawn.Map ).TryDoWork();
-                                          ReadyForNextToil();
-                                      }
-                                  };
+                // are we done yet?
+                if ( workDone > workNeeded )
+                {
+                    Manager.For( pawn.Map ).TryDoWork();
+                    ReadyForNextToil();
+                }
+            };
 
             toil.WithProgressBar( TargetIndex.A, () => workDone / workNeeded );
             return toil;

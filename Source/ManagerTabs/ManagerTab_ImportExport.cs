@@ -52,7 +52,6 @@
 //        #endregion Constructors
 
 
-
 //        #region Properties
 
 //        public override Texture2D Icon
@@ -78,7 +77,6 @@
 //        }
 
 //        #endregion Properties
-
 
 
 //        #region Methods
@@ -414,3 +412,4 @@
 //        #endregion Methods
 //    }
 //}
+

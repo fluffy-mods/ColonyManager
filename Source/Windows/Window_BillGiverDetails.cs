@@ -19,13 +19,11 @@
 //        #endregion Fields
 
 
-
 //        #region Properties
 
 //        public override Vector2 InitialSize => new Vector2( 300f, 500 );
 
 //        #endregion Properties
-
 
 
 //        #region Methods
@@ -199,3 +197,4 @@
 //        #endregion Methods
 //    }
 //}
+

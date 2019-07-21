@@ -3,10 +3,10 @@
 // 2016-12-09
 
 using System;
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -16,36 +16,37 @@ namespace FluffyManager
 {
     public class ManagerJob_Livestock : ManagerJob
     {
-        private History _history;
-        public bool ButcherExcess;
-        public bool ButcherTrained;
-        public bool ButcherPregnant;
-        public bool ButcherBonded;
-        private List<Designation> _designations;
-        public List<Designation> Designations => new List<Designation>( _designations );
-        public List<Area> RestrictArea;
-        public bool RestrictToArea;
-        public Area TameArea;
-        public bool SendToSlaughterArea;
-        public Area SlaughterArea;
-        public bool SendToTrainingArea;
-        public Area TrainingArea;
-        public TrainingTracker Training;
-        public new Trigger_PawnKind Trigger;
-        public bool TryTameMore;
-        public bool SetFollow;
-        public bool FollowDrafted;
-        public bool FollowFieldwork;
-        public bool FollowTraining;
-        public MasterMode Masters;
-        public Pawn Master;
-        public MasterMode Trainers;
-        public Pawn Trainer;
-        public bool RespectBonds = true;
+        private static readonly MethodInfo        SetWanted_MI;
+        private                 List<Designation> _designations;
+        private                 History           _history;
+        public                  bool              ButcherBonded;
+        public                  bool              ButcherExcess;
+        public                  bool              ButcherPregnant;
+        public                  bool              ButcherTrained;
+        public                  bool              FollowDrafted;
+        public                  bool              FollowFieldwork;
+        public                  bool              FollowTraining;
+        public                  Pawn              Master;
+        public                  MasterMode        Masters;
+        public                  bool              RespectBonds = true;
+        public                  List<Area>        RestrictArea;
+        public                  bool              RestrictToArea;
+        public                  bool              SendToSlaughterArea;
+        public                  bool              SendToTrainingArea;
+        public                  bool              SetFollow;
+        public                  Area              SlaughterArea;
+        public                  Area              TameArea;
+        public                  Pawn              Trainer;
+        public                  MasterMode        Trainers;
+        public                  TrainingTracker   Training;
+        public                  Area              TrainingArea;
+        public new              Trigger_PawnKind  Trigger;
+        public                  bool              TryTameMore;
 
         static ManagerJob_Livestock()
         {
-            SetWanted_MI = typeof( Pawn_TrainingTracker ).GetMethod( "SetWanted", BindingFlags.NonPublic | BindingFlags.Instance );
+            SetWanted_MI =
+                typeof( Pawn_TrainingTracker ).GetMethod( "SetWanted", BindingFlags.NonPublic | BindingFlags.Instance );
             if ( SetWanted_MI == null )
                 throw new NullReferenceException( "Could not find Pawn_TrainingTracker.SetWanted()" );
         }
@@ -65,37 +66,37 @@ namespace FluffyManager
             Training = new TrainingTracker();
 
             // set areas for restriction and taming to unrestricted
-            TameArea = null;
+            TameArea       = null;
             RestrictToArea = false;
-            RestrictArea = Utilities_Livestock.AgeSexArray.Select( k => (Area)null ).ToList();
+            RestrictArea   = Utilities_Livestock.AgeSexArray.Select( k => (Area) null ).ToList();
 
             // set up sending animals designated for slaughter to an area (freezer)
             SendToSlaughterArea = false;
-            SlaughterArea = null;
+            SlaughterArea       = null;
 
             // set up training area
             SendToTrainingArea = false;
-            TrainingArea = null;
+            TrainingArea       = null;
 
             // taming
             TryTameMore = false;
-            TameArea = null;
+            TameArea    = null;
 
             // set defaults for butchering
-            ButcherExcess = true;
-            ButcherTrained = false;
+            ButcherExcess   = true;
+            ButcherTrained  = false;
             ButcherPregnant = false;
-            ButcherBonded = false;
+            ButcherBonded   = false;
 
             // following
-            SetFollow = true;
-            FollowDrafted = true;
+            SetFollow       = true;
+            FollowDrafted   = true;
             FollowFieldwork = true;
-            FollowTraining = false;
-            Masters = MasterMode.Default;
-            Master = null;
-            Trainers = MasterMode.Default;
-            Trainer = null;
+            FollowTraining  = false;
+            Masters         = MasterMode.Default;
+            Master          = null;
+            Trainers        = MasterMode.Default;
+            Trainer         = null;
         }
 
         public ManagerJob_Livestock( PawnKindDef pawnKindDef, Manager manager ) : this( manager ) // set defaults
@@ -104,37 +105,29 @@ namespace FluffyManager
             Trigger.pawnKind = pawnKindDef;
         }
 
+        public List<Designation> Designations => new List<Designation>( _designations );
+
         public override string Label => Trigger.pawnKind.LabelCap;
 
-        public override bool Completed
-        {
-            get
-            {
-                // state for lifestock trigger includes counts as well as training targets.
-                return Trigger.State;
-            }
-        }
+        public override bool Completed => Trigger.State;
 
-        public override ManagerTab Tab
-        {
-            get { return Manager.For( manager ).Tabs.OfType<ManagerTab_Livestock>().First(); }
-        }
+        public override ManagerTab Tab => Manager.For( manager ).Tabs.OfType<ManagerTab_Livestock>().First();
 
         public override string[] Targets
         {
             get
             {
                 return Utilities_Livestock.AgeSexArray
-                    .Select( ageSex =>
-                        ( "FMP." + ageSex.ToString() + "Count" ).Translate(
-                            Trigger.pawnKind.GetTame( manager, ageSex ).Count,
-                            Trigger.CountTargets[ageSex] ) )
-                    .ToArray();
+                                          .Select( ageSex =>
+                                                       ( "FMP." + ageSex.ToString() + "Count" ).Translate(
+                                                           Trigger.pawnKind.GetTame( manager, ageSex ).Count,
+                                                           Trigger.CountTargets[ageSex] ) )
+                                          .ToArray();
             }
         }
 
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Handling;
-        
+
         public override void ExposeData()
         {
             base.ExposeData();
@@ -149,19 +142,19 @@ namespace FluffyManager
             Scribe_Deep.Look( ref Trigger, "trigger", manager );
             Scribe_Deep.Look( ref Training, "Training" );
             Scribe_Values.Look( ref ButcherExcess, "ButcherExcess", true );
-            Scribe_Values.Look( ref ButcherTrained, "ButcherTrained", false );
-            Scribe_Values.Look( ref ButcherPregnant, "ButcherPregnant", false );
-            Scribe_Values.Look(ref ButcherBonded, "ButcherBonded", false);
-            Scribe_Values.Look( ref RestrictToArea, "RestrictToArea", false );
-            Scribe_Values.Look( ref SendToSlaughterArea, "SendToSlaughterArea", false );
-            Scribe_Values.Look( ref SendToTrainingArea, "SendToTrainingArea", false );
-            Scribe_Values.Look( ref TryTameMore, "TryTameMore", false );
+            Scribe_Values.Look( ref ButcherTrained, "ButcherTrained" );
+            Scribe_Values.Look( ref ButcherPregnant, "ButcherPregnant" );
+            Scribe_Values.Look( ref ButcherBonded, "ButcherBonded" );
+            Scribe_Values.Look( ref RestrictToArea, "RestrictToArea" );
+            Scribe_Values.Look( ref SendToSlaughterArea, "SendToSlaughterArea" );
+            Scribe_Values.Look( ref SendToTrainingArea, "SendToTrainingArea" );
+            Scribe_Values.Look( ref TryTameMore, "TryTameMore" );
             Scribe_Values.Look( ref SetFollow, "SetFollow", true );
             Scribe_Values.Look( ref FollowDrafted, "FollowDrafted", true );
             Scribe_Values.Look( ref FollowFieldwork, "FollowFieldwork", true );
-            Scribe_Values.Look( ref FollowTraining, "FollowTraining", false );
-            Scribe_Values.Look( ref Masters, "Masters", MasterMode.Default );
-            Scribe_Values.Look( ref Trainers, "Trainers", MasterMode.Default );
+            Scribe_Values.Look( ref FollowTraining, "FollowTraining" );
+            Scribe_Values.Look( ref Masters, "Masters" );
+            Scribe_Values.Look( ref Trainers, "Trainers" );
             Scribe_Values.Look( ref RespectBonds, "RespectBonds", true );
 
             // our current designations
@@ -169,11 +162,11 @@ namespace FluffyManager
             {
                 // populate with all designations.
                 _designations.AddRange(
-                                      manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Slaughter )
-                                             .Where( des => ( (Pawn)des.target.Thing ).kindDef == Trigger.pawnKind ) );
+                    manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Slaughter )
+                           .Where( des => ( (Pawn) des.target.Thing ).kindDef == Trigger.pawnKind ) );
                 _designations.AddRange(
-                                      manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Tame )
-                                             .Where( des => ( (Pawn)des.target.Thing ).kindDef == Trigger.pawnKind ) );
+                    manager.map.designationManager.SpawnedDesignationsOfDef( DesignationDefOf.Tame )
+                           .Where( des => ( (Pawn) des.target.Thing ).kindDef == Trigger.pawnKind ) );
             }
 
             Scribe_Deep.Look( ref _history, "History" );
@@ -216,15 +209,13 @@ namespace FluffyManager
         private void DoAreaRestrictions( ref bool actionTaken )
         {
             if ( RestrictToArea )
-            {
                 for ( var i = 0; i < Utilities_Livestock.AgeSexArray.Length; i++ )
-                {
-                    foreach ( Pawn p in Trigger.pawnKind.GetTame( manager, Utilities_Livestock.AgeSexArray[i] ) )
-                    {
+                    foreach ( var p in Trigger.pawnKind.GetTame( manager, Utilities_Livestock.AgeSexArray[i] ) )
                         // slaughter
-                        if ( SendToSlaughterArea && manager.map.designationManager.DesignationOn( p, DesignationDefOf.Slaughter ) != null )
+                        if ( SendToSlaughterArea &&
+                             manager.map.designationManager.DesignationOn( p, DesignationDefOf.Slaughter ) != null )
                         {
-                            actionTaken = p.playerSettings.AreaRestriction != SlaughterArea;
+                            actionTaken                      = p.playerSettings.AreaRestriction != SlaughterArea;
                             p.playerSettings.AreaRestriction = SlaughterArea;
                         }
 
@@ -233,7 +224,7 @@ namespace FluffyManager
                         {
                             if ( p.playerSettings.AreaRestriction != TrainingArea )
                             {
-                                actionTaken = true;
+                                actionTaken                      = true;
                                 p.playerSettings.AreaRestriction = TrainingArea;
                             }
                         }
@@ -241,14 +232,11 @@ namespace FluffyManager
                         // all
                         else if ( p.playerSettings.AreaRestriction != RestrictArea[i] )
                         {
-                            actionTaken = true;
+                            actionTaken                      = true;
                             p.playerSettings.AreaRestriction = RestrictArea[i];
                         }
-                    }
-                }
-            }
         }
-        
+
         public void DoFollowSettings( ref bool actionTaken )
         {
             foreach ( var animal in Trigger.pawnKind.GetTame( manager ) )
@@ -257,25 +245,19 @@ namespace FluffyManager
                 Logger.Follow( animal.LabelShort );
                 if ( FollowTraining && animal.training.NextTrainableToTrain() != null )
                 {
-                    Logger.Follow( "\ttraining"  );
+                    Logger.Follow( "\ttraining" );
                     if ( Trainers != MasterMode.Default )
                     {
                         SetMaster( animal, Trainers, Trainer, ref actionTaken );
-                        SetFollowing( animal, false, true, ref actionTaken);
+                        SetFollowing( animal, false, true, ref actionTaken );
                     }
                 }
 
                 // default 
                 else
                 {
-                    if ( Masters != MasterMode.Default )
-                    {
-                        SetMaster( animal, Masters, Master, ref actionTaken);
-                    }
-                    if ( SetFollow )
-                    {
-                        SetFollowing( animal, FollowDrafted, FollowFieldwork, ref actionTaken);
-                    }
+                    if ( Masters != MasterMode.Default ) SetMaster( animal, Masters, Master, ref actionTaken );
+                    if ( SetFollow ) SetFollowing( animal, FollowDrafted, FollowFieldwork, ref actionTaken );
                 }
             }
         }
@@ -298,7 +280,7 @@ namespace FluffyManager
 
         public Pawn GetMaster( Pawn animal, MasterMode mode )
         {
-            var master = animal.playerSettings.Master;
+            var master  = animal.playerSettings.Master;
             var options = animal.kindDef.GetMasterOptions( manager, mode );
 
             // if the animal is bonded, and we care about bonds, there's no discussion
@@ -309,7 +291,8 @@ namespace FluffyManager
                     return bondee;
             }
 
-            Logger.Follow( $"Getting master for {animal.LabelShort}:\n\tcurrent: {master?.LabelShort ?? "None"}\n\toptions:\n"  );
+            Logger.Follow(
+                $"Getting master for {animal.LabelShort}:\n\tcurrent: {master?.LabelShort ?? "None"}\n\toptions:\n" );
 #if DEBUG_FOLLOW
             foreach ( var option in options )
             {
@@ -338,11 +321,11 @@ namespace FluffyManager
 
         public void SetMaster( Pawn animal, Pawn master, ref bool actionTaken )
         {
-            Logger.Follow( $"Current: {master?.LabelShort ?? "None"}, New: {master?.LabelShort ?? "None"}"  );
+            Logger.Follow( $"Current: {master?.LabelShort ?? "None"}, New: {master?.LabelShort ?? "None"}" );
             if ( animal.playerSettings.Master != master )
             {
                 animal.playerSettings.Master = master;
-                actionTaken = true;
+                actionTaken                  = true;
             }
         }
 
@@ -353,42 +336,42 @@ namespace FluffyManager
                 Log.Warning( "NULL!" );
                 return;
             }
-            Logger.Follow( $"Current: {animal.playerSettings.followDrafted} | {animal.playerSettings.followFieldwork}, {drafted} | {fieldwork}" );
+
+            Logger.Follow(
+                $"Current: {animal.playerSettings.followDrafted} | {animal.playerSettings.followFieldwork}, {drafted} | {fieldwork}" );
             if ( animal.playerSettings.followDrafted != drafted )
             {
                 animal.playerSettings.followDrafted = drafted;
-                actionTaken = true;
+                actionTaken                         = true;
             }
+
             if ( animal.playerSettings.followFieldwork != fieldwork )
             {
                 animal.playerSettings.followFieldwork = fieldwork;
-                actionTaken = true;
+                actionTaken                           = true;
             }
         }
 
         public List<Designation> DesignationsOfOn( DesignationDef def, AgeAndSex ageSex )
         {
             return _designations.Where( des => des.def == def
-                                              && des.target.HasThing
-                                              && des.target.Thing is Pawn
-                                              && ( (Pawn)des.target.Thing ).PawnIsOfAgeSex( ageSex ) )
-                               .ToList();
+                                            && des.target.HasThing
+                                            && des.target.Thing is Pawn
+                                            && ( (Pawn) des.target.Thing ).PawnIsOfAgeSex( ageSex ) )
+                                .ToList();
         }
 
         private bool TryRemoveDesignation( AgeAndSex ageSex, DesignationDef def )
         {
             // get current designations
-            List<Designation> currentDesignations = DesignationsOfOn( def, ageSex );
+            var currentDesignations = DesignationsOfOn( def, ageSex );
 
             // if none, return false
-            if ( currentDesignations.Count == 0 )
-            {
-                return false;
-            }
+            if ( currentDesignations.Count == 0 ) return false;
 
             // else, remove one from the game as well as our managed list. (delete last - this should be the youngest/oldest).
             var designation = currentDesignations.Last();
-            _designations.Remove(designation);
+            _designations.Remove( designation );
             designation.Delete();
             return true;
         }
@@ -401,21 +384,19 @@ namespace FluffyManager
             manager.map.designationManager.AddDesignation( des );
         }
 
-        private static MethodInfo SetWanted_MI;
-        
         internal void DoTrainingJobs( ref bool actionTaken, bool assign = true )
         {
             actionTaken = false;
 
-            foreach ( AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
+            foreach ( var ageSex in Utilities_Livestock.AgeSexArray )
             {
                 // skip juveniles if TrainYoung is not enabled.
                 if ( ageSex.Juvenile() && !Training.TrainYoung )
                     continue;
 
-                foreach ( Pawn animal in Trigger.pawnKind.GetTame( manager, ageSex ) )
+                foreach ( var animal in Trigger.pawnKind.GetTame( manager, ageSex ) )
                 {
-                    foreach ( TrainableDef def in Training.Defs )
+                    foreach ( var def in Training.Defs )
                     {
                         bool dump;
                         if ( !animal.training.HasLearned( def ) &&
@@ -437,17 +418,14 @@ namespace FluffyManager
 
         private void DoTamingJobs( ref bool actionTaken )
         {
-            if ( !TryTameMore )
-            {
-                return;
-            }
+            if ( !TryTameMore ) return;
 
-            foreach ( AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
+            foreach ( var ageSex in Utilities_Livestock.AgeSexArray )
             {
                 // not enough animals?
-                int deficit = Trigger.CountTargets[ageSex]
-                              - Trigger.pawnKind.GetTame( manager, ageSex ).Count
-                              - DesignationsOfOn( DesignationDefOf.Tame, ageSex ).Count;
+                var deficit = Trigger.CountTargets[ageSex]
+                            - Trigger.pawnKind.GetTame( manager, ageSex ).Count
+                            - DesignationsOfOn( DesignationDefOf.Tame, ageSex ).Count;
 
 #if DEBUG_LIFESTOCK
                 Log.Message( "Taming " + ageSex + ", deficit: " + deficit );
@@ -456,14 +434,16 @@ namespace FluffyManager
                 if ( deficit > 0 )
                 {
                     // get the 'home' position
-                    IntVec3 position = manager.map.GetBaseCenter();
+                    var position = manager.map.GetBaseCenter();
 
                     // get list of animals in sorted by youngest weighted to distance.
-                    List<Pawn> animals = Trigger.pawnKind.GetWild( manager, ageSex )
-                        .Where( p => p != null && p.Spawned &&
-                                     manager.map.designationManager.DesignationOn( p ) == null &&
-                                     ( TameArea == null || TameArea.ActiveCells.Contains( p.Position ) ) &&
-                                     IsReachable( p ) ).ToList();
+                    var animals = Trigger.pawnKind.GetWild( manager, ageSex )
+                                         .Where( p => p != null                                                 &&
+                                                      p.Spawned                                                 &&
+                                                      manager.map.designationManager.DesignationOn( p ) == null &&
+                                                      ( TameArea == null ||
+                                                        TameArea.ActiveCells.Contains( p.Position ) ) &&
+                                                      IsReachable( p ) ).ToList();
 
                     // skip if no animals available.
                     if ( animals.Count == 0 )
@@ -487,7 +467,6 @@ namespace FluffyManager
 
                 // remove extra designations
                 while ( deficit < 0 )
-                {
                     if ( TryRemoveDesignation( ageSex, DesignationDefOf.Tame ) )
                     {
 #if DEBUG_LIFESTOCK
@@ -500,27 +479,23 @@ namespace FluffyManager
                     {
                         break;
                     }
-                }
             }
         }
 
         private void DoButcherJobs( ref bool actionTaken )
         {
-            if ( !ButcherExcess )
-            {
-                return;
-            }
+            if ( !ButcherExcess ) return;
 
 #if DEBUG_LIFESTOCK
             Log.Message( "Doing butchery: " + Trigger.pawnKind.LabelCap );
 #endif
 
-            foreach ( AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
+            foreach ( var ageSex in Utilities_Livestock.AgeSexArray )
             {
                 // too many animals?
-                int surplus = Trigger.pawnKind.GetTame( manager, ageSex ).Count
-                              - DesignationsOfOn( DesignationDefOf.Slaughter, ageSex ).Count
-                              - Trigger.CountTargets[ageSex];
+                var surplus = Trigger.pawnKind.GetTame( manager, ageSex ).Count
+                            - DesignationsOfOn( DesignationDefOf.Slaughter, ageSex ).Count
+                            - Trigger.CountTargets[ageSex];
 
 #if DEBUG_LIFESTOCK
                 Log.Message( "Butchering " + ageSex + ", surplus" + surplus );
@@ -529,19 +504,21 @@ namespace FluffyManager
                 if ( surplus > 0 )
                 {
                     // should slaughter oldest adults, youngest juveniles.
-                    bool oldestFirst = ageSex == AgeAndSex.AdultFemale ||
-                                       ageSex == AgeAndSex.AdultMale;
+                    var oldestFirst = ageSex == AgeAndSex.AdultFemale ||
+                                      ageSex == AgeAndSex.AdultMale;
 
                     // get list of animals in correct sort order.
-                    List<Pawn> animals = Trigger.pawnKind.GetTame( manager, ageSex )
-                                                .Where(
-                                                       p => manager.map.designationManager.DesignationOn( p, DesignationDefOf.Slaughter ) == null
-                                                       && ( ButcherTrained || !p.training.HasLearned( TrainableDefOf.Obedience ) )
-                                                       && ( ButcherPregnant || !p.VisiblyPregnant() )
-                                                       && ( ButcherBonded || !p.BondedWithColonist() ) )
-                                                .OrderBy(
-                                                         p => ( oldestFirst ? -1 : 1 ) * p.ageTracker.AgeBiologicalTicks )
-                                                .ToList();
+                    var animals = Trigger.pawnKind.GetTame( manager, ageSex )
+                                         .Where(
+                                              p => manager.map.designationManager.DesignationOn(
+                                                       p, DesignationDefOf.Slaughter ) == null
+                                                && ( ButcherTrained ||
+                                                     !p.training.HasLearned( TrainableDefOf.Obedience ) )
+                                                && ( ButcherPregnant || !p.VisiblyPregnant() )
+                                                && ( ButcherBonded   || !p.BondedWithColonist() ) )
+                                         .OrderBy(
+                                              p => ( oldestFirst ? -1 : 1 ) * p.ageTracker.AgeBiologicalTicks )
+                                         .ToList();
 
 #if DEBUG_LIFESTOCK
                     Log.Message( "Tame animals: " + animals.Count );
@@ -553,12 +530,11 @@ namespace FluffyManager
                         Log.Message( "Butchering " + animals[i].GetUniqueLoadID() );
 #endif
                         AddDesignation( animals[i], DesignationDefOf.Slaughter );
-
                     }
                 }
 
                 // remove extra designations
-                while ( surplus < 0) { 
+                while ( surplus < 0 )
                     if ( TryRemoveDesignation( ageSex, DesignationDefOf.Slaughter ) )
                     {
 #if DEBUG_LIFESTOCK
@@ -571,16 +547,12 @@ namespace FluffyManager
                     {
                         break;
                     }
-                }
             }
         }
 
         public override void CleanUp()
         {
-            foreach ( Designation des in _designations )
-            {
-                des.Delete();
-            }
+            foreach ( var des in _designations ) des.Delete();
 
             _designations.Clear();
         }
@@ -591,20 +563,18 @@ namespace FluffyManager
 
             // set up rects
             Rect labelRect = new Rect(
-                Margin, Margin, rect.width - ( active ? StatusRectWidth + 4 * Margin : 2 * Margin ),
-                rect.height - 2 * Margin ),
-                statusRect = new Rect( labelRect.xMax + Margin, Margin, StatusRectWidth,
-                rect.height - 2 * Margin );
+                     Margin, Margin, rect.width - ( active ? StatusRectWidth + 4 * Margin : 2 * Margin ),
+                     rect.height                - 2 * Margin ),
+                 statusRect = new Rect( labelRect.xMax + Margin, Margin, StatusRectWidth,
+                                        rect.height    - 2 * Margin );
 
             // create label string
-            string text = Label + "\n<i>";
-            foreach ( AgeAndSex ageSex in Utilities_Livestock.AgeSexArray )
-            {
+            var text = Label + "\n<i>";
+            foreach ( var ageSex in Utilities_Livestock.AgeSexArray )
                 text += Trigger.pawnKind.GetTame( manager, ageSex ).Count + "/" + Trigger.CountTargets[ageSex] + ", ";
-            }
 
             text += Trigger.pawnKind.GetWild( manager ).Count + "</i>";
-            string tooltip = Trigger.StatusTooltip;
+            var tooltip = Trigger.StatusTooltip;
 
             // do the drawing
             GUI.BeginGroup( rect );
@@ -613,10 +583,7 @@ namespace FluffyManager
             Widgets_Labels.Label( labelRect, text, tooltip );
 
             // if the bill has a manager job, give some more info.
-            if ( active )
-            {
-                this.DrawStatusForListEntry( statusRect, Trigger );
-            }
+            if ( active ) this.DrawStatusForListEntry( statusRect, Trigger );
             GUI.EndGroup();
         }
 
@@ -627,40 +594,34 @@ namespace FluffyManager
 
         public override void Tick()
         {
-            if( _history.IsRelevantTick )
+            if ( _history.IsRelevantTick )
                 _history.Update( Trigger.Counts );
         }
 
         public AcceptanceReport CanBeTrained( PawnKindDef pawnKind, TrainableDef td, out bool visible )
         {
             if ( pawnKind.RaceProps.untrainableTags != null )
-            {
                 for ( var index = 0; index < pawnKind.RaceProps.untrainableTags.Count; ++index )
-                {
                     if ( td.MatchesTag( pawnKind.RaceProps.untrainableTags[index] ) )
                     {
                         visible = false;
                         return false;
                     }
-                }
-            }
+
             if ( pawnKind.RaceProps.trainableTags != null )
-            {
                 for ( var index = 0; index < pawnKind.RaceProps.trainableTags.Count; ++index )
-                {
                     if ( td.MatchesTag( pawnKind.RaceProps.trainableTags[index] ) )
                     {
-                        if ( pawnKind.RaceProps.baseBodySize < (double)td.minBodySize )
+                        if ( pawnKind.RaceProps.baseBodySize < (double) td.minBodySize )
                         {
                             visible = true;
-                            return new AcceptanceReport( "CannotTrainTooSmall".Translate( (object)pawnKind.LabelCap ) );
+                            return new AcceptanceReport(
+                                "CannotTrainTooSmall".Translate( (object) pawnKind.LabelCap ) );
                         }
 
                         visible = true;
                         return true;
                     }
-                }
-            }
 
             if ( !td.defaultTrainable )
             {
@@ -668,17 +629,18 @@ namespace FluffyManager
                 return false;
             }
 
-            if ( pawnKind.RaceProps.baseBodySize < (double)td.minBodySize )
+            if ( pawnKind.RaceProps.baseBodySize < (double) td.minBodySize )
             {
                 visible = true;
-                return new AcceptanceReport( "FM.Livestock.CannotTrainTooSmall".Translate( (object)pawnKind.GetLabelPlural() ) );
+                return new AcceptanceReport(
+                    "FM.Livestock.CannotTrainTooSmall".Translate( (object) pawnKind.GetLabelPlural() ) );
             }
 
             if ( pawnKind.RaceProps.trainability.intelligenceOrder < td.requiredTrainability.intelligenceOrder )
             {
                 visible = true;
                 return
-                    new AcceptanceReport( "CannotTrainNotSmartEnough".Translate( (object)td.requiredTrainability ) );
+                    new AcceptanceReport( "CannotTrainNotSmartEnough".Translate( (object) td.requiredTrainability ) );
             }
 
             visible = true;
@@ -689,41 +651,33 @@ namespace FluffyManager
         public class TrainingTracker : IExposable
         {
             public DefMap<TrainableDef, bool> TrainingTargets = new DefMap<TrainableDef, bool>();
-            public bool TrainYoung;
+            public bool                       TrainYoung;
 
-            public bool this[TrainableDef index]
+            public bool this[ TrainableDef index ]
             {
-                get { return TrainingTargets[index]; }
-                set { SetWantedRecursive( index, value ); }
+                get => TrainingTargets[index];
+                set => SetWantedRecursive( index, value );
             }
 
             public bool Any
             {
                 get
                 {
-                    foreach ( TrainableDef def in Defs )
-                    {
+                    foreach ( var def in Defs )
                         if ( TrainingTargets[def] )
                             return true;
-                    }
 
                     return false;
                 }
             }
 
-            public int Count
-            {
-                get { return TrainingTargets.Count; }
-            }
+            public int Count => TrainingTargets.Count;
 
-            public List<TrainableDef> Defs
-            {
-                get { return DefDatabase<TrainableDef>.AllDefsListForReading; }
-            }
+            public List<TrainableDef> Defs => DefDatabase<TrainableDef>.AllDefsListForReading;
 
             public void ExposeData()
             {
-                Scribe_Values.Look( ref TrainYoung, "TrainYoung", false );
+                Scribe_Values.Look( ref TrainYoung, "TrainYoung" );
                 Scribe_Deep.Look( ref TrainingTargets, "TrainingTargets" );
             }
 
@@ -739,24 +693,17 @@ namespace FluffyManager
                 {
                     SoundDefOf.Checkbox_TurnedOn.PlayOneShotOnCamera();
                     if ( td.prerequisites != null )
-                    {
-                        foreach ( TrainableDef trainable in td.prerequisites )
-                        {
+                        foreach ( var trainable in td.prerequisites )
                             SetWantedRecursive( trainable, true );
-                        }
-                    }
                 }
                 else
                 {
                     SoundDefOf.Checkbox_TurnedOff.PlayOneShotOnCamera();
-                    IEnumerable<TrainableDef> enumerable = from t in DefDatabase<TrainableDef>.AllDefsListForReading
-                                                           where
-                                                               t.prerequisites != null && t.prerequisites.Contains( td )
-                                                           select t;
-                    foreach ( TrainableDef current in enumerable )
-                    {
-                        SetWantedRecursive( current, false );
-                    }
+                    var enumerable = from t in DefDatabase<TrainableDef>.AllDefsListForReading
+                                     where
+                                         t.prerequisites != null && t.prerequisites.Contains( td )
+                                     select t;
+                    foreach ( var current in enumerable ) SetWantedRecursive( current, false );
                 }
             }
         }

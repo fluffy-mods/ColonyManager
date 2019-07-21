@@ -2,11 +2,8 @@
 // AssemblyInfo.cs
 // 2016-12-09
 
-using RimWorld;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using UnityEngine;
-using Verse;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
@@ -42,5 +39,5 @@ using Verse;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("4.0.0")]
-[assembly: AssemblyFileVersion("4.8.447")]
+[assembly: AssemblyVersion( "4.0.0" )]
+[assembly: AssemblyFileVersion( "4.8.447" )]

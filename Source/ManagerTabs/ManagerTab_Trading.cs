@@ -33,7 +33,6 @@
 //         #endregion Constructors
 
 
-
 //         #region Properties
 
 //         public override Texture2D Icon => Resources.IconTrading;
@@ -49,7 +48,6 @@
 //         }
 
 //         #endregion Properties
-
 
 
 //         #region Methods
@@ -74,3 +72,4 @@
 //         #endregion Methods
 //     }
 // }
+

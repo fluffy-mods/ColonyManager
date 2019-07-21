@@ -2,10 +2,9 @@
 // ManagerTab_Hunting.cs
 // 2016-12-09
 
-using System;
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 using static FluffyManager.Constants;
@@ -14,8 +13,8 @@ namespace FluffyManager
 {
     internal class ManagerTab_Hunting : ManagerTab
     {
-        private float _leftRowHeight = 9999f;
-        private Vector2 _scrollPosition = Vector2.zero;
+        private float              _leftRowHeight  = 9999f;
+        private Vector2            _scrollPosition = Vector2.zero;
         private ManagerJob_Hunting _selected;
 
         public List<ManagerJob_Hunting> Jobs;
@@ -25,25 +24,16 @@ namespace FluffyManager
             _selected = new ManagerJob_Hunting( manager );
         }
 
-        public override Texture2D Icon
-        {
-            get { return Resources.IconHunting; }
-        }
+        public override Texture2D Icon => Resources.IconHunting;
 
-        public override IconAreas IconArea
-        {
-            get { return IconAreas.Middle; }
-        }
+        public override IconAreas IconArea => IconAreas.Middle;
 
-        public override string Label
-        {
-            get { return "FMH.Hunting".Translate(); }
-        }
+        public override string Label => "FMH.Hunting".Translate();
 
         public override ManagerJob Selected
         {
-            get { return _selected; }
-            set { _selected = (ManagerJob_Hunting)value; }
+            get => _selected;
+            set => _selected = (ManagerJob_Hunting) value;
         }
 
         public void DoContent( Rect rect )
@@ -51,7 +41,7 @@ namespace FluffyManager
             // layout: settings | animals
             // draw background
             Widgets.DrawMenuSection( rect );
-            
+
             // rects
             var optionsColumnRect = new Rect(
                 rect.xMin,
@@ -64,28 +54,29 @@ namespace FluffyManager
                 rect.width * 2 / 5f,
                 rect.height - Margin - ButtonSize.y );
             var buttonRect = new Rect(
-                rect.xMax - ButtonSize.x,
-                rect.yMax - ButtonSize.y,
+                rect.xMax    - ButtonSize.x,
+                rect.yMax    - ButtonSize.y,
                 ButtonSize.x - Margin,
                 ButtonSize.y - Margin );
 
             Vector2 position;
-            float width;
+            float   width;
 
             // options
             Widgets_Section.BeginSectionColumn( optionsColumnRect, "Hunting.Options", out position, out width );
             Widgets_Section.Section( ref position, width, DrawThresholdSettings, "FM.Threshold".Translate() );
             Widgets_Section.Section( ref position, width, DrawUnforbidCorpses );
-            Widgets_Section.Section( ref position, width, DrawHuntingGrounds, "FM.Hunting.AreaRestriction".Translate() );
+            Widgets_Section.Section( ref position, width, DrawHuntingGrounds,
+                                     "FM.Hunting.AreaRestriction".Translate() );
             Widgets_Section.EndSectionColumn( "Hunting.Options", position );
 
             // animals
             Widgets_Section.BeginSectionColumn( animalsColumnRect, "Hunting.Animals", out position, out width );
             var refreshRect = new Rect(
                 position.x + width - SmallIconSize - 2 * Margin,
-                position.y + Margin,
+                position.y                         + Margin,
                 SmallIconSize,
-                SmallIconSize);
+                SmallIconSize );
             if ( Widgets.ButtonImage( refreshRect, Resources.Refresh, Color.grey ) )
                 _selected.RefreshAllowedAnimals();
             Widgets_Section.Section( ref position, width, DrawAnimalShortcuts, "FMH.Animals".Translate() );
@@ -123,31 +114,35 @@ namespace FluffyManager
 
         public float DrawThresholdSettings( Vector2 pos, float width )
         {
-            var start = pos; 
+            var start = pos;
 
             // target count (1)
-            int currentCount = _selected.Trigger.CurrentCount;
-            int corpseCount = _selected.GetMeatInCorpses();
-            int designatedCount = _selected.GetMeatInDesignations();
-            int targetCount = _selected.Trigger.TargetCount;
+            var currentCount    = _selected.Trigger.CurrentCount;
+            var corpseCount     = _selected.GetMeatInCorpses();
+            var designatedCount = _selected.GetMeatInDesignations();
+            var targetCount     = _selected.Trigger.TargetCount;
 
-            _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight, 
-                "FMH.TargetCount".Translate(currentCount, corpseCount, designatedCount, targetCount),
-                "FMH.TargetCountTooltip".Translate(currentCount, corpseCount, designatedCount, targetCount),
-                _selected.Designations, null, _selected.DesignationLabel );
+            _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight,
+                                                 "FMH.TargetCount".Translate(
+                                                     currentCount, corpseCount, designatedCount, targetCount ),
+                                                 "FMH.TargetCountTooltip".Translate(
+                                                     currentCount, corpseCount, designatedCount, targetCount ),
+                                                 _selected.Designations, null, _selected.DesignationLabel );
 
             // allow human & insect meat (2)
-            Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(), 
-                "FM.PathBasedDistance.Tip".Translate(), ref _selected.PathBasedDistance, true );
-            Utilities.DrawReachabilityToggle( ref pos, width, ref _selected.CheckReachable);
-            Utilities.DrawToggle( ref pos, width, "FMH.AllowHumanMeat".Translate(), "FMH.AllowHumanMeat.Tip".Translate(),
-                _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.HumanMeat ),
-                () => _selected.AllowHumanLikeMeat = true,
-                () => _selected.AllowHumanLikeMeat = false );
-            Utilities.DrawToggle( ref pos, width, "FMH.AllowInsectMeat".Translate(), "FMH.AllowInsectMeat.Tip".Translate(),
-                _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.InsectMeat ),
-                () => _selected.AllowInsectMeat = true,
-                () => _selected.AllowInsectMeat = false );
+            Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(),
+                                  "FM.PathBasedDistance.Tip".Translate(), ref _selected.PathBasedDistance, true );
+            Utilities.DrawReachabilityToggle( ref pos, width, ref _selected.CheckReachable );
+            Utilities.DrawToggle( ref pos, width, "FMH.AllowHumanMeat".Translate(),
+                                  "FMH.AllowHumanMeat.Tip".Translate(),
+                                  _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.HumanMeat ),
+                                  () => _selected.AllowHumanLikeMeat = true,
+                                  () => _selected.AllowHumanLikeMeat = false );
+            Utilities.DrawToggle( ref pos, width, "FMH.AllowInsectMeat".Translate(),
+                                  "FMH.AllowInsectMeat.Tip".Translate(),
+                                  _selected.Trigger.ThresholdFilter.Allows( Utilities_Hunting.InsectMeat ),
+                                  () => _selected.AllowInsectMeat = true,
+                                  () => _selected.AllowInsectMeat = false );
 
             return pos.y - start.y;
         }
@@ -156,14 +151,15 @@ namespace FluffyManager
         {
             // unforbid corpses (3)
             var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            Utilities.DrawToggle(rowRect, "FMH.UnforbidCorpses".Translate(), "FMH.UnforbidCorpses.Tip".Translate(), ref _selected.UnforbidCorpses );
+            Utilities.DrawToggle( rowRect, "FMH.UnforbidCorpses".Translate(), "FMH.UnforbidCorpses.Tip".Translate(),
+                                  ref _selected.UnforbidCorpses );
             return ListEntryHeight;
         }
 
         public float DrawHuntingGrounds( Vector2 pos, float width )
         {
             var start = pos;
-            AreaAllowedGUI.DoAllowedAreaSelectors(ref pos, width, ref _selected.HuntingGrounds, manager);
+            AreaAllowedGUI.DoAllowedAreaSelectors( ref pos, width, ref _selected.HuntingGrounds, manager );
             return pos.y - start.y;
         }
 
@@ -173,49 +169,50 @@ namespace FluffyManager
 
             // list of keys in allowed animals list (all animals in biome + visible animals on map)
             var allowed = _selected.AllowedAnimals;
-            var animals = new List<PawnKindDef>(allowed.Keys);
+            var animals = new List<PawnKindDef>( allowed.Keys );
 
             // toggle all
-            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            Utilities.DrawToggle(rowRect, "FM.All".Translate().Italic(),
-                string.Empty,
-                allowed.Values.All(v => v),
-                allowed.Values.All(v => !v),
-                () => animals.ForEach(a => allowed[a] = true),
-                () => animals.ForEach(a => allowed[a] = false));
+            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            Utilities.DrawToggle( rowRect, "FM.All".Translate().Italic(),
+                                  string.Empty,
+                                  allowed.Values.All( v => v ),
+                                  allowed.Values.All( v => !v ),
+                                  () => animals.ForEach( a => allowed[a] = true ),
+                                  () => animals.ForEach( a => allowed[a] = false ) );
 
             // toggle predators
             rowRect.y += ListEntryHeight;
-            var predators = animals.Where(a => a.RaceProps.predator).ToList();
-            Utilities.DrawToggle(rowRect, "FM.Hunting.Predators".Translate().Italic(),
-                "FM.Hunting.Predators.Tip".Translate(),
-                predators.All(p => allowed[p]),
-                predators.All(p => !allowed[p]),
-                () => predators.ForEach(p => allowed[p] = true),
-                () => predators.ForEach(p => allowed[p] = false));
+            var predators = animals.Where( a => a.RaceProps.predator ).ToList();
+            Utilities.DrawToggle( rowRect, "FM.Hunting.Predators".Translate().Italic(),
+                                  "FM.Hunting.Predators.Tip".Translate(),
+                                  predators.All( p => allowed[p] ),
+                                  predators.All( p => !allowed[p] ),
+                                  () => predators.ForEach( p => allowed[p] = true ),
+                                  () => predators.ForEach( p => allowed[p] = false ) );
 
             // toggle herd animals
             rowRect.y += ListEntryHeight;
-            var herders = animals.Where(a => a.RaceProps.herdAnimal).ToList();
-            Utilities.DrawToggle(rowRect, "FM.Hunting.HerdAnimals".Translate().Italic(),
-                "FM.Hunting.HerdAnimals.Tip".Translate(),
-                herders.All(h => allowed[h]),
-                herders.All(h => !allowed[h]),
-                () => herders.ForEach(h => allowed[h] = true),
-                () => herders.ForEach(h => allowed[h] = false));
+            var herders = animals.Where( a => a.RaceProps.herdAnimal ).ToList();
+            Utilities.DrawToggle( rowRect, "FM.Hunting.HerdAnimals".Translate().Italic(),
+                                  "FM.Hunting.HerdAnimals.Tip".Translate(),
+                                  herders.All( h => allowed[h] ),
+                                  herders.All( h => !allowed[h] ),
+                                  () => herders.ForEach( h => allowed[h] = true ),
+                                  () => herders.ForEach( h => allowed[h] = false ) );
 
             // exploding animals
             rowRect.y += ListEntryHeight;
             var exploding = animals
-                .Where(a => a.RaceProps.deathActionWorkerClass == typeof(DeathActionWorker_SmallExplosion)
-                            || a.RaceProps.deathActionWorkerClass == typeof(DeathActionWorker_BigExplosion)).ToList();
-            Utilities.DrawToggle(rowRect,
-                "FM.Hunting.Exploding".Translate().Italic(),
-                "FM.Hunting.Exploding.Tip".Translate(),
-                exploding.All(e => allowed[e]),
-                exploding.All(e => !allowed[e]),
-                () => exploding.ForEach(e => allowed[e] = true),
-                () => exploding.ForEach(e => allowed[e] = false));
+                           .Where( a => a.RaceProps.deathActionWorkerClass == typeof( DeathActionWorker_SmallExplosion )
+                                     || a.RaceProps.deathActionWorkerClass == typeof( DeathActionWorker_BigExplosion ) )
+                           .ToList();
+            Utilities.DrawToggle( rowRect,
+                                  "FM.Hunting.Exploding".Translate().Italic(),
+                                  "FM.Hunting.Exploding.Tip".Translate(),
+                                  exploding.All( e => allowed[e] ),
+                                  exploding.All( e => !allowed[e] ),
+                                  () => exploding.ForEach( e => allowed[e] = true ),
+                                  () => exploding.ForEach( e => allowed[e] = false ) );
 
             return rowRect.yMax - start.y;
         }
@@ -225,15 +222,15 @@ namespace FluffyManager
             var start = pos;
             // list of keys in allowed animals list (all animals in biome + visible animals on map)
             var allowed = _selected.AllowedAnimals;
-            var animals = new List<PawnKindDef>(allowed.Keys);
+            var animals = new List<PawnKindDef>( allowed.Keys );
 
             // toggle for each animal
-            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            foreach (PawnKindDef animal in animals)
+            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            foreach ( var animal in animals )
             {
                 // draw the toggle
-                Utilities.DrawToggle(rowRect, animal.LabelCap, animal.race.description, allowed[animal],
-                    () => allowed[animal] = !allowed[animal]);
+                Utilities.DrawToggle( rowRect, animal.LabelCap, animal.race.description, allowed[animal],
+                                      () => allowed[animal] = !allowed[animal] );
                 rowRect.y += ListEntryHeight;
             }
 
@@ -245,45 +242,34 @@ namespace FluffyManager
             Widgets.DrawMenuSection( rect );
 
             // content
-            float height = _leftRowHeight;
+            var height     = _leftRowHeight;
             var scrollView = new Rect( 0f, 0f, rect.width, height );
             if ( height > rect.height )
                 scrollView.width -= ScrollbarWidth;
 
             Widgets.BeginScrollView( rect, ref _scrollPosition, scrollView );
-            Rect scrollContent = scrollView;
+            var scrollContent = scrollView;
 
             GUI.BeginGroup( scrollContent );
-            Vector2 cur = Vector2.zero;
-            var i = 0;
+            var cur = Vector2.zero;
+            var i   = 0;
 
-            foreach ( ManagerJob_Hunting job in Jobs )
+            foreach ( var job in Jobs )
             {
                 var row = new Rect( 0f, cur.y, scrollContent.width, LargeListEntryHeight );
                 Widgets.DrawHighlightIfMouseover( row );
-                if ( _selected == job )
-                {
-                    Widgets.DrawHighlightSelected( row );
-                }
+                if ( _selected == job ) Widgets.DrawHighlightSelected( row );
 
-                if ( i++ % 2 == 1 )
-                {
-                    Widgets.DrawAltRect( row );
-                }
+                if ( i++ % 2 == 1 ) Widgets.DrawAltRect( row );
 
-                Rect jobRect = row;
+                var jobRect = row;
 
-                if ( ManagerTab_Overview.DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), manager, job ) )
-                {
-                    Refresh();
-                }
+                if ( ManagerTab_Overview.DrawOrderButtons( new Rect( row.xMax - 50f, row.yMin, 50f, 50f ), manager,
+                                                           job ) ) Refresh();
                 jobRect.width -= 50f;
 
-                job.DrawListEntry( jobRect, false, true );
-                if ( Widgets.ButtonInvisible( jobRect ) )
-                {
-                    _selected = job;
-                }
+                job.DrawListEntry( jobRect, false );
+                if ( Widgets.ButtonInvisible( jobRect ) ) _selected = job;
 
                 cur.y += LargeListEntryHeight;
             }
@@ -292,19 +278,13 @@ namespace FluffyManager
             var newRect = new Rect( 0f, cur.y, scrollContent.width, LargeListEntryHeight );
             Widgets.DrawHighlightIfMouseover( newRect );
 
-            if ( i++ % 2 == 1 )
-            {
-                Widgets.DrawAltRect( newRect );
-            }
+            if ( i++ % 2 == 1 ) Widgets.DrawAltRect( newRect );
 
             Text.Anchor = TextAnchor.MiddleCenter;
             Widgets.Label( newRect, "<" + "FMH.NewHuntingJob".Translate() + ">" );
             Text.Anchor = TextAnchor.UpperLeft;
 
-            if ( Widgets.ButtonInvisible( newRect ) )
-            {
-                Selected = new ManagerJob_Hunting( manager );
-            }
+            if ( Widgets.ButtonInvisible( newRect ) ) Selected = new ManagerJob_Hunting( manager );
 
             TooltipHandler.TipRegion( newRect, "FMH.NewHuntingJobTooltip".Translate() );
 
@@ -341,7 +321,7 @@ namespace FluffyManager
             Jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Hunting>();
 
             // update pawnkind options
-            foreach ( ManagerJob_Hunting job in Jobs )
+            foreach ( var job in Jobs )
                 job.RefreshAllowedAnimals();
             _selected?.RefreshAllowedAnimals();
         }

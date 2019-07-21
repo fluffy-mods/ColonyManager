@@ -3,6 +3,7 @@
 // 2017-06-10
 
 using System.Diagnostics;
+using Verse;
 
 namespace FluffyManager
 {
@@ -13,13 +14,13 @@ namespace FluffyManager
         [Conditional( "DEBUG" )]
         public static void Debug( string message )
         {
-            Verse.Log.Message( identifier + " :: " + message );
+            Log.Message( identifier + " :: " + message );
         }
 
         [Conditional( "DEBUG_FOLLOW" )]
         public static void Follow( string message )
         {
-            Verse.Log.Message( identifier + " :: " + message );
+            Log.Message( identifier + " :: " + message );
         }
     }
 }

@@ -2,21 +2,15 @@
 // ResearchWorkers.cs
 // 2016-12-09
 
-using RimWorld;
-using UnityEngine;
 using Verse;
 
 namespace FluffyManager
 {
-    public class UnlockPowerTab: ResearchMod
+    public class UnlockPowerTab : ResearchMod
     {
-        #region Overrides of ResearchMod
-
         public override void Apply()
         {
             ManagerTab_Power.unlocked = true;
         }
-
-        #endregion
     }
 }

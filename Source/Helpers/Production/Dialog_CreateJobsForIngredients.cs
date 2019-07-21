@@ -47,7 +47,6 @@
 //        #endregion Constructors
 
 
-
 //        #region Methods
 
 //        /// <summary>
@@ -116,7 +115,6 @@
 //        #endregion Methods
 
 
-
 //        #region Classes
 
 //        public class IngredientSelector
@@ -162,7 +160,6 @@
 //            }
 
 //            #endregion Constructors
-
 
 
 //            #region Methods
@@ -347,7 +344,6 @@
 //            #endregion Constructors
 
 
-
 //            #region Methods
 
 //            public static List<RecipeDef> GetRecipesFor( Map map, ThingDef td, bool currentlyAvailable = true )
@@ -441,3 +437,4 @@
 //        #endregion Classes
 //    }
 //}
+

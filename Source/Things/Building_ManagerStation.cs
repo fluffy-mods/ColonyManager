@@ -11,8 +11,6 @@ namespace FluffyManager
     // special blinking LED texture/glower logic + automagically doing jobs.
     public class Building_AIManager : Building_ManagerStation
     {
-        #region Fields
-
         private readonly Color[] _colors =
         {
             Color.white, Color.green, Color.red, Color.blue, Color.yellow, Color.cyan
@@ -38,154 +36,102 @@ namespace FluffyManager
 
         private int _secondaryColourIndex;
 
-        #endregion Fields
-
-        #region Constructors
-
         public Building_AIManager()
         {
             _powerTrader = PowerComp as CompPowerTrader;
-            _glower = GetComp<CompGlower>();
+            _glower      = GetComp<CompGlower>();
         }
-
-        #endregion Constructors
-
-
-
-        #region Properties
 
         public override Color DrawColor => PrimaryColourBlinker;
 
         public override Color DrawColorTwo => SecondaryColour;
 
-        public CompGlower Glower
-        {
-            get { return _glower ?? ( _glower = GetComp<CompGlower>() ); }
-        }
+        public CompGlower Glower => _glower ?? ( _glower = GetComp<CompGlower>() );
 
-        public Comp_ManagerStation ManagerStation
-        {
-            get { return _managerStation ?? ( _managerStation = GetComp<Comp_ManagerStation>() ); }
-        }
+        public Comp_ManagerStation ManagerStation =>
+            _managerStation ?? ( _managerStation = GetComp<Comp_ManagerStation>() );
 
         public bool Powered
         {
-            get
-            {
-                return _powered;
-            }
+            get => _powered;
             set
             {
                 _powered = value;
                 Glower.SetLit( value );
                 PrimaryColourBlinker = value ? PrimaryColour : Color.black;
-                SecondaryColour = value ? _colors[_secondaryColourIndex] : Color.black;
+                SecondaryColour      = value ? _colors[_secondaryColourIndex] : Color.black;
             }
         }
 
-        public CompPowerTrader PowerTrader
-        {
-            get { return _powerTrader ?? ( _powerTrader = PowerComp as CompPowerTrader ); }
-        }
+        public CompPowerTrader PowerTrader => _powerTrader ?? ( _powerTrader = PowerComp as CompPowerTrader );
 
         public Color PrimaryColour
         {
-            get
-            {
-                return _primaryColor;
-            }
+            get => _primaryColor;
             set
             {
-                var newColour = new ColorInt( (int)( value.r * 255 ), (int)( value.g * 255 ),
-                                              (int)( value.b * 255 ), 0 );
+                var newColour = new ColorInt( (int) ( value.r * 255 ), (int) ( value.g * 255 ),
+                                              (int) ( value.b * 255 ), 0 );
                 Glower.Props.glowColor = newColour;
-                _primaryColor = value;
-                _glowDirty = true;
+                _primaryColor          = value;
+                _glowDirty             = true;
             }
         }
 
         public Color PrimaryColourBlinker
         {
-            get
-            {
-                return _primaryBlinkerColour;
-            }
+            get => _primaryBlinkerColour;
             set
             {
                 _primaryBlinkerColour = value;
-                _graphicDirty = true;
+                _graphicDirty         = true;
             }
         }
 
         public Color SecondaryColour
         {
-            get
-            {
-                return _secondaryColor;
-            }
+            get => _secondaryColor;
             set
             {
                 _secondaryColor = value;
-                _graphicDirty = true;
+                _graphicDirty   = true;
             }
         }
 
         public int SecondaryColourIndex
         {
-            get
-            {
-                return _secondaryColourIndex;
-            }
+            get => _secondaryColourIndex;
             set
             {
                 _secondaryColourIndex = value;
-                SecondaryColour = _colors[_secondaryColourIndex];
+                SecondaryColour       = _colors[_secondaryColourIndex];
             }
         }
-
-        #endregion Properties
-
-
-
-        #region Methods
 
         public override void Tick()
         {
             base.Tick();
 
-            if ( Powered != PowerTrader.PowerOn )
-            {
-                Powered = PowerTrader.PowerOn;
-            }
+            if ( Powered != PowerTrader.PowerOn ) Powered = PowerTrader.PowerOn;
 
             if ( Powered )
             {
-                int tick = Find.TickManager.TicksGame;
+                var tick = Find.TickManager.TicksGame;
 
                 // turn on glower
-                Glower.SetLit( true );
+                Glower.SetLit();
 
                 // random blinking on secondary
                 if ( tick % 30 == Rand.RangeInclusive( 0, 25 ) )
-                {
                     SecondaryColourIndex = ( SecondaryColourIndex + 1 ) % _colors.Length;
-                }
 
                 // primary colour
                 if ( tick % ManagerStation.Props.Speed == 0 )
-                {
                     PrimaryColour = Manager.For( Map ).TryDoWork() ? Color.green : Color.red;
-                }
 
                 // blinking on primary
-                if ( tick % 30 == 0 )
-                {
-                    PrimaryColourBlinker = PrimaryColour;
-                }
-                if (tick % 30 == 25 )
-                {
-                    PrimaryColourBlinker = Color.black;
-                }
+                if ( tick % 30 == 0 ) PrimaryColourBlinker  = PrimaryColour;
+                if ( tick % 30 == 25 ) PrimaryColourBlinker = Color.black;
             }
 
             // apply changes
@@ -195,6 +141,7 @@ namespace FluffyManager
                 Notify_ColorChanged();
                 _graphicDirty = false;
             }
+
             if ( _glowDirty )
             {
                 // Update glow grid
@@ -207,8 +154,6 @@ namespace FluffyManager
                 _glowDirty = false;
             }
         }
-
-        #endregion Methods
     }
 
     public class Building_ManagerStation : Building_WorkTable

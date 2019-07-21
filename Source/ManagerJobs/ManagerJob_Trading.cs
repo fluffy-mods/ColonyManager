@@ -28,7 +28,7 @@
 //         }
 
 //         #endregion Constructors
-        
+
 //         #region Properties
 
 //         public override bool Completed => false;
@@ -70,3 +70,4 @@
 //         #endregion Methods
 //     }
 // }
+

@@ -2,24 +2,17 @@
 // JobStack.cs
 // 2016-12-09
 
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Verse;
 
 namespace FluffyManager
 {
     public class JobStack : IExposable
     {
-        #region Fields
-
-        public Manager manager;
         private List<ManagerJob> _stack;
 
-        #endregion Fields
-
-        #region Constructors
+        public Manager manager;
 
         /// <summary>
         ///     Full jobstack, in order of assignment
@@ -27,12 +20,8 @@ namespace FluffyManager
         public JobStack( Manager manager )
         {
             this.manager = manager;
-            _stack = new List<ManagerJob>();
+            _stack       = new List<ManagerJob>();
         }
-
-        #endregion Constructors
-        
-        #region Properties
 
         /// <summary>
         ///     Jobstack of jobs that are available now
@@ -47,14 +36,13 @@ namespace FluffyManager
         /// </summary>
         public ManagerJob NextJob => CurStack.FirstOrDefault();
 
-        #endregion Properties
-
-
-
-        #region Methods
+        public void ExposeData()
+        {
+            Scribe_Collections.Look( ref _stack, "JobStack", LookMode.Deep, manager );
+        }
 
         /// <summary>
-        /// Add job to the stack with bottom priority.
+        ///     Add job to the stack with bottom priority.
         /// </summary>
         /// <param name="job"></param>
         public void Add( ManagerJob job )
@@ -72,8 +60,8 @@ namespace FluffyManager
         public void BottomPriority<T>( T job ) where T : ManagerJob
         {
             // get list of priorities for this type.
-            List<T> jobsOfType = _stack.OfType<T>().OrderBy( j => j.priority ).ToList();
-            List<int> priorities = jobsOfType.Select( j => j.priority ).ToList();
+            var jobsOfType = _stack.OfType<T>().OrderBy( j => j.priority ).ToList();
+            var priorities = jobsOfType.Select( j => j.priority ).ToList();
 
             // make sure our job is on the bottom.
             job.priority = _stack.Count + 10;
@@ -82,15 +70,12 @@ namespace FluffyManager
             jobsOfType = jobsOfType.OrderBy( j => j.priority ).ToList();
 
             // fill in priorities, making sure we don't affect other types.
-            for ( var i = 0; i < jobsOfType.Count; i++ )
-            {
-                jobsOfType[i].priority = priorities[i];
-            }
+            for ( var i = 0; i < jobsOfType.Count; i++ ) jobsOfType[i].priority = priorities[i];
         }
 
         public void DecreasePriority( ManagerJob job )
         {
-            ManagerJob jobB = _stack.OrderBy( mj => mj.priority ).First( mj => mj.priority > job.priority );
+            var jobB = _stack.OrderBy( mj => mj.priority ).First( mj => mj.priority > job.priority );
             SwitchPriorities( job, jobB );
         }
 
@@ -103,18 +88,16 @@ namespace FluffyManager
         }
 
         /// <summary>
-        /// Cleanup job, delete from stack and update priorities.
+        ///     Cleanup job, delete from stack and update priorities.
         /// </summary>
         /// <param name="job"></param>
         public void Delete( ManagerJob job, bool cleanup = true )
         {
-            if (cleanup)
+            if ( cleanup )
                 job.CleanUp();
             _stack.Remove( job );
             CleanPriorities();
         }
-
-        public void ExposeData() { Scribe_Collections.Look( ref _stack, "JobStack", LookMode.Deep, manager ); }
 
         /// <summary>
         ///     Jobs of type T in jobstack, in order of priority
@@ -134,7 +117,7 @@ namespace FluffyManager
 
         public void IncreasePriority( ManagerJob job )
         {
-            ManagerJob jobB = _stack.OrderByDescending( mj => mj.priority ).First( mj => mj.priority < job.priority );
+            var jobB = _stack.OrderByDescending( mj => mj.priority ).First( mj => mj.priority < job.priority );
             SwitchPriorities( job, jobB );
         }
 
@@ -147,7 +130,7 @@ namespace FluffyManager
 
         public void SwitchPriorities( ManagerJob a, ManagerJob b )
         {
-            int tmp = a.priority;
+            var tmp = a.priority;
             a.priority = b.priority;
             b.priority = tmp;
         }
@@ -161,8 +144,8 @@ namespace FluffyManager
         public void TopPriority<T>( T job ) where T : ManagerJob
         {
             // get list of priorities for this type.
-            List<T> jobsOfType = _stack.OfType<T>().OrderBy( j => j.priority ).ToList();
-            List<int> priorities = jobsOfType.Select( j => j.priority ).ToList();
+            var jobsOfType = _stack.OfType<T>().OrderBy( j => j.priority ).ToList();
+            var priorities = jobsOfType.Select( j => j.priority ).ToList();
 
             // make sure our job is on top.
             job.priority = -1;
@@ -171,10 +154,7 @@ namespace FluffyManager
             jobsOfType = jobsOfType.OrderBy( j => j.priority ).ToList();
 
             // fill in priorities, making sure we don't affect other types.
-            for ( var i = 0; i < jobsOfType.Count; i++ )
-            {
-                jobsOfType[i].priority = priorities[i];
-            }
+            for ( var i = 0; i < jobsOfType.Count; i++ ) jobsOfType[i].priority = priorities[i];
         }
 
         /// <summary>
@@ -182,36 +162,26 @@ namespace FluffyManager
         /// </summary>
         public bool TryDoNextJob()
         {
-            ManagerJob job = NextJob;
-            if ( job == null )
-            {
-                return false;
-            }
+            var job = NextJob;
+            if ( job == null ) return false;
 
             // update lastAction
             job.Touch();
 
             // perform next job if no action was taken
-            if ( !job.TryDoJob() )
-            {
-                return TryDoNextJob();
-            }
+            if ( !job.TryDoJob() ) return TryDoNextJob();
 
             return true;
         }
 
         /// <summary>
-        /// Normalize priorities
+        ///     Normalize priorities
         /// </summary>
         private void CleanPriorities()
         {
-            List<ManagerJob> orderedStack = _stack.OrderBy( mj => mj.priority ).ToList();
-            for ( var i = 1; i <= _stack.Count; i++ )
-            {
-                orderedStack[i - 1].priority = i;
-            }
+            var orderedStack =
+                _stack.OrderBy( mj => mj.priority ).ToList();
+            for ( var i = 1; i <= _stack.Count; i++ ) orderedStack[i - 1].priority = i;
         }
-
-        #endregion Methods
     }
 }

@@ -2,10 +2,10 @@
 // ManagerTab_Power.cs
 // 2016-12-09
 
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RimWorld;
 using UnityEngine;
 using Verse;
 using static FluffyManager.Constants;
@@ -14,12 +14,10 @@ namespace FluffyManager
 {
     public class ManagerTab_Power : ManagerTab, IExposable
     {
-        #region Fields
+        public static bool                         unlocked = false;
+        private       List<List<CompPowerBattery>> _batteries;
 
-        public static bool unlocked = false;
-        private List<List<CompPowerBattery>> _batteries;
-
-        private List<ThingDef> _batteryDefs;
+        private readonly List<ThingDef> _batteryDefs;
 
         private Vector2 _consumptionScrollPos = Vector2.zero;
 
@@ -27,7 +25,7 @@ namespace FluffyManager
 
         private Vector2 _productionScrollPos = Vector2.zero;
 
-        private List<ThingDef> _traderDefs;
+        private readonly List<ThingDef> _traderDefs;
 
         private List<List<CompPowerTrader>> _traders;
 
@@ -35,14 +33,10 @@ namespace FluffyManager
 
         private History tradingHistory;
 
-        #endregion Fields
-
-        #region Constructors
-
         public ManagerTab_Power( Manager manager ) : base( manager )
         {
             // get list of thingdefs set to use the power comps - this should be static throughout the game (barring added mods midgame)
-            _traderDefs = GetTraderDefs().ToList();
+            _traderDefs  = GetTraderDefs().ToList();
             _batteryDefs = GetBatteryDefs().ToList();
 
             // get a dictionary of powercomps actually existing on the map for each thingdef.
@@ -52,37 +46,31 @@ namespace FluffyManager
             tradingHistory =
                 new History(
                     _traderDefs.Select(
-                                       def =>
-                                       new ThingDefCount( def,
-                                                       manager.map.listerBuildings.AllBuildingsColonistOfDef( def )
-                                                              .Count() ) )
+                                    def =>
+                                        new ThingDefCount( def,
+                                                           manager.map.listerBuildings.AllBuildingsColonistOfDef( def )
+                                                                  .Count() ) )
                                .ToArray() )
                 {
-                    DrawOptions = false,
+                    DrawOptions      = false,
                     DrawInlineLegend = false,
-                    Suffix = "W",
-                    DrawInfoInBar = true,
-                    DrawMaxMarkers = true
+                    Suffix           = "W",
+                    DrawInfoInBar    = true,
+                    DrawMaxMarkers   = true
                 };
 
-            overallHistory = new History( new[] { "Production", "Consumption", "Batteries" } )
+            overallHistory = new History( new[] {"Production", "Consumption", "Batteries"} )
             {
-                DrawOptions = false,
+                DrawOptions      = false,
                 DrawInlineLegend = false,
-                Suffix = "W",
-                DrawIcons = false,
-                DrawCounts = false,
-                DrawInfoInBar = true,
-                DrawMaxMarkers = true,
-                MaxPerChapter = true
+                Suffix           = "W",
+                DrawIcons        = false,
+                DrawCounts       = false,
+                DrawInfoInBar    = true,
+                DrawMaxMarkers   = true,
+                MaxPerChapter    = true
             };
         }
-
-        #endregion Constructors
-
-
-
-        #region Properties
 
         public bool AnyPoweredStationOnline
         {
@@ -103,10 +91,7 @@ namespace FluffyManager
 
         public override ManagerJob Selected { get; set; }
 
-        public override bool Enabled
-        {
-            get { return unlocked && AnyPoweredStationOnline; }
-        }
+        public override bool Enabled => unlocked && AnyPoweredStationOnline;
 
         public override string DisabledReason
         {
@@ -120,11 +105,11 @@ namespace FluffyManager
             }
         }
 
-        #endregion Properties
-
-
-
-        #region Methods
+        public void ExposeData()
+        {
+            Scribe_Deep.Look( ref tradingHistory, "tradingHistory" );
+            Scribe_Deep.Look( ref overallHistory, "overallHistory" );
+        }
 
         public override void DoWindowContents( Rect canvas )
         {
@@ -147,12 +132,6 @@ namespace FluffyManager
             DrawOverview( overviewRect );
             DrawConsumption( consumtionRect );
             DrawProduction( productionRect );
-        }
-
-        public void ExposeData()
-        {
-            Scribe_Deep.Look( ref tradingHistory, "tradingHistory" );
-            Scribe_Deep.Look( ref overallHistory, "overallHistory" );
         }
 
         public override void PreOpen()
@@ -189,11 +168,11 @@ namespace FluffyManager
                 overallHistory.UpdateMax( 0, 0,
                                           (int)
                                           _batteries.Sum(
-                                                         list => list.Sum( battery => battery.Props.storedEnergyMax ) ) );
+                                              list => list.Sum( battery => battery.Props.storedEnergyMax ) ) );
             }
 
             // update the history tracker.
-            int[] trade = GetCurrentTrade();
+            var trade = GetCurrentTrade();
             tradingHistory.Update( trade );
             overallHistory.Update( trade.Where( i => i > 0 ).Sum(), trade.Where( i => i < 0 ).Sum( Math.Abs ),
                                    GetCurrentBatteries().Sum() );
@@ -230,21 +209,19 @@ namespace FluffyManager
             overallHistory.DrawDetailedLegend( legendRect, ref _overallScrollPos, null );
 
             // draw period switcher
-            Rect periodRect = buttonsRect;
+            var periodRect = buttonsRect;
             periodRect.width /= 2f;
 
             // label
             Widgets_Labels.Label( periodRect, "FME.PeriodShown".Translate( tradingHistory.periodShown.ToString() ),
-                             "FME.PeriodShownTooltip".Translate( tradingHistory.periodShown.ToString() ) );
+                                  "FME.PeriodShownTooltip".Translate( tradingHistory.periodShown.ToString() ) );
 
             // mark interactivity
-            Rect searchIconRect = periodRect;
+            var searchIconRect = periodRect;
             searchIconRect.xMin = searchIconRect.xMax - searchIconRect.height;
             if ( searchIconRect.height > SmallIconSize )
-            {
                 // center it.
                 searchIconRect = searchIconRect.ContractedBy( ( searchIconRect.height - SmallIconSize ) / 2 );
-            }
             GUI.DrawTexture( searchIconRect, Resources.Search );
             Widgets.DrawHighlightIfMouseover( periodRect );
             if ( Widgets.ButtonInvisible( periodRect ) )
@@ -252,14 +229,14 @@ namespace FluffyManager
                 var periodOptions = new List<FloatMenuOption>();
                 for ( var i = 0; i < History.periods.Length; i++ )
                 {
-                    History.Period period = History.periods[i];
+                    var period = History.periods[i];
                     periodOptions.Add( new FloatMenuOption( period.ToString(), delegate
-                                                                                   {
-                                                                                       tradingHistory.periodShown =
-                                                                                           period;
-                                                                                       overallHistory.periodShown =
-                                                                                           period;
-                                                                                   } ) );
+                    {
+                        tradingHistory.periodShown =
+                            period;
+                        overallHistory.periodShown =
+                            period;
+                    } ) );
                 }
 
                 Find.WindowStack.Add( new FloatMenu( periodOptions ) );
@@ -289,13 +266,13 @@ namespace FluffyManager
 
         private int[] GetCurrentBatteries()
         {
-            return _batteries.Select( list => (int)list.Sum( battery => battery.StoredEnergy ) ).ToArray();
+            return _batteries.Select( list => (int) list.Sum( battery => battery.StoredEnergy ) ).ToArray();
         }
 
         private int[] GetCurrentTrade()
         {
             return
-                _traders.Select( list => (int)list.Sum( trader => trader.PowerOn ? trader.PowerOutput : 0f ) )
+                _traders.Select( list => (int) list.Sum( trader => trader.PowerOn ? trader.PowerOutput : 0f ) )
                         .ToArray();
         }
 
@@ -316,12 +293,10 @@ namespace FluffyManager
 
             // get list of lists of powertrader comps per thingdef.
             _batteries = _batteryDefs
-                .Select( v => manager.map.listerBuildings.AllBuildingsColonistOfDef( v )
-                                     .Select( t => t.GetComp<CompPowerBattery>() )
-                                     .ToList() )
-                .ToList();
+                        .Select( v => manager.map.listerBuildings.AllBuildingsColonistOfDef( v )
+                                             .Select( t => t.GetComp<CompPowerBattery>() )
+                                             .ToList() )
+                        .ToList();
         }
-
-#endregion Methods
     }
 }

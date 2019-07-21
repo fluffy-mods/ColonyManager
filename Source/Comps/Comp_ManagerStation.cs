@@ -2,8 +2,6 @@
 // Comp_ManagerStation.cs
 // 2016-12-09
 
-using RimWorld;
-using UnityEngine;
 using Verse;
 
 namespace FluffyManager

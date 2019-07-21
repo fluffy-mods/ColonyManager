@@ -6,26 +6,26 @@ using System.Collections.Generic;
 
 namespace FluffyManager
 {
-    public struct Triplet<T1, T2, T3>: IEquatable<Triplet<T1, T2, T3>>
+    public struct Triplet<T1, T2, T3> : IEquatable<Triplet<T1, T2, T3>>
     {
-        private T1 first;
-        private T2 second;
-        private T3 third;
+        public T1 First { get; }
 
-        public T1 First => first;
-        public T2 Second => second;
-        public T3 Third => third;
+        public T2 Second { get; }
+
+        public T3 Third { get; }
 
         public Triplet( T1 first, T2 second, T3 third )
         {
-            this.first = first;
-            this.second = second;
-            this.third = third;
+            First  = first;
+            Second = second;
+            Third  = third;
         }
 
         public bool Equals( Triplet<T1, T2, T3> other )
         {
-            return EqualityComparer<T1>.Default.Equals( first, other.first ) && EqualityComparer<T2>.Default.Equals( second, other.second ) && EqualityComparer<T3>.Default.Equals( third, other.third );
+            return EqualityComparer<T1>.Default.Equals( First, other.First )   &&
+                   EqualityComparer<T2>.Default.Equals( Second, other.Second ) &&
+                   EqualityComparer<T3>.Default.Equals( Third, other.Third );
         }
 
         public override bool Equals( object obj )
@@ -38,9 +38,9 @@ namespace FluffyManager
         {
             unchecked
             {
-                var hashCode = EqualityComparer<T1>.Default.GetHashCode( first );
-                hashCode = ( hashCode * 397 ) ^ EqualityComparer<T2>.Default.GetHashCode( second );
-                hashCode = ( hashCode * 397 ) ^ EqualityComparer<T3>.Default.GetHashCode( third );
+                var hashCode = EqualityComparer<T1>.Default.GetHashCode( First );
+                hashCode = ( hashCode * 397 ) ^ EqualityComparer<T2>.Default.GetHashCode( Second );
+                hashCode = ( hashCode * 397 ) ^ EqualityComparer<T3>.Default.GetHashCode( Third );
                 return hashCode;
             }
         }
