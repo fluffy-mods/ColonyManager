@@ -23,7 +23,7 @@ namespace FluffyManager
                             ProgressRectWidth   = 10f,
                             StatusRectWidth     = SuspendStampWidth + LastUpdateRectWidth + ProgressRectWidth;
 
-        private UpdateInterval  _updateInterval = Settings.DefaultUpdateInterval;
+        private UpdateInterval _updateInterval;
         private bool _suspended;
 
         public bool CheckReachable = true;
@@ -36,6 +36,7 @@ namespace FluffyManager
         public int priority;
 
         public Trigger Trigger;
+        private int _updateIntervalScribe;
 
         public ManagerJob( Manager manager )
         {
@@ -45,7 +46,7 @@ namespace FluffyManager
 
         public virtual UpdateInterval UpdateInterval
         {
-            get => _updateInterval;
+            get => _updateInterval ?? Settings.DefaultUpdateInterval;
             set => _updateInterval = value;
         }
 
@@ -72,8 +73,10 @@ namespace FluffyManager
 
         public virtual void ExposeData()
         {
+            if ( Scribe.mode == LoadSaveMode.Saving )
+                _updateIntervalScribe = _updateInterval.ticks;
             Scribe_References.Look( ref manager, "manager" );
-            Scribe_Values.Look( ref _updateInterval, "UpdateInterval" );
+            Scribe_Values.Look( ref _updateIntervalScribe, "UpdateInterval" );
             Scribe_Values.Look( ref lastAction, "lastAction" );
             Scribe_Values.Look( ref priority, "priority" );
             Scribe_Values.Look( ref CheckReachable, "CheckReachable", true );
@@ -81,8 +84,13 @@ namespace FluffyManager
             Scribe_Values.Look( ref _suspended, "Suspended" );
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit || Manager.LoadSaveMode == Manager.Modes.ImportExport )
+            {
                 // must be true if it was saved.
                 Managed = true;
+
+                _updateInterval = Utilities.UpdateIntervalOptions.Find( ui => ui.ticks == _updateIntervalScribe ) ??
+                                  Settings.DefaultUpdateInterval;
+            }
         }
 
         public abstract bool TryDoJob();
