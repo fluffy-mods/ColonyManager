@@ -23,7 +23,7 @@ namespace FluffyManager
                             ProgressRectWidth   = 10f,
                             StatusRectWidth     = SuspendStampWidth + LastUpdateRectWidth + ProgressRectWidth;
 
-        private int  _actionInterval = Settings.DefaultUpdateInterval;
+        private UpdateInterval  _updateInterval = Settings.DefaultUpdateInterval;
         private bool _suspended;
 
         public bool CheckReachable = true;
@@ -43,10 +43,10 @@ namespace FluffyManager
             Touch(); // set last updated to current time.
         }
 
-        public virtual int ActionInterval
+        public virtual UpdateInterval UpdateInterval
         {
-            get => _actionInterval;
-            set => _actionInterval = value;
+            get => _updateInterval;
+            set => _updateInterval = value;
         }
 
         public abstract bool   Completed { get; }
@@ -56,7 +56,7 @@ namespace FluffyManager
 
 
         public virtual bool ShouldDoNow => Managed && !Suspended && !Completed &&
-                                           lastAction + ActionInterval < Find.TickManager.TicksGame;
+                                           lastAction + UpdateInterval.ticks < Find.TickManager.TicksGame;
 
         public virtual SkillDef SkillDef { get; } = null;
 
@@ -73,7 +73,7 @@ namespace FluffyManager
         public virtual void ExposeData()
         {
             Scribe_References.Look( ref manager, "manager" );
-            Scribe_Values.Look( ref _actionInterval, "ActionInterval" );
+            Scribe_Values.Look( ref _updateInterval, "UpdateInterval" );
             Scribe_Values.Look( ref lastAction, "lastAction" );
             Scribe_Values.Look( ref priority, "priority" );
             Scribe_Values.Look( ref CheckReachable, "CheckReachable", true );
@@ -133,7 +133,7 @@ namespace FluffyManager
             s.AppendLine( "Priority: "   + priority );
             s.AppendLine( "Active: "     + Suspended );
             s.AppendLine( "LastAction: " + lastAction );
-            s.AppendLine( "Interval: "   + ActionInterval );
+            s.AppendLine( "Interval: "   + UpdateInterval );
             s.AppendLine( "GameTick: "   + Find.TickManager.TicksGame );
             return s.ToString();
         }

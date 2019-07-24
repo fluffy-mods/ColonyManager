@@ -50,6 +50,8 @@
     <Compile Include="Core\Controller.cs" />
     <Compile Include="Core\Settings.cs" />
     <Compile Include="GetBuildingCost.cs" />
+    <Compile Include="Helpers\Calendar.cs" />
+    <Compile Include="Helpers\Clock.cs" />
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\Extensions\CompGlower_Extensions.cs" />
     <Compile Include="Helpers\Extensions\Rect_Extensions.cs" />
@@ -61,12 +63,14 @@
     <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\Mining\Dialog_MiningDebugOptions.cs" />
     <Compile Include="Helpers\Production\Dialog_CreateJobsForIngredients.cs" />
+    <Compile Include="Helpers\RadialProgressBar.cs" />
     <Compile Include="Helpers\Research\ResearchWorkers.cs" />
     <Compile Include="Helpers\Resources.cs" />
     <Compile Include="Helpers\Triplet.cs" />
     <Compile Include="Helpers\UI\Widgets_Labels.cs" />
     <Compile Include="Helpers\UI\StockpileGUI.cs" />
     <Compile Include="Helpers\UI\Widgets_Section.cs" />
+    <Compile Include="Helpers\UpdateInterval.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Foraging.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Forestry.cs" />
     <Compile Include="ManagerJobs\ManagerJob_Hunting.cs" />

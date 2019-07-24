@@ -17,6 +17,6 @@ namespace FluffyManager
         {
         }
 
-        public int Speed { get; } = 250;
+        public int speed = 250;
     }
 }

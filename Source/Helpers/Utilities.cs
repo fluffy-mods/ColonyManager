@@ -19,18 +19,32 @@ namespace FluffyManager
         public static Dictionary<MapStockpileFilter, FilterCountCache> CountCache =
             new Dictionary<MapStockpileFilter, FilterCountCache>();
 
-        public static Dictionary<string, int> updateIntervalOptions  = new Dictionary<string, int>();
         public static WorkTypeDef             WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
 
         static Utilities()
         {
-            updateIntervalOptions["FM.Hourly".Translate()]         = GenDate.TicksPerHour;
-            updateIntervalOptions["FM.MultiHourly".Translate( 2 )] = GenDate.TicksPerHour * 2;
-            updateIntervalOptions["FM.MultiHourly".Translate( 4 )] = GenDate.TicksPerHour * 4;
-            updateIntervalOptions["FM.MultiHourly".Translate( 8 )] = GenDate.TicksPerHour * 8;
-            updateIntervalOptions["FM.Daily".Translate()]          = GenDate.TicksPerDay;
-            updateIntervalOptions["FM.Monthly".Translate()]        = GenDate.TicksPerTwelfth;
-            updateIntervalOptions["FM.Yearly".Translate()]         = GenDate.TicksPerYear;
+
+        }
+
+        private static List<UpdateInterval> _updateIntervalOptions;
+        public static List<UpdateInterval> UpdateIntervalOptions
+        {
+            get
+            {
+                if ( _updateIntervalOptions.NullOrEmpty() )
+                {
+                    _updateIntervalOptions = new List<UpdateInterval>();
+                    _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerHour, "FM.Hourly".Translate() ) );
+                    _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerHour * 2, "FM.MultiHourly".Translate( 2 ) ) );
+                    _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerHour * 4, "FM.MultiHourly".Translate( 4 ) ) );
+                    _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerHour * 8, "FM.MultiHourly".Translate( 8 ) ) );
+                    _updateIntervalOptions.Add( UpdateInterval.Daily );
+                    _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerTwelfth, "FM.Monthly".Translate() ) );
+                    _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerYear, "FM.Yearly".Translate() ) );
+                }
+
+                return _updateIntervalOptions;
+            }
         }
 
         public static bool HasCompOrChildCompOf( this ThingDef def, Type compType )
@@ -221,38 +235,9 @@ namespace FluffyManager
             trigger.DrawProgressBar( progressRect, true );
             TooltipHandler.TipRegion( progressRect, trigger.StatusTooltip );
 
-            // draw time since last action
-            Text.Anchor = TextAnchor.MiddleCenter;
-            var lastUpdate = Find.TickManager.TicksGame - job.lastAction;
-
-            // set color by how timely we've been
-            if ( lastUpdate < job.ActionInterval )
-                GUI.color = Color.green;
-            if ( lastUpdate > job.ActionInterval )
-                GUI.color = Color.white;
-            if ( lastUpdate > job.ActionInterval * 1.5f )
-                GUI.color = Color.red;
-
-            Widgets.Label( lastUpdateRect, lastUpdate.TimeString() );
-            GUI.color = Color.white;
-            TooltipHandler.TipRegion( lastUpdateRect,
-                                      "FM.LastUpdateTooltip".Translate(
-                                          lastUpdate.TimeString(),
-                                          job.ActionInterval.TimeString() ) );
-
-            Widgets.DrawHighlightIfMouseover( lastUpdateRect );
-            if ( Widgets.ButtonInvisible( lastUpdateRect ) )
-            {
-                var options = new List<FloatMenuOption>();
-                foreach ( var period in updateIntervalOptions )
-                {
-                    var label = period.Key;
-                    var time  = period.Value;
-                    options.Add( new FloatMenuOption( label, () => job.ActionInterval = time ) );
-                }
-
-                Find.WindowStack.Add( new FloatMenu( options ) );
-            }
+            // draw update interval
+            var timeSinceLastUpdate = Find.TickManager.TicksGame - job.lastAction;
+            job.UpdateInterval?.Draw( lastUpdateRect, job );
         }
 
         public static void DrawToggle( ref Vector2 pos, float width, string label, string tooltip, ref bool checkOn,

@@ -13,8 +13,6 @@ namespace FluffyManager
     {
         public Controller( ModContentPack content ) : base( content )
         {
-            GetSettings<Settings>();
-
             // apply fixes
             var harmony = HarmonyInstance.Create( "fluffy.colonymanager" );
             harmony.PatchAll( Assembly.GetExecutingAssembly() );

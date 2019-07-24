@@ -10,6 +10,9 @@ namespace FluffyManager
     [StaticConstructorOnStartup]
     public static class Resources
     {
+        public static readonly Color Orange                       = new Color( 1f, 144 / 255f, 0f ),
+                                     SlightlyDarkBackgroundColour = new Color( 0f, 0f, 0f, .2f );
+
         public static Texture2D
             // sorting arrows
             ArrowTop    = ContentFinder<Texture2D>.Get( "UI/Buttons/ArrowTop" ),
@@ -35,7 +38,7 @@ namespace FluffyManager
             IconMining       = ContentFinder<Texture2D>.Get( "UI/Icons/mining" ),
 
             // misc
-            SlightlyDarkBackground       = SolidColorMaterials.NewSolidColorTexture( 0f, 0f, 0f, .2f ),
+            SlightlyDarkBackground       = SolidColorMaterials.NewSolidColorTexture( SlightlyDarkBackgroundColour ),
             DeleteX                      = ContentFinder<Texture2D>.Get( "UI/Buttons/Delete" ),
             Cog                          = ContentFinder<Texture2D>.Get( "UI/Buttons/Cog" ),
             BarBackgroundActiveTexture   = SolidColorMaterials.NewSolidColorTexture( new Color( 0.2f, 0.8f, 0.85f ) ),
@@ -56,7 +59,6 @@ namespace FluffyManager
             MeatIcon   = ContentFinder<Texture2D>.Get( "UI/Icons/meat" ),
             UnkownIcon = ContentFinder<Texture2D>.Get( "UI/Icons/unknown" );
 
-        public static readonly Color Orange = new Color( 1f, 144 / 255f, 0f );
         //public static Texture2D[] LifeStages = {StageA, StageB, StageC};
 
         public static Texture2D LifeStages( int lifeStageIndex )

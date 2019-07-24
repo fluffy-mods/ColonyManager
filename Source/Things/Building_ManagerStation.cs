@@ -126,7 +126,7 @@ namespace FluffyManager
                     SecondaryColourIndex = ( SecondaryColourIndex + 1 ) % _colors.Length;
 
                 // primary colour
-                if ( tick % ManagerStation.Props.Speed == 0 )
+                if ( tick % ManagerStation.Props.speed == 0 )
                     PrimaryColour = Manager.For( Map ).TryDoWork() ? Color.green : Color.red;
 
                 // blinking on primary

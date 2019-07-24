@@ -60,7 +60,7 @@ namespace FluffyManager
             toil.initAction = () =>
             {
                 workDone   = 0;
-                workNeeded = comp.Props.Speed;
+                workNeeded = comp.Props.speed;
             };
 
             toil.tickAction = () =>

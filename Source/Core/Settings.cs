@@ -12,7 +12,8 @@ namespace FluffyManager
 {
     public class Settings : ModSettings
     {
-        public static int DefaultUpdateInterval = GenDate.TicksPerHour;
+        public static UpdateInterval DefaultUpdateInterval = UpdateInterval.Daily;
+        private static int _defaultUpdateIntervalTicks_Scribe;
 
         public static void DoSettingsWindowContents( Rect rect )
         {
@@ -22,8 +23,7 @@ namespace FluffyManager
             Text.Anchor = TextAnchor.LowerLeft;
             Widgets.Label( row, "FM.DefaultUpdateInterval".Translate() );
             Text.Anchor = TextAnchor.LowerRight;
-            Widgets.Label(
-                row, Utilities.updateIntervalOptions.FirstOrDefault( p => p.Value == DefaultUpdateInterval ).Key );
+            Widgets.Label( row, DefaultUpdateInterval.label );
             Text.Anchor = TextAnchor.UpperLeft;
 
             // interaction
@@ -31,12 +31,9 @@ namespace FluffyManager
             if ( Widgets.ButtonInvisible( row ) )
             {
                 var options = new List<FloatMenuOption>();
-                foreach ( var period in Utilities.updateIntervalOptions )
+                foreach ( var interval in Utilities.UpdateIntervalOptions )
                 {
-                    var label = period.Key;
-                    var time  = period.Value;
-                    options.Add( new FloatMenuOption( label, delegate { DefaultUpdateInterval = time; }
-                                 ) );
+                    options.Add( new FloatMenuOption( interval.label, () => DefaultUpdateInterval = interval ) );
                 }
 
                 Find.WindowStack.Add( new FloatMenu( options ) );
@@ -46,7 +43,15 @@ namespace FluffyManager
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Values.Look( ref DefaultUpdateInterval, "defaultUpdateInterval", GenDate.TicksPerHour );
+
+            if ( Scribe.mode == LoadSaveMode.Saving )
+                _defaultUpdateIntervalTicks_Scribe = DefaultUpdateInterval.ticks;
+
+            Scribe_Values.Look( ref _defaultUpdateIntervalTicks_Scribe, "defaultUpdateInterval", GenDate.TicksPerDay );
+
+            if ( Scribe.mode == LoadSaveMode.PostLoadInit )
+                DefaultUpdateInterval = Utilities.UpdateIntervalOptions.Find( ui => ui.ticks == _defaultUpdateIntervalTicks_Scribe ) ?? UpdateInterval.Daily;
+
         }
     }
 }
