@@ -74,7 +74,7 @@ namespace FluffyManager
         public virtual void ExposeData()
         {
             if ( Scribe.mode == LoadSaveMode.Saving )
-                _updateIntervalScribe = _updateInterval.ticks;
+                _updateIntervalScribe = UpdateInterval.ticks;
             Scribe_References.Look( ref manager, "manager" );
             Scribe_Values.Look( ref _updateIntervalScribe, "UpdateInterval" );
             Scribe_Values.Look( ref lastAction, "lastAction" );

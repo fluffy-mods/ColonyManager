@@ -143,6 +143,7 @@ namespace FluffyManager
             Scribe_Collections.Look( ref RestrictArea, "AreaRestrictions", LookMode.Reference );
             Scribe_Deep.Look( ref Trigger, "trigger", manager );
             Scribe_Deep.Look( ref Training, "Training" );
+            Scribe_Deep.Look( ref _history, "History" );
             Scribe_Values.Look( ref ButcherExcess, "ButcherExcess", true );
             Scribe_Values.Look( ref ButcherTrained, "ButcherTrained" );
             Scribe_Values.Look( ref ButcherPregnant, "ButcherPregnant" );
@@ -171,7 +172,6 @@ namespace FluffyManager
                            .Where( des => ( (Pawn) des.target.Thing ).kindDef == Trigger.pawnKind ) );
             }
 
-            Scribe_Deep.Look( ref _history, "History" );
         }
 
         public override bool TryDoJob()
