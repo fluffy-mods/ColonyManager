@@ -93,8 +93,10 @@ namespace FluffyManager
 
         public override ManagerTab Tab
         {
-            get { return Manager.For( manager ).Tabs.Find( tab => tab is ManagerTab_Forestry ); }
+            get { return manager.Tabs.Find( tab => tab is ManagerTab_Forestry ); }
         }
+
+        public override bool IsValid => base.IsValid && Trigger != null && History != null;
 
         public override string[] Targets
         {
@@ -292,32 +294,6 @@ namespace FluffyManager
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
                 // scribe history
                 Scribe_Deep.Look( ref History, "History" );
-
-            // backwards compatibility for wind areas
-            // TODO: REMOVE ON NEXT BREAKING VERSION!
-            if ( !_newClearJobs )
-            {
-                Log.Message( "Colony Manager :: Loading old save - updating job parameters." );
-                if ( Type == ForestryJobType.ClearWind )
-                {
-                    Log.Message( "Colony Manager :: Loading old save - clear wind." );
-                    _type          = ForestryJobType.ClearArea;
-                    ClearWindCells = true;
-                    var trees =
-                        AllowedTrees.Keys.ToList();
-                    foreach ( var tree in trees ) AllowedTrees[tree]                                 = false;
-                    foreach ( var tree in trees.Where( tree => tree.blockWind ) ) AllowedTrees[tree] = true;
-                }
-                else if ( Type == ForestryJobType.ClearArea )
-                {
-                    Log.Message( "Colony Manager :: Loading old save - clear area." );
-                    var trees                                        = AllowedTrees.Keys.ToList();
-                    foreach ( var tree in trees ) AllowedTrees[tree] = true;
-                }
-
-                Log.Message( "Colony Manager ::  Loading old save - done." );
-                _newClearJobs = true;
-            }
         }
 
         public int GetWoodInDesignations()

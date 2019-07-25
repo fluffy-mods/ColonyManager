@@ -37,6 +37,9 @@ namespace FluffyManager
         public     bool              SyncFilterAndAllowed = true;
         public new Trigger_Threshold Trigger;
 
+
+        public override bool IsValid => base.IsValid && History != null && Trigger != null;
+
         public ManagerJob_Mining( Manager manager ) : base( manager )
         {
             // populate the trigger field, set the root category to meats and allow all but human & insect meat.

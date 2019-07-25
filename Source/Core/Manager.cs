@@ -2,6 +2,7 @@
 // Manager.cs
 // 2016-12-09
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
@@ -129,7 +130,17 @@ namespace FluffyManager
 
             // tick jobs
             foreach ( var job in JobStack.FullStack() )
-                job.Tick();
+            {
+                if ( !job.Suspended )
+                {
+                    try
+                    {
+                        job.Tick();
+                    } catch ( Exception err ) {
+                        Log.Error( $"Suspending manager job because it error-ed on tick: \n{err}" );
+                    }
+                }
+            }
 
             // tick tabs
             foreach ( var tab in Tabs )

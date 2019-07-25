@@ -27,6 +27,8 @@ namespace FluffyManager
         public new Trigger_Threshold             Trigger;
         public     bool                          UnforbidCorpses = true;
 
+        public override bool IsValid => base.IsValid && History != null && Trigger != null;
+
         public ManagerJob_Hunting( Manager manager ) : base( manager )
         {
             // populate the trigger field, set the root category to meats and allow all but human & insect meat.

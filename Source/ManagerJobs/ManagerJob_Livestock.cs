@@ -43,6 +43,8 @@ namespace FluffyManager
         public new              Trigger_PawnKind  Trigger;
         public                  bool              TryTameMore;
 
+        public override bool IsValid => base.IsValid && _history != null && Training != null && Trigger != null;
+
         static ManagerJob_Livestock()
         {
             SetWanted_MI =
@@ -111,7 +113,7 @@ namespace FluffyManager
 
         public override bool Completed => Trigger.State;
 
-        public override ManagerTab Tab => Manager.For( manager ).Tabs.OfType<ManagerTab_Livestock>().First();
+        public override ManagerTab Tab => manager.Tabs.OfType<ManagerTab_Livestock>().First();
 
         public override string[] Targets
         {

@@ -51,7 +51,7 @@ namespace FluffyManager
         }
 
         public abstract bool   Completed { get; }
-        public virtual  bool   IsValid   => true;
+        public virtual  bool   IsValid => manager != null;
         public abstract string Label     { get; }
         public virtual  bool   Managed   { get; set; }
 
@@ -88,8 +88,15 @@ namespace FluffyManager
                 // must be true if it was saved.
                 Managed = true;
 
-                _updateInterval = Utilities.UpdateIntervalOptions.Find( ui => ui.ticks == _updateIntervalScribe ) ??
-                                  Settings.DefaultUpdateInterval;
+                try
+                {
+                    _updateInterval = Utilities.UpdateIntervalOptions.Find( ui => ui.ticks == _updateIntervalScribe ) ??
+                                      Settings.DefaultUpdateInterval;
+                }
+                catch
+                {
+                    _updateInterval = Settings.DefaultUpdateInterval;
+                }
             }
         }
 

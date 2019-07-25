@@ -23,6 +23,8 @@ namespace FluffyManager
         public     History                    History;
         public new Trigger_Threshold          Trigger;
 
+        public override bool IsValid => base.IsValid && Trigger != null && History != null;
+
         public ManagerJob_Foraging( Manager manager ) : base( manager )
         {
             // populate the trigger field, count all harvested thingdefs from the allowed plant list

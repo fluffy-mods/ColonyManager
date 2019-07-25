@@ -39,6 +39,15 @@ namespace FluffyManager
         public void ExposeData()
         {
             Scribe_Collections.Look( ref _stack, "JobStack", LookMode.Deep, manager );
+
+            if ( Scribe.mode == LoadSaveMode.PostLoadInit )
+            {
+                if ( _stack.Any( j => !j.IsValid ) )
+                {
+                    Log.Error( $"Colony Manager :: Removing {_stack.Count( j => !j.IsValid )} invalid manager jobs. If this keeps happening, please report it."  );
+                    _stack = _stack.Where( job => job.IsValid ).ToList();
+                }
+            }
         }
 
         /// <summary>
