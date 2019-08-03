@@ -52,7 +52,7 @@ namespace FluffyManager
 
         public static bool operator !=( Triplet<T1, T2, T3> left, Triplet<T1, T2, T3> right )
         {
-            return !left.Equals( right );
+            return !(left == right );
         }
     }
 }

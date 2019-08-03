@@ -20,14 +20,15 @@ namespace FluffyManager
         public Trigger_PawnKind( Manager manager ) : base( manager )
         {
             CountTargets = Utilities_Livestock.AgeSexArray.ToDictionary( k => k, v => 5 );
+
+            _cachedTooltip = new Utilities.CachedValue<string>( "", 250, _getTooltip );
         }
 
         public int[] Counts
         {
             get
             {
-                // todo; figure out why this is excuciatingly slow.
-                return Utilities_Livestock.AgeSexArray.Select( ageSex => pawnKind.GetTame( manager, ageSex ).Count )
+                return Utilities_Livestock.AgeSexArray.Select( ageSex => pawnKind.GetTame( manager, ageSex ).Count() )
                                           .ToArray();
             }
         }
@@ -48,11 +49,8 @@ namespace FluffyManager
                 bool state;
                 if ( !_state.TryGetValue( out state ) )
                 {
-                    state =
-                        Utilities_Livestock.AgeSexArray.All( ageSex
-                                                                 => CountTargets[ageSex] ==
-                                                                    pawnKind.GetTame( manager, ageSex ).Count )
-                     && AllTrainingWantedSet();
+                    state = Utilities_Livestock.AgeSexArray.All( ageSex => CountTargets[ageSex] == pawnKind.GetTame( manager, ageSex ).Count() )
+                            && AllTrainingWantedSet();
                     _state.Update( state );
                 }
 
@@ -60,17 +58,18 @@ namespace FluffyManager
             }
         }
 
-        public override string StatusTooltip
+        private Utilities.CachedValue<string> _cachedTooltip;
+
+        private string _getTooltip()
         {
-            get
-            {
-                var tooltipArgs = new List<string>();
-                tooltipArgs.Add( pawnKind.LabelCap );
-                tooltipArgs.AddRange( Counts.Select( x => x.ToString() ) );
-                tooltipArgs.AddRange( CountTargets.Values.Select( v => v.ToString() ) );
-                return "FML.ListEntryTooltip".Translate( tooltipArgs.ToArray() );
-            }
+            var tooltipArgs = new List<string>();
+            tooltipArgs.Add( pawnKind.LabelCap );
+            tooltipArgs.AddRange( Counts.Select( x => x.ToString() ) );
+            tooltipArgs.AddRange( CountTargets.Values.Select( v => v.ToString() ) );
+            return "FML.ListEntryTooltip".Translate( tooltipArgs.ToArray() );
         }
+
+        public override string StatusTooltip => _cachedTooltip.Value;
 
         public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight,
                                                 string label = null, string tooltip = null,

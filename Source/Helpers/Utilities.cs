@@ -233,7 +233,7 @@ namespace FluffyManager
 
             // draw progress bar
             trigger.DrawProgressBar( progressRect, true );
-            TooltipHandler.TipRegion( progressRect, trigger.StatusTooltip );
+            TooltipHandler.TipRegion( progressRect, () => trigger.StatusTooltip, trigger.GetHashCode() );
 
             // draw update interval
             var timeSinceLastUpdate = Find.TickManager.TicksGame - job.lastAction;
@@ -467,24 +467,82 @@ namespace FluffyManager
             }
         }
 
+        public class CachedValues<T, V>
+        {
+            private          Dictionary<T, CachedValue<V>> _cache;
+            private readonly int                           updateInterval;
+
+            public CachedValues( int updateInterval = 250 )
+            {
+                _cache = new Dictionary<T, CachedValue<V>>();
+            }
+
+            public bool TryGetValue( T key, out V value )
+            {
+                if ( _cache.TryGetValue( key, out var cachedValue ) )
+                {
+                    return cachedValue.TryGetValue( out value );
+                }
+
+                value = default( V );
+                return false;
+            }
+
+            public void Add( T key, Func<V> updater )
+            {
+                Log.Message( $"Adding cached value for: {key}", true );
+
+                V value = updater();
+                var cached = new CachedValue<V>( value, updateInterval, updater );
+                _cache.Add( key, cached );
+            }
+
+            public void Update( T key, V value )
+            {
+                if ( _cache.TryGetValue( key, out var cachedValue ) )
+                    cachedValue.Update( value );
+                else 
+                    _cache.Add( key, new CachedValue<V>( value, updateInterval ) );
+            }
+
+            public V this[ T index ]
+            {
+                get
+                {
+                    TryGetValue( index, out var value );
+                    return value;
+                }
+                set => Update( index, value );
+            }
+        }
+
         public class CachedValue<T>
         {
-            private          T   _cached;
-            private readonly T   _default;
-            private          int timeSet;
-            private readonly int updateInterval;
+            private          T       _cached;
+            private readonly T       _default;
+            private          int     _timeSet;
+            private readonly int     _updateInterval;
+            private readonly Func<T> _updater;
 
-            public CachedValue( T value = default, int updateInterval = 250 )
+            public CachedValue( T @default = default, int updateInterval = 250, Func<T> updater = null )
             {
-                this.updateInterval = updateInterval;
-                _cached             = _default = value;
-                timeSet             = Find.TickManager.TicksGame;
+                _updateInterval = updateInterval;
+                _cached         = _default = @default;
+                _updater        = updater;
+                _timeSet        = Find.TickManager.TicksGame;
             }
 
             public bool TryGetValue( out T value )
             {
-                if ( Find.TickManager.TicksGame - timeSet <= updateInterval )
+                if ( Find.TickManager.TicksGame - _timeSet <= _updateInterval )
                 {
+                    value = _cached;
+                    return true;
+                }
+
+                if ( _updater != null )
+                {
+                    Update();
                     value = _cached;
                     return true;
                 }
@@ -493,10 +551,30 @@ namespace FluffyManager
                 return false;
             }
 
+            public T Value
+            {
+                get
+                {
+                    if ( TryGetValue( out T value ) )
+                        return value;
+                    throw new InvalidOperationException( "get_Value() on a CachedValue that is out of date, and has no updater." );
+                }
+            }
+
             public void Update( T value )
             {
                 _cached = value;
-                timeSet = Find.TickManager.TicksGame;
+                _timeSet = Find.TickManager.TicksGame;
+            }
+
+            public void Update()
+            {
+                Log.Message( $"Running Update()", true );
+
+                if ( _updater == null )
+                    Log.Error( "Calling Update() without updater" );
+                else
+                    Update( _updater() );
             }
         }
 

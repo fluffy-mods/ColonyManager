@@ -184,7 +184,7 @@ namespace FluffyManager
             // draw a mark at the treshold
             Widgets.DrawLineHorizontal( rect.xMin, markHeight, rect.width );
 
-            TooltipHandler.TipRegion( rect, StatusTooltip );
+            TooltipHandler.TipRegion( rect, ( ) => StatusTooltip, GetHashCode() );
         }
 
         public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, string label = null,

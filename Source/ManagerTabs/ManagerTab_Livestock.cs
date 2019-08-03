@@ -578,7 +578,7 @@ namespace FluffyManager
         }
 
         private float DrawAnimalSection( ref Vector2 pos, float width, string type, PawnKindDef pawnKind,
-                                         List<Pawn> animals )
+                                         IEnumerable<Pawn> animals )
         {
             if ( animals == null )
                 return 0;
@@ -586,7 +586,7 @@ namespace FluffyManager
             var start = pos;
             DrawAnimalListheader( ref pos, new Vector2( width, ListEntryHeight / 3 * 2 ), pawnKind );
 
-            if ( animals.Count == 0 )
+            if ( !animals.Any() )
             {
                 Label( new Rect( pos.x, pos.y, width, ListEntryHeight ),
                        "FML.NoAnimals".Translate( type, pawnKind.GetLabelPlural() ),
@@ -594,8 +594,8 @@ namespace FluffyManager
                 pos.y += ListEntryHeight;
             }
 
-            for ( var i = 0; i < animals.Count; i++ )
-                DrawAnimalRow( ref pos, new Vector2( width, ListEntryHeight ), animals[i] );
+            foreach ( var animal in animals )
+                DrawAnimalRow( ref pos, new Vector2( width, ListEntryHeight ), animal );
 
             return pos.y - start.y;
         }
@@ -845,8 +845,8 @@ namespace FluffyManager
                 // draw label
                 var label = _availablePawnKinds[i].LabelCap + "\n<i>" +
                             "FML.TameWildCount".Translate(
-                                _availablePawnKinds[i].GetTame( manager ).Count,
-                                _availablePawnKinds[i].GetWild( manager ).Count ) + "</i>";
+                                _availablePawnKinds[i].GetTame( manager ).Count(),
+                                _availablePawnKinds[i].GetWild( manager ).Count() ) + "</i>";
                 Label( row, label, TextAnchor.MiddleLeft, margin: Margin * 2 );
 
                 // button

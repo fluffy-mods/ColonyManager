@@ -3,6 +3,7 @@
 // 2016-12-09
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -37,26 +38,40 @@ namespace FluffyManager
     {
         public static AgeAndSex[] AgeSexArray = (AgeAndSex[]) Enum.GetValues( typeof( AgeAndSex ) );
 
-        private static readonly Dictionary<Pair<PawnKindDef, Map>, Utilities.CachedValue<IEnumerable<Pawn>>> _allCache =
-            new Dictionary<Pair<PawnKindDef, Map>, Utilities.CachedValue<IEnumerable<Pawn>>>();
+        private static readonly Utilities.CachedValues<Pair<PawnKindDef, Map>, IEnumerable<Pawn>> AllCache = 
+            new Utilities.CachedValues<Pair<PawnKindDef, Map>, IEnumerable<Pawn>>( 5 );
 
-        private static readonly
-            Dictionary<Triplet<PawnKindDef, Map, MasterMode>, Utilities.CachedValue<IEnumerable<Pawn>>> _masterCache =
-                new Dictionary<Triplet<PawnKindDef, Map, MasterMode>, Utilities.CachedValue<IEnumerable<Pawn>>>();
+        private static readonly Utilities.CachedValues<Pair<PawnKindDef, Map>, IEnumerable<Pawn>> TameCache =
+            new Utilities.CachedValues<Pair<PawnKindDef, Map>, IEnumerable<Pawn>>( 5 );
 
-        private static readonly Dictionary<Pawn, Utilities.CachedValue<IEnumerable<Pawn>>> _followerCache =
+        private static readonly Utilities.CachedValues<Pair<PawnKindDef, Map>, IEnumerable<Pawn>> WildCache =
+            new Utilities.CachedValues<Pair<PawnKindDef, Map>, IEnumerable<Pawn>>( 5 );
+
+        private static readonly Utilities.CachedValues<Triplet<PawnKindDef, Map, AgeAndSex>, IEnumerable<Pawn>>
+            AllSexedCache = new Utilities.CachedValues<Triplet<PawnKindDef, Map, AgeAndSex>, IEnumerable<Pawn>>( 5 );
+
+        private static readonly Utilities.CachedValues<Triplet<PawnKindDef, Map, AgeAndSex>, IEnumerable<Pawn>>
+            TameSexedCache = new Utilities.CachedValues<Triplet<PawnKindDef, Map, AgeAndSex>, IEnumerable<Pawn>>( 5 );
+
+        private static readonly Utilities.CachedValues<Triplet<PawnKindDef, Map, AgeAndSex>, IEnumerable<Pawn>>
+            WildSexedCache = new Utilities.CachedValues<Triplet<PawnKindDef, Map, AgeAndSex>, IEnumerable<Pawn>>( 5 );
+
+        private static readonly Dictionary<Triplet<PawnKindDef, Map, MasterMode>, Utilities.CachedValue<IEnumerable<Pawn>>> MasterCache =
+            new Dictionary<Triplet<PawnKindDef, Map, MasterMode>, Utilities.CachedValue<IEnumerable<Pawn>>>();
+
+        private static readonly Dictionary<Pawn, Utilities.CachedValue<IEnumerable<Pawn>>> FollowerCache =
             new Dictionary<Pawn, Utilities.CachedValue<IEnumerable<Pawn>>>();
 
-        private static readonly Dictionary<PawnKindDef, Utilities.CachedValue<bool>> _milkablePawnkind =
+        private static readonly Dictionary<PawnKindDef, Utilities.CachedValue<bool>> MilkablePawnkind =
             new Dictionary<PawnKindDef, Utilities.CachedValue<bool>>();
 
-        private static readonly Dictionary<Pawn, Utilities.CachedValue<bool>> _milkablePawn =
+        private static readonly Dictionary<Pawn, Utilities.CachedValue<bool>> MilkablePawn =
             new Dictionary<Pawn, Utilities.CachedValue<bool>>();
 
-        private static readonly Dictionary<PawnKindDef, Utilities.CachedValue<bool>> _shearablePawnkind =
+        private static readonly Dictionary<PawnKindDef, Utilities.CachedValue<bool>> ShearablePawnkind =
             new Dictionary<PawnKindDef, Utilities.CachedValue<bool>>();
 
-        private static readonly Dictionary<Pawn, Utilities.CachedValue<bool>> _shearablePawn =
+        private static readonly Dictionary<Pawn, Utilities.CachedValue<bool>> ShearablePawn =
             new Dictionary<Pawn, Utilities.CachedValue<bool>>();
 
 
@@ -115,32 +130,18 @@ namespace FluffyManager
         public static IEnumerable<Pawn> GetAll( this PawnKindDef pawnKind, Map map )
         {
             // check if we have a cached version
-            IEnumerable<Pawn> cached;
-
-            // does it exist at all?
             var key         = new Pair<PawnKindDef, Map>( pawnKind, map );
-            var cacheExists = _allCache.ContainsKey( key );
+            if ( AllCache.TryGetValue( key, out var pawns ) )
+                return pawns;
 
-            // is it up to date?
-            if ( cacheExists                              &&
-                 _allCache[key].TryGetValue( out cached ) && cached != null )
-                return cached;
-
-            // if not, get a new list.
-            cached = map.mapPawns.AllPawns
+            // if not, set up a cache
+            Func<IEnumerable<Pawn>> getter = () => map.mapPawns.AllPawns
                         .Where( p => p.RaceProps.Animal       // is animal
                                   && !p.Dead                  // is alive
                                   && p.kindDef == pawnKind ); // is our managed pawnkind
 
-            // update if key exists
-            if ( cacheExists )
-                _allCache[key].Update( cached );
-
-            // else add it
-            else
-                // severely limit cache to only apply for one cycle (one job)
-                _allCache.Add( key, new Utilities.CachedValue<IEnumerable<Pawn>>( cached, 2 ) );
-            return cached;
+            AllCache.Add( key, getter );
+            return getter();
         }
 
         public static List<Pawn> GetMasterOptions( this PawnKindDef pawnkind, Map map, MasterMode mode )
@@ -150,11 +151,11 @@ namespace FluffyManager
 
             // does it exist at all?
             var key         = new Triplet<PawnKindDef, Map, MasterMode>( pawnkind, map, mode );
-            var cacheExists = _masterCache.ContainsKey( key );
+            var cacheExists = MasterCache.ContainsKey( key );
 
             // is it up to date?
             if ( cacheExists                                 &&
-                 _masterCache[key].TryGetValue( out cached ) && cached != null )
+                 MasterCache[key].TryGetValue( out cached ) && cached != null )
                 return cached.ToList();
 
             // if not, get a new list.
@@ -167,12 +168,12 @@ namespace FluffyManager
 
             // update if key exists
             if ( cacheExists )
-                _masterCache[key].Update( cached );
+                MasterCache[key].Update( cached );
 
             // else add it
             else
                 // severely limit cache to only apply for one cycle (one job)
-                _masterCache.Add( key, new Utilities.CachedValue<IEnumerable<Pawn>>( cached, 2 ) );
+                MasterCache.Add( key, new Utilities.CachedValue<IEnumerable<Pawn>>( cached, 2 ) );
             return cached.ToList();
         }
 
@@ -182,10 +183,10 @@ namespace FluffyManager
             IEnumerable<Pawn> cached;
 
             // does it exist at all?
-            var cacheExists = _followerCache.ContainsKey( pawn );
+            var cacheExists = FollowerCache.ContainsKey( pawn );
 
             // is it up to date?
-            if ( cacheExists && _followerCache[pawn].TryGetValue( out cached ) && cached != null )
+            if ( cacheExists && FollowerCache[pawn].TryGetValue( out cached ) && cached != null )
                 return cached.ToList();
 
             // if not, get a new list.
@@ -197,12 +198,12 @@ namespace FluffyManager
 
             // update if key exists
             if ( cacheExists )
-                _followerCache[pawn].Update( cached );
+                FollowerCache[pawn].Update( cached );
 
             // else add it
             else
                 // severely limit cache to only apply for one cycle (one job)
-                _followerCache.Add( pawn, new Utilities.CachedValue<IEnumerable<Pawn>>( cached, 2 ) );
+                FollowerCache.Add( pawn, new Utilities.CachedValue<IEnumerable<Pawn>>( cached, 2 ) );
             return cached.ToList();
         }
 
@@ -225,22 +226,41 @@ namespace FluffyManager
                            .ToList();
         }
 
-        public static List<Pawn> GetWild( this PawnKindDef pawnKind, Map map )
+        public static IEnumerable<Pawn> GetWild( this PawnKindDef pawnKind, Map map )
         {
-            return pawnKind.GetAll( map ).Where( p => p.Faction == null ).ToList();
+            var key = new Pair<PawnKindDef, Map>( pawnKind, map );
+            if ( WildCache.TryGetValue( key, out var pawns ) )
+                return pawns;
+
+            Func<IEnumerable<Pawn>> getter = () => pawnKind.GetAll( map ).Where( p => p.Faction == null );
+            WildCache.Add( key, getter );
+            return getter();
         }
 
-        public static List<Pawn> GetTame( this PawnKindDef pawnKind, Map map )
+        public static IEnumerable<Pawn> GetTame( this PawnKindDef pawnKind, Map map )
         {
-            return pawnKind.GetAll( map ).Where( p => p.Faction == Faction.OfPlayer ).ToList();
+            var key = new Pair<PawnKindDef, Map>( pawnKind, map );
+            if ( TameCache.TryGetValue( key, out var pawns ) )
+                return pawns;
+
+            Func<IEnumerable<Pawn>> getter = () => pawnKind.GetAll( map ).Where( p => p.Faction == Faction.OfPlayer );
+            TameCache.Add( key, getter );
+            return getter();
         }
+
 
         public static IEnumerable<Pawn> GetAll( this PawnKindDef pawnKind, Map map, AgeAndSex ageSex )
         {
-            return pawnKind.GetAll( map ).Where( p => PawnIsOfAgeSex( p, ageSex ) ); // is of age and sex we want
+            var key = new Triplet<PawnKindDef, Map, AgeAndSex>( pawnKind, map, ageSex );
+            if ( AllSexedCache.TryGetValue( key, out var pawns ) )
+                return pawns;
+
+            Func<IEnumerable<Pawn>> getter = () => pawnKind.GetAll( map ).Where( p => PawnIsOfAgeSex( p, ageSex ) ); // is of age and sex we want
+            AllSexedCache.Add( key, getter );
+            return getter();
         }
 
-        public static List<Pawn> GetWild( this PawnKindDef pawnKind, Map map, AgeAndSex ageSex )
+        public static IEnumerable<Pawn> GetWild( this PawnKindDef pawnKind, Map map, AgeAndSex ageSex )
         {
 #if DEBUG_LIFESTOCK_COUNTS
             foreach (Pawn p in GetAll( ageSex )) Log.Message(p.Faction?.GetCallLabel() ?? "NULL" );
@@ -248,18 +268,30 @@ namespace FluffyManager
             Log.Message( "Wildcount " + ageSex + ": " + wild.Count );
             return wild;
 #else
-            return pawnKind.GetAll( map, ageSex ).Where( p => p.Faction == null ).ToList();
+            var key = new Triplet<PawnKindDef, Map, AgeAndSex>( pawnKind, map, ageSex );
+            if ( WildSexedCache.TryGetValue( key, out var pawns ) )
+                return pawns;
+
+            Func<IEnumerable<Pawn>> getter = () => pawnKind.GetAll( map, ageSex ).Where( p => p.Faction == null );
+            WildSexedCache.Add( key, getter );
+            return getter();
 #endif
         }
 
-        public static List<Pawn> GetTame( this PawnKindDef pawnKind, Map map, AgeAndSex ageSex )
+        public static IEnumerable<Pawn> GetTame( this PawnKindDef pawnKind, Map map, AgeAndSex ageSex )
         {
 #if DEBUG_LIFESTOCK_COUNTS
             List<Pawn> tame = GetAll( ageSex ).Where( p => p.Faction == Faction.OfPlayer ).ToList();
             Log.Message( "Tamecount " + ageSex + ": " + tame.Count );
             return tame;
 #else
-            return pawnKind.GetAll( map, ageSex ).Where( p => p.Faction == Faction.OfPlayer ).ToList();
+            var key = new Triplet<PawnKindDef, Map, AgeAndSex>( pawnKind, map, ageSex );
+            if ( TameSexedCache.TryGetValue( key, out var pawns ) )
+                return pawns;
+
+            Func<IEnumerable<Pawn>> getter = () => pawnKind.GetAll( map, ageSex ).Where( p => p.Faction == Faction.OfPlayer );
+            TameSexedCache.Add( key, getter );
+            return getter();
 #endif
         }
 
@@ -269,17 +301,17 @@ namespace FluffyManager
                 return false;
 
             var ret = false;
-            if ( _milkablePawnkind.ContainsKey( pawnKind ) )
+            if ( MilkablePawnkind.ContainsKey( pawnKind ) )
             {
-                if ( _milkablePawnkind[pawnKind].TryGetValue( out ret ) ) return ret;
+                if ( MilkablePawnkind[pawnKind].TryGetValue( out ret ) ) return ret;
 
                 ret = pawnKind.race.comps.OfType<CompProperties_Milkable>().Any( cp => cp.milkDef != null );
-                _milkablePawnkind[pawnKind].Update( ret );
+                MilkablePawnkind[pawnKind].Update( ret );
                 return ret;
             }
 
             ret = pawnKind.race.comps.OfType<CompProperties_Milkable>().Any( cp => cp.milkDef != null );
-            _milkablePawnkind.Add( pawnKind, new Utilities.CachedValue<bool>( ret, int.MaxValue ) );
+            MilkablePawnkind.Add( pawnKind, new Utilities.CachedValue<bool>( ret, int.MaxValue ) );
             return ret;
         }
 
@@ -296,17 +328,17 @@ namespace FluffyManager
         public static bool Milkable( this Pawn pawn )
         {
             var ret = false;
-            if ( _milkablePawn.ContainsKey( pawn ) )
+            if ( MilkablePawn.ContainsKey( pawn ) )
             {
-                if ( _milkablePawn[pawn].TryGetValue( out ret ) ) return ret;
+                if ( MilkablePawn[pawn].TryGetValue( out ret ) ) return ret;
 
                 ret = pawn._milkable();
-                _milkablePawn[pawn].Update( ret );
+                MilkablePawn[pawn].Update( ret );
                 return ret;
             }
 
             ret = pawn._milkable();
-            _milkablePawn.Add( pawn, new Utilities.CachedValue<bool>( ret, 5000 ) );
+            MilkablePawn.Add( pawn, new Utilities.CachedValue<bool>( ret, 5000 ) );
             return ret;
         }
 
@@ -324,34 +356,34 @@ namespace FluffyManager
                 return false;
 
             var ret = false;
-            if ( _shearablePawnkind.ContainsKey( pawnKind ) )
+            if ( ShearablePawnkind.ContainsKey( pawnKind ) )
             {
-                if ( _shearablePawnkind[pawnKind].TryGetValue( out ret ) ) return ret;
+                if ( ShearablePawnkind[pawnKind].TryGetValue( out ret ) ) return ret;
 
                 ret = pawnKind.race.comps.OfType<CompProperties_Shearable>().Any( cp => cp.woolDef != null );
-                _shearablePawnkind[pawnKind].Update( ret );
+                ShearablePawnkind[pawnKind].Update( ret );
                 return ret;
             }
 
             ret = pawnKind.race.comps.OfType<CompProperties_Shearable>().Any( cp => cp.woolDef != null );
-            _shearablePawnkind.Add( pawnKind, new Utilities.CachedValue<bool>( ret, int.MaxValue ) );
+            ShearablePawnkind.Add( pawnKind, new Utilities.CachedValue<bool>( ret, int.MaxValue ) );
             return ret;
         }
 
         public static bool Shearable( this Pawn pawn )
         {
             var ret = false;
-            if ( _shearablePawn.ContainsKey( pawn ) )
+            if ( ShearablePawn.ContainsKey( pawn ) )
             {
-                if ( _shearablePawn[pawn].TryGetValue( out ret ) ) return ret;
+                if ( ShearablePawn[pawn].TryGetValue( out ret ) ) return ret;
 
                 ret = pawn._shearable();
-                _shearablePawn[pawn].Update( ret );
+                ShearablePawn[pawn].Update( ret );
                 return ret;
             }
 
             ret = pawn._shearable();
-            _shearablePawn.Add( pawn, new Utilities.CachedValue<bool>( ret, 5000 ) );
+            ShearablePawn.Add( pawn, new Utilities.CachedValue<bool>( ret, 5000 ) );
             return ret;
         }
 

@@ -122,7 +122,7 @@ namespace FluffyManager
                 return Utilities_Livestock.AgeSexArray
                                           .Select( ageSex =>
                                                        ( "FMP." + ageSex.ToString() + "Count" ).Translate(
-                                                           Trigger.pawnKind.GetTame( manager, ageSex ).Count,
+                                                           Trigger.pawnKind.GetTame( manager, ageSex ).Count(),
                                                            Trigger.CountTargets[ageSex] ) )
                                           .ToArray();
             }
@@ -426,7 +426,7 @@ namespace FluffyManager
             {
                 // not enough animals?
                 var deficit = Trigger.CountTargets[ageSex]
-                            - Trigger.pawnKind.GetTame( manager, ageSex ).Count
+                            - Trigger.pawnKind.GetTame( manager, ageSex ).Count()
                             - DesignationsOfOn( DesignationDefOf.Tame, ageSex ).Count;
 
 #if DEBUG_LIFESTOCK
@@ -495,7 +495,7 @@ namespace FluffyManager
             foreach ( var ageSex in Utilities_Livestock.AgeSexArray )
             {
                 // too many animals?
-                var surplus = Trigger.pawnKind.GetTame( manager, ageSex ).Count
+                var surplus = Trigger.pawnKind.GetTame( manager, ageSex ).Count()
                             - DesignationsOfOn( DesignationDefOf.Slaughter, ageSex ).Count
                             - Trigger.CountTargets[ageSex];
 
@@ -570,23 +570,42 @@ namespace FluffyManager
                  statusRect = new Rect( labelRect.xMax + Margin, Margin, StatusRectWidth,
                                         rect.height    - 2 * Margin );
 
-            // create label string
-            var text = Label + "\n<i>";
-            foreach ( var ageSex in Utilities_Livestock.AgeSexArray )
-                text += Trigger.pawnKind.GetTame( manager, ageSex ).Count + "/" + Trigger.CountTargets[ageSex] + ", ";
-
-            text += Trigger.pawnKind.GetWild( manager ).Count + "</i>";
-            var tooltip = Trigger.StatusTooltip;
-
+            
             // do the drawing
             GUI.BeginGroup( rect );
 
             // draw label
-            Widgets_Labels.Label( labelRect, text, tooltip );
+            Widgets.Label( labelRect, FullLabel );
+            TooltipHandler.TipRegion( labelRect, () => Trigger.StatusTooltip, GetHashCode() );
 
             // if the bill has a manager job, give some more info.
             if ( active ) this.DrawStatusForListEntry( statusRect, Trigger );
             GUI.EndGroup();
+        }
+
+        private Utilities.CachedValue<string> _cachedLabel;
+
+        public string FullLabel
+        {
+            get
+            {
+                if ( _cachedLabel != null && _cachedLabel.TryGetValue( out string label ) )
+                    return label;
+
+                Func<string> labelGetter = () =>
+                {
+                    var text = Label + "\n<i>";
+                    foreach ( var ageSex in Utilities_Livestock.AgeSexArray )
+                        text += Trigger.pawnKind.GetTame( manager, ageSex ).Count() + "/" +
+                                Trigger.CountTargets[ageSex]                        +
+                                ", ";
+
+                    text += Trigger.pawnKind.GetWild( manager ).Count() + "</i>";
+                    return text;
+                };
+                _cachedLabel = new Utilities.CachedValue<string>( labelGetter(), 250, labelGetter );
+                return labelGetter();
+            }
         }
 
         public override void DrawOverviewDetails( Rect rect )
