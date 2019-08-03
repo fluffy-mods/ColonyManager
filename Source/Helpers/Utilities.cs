@@ -490,7 +490,7 @@ namespace FluffyManager
 
             public void Add( T key, Func<V> updater )
             {
-                Log.Message( $"Adding cached value for: {key}", true );
+                // Log.Message( $"Adding cached value for: {key}", true );
 
                 V value = updater();
                 var cached = new CachedValue<V>( value, updateInterval, updater );
@@ -569,7 +569,7 @@ namespace FluffyManager
 
             public void Update()
             {
-                Log.Message( $"Running Update()", true );
+                // Log.Message( $"Running Update()", true );
 
                 if ( _updater == null )
                     Log.Error( "Calling Update() without updater" );
