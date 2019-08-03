@@ -234,4 +234,9 @@
   <FM.Livestock.MasterMode.NonViolent>Non-violent</FM.Livestock.MasterMode.NonViolent>
   <FM.Livestock.MasterMode.All>All</FM.Livestock.MasterMode.All>
 
+  <!-- Right click job fail reasons -->
+  <Fluffy.ColonyManager.CannotManage.NoPower>no power</Fluffy.ColonyManager.CannotManage.NoPower>
+  <Fluffy.ColonyManager.CannotManage.NoJobs>no jobs set</Fluffy.ColonyManager.CannotManage.NoJobs>
+  <Fluffy.ColonyManager.CannotManage.NoActiveJobs>all jobs are done</Fluffy.ColonyManager.CannotManage.NoActiveJobs>
+
 </LanguageData>

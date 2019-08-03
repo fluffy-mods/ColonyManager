@@ -45,11 +45,24 @@ namespace FluffyManager
             var power = t.TryGetComp<CompPowerTrader>();
             if ( power != null &&
                  !power.PowerOn )
+            {
+                JobFailReason.Is( "Fluffy.ColonyManager.CannotManage.NoPower".Translate() );
                 return false;
+            }
 
-            if ( Manager.For( pawn.Map ).JobStack.NextJob != null ) return true;
+            if ( !Manager.For( pawn.Map ).JobStack.FullStack().Any() )
+            {
+                JobFailReason.Is( "Fluffy.ColonyManager.CannotManage.NoJobs".Translate() );
+                return false;
+            }
 
-            return false;
+            if ( Manager.For( pawn.Map ).JobStack.NextJob == null )
+            {
+                JobFailReason.Is( "Fluffy.ColonyManager.CannotManage.NoActiveJobs".Translate() );
+                return false;
+            }
+
+            return true;
         }
 
         public override Job JobOnThing( Pawn pawn, Thing t, bool forced )
