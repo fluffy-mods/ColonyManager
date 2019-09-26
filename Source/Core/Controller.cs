@@ -11,11 +11,14 @@ namespace FluffyManager
 {
     public class Controller : Mod
     {
+        private Settings mySettings;
         public Controller( ModContentPack content ) : base( content )
         {
             // apply fixes
             var harmony = HarmonyInstance.Create( "fluffy.colonymanager" );
             harmony.PatchAll( Assembly.GetExecutingAssembly() );
+
+            mySettings = GetSettings<Settings>();
         }
 
         public override string SettingsCategory()

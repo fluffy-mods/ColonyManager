@@ -12,8 +12,31 @@ namespace FluffyManager
 {
     public class Settings : ModSettings
     {
-        public static UpdateInterval DefaultUpdateInterval = UpdateInterval.Daily;
-        private static int _defaultUpdateIntervalTicks_Scribe;
+        private static int _defaultUpdateIntervalTicks_Scribe = GenDate.TicksPerDay;
+
+        public static UpdateInterval DefaultUpdateInterval
+        {
+            get
+            {
+                return ticksToInterval(_defaultUpdateIntervalTicks_Scribe);
+            }
+            set
+            {
+                _defaultUpdateIntervalTicks_Scribe = value.ticks;
+            }
+        }
+
+        private static UpdateInterval ticksToInterval(int ticks)
+        {
+            foreach (var interval in Utilities.UpdateIntervalOptions)
+            {
+                if (interval.ticks == ticks)
+                {
+                    return interval;
+                }
+            }
+            return null;
+        }
 
         public static void DoSettingsWindowContents( Rect rect )
         {
@@ -44,14 +67,7 @@ namespace FluffyManager
         {
             base.ExposeData();
 
-            if ( Scribe.mode == LoadSaveMode.Saving )
-                _defaultUpdateIntervalTicks_Scribe = DefaultUpdateInterval.ticks;
-
             Scribe_Values.Look( ref _defaultUpdateIntervalTicks_Scribe, "defaultUpdateInterval", GenDate.TicksPerDay );
-
-            if ( Scribe.mode == LoadSaveMode.PostLoadInit )
-                DefaultUpdateInterval = Utilities.UpdateIntervalOptions.Find( ui => ui.ticks == _defaultUpdateIntervalTicks_Scribe ) ?? UpdateInterval.Daily;
-
         }
     }
 }
