@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <FM.Mining>Minage</FM.Mining>
+    <FM.Mining.MiningArea>Zone de minage</FM.Mining.MiningArea>
+    <FM.Mining.HealthAndSafety>Santé et sécurité</FM.Mining.HealthAndSafety>
+    <FM.Mining.AllowedMinerals>Minéraux</FM.Mining.AllowedMinerals>
+    <FM.Mining.AllowedBuildings>Batiments</FM.Mining.AllowedBuildings>
+    <FM.Mining.DeconstructBuildings>Détruire batiments</FM.Mining.DeconstructBuildings>
+    <FM.Mining.DeconstructBuildings.Tip>Les bâtiments non revendiqués devraient-ils être déconstruction pour être recyclés?</FM.Mining.DeconstructBuildings.Tip>
+    <FM.Mining.CheckRoofSupport>Laisser les supports de toit</FM.Mining.CheckRoofSupport>
+    <FM.Mining.CheckRoofSupport.Tip>Les gestionnaires laisseront des colonnes de support à intervalles réguliers.\n\nNOTE: La position des colonnes est pré-calculée, les effondrements peuvent encore se produire</FM.Mining.CheckRoofSupport.Tip>
+    <FM.Mining.CheckRoofSupportAdvanced>Vérifier les supports de toit</FM.Mining.CheckRoofSupportAdvanced>
+    <FM.Mining.CheckRoofSupportAdvanced.Tip>Les gestionnaires calculeront des supports de toit avant de désigner les tâches de minages et de déconstruction, réduisant drastiquement le risque d'effondrement.</FM.Mining.CheckRoofSupportAdvanced.Tip>
+    <FM.Mining.CheckRoofSupportAdvanced.DisabledTip>Désactivé car la verification des supports de toit est désactivée.</FM.Mining.CheckRoofSupportAdvanced.DisabledTip>
+    <FM.Mining.CheckRoomDivision>Vérifiez les limites de la pièce</FM.Mining.CheckRoomDivision>
+    <FM.Mining.CheckRoomDivision.Tip>Les gestionnaires tenteront d’empêcher toute faille dans les murs qui divisent les pièces ou qui créeraient des raccourcis.</FM.Mining.CheckRoomDivision.Tip>
+    <FM.Mining.SyncFilterAndAllowed>Synchroniser le seuil</FM.Mining.SyncFilterAndAllowed>
+    <FM.Mining.SyncFilterAndAllowed.Tip>Activez cette option pour essayer de synchroniser la quantité matériaux dans le filtre à seuil avec les roches et bâtiments autorisés à l'extraction / déconstruction, et inversement.</FM.Mining.SyncFilterAndAllowed.Tip>
+
+    <!-- cur, chunks, designated, target -->
+    <FM.Mining.TargetCount>Quantité ciblée: {0}+{1}+{2}/{3}</FM.Mining.TargetCount>
+    <FM.Mining.TargetCount.Tip>Objectif: {3}\n{0} en stock\n{1} attendue de la taille de pierre\n{2} attendu des réglages actuels.</FM.Mining.TargetCount.Tip>
+
+    <!-- Jobs -->
+    <FM.Mining.NewJob>Nouvelle tâche</FM.Mining.NewJob>
+    <FM.Mining.NewJob.Tip>Créer une nouvelle tâche de minage</FM.Mining.NewJob.Tip>
+
+    <!-- shortcuts -->
+    <FM.Mining.Stone>Pierre</FM.Mining.Stone>
+    <FM.Mining.Stone.Tip>Autoriser tous les objets minables qui produisent des morceaux de pierre</FM.Mining.Stone.Tip>
+    <FM.Mining.Metal>Métal</FM.Mining.Metal>
+    <FM.Mining.Metal.Tip>Autoriser tous les objets minables qui produisent des métaux</FM.Mining.Metal.Tip>
+    <FM.Mining.Precious>Precieux</FM.Mining.Precious>
+    <FM.Mining.Precious.Tip>Autoriser tous les objets minables qui produisent des matériaux précieux</FM.Mining.Precious.Tip>
+</LanguageData>
