@@ -193,11 +193,11 @@ namespace FluffyManager
             // handle butchery
             DoButcherJobs( ref actionTaken );
 
+            // handle training
+            DoTrainingJobs(ref actionTaken);
+
             // area restrictions
             DoAreaRestrictions( ref actionTaken );
-
-            // handle training
-            DoTrainingJobs( ref actionTaken );
 
             // handle taming
             DoTamingJobs( ref actionTaken );
@@ -401,14 +401,12 @@ namespace FluffyManager
                     foreach ( var def in Training.Defs )
                     {
                         bool dump;
-                        if ( !animal.training.HasLearned( def ) &&
-
-                             // only train if allowed.
+                        if ( // only train if allowed.
                              animal.training.CanAssignToTrain( def, out dump ).Accepted &&
 
-                             // only ever assign training, never de-asign.
+                             // only assign training, unless unassign is ticked.
                              animal.training.GetWanted( def ) != Training[def] &&
-                             Training[def] )
+                             (Training[def] || Training.UnassignTraining) )
                         {
                             if ( assign ) SetWanted_MI.Invoke( animal.training, new object[] {def, Training[def]} );
                             actionTaken = true;
@@ -673,6 +671,7 @@ namespace FluffyManager
         {
             public DefMap<TrainableDef, bool> TrainingTargets = new DefMap<TrainableDef, bool>();
             public bool                       TrainYoung;
+            public bool                       UnassignTraining;
 
             public bool this[ TrainableDef index ]
             {
@@ -699,6 +698,7 @@ namespace FluffyManager
             public void ExposeData()
             {
                 Scribe_Values.Look( ref TrainYoung, "TrainYoung" );
+                Scribe_Values.Look( ref UnassignTraining, "UnassignTraining");
                 Scribe_Deep.Look( ref TrainingTargets, "TrainingTargets" );
             }
 

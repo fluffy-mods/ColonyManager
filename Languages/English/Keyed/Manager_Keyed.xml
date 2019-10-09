@@ -187,6 +187,7 @@
   <FML.MilkHeader>Progress till next milking</FML.MilkHeader>
   <FML.WoolHeader>Progress till next shearing</FML.WoolHeader>
   <FML.Yields>Expected yield: {0} x{1}</FML.Yields>
+	<FML.UnassignTraining>Unassign training</FML.UnassignTraining>
   <FML.TrainYoung>Train young animals</FML.TrainYoung>
   <FML.SendToSlaughterArea>Restrict animals marked for slaughter</FML.SendToSlaughterArea>
   <FML.SendToSlaughterArea.Tip>Restrict animals designated for slaughtering to a specific area</FML.SendToSlaughterArea.Tip>
