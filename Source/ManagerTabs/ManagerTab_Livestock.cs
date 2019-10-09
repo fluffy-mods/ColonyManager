@@ -426,31 +426,6 @@ namespace FluffyManager
                        color: Color.grey );
             }
 
-            var sendToTrainingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            pos.y += ListEntryHeight;
-            if ( _selectedCurrent.Training.Any )
-            {
-                DrawToggle( sendToTrainingAreaRect,
-                            "FML.SendToTrainingArea".Translate(),
-                            "FML.SendToTrainingArea.Tip".Translate(),
-                            ref _selectedCurrent.SendToTrainingArea );
-
-                if ( _selectedCurrent.SendToTrainingArea )
-                {
-                    var trainingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-                    AreaAllowedGUI.DoAllowedAreaSelectors( trainingAreaRect, ref _selectedCurrent.TrainingArea,
-                                                           manager );
-                    pos.y += ListEntryHeight;
-                }
-            }
-            else
-            {
-                sendToTrainingAreaRect.xMin += Margin;
-                Label( sendToTrainingAreaRect, "FML.SendToTrainingArea".Translate(),
-                       "FM.Livestock.DisabledBecauseNoTrainingSet".Translate(), TextAnchor.MiddleLeft,
-                       color: Color.grey );
-            }
-
             if (_selectedCurrent.Trigger.pawnKind.Milkable())
             {
                 var sendToMilkingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
@@ -485,6 +460,31 @@ namespace FluffyManager
                                                            manager);
                     pos.y += ListEntryHeight;
                 }
+            }
+
+            var sendToTrainingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            pos.y += ListEntryHeight;
+            if ( _selectedCurrent.Training.Any )
+            {
+                DrawToggle( sendToTrainingAreaRect,
+                            "FML.SendToTrainingArea".Translate(),
+                            "FML.SendToTrainingArea.Tip".Translate(),
+                            ref _selectedCurrent.SendToTrainingArea );
+
+                if ( _selectedCurrent.SendToTrainingArea )
+                {
+                    var trainingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+                    AreaAllowedGUI.DoAllowedAreaSelectors( trainingAreaRect, ref _selectedCurrent.TrainingArea,
+                                                           manager );
+                    pos.y += ListEntryHeight;
+                }
+            }
+            else
+            {
+                sendToTrainingAreaRect.xMin += Margin;
+                Label( sendToTrainingAreaRect, "FML.SendToTrainingArea".Translate(),
+                       "FM.Livestock.DisabledBecauseNoTrainingSet".Translate(), TextAnchor.MiddleLeft,
+                       color: Color.grey );
             }
 
             return pos.y - start.y;

@@ -32,14 +32,14 @@ namespace FluffyManager
         public                  List<Area>        RestrictArea;
         public                  bool              RestrictToArea;
         public                  bool              SendToSlaughterArea;
-        public                  bool              SendToTrainingArea;
         public                  bool              SendToMilkingArea;
         public                  bool              SendToShearingArea;
+        public                  bool              SendToTrainingArea;
         public                  bool              SetFollow;
         public                  Area              SlaughterArea;
-        public                  Area              TameArea;
         public                  Area              MilkArea;
         public                  Area              ShearArea;
+        public                  Area              TameArea;
         public                  Pawn              Trainer;
         public                  MasterMode        Trainers;
         public                  TrainingTracker   Training;
@@ -80,10 +80,6 @@ namespace FluffyManager
             SendToSlaughterArea = false;
             SlaughterArea       = null;
 
-            // set up training area
-            SendToTrainingArea = false;
-            TrainingArea       = null;
-
             // set up milking area
             SendToMilkingArea = false;
             MilkArea = null;
@@ -91,6 +87,10 @@ namespace FluffyManager
             // set up shearing area
             SendToShearingArea = false;
             ShearArea = null;
+
+            // set up training area
+            SendToTrainingArea = false;
+            TrainingArea       = null;
 
             // taming
             TryTameMore = false;
@@ -149,9 +149,9 @@ namespace FluffyManager
             // settings, references first!
             Scribe_References.Look( ref TameArea, "TameArea" );
             Scribe_References.Look( ref SlaughterArea, "SlaughterArea" );
+            Scribe_References.Look( ref MilkArea, "MilkArea" );
+            Scribe_References.Look( ref ShearArea, "ShearArea" );
             Scribe_References.Look( ref TrainingArea, "TrainingArea" );
-            Scribe_References.Look( ref MilkArea, "MilkArea");
-            Scribe_References.Look( ref ShearArea, "ShearArea");
             Scribe_References.Look( ref Master, "Master" );
             Scribe_References.Look( ref Trainer, "Trainer" );
             Scribe_Collections.Look( ref RestrictArea, "AreaRestrictions", LookMode.Reference );
@@ -164,9 +164,9 @@ namespace FluffyManager
             Scribe_Values.Look( ref ButcherBonded, "ButcherBonded" );
             Scribe_Values.Look( ref RestrictToArea, "RestrictToArea" );
             Scribe_Values.Look( ref SendToSlaughterArea, "SendToSlaughterArea" );
+            Scribe_Values.Look( ref SendToMilkingArea, "SendToMilkingArea" );
+            Scribe_Values.Look( ref SendToShearingArea, "SendToShearingArea" );
             Scribe_Values.Look( ref SendToTrainingArea, "SendToTrainingArea" );
-            Scribe_Values.Look( ref SendToMilkingArea, "SendToMilkingArea");
-            Scribe_Values.Look( ref SendToShearingArea, "SendToShearingArea");
             Scribe_Values.Look( ref TryTameMore, "TryTameMore" );
             Scribe_Values.Look( ref SetFollow, "SetFollow", true );
             Scribe_Values.Look( ref FollowDrafted, "FollowDrafted", true );
@@ -237,16 +237,6 @@ namespace FluffyManager
                             p.playerSettings.AreaRestriction = SlaughterArea;
                         }
 
-                        // training
-                        else if ( SendToTrainingArea && p.training.NextTrainableToTrain() != null )
-                        {
-                            if ( p.playerSettings.AreaRestriction != TrainingArea )
-                            {
-                                actionTaken                      = true;
-                                p.playerSettings.AreaRestriction = TrainingArea;
-                            }
-                        }
-
                         // milking
                         else if ( SendToMilkingArea &&
                                   p.GetComp<CompMilkable>() != null &&
@@ -260,14 +250,24 @@ namespace FluffyManager
                         }
 
                         // shearing
-                        else if (SendToShearingArea &&
+                        else if ( SendToShearingArea &&
                                   p.GetComp<CompShearable>() != null &&
-                                  p.GetComp<CompShearable>().Fullness > 0.94)
+                                  p.GetComp<CompShearable>().Fullness > 0.94 )
                         {
                             if (p.playerSettings.AreaRestriction != ShearArea)
                             {
                                 actionTaken = true;
                                 p.playerSettings.AreaRestriction = ShearArea;
+                            }
+                        }
+
+                        // training
+                        else if ( SendToTrainingArea && p.training.NextTrainableToTrain() != null )
+                        {
+                            if ( p.playerSettings.AreaRestriction != TrainingArea )
+                            {
+                                actionTaken                      = true;
+                                p.playerSettings.AreaRestriction = TrainingArea;
                             }
                         }
 
