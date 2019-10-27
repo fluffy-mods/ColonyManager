@@ -199,7 +199,7 @@ namespace FluffyManager
             DoCountField( countRects[1, 2], AgeAndSex.AdultMale );
             DoCountField( countRects[2, 1], AgeAndSex.JuvenileFemale );
             DoCountField( countRects[2, 2], AgeAndSex.JuvenileMale );
-            
+
             return 3 * ListEntryHeight;
         }
 
