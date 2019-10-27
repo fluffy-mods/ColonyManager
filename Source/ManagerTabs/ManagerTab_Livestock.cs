@@ -199,7 +199,7 @@ namespace FluffyManager
             DoCountField( countRects[1, 2], AgeAndSex.AdultMale );
             DoCountField( countRects[2, 1], AgeAndSex.JuvenileFemale );
             DoCountField( countRects[2, 2], AgeAndSex.JuvenileMale );
-
+            
             return 3 * ListEntryHeight;
         }
 
@@ -361,44 +361,8 @@ namespace FluffyManager
 
             if ( _selectedCurrent.RestrictToArea )
             {
-                // area selectors table
-                // set up a 3x3 table of rects
-                var     cols    = 3;
-                var     fifth   = width / 5;
-                float[] widths  = {fifth, fifth        * 2, fifth * 2};
-                float[] heights = {ListEntryHeight * 2 / 3, ListEntryHeight, ListEntryHeight};
-
-                var areaRects = new Rect[cols, cols];
-                for ( var x = 0; x < cols; x++ )
-                    for ( var y = 0; y < cols; y++ )
-                        areaRects[x, y] = new Rect(
-                            widths.Take( x ).Sum(),
-                            pos.y + heights.Take( y ).Sum(),
-                            widths[x],
-                            heights[y] );
-
-                // headers
-                Label( areaRects[1, 0], Gender.Female.ToString(), TextAnchor.LowerCenter, GameFont.Tiny );
-                Label( areaRects[2, 0], Gender.Male.ToString(), TextAnchor.LowerCenter, GameFont.Tiny );
-                Label( areaRects[0, 1], "FML.Adult".Translate(), TextAnchor.MiddleRight, GameFont.Tiny );
-                Label( areaRects[0, 2], "FML.Juvenile".Translate(), TextAnchor.MiddleRight, GameFont.Tiny );
-
-                // do the selectors
-                _selectedCurrent.RestrictArea[0] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 1],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              0], manager, Margin );
-                _selectedCurrent.RestrictArea[1] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 1],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              1], manager, Margin );
-                _selectedCurrent.RestrictArea[2] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 2],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              2], manager, Margin );
-                _selectedCurrent.RestrictArea[3] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 2],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              3], manager, Margin );
-
-                Text.Anchor =  TextAnchor.UpperLeft; // DoAllowedAreaMode leaves the anchor in an incorrect state.
-                pos.y       += 3 * ListEntryHeight;
+                 DrawAreaSelectorPerGenderAndAge(pos, width, ref _selectedCurrent.RestrictArea);
+                pos.y += 3 * ListEntryHeight;
             }
 
             var sendToSlaughterAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
@@ -424,6 +388,29 @@ namespace FluffyManager
                 Label( sendToSlaughterAreaRect, "FML.SendToSlaughterArea".Translate(),
                        "FM.Livestock.DisabledBecauseSlaughterExcessDisabled".Translate(), TextAnchor.MiddleLeft,
                        color: Color.grey );
+            }
+
+            // restrict to hungry area
+            var RestrictHungryAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+
+            DrawToggle(RestrictHungryAreaRect,
+                        "FML.RestrictToHungryArea".Translate(),
+                        "FML.RestrictToHungryArea.Tip".Translate(),
+                        ref _selectedCurrent.RestrictToHungryArea);
+            pos.y += ListEntryHeight;
+            if (_selectedCurrent.RestrictToHungryArea)
+            {
+                if (_selectedCurrent.RestrictHungryArea.Count != _selectedCurrent.RestrictArea.Count)
+                {
+                    _selectedCurrent.RestrictHungryArea = Utilities_Livestock.AgeSexArray.Select(k => (Area)null).ToList();
+                }
+                DrawAreaSelectorPerGenderAndAge(pos, width, ref _selectedCurrent.RestrictHungryArea);
+                pos.y += 3 * ListEntryHeight;
+                var HungryAreaFoodFullness = new Rect(pos.x, pos.y, width, ListEntryHeight);
+                HungryAreaFoodFullness.xMin += 3 * Margin;
+                DrawSlider(HungryAreaFoodFullness, "FML.SendToHungryAreaMaximumFoodNeed.Label".Translate(), "FML.SendToHungryAreaMaximumFoodNeed.Tip".Translate(),
+                    ref _selectedCurrent.SendToHungryAreaMaximumFoodNeed);
+                pos.y += ListEntryHeight;
             }
 
             var sendToTrainingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
@@ -452,6 +439,41 @@ namespace FluffyManager
             }
 
             return pos.y - start.y;
+        }
+
+
+
+        private void DrawAreaSelectorPerGenderAndAge(Vector2 pos, float width, ref List<Area> restrictArea)
+        {
+            // area selectors table
+            // set up a 3x3 table of rects
+            var cols = 3;
+            var fifth = width / 5;
+            float[] widths = { fifth, fifth * 2, fifth * 2 };
+            float[] heights = { ListEntryHeight * 2 / 3, ListEntryHeight, ListEntryHeight };
+
+            var areaRects = new Rect[cols, cols];
+            for (var x = 0; x < cols; x++)
+                for (var y = 0; y < cols; y++)
+                    areaRects[x, y] = new Rect(
+                        widths.Take(x).Sum(),
+                        pos.y + heights.Take(y).Sum(),
+                        widths[x],
+                        heights[y]);
+
+            // headers
+            Label(areaRects[1, 0], Gender.Female.ToString(), TextAnchor.LowerCenter, GameFont.Tiny);
+            Label(areaRects[2, 0], Gender.Male.ToString(), TextAnchor.LowerCenter, GameFont.Tiny);
+            Label(areaRects[0, 1], "FML.Adult".Translate(), TextAnchor.MiddleRight, GameFont.Tiny);
+            Label(areaRects[0, 2], "FML.Juvenile".Translate(), TextAnchor.MiddleRight, GameFont.Tiny);
+
+            // do the selectors
+            restrictArea[0] = AreaAllowedGUI.DoAllowedAreaSelectors(areaRects[1, 1], restrictArea[0], manager, Margin);
+            restrictArea[1] = AreaAllowedGUI.DoAllowedAreaSelectors(areaRects[2, 1], restrictArea[1], manager, Margin);
+            restrictArea[2] = AreaAllowedGUI.DoAllowedAreaSelectors(areaRects[1, 2], restrictArea[2], manager, Margin);
+            restrictArea[3] = AreaAllowedGUI.DoAllowedAreaSelectors(areaRects[2, 2], restrictArea[3], manager, Margin);
+
+            Text.Anchor = TextAnchor.UpperLeft; // DoAllowedAreaMode leaves the anchor in an incorrect state.
         }
 
         private float DrawTrainingSection( Vector2 pos, float width )
