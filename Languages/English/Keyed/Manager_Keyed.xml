@@ -209,7 +209,7 @@
   <FM.Livestock.DisabledBecauseNoTrainingSet>Disabled because no training target is set.</FM.Livestock.DisabledBecauseNoTrainingSet>
   <FM.Livestock.CannotTrainTooSmall>{0} are too small to train this.</FM.Livestock.CannotTrainTooSmall>
 
-    <!-- following -->
+  <!-- following -->
   <FM.Livestock.FollowHeader>Following</FM.Livestock.FollowHeader>
   <FM.Livestock.MasterDefault>Assign master(s)</FM.Livestock.MasterDefault>
   <FM.Livestock.MasterDefault.Tip>Assign animals to a specific master, or to groups of colonists. May overwrite user settings when enabled.</FM.Livestock.MasterDefault.Tip>

@@ -158,7 +158,8 @@ namespace FluffyManager
             Scribe_Values.Look( ref ButcherPregnant, "ButcherPregnant" );
             Scribe_Values.Look( ref ButcherBonded, "ButcherBonded" );
             Scribe_Values.Look( ref RestrictToArea, "RestrictToArea" );
-            Scribe_Values.Look(ref RestrictToHungryArea, "RestrictToHungryArea", false);
+            Scribe_Values.Look( ref RestrictToHungryArea, "RestrictToHungryArea", false);
+            Scribe_Values.Look( ref SendToHungryAreaMaximumFoodNeed, "SendToHungryAreaMaximumFoodNeed", 0.01f);
             Scribe_Values.Look( ref SendToSlaughterArea, "SendToSlaughterArea" );
             Scribe_Values.Look( ref SendToTrainingArea, "SendToTrainingArea" );
             Scribe_Values.Look( ref TryTameMore, "TryTameMore" );
