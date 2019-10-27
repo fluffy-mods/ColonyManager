@@ -210,7 +210,7 @@ namespace FluffyManager
 
         private void DoAreaRestrictions( ref bool actionTaken )
         {
-            if ( RestrictToArea )
+            
                 for ( var i = 0; i < Utilities_Livestock.AgeSexArray.Length; i++ )
                     foreach ( var p in Trigger.pawnKind.GetTame( manager, Utilities_Livestock.AgeSexArray[i] ) )
                         // slaughter
@@ -231,8 +231,8 @@ namespace FluffyManager
                             }
                         }
 
-                        // all
-                        else if ( p.playerSettings.AreaRestriction != RestrictArea[i] )
+                        // default areas
+                        else if ( p.playerSettings.AreaRestriction != RestrictArea[i] && RestrictToArea)
                         {
                             actionTaken                      = true;
                             p.playerSettings.AreaRestriction = RestrictArea[i];
