@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
 
+        <Managing.label>Gestion</Managing.label>
 		<Managing.skillLabel>Gestion</Managing.skillLabel>
 		<Managing.pawnLabel>Gestionnaire</Managing.pawnLabel>
   

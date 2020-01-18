@@ -109,7 +109,7 @@
   <FMF.ClearWindCells.Tip>Clear all cells that are in wind turbines' catchment area</FMF.ClearWindCells.Tip>
   <FMF.AllowSaplings>Only fully matured trees</FMF.AllowSaplings>
   <FMF.AllowSaplings.Tip>Should forestry be limited to fully mature trees only?</FMF.AllowSaplings.Tip>
-  <FMF.LoggingArea>Alllow logging in:</FMF.LoggingArea>
+  <FMF.LoggingArea>Allow logging in:</FMF.LoggingArea>
   <FMF.TargetCount>Target count: {0}+{1}/{2}</FMF.TargetCount>
   <FMF.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMF.TargetCountTooltip>
   <FMF.ClearAreas>Clear areas of all vegetation:</FMF.ClearAreas>
