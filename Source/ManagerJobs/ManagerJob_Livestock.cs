@@ -31,6 +31,9 @@ namespace FluffyManager
         public                  bool              RespectBonds = true;
         public                  List<Area>        RestrictArea;
         public                  bool              RestrictToArea;
+        public                  List<Area>        RestrictHungryArea;
+        public                  bool              RestrictToHungryArea;
+        public                  float             SendToHungryAreaMaximumFoodNeed;
         public                  bool              SendToSlaughterArea;
         public                  bool              SendToTrainingArea;
         public                  bool              SetFollow;
@@ -71,6 +74,11 @@ namespace FluffyManager
             TameArea       = null;
             RestrictToArea = false;
             RestrictArea   = Utilities_Livestock.AgeSexArray.Select( k => (Area) null ).ToList();
+
+            // set hungry animals areas for restriction
+            RestrictToHungryArea = false;
+            SendToHungryAreaMaximumFoodNeed = 0.01f;
+            RestrictHungryArea = Utilities_Livestock.AgeSexArray.Select(k => (Area)null).ToList();
 
             // set up sending animals designated for slaughter to an area (freezer)
             SendToSlaughterArea = false;
@@ -141,6 +149,7 @@ namespace FluffyManager
             Scribe_References.Look( ref Master, "Master" );
             Scribe_References.Look( ref Trainer, "Trainer" );
             Scribe_Collections.Look( ref RestrictArea, "AreaRestrictions", LookMode.Reference );
+            Scribe_Collections.Look(ref RestrictHungryArea, "HungryAreaRestrictions", LookMode.Reference);
             Scribe_Deep.Look( ref Trigger, "trigger", manager );
             Scribe_Deep.Look( ref Training, "Training" );
             Scribe_Deep.Look( ref _history, "History" );
@@ -149,6 +158,8 @@ namespace FluffyManager
             Scribe_Values.Look( ref ButcherPregnant, "ButcherPregnant" );
             Scribe_Values.Look( ref ButcherBonded, "ButcherBonded" );
             Scribe_Values.Look( ref RestrictToArea, "RestrictToArea" );
+            Scribe_Values.Look( ref RestrictToHungryArea, "RestrictToHungryArea", false);
+            Scribe_Values.Look( ref SendToHungryAreaMaximumFoodNeed, "SendToHungryAreaMaximumFoodNeed", 0.01f);
             Scribe_Values.Look( ref SendToSlaughterArea, "SendToSlaughterArea" );
             Scribe_Values.Look( ref SendToTrainingArea, "SendToTrainingArea" );
             Scribe_Values.Look( ref TryTameMore, "TryTameMore" );
@@ -221,6 +232,12 @@ namespace FluffyManager
                             p.playerSettings.AreaRestriction = SlaughterArea;
                         }
 
+                        // hungry
+                        else if (RestrictToHungryArea && p.needs.food.CurLevelPercentage <= SendToHungryAreaMaximumFoodNeed)
+                        {
+                            actionTaken = true;
+                            p.playerSettings.AreaRestriction = RestrictHungryArea[i];
+                        }
                         // training
                         else if ( SendToTrainingArea && p.training.NextTrainableToTrain() != null )
                         {

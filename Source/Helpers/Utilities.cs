@@ -327,6 +327,22 @@ namespace FluffyManager
             DrawToggle( rect, label, tooltip, checkOn, !checkOn, on, off, expensive, size, margin, wrap );
         }
 
+        public static void DrawSlider(Rect rect, string label, string tooltip, ref float value, float size = 5*SmallIconSize,
+                                       float margin = Margin, bool wrap = true)
+        {
+            // set up rects
+            var labelRect = rect;
+            var sliderRect = new Rect(rect.xMax - size - margin, 0f, size, labelRect.height/2f);
+            labelRect.xMax = sliderRect.xMin - Margin / 2f;           
+            // finetune rects
+            sliderRect = sliderRect.CenteredOnYIn(labelRect);
+            // draw label
+            Label(rect, label, TextAnchor.MiddleLeft, GameFont.Small, margin: margin, wrap: wrap);
+            // tooltip
+            if (!tooltip.NullOrEmpty()) TooltipHandler.TipRegion(rect, tooltip );
+            // draw slider
+            value = Widgets.HorizontalSlider(sliderRect, value, 0f, 1f, true, String.Format("{0:P0}", value)); // GUI.HorizontalSlider(sliderRect, value, 0f, 1f);
+        }
 
         public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, bool checkOff, Action on,
                                        Action off, bool expensive = false, float size = SmallIconSize,

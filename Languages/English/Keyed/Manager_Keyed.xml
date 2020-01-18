@@ -167,6 +167,10 @@
   <FML.Training>Training</FML.Training>
   <FML.RestrictToArea>Restrict animals to area?</FML.RestrictToArea>
   <FML.RestrictToArea.Tip>Restrict animals to a specific area, optionally separated by gender and lifestage</FML.RestrictToArea.Tip>
+  <FML.RestrictToHungryArea>Restrict hungry animals</FML.RestrictToHungryArea>
+  <FML.RestrictToHungryArea.Tip>Restrict hungry animals to a specific area, optionally separated by gender and lifestage, as long as they are not restricted animals marked for slaughter.</FML.RestrictToHungryArea.Tip>
+  <FML.SendToHungryAreaMaximumFoodNeed.Label>Animal Food Need</FML.SendToHungryAreaMaximumFoodNeed.Label>
+  <FML.SendToHungryAreaMaximumFoodNeed.Tip>An animal whose food need is below or equal to this value will be restricted to this area.</FML.SendToHungryAreaMaximumFoodNeed.Tip>
   <FML.ButcherExcess>Butcher excess livestock</FML.ButcherExcess>
   <FML.ButcherExcess.Tip>Should excess livestock be butchered for meat?</FML.ButcherExcess.Tip>
   <FML.ButcherTrained>Trained</FML.ButcherTrained>
