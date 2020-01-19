@@ -400,13 +400,11 @@ namespace FluffyManager
                 {
                     foreach ( var def in Training.Defs )
                     {
-                        bool dump;
                         if ( // only train if allowed.
-                             animal.training.CanAssignToTrain( def, out dump ).Accepted &&
+                             animal.training.CanAssignToTrain( def, out _ ).Accepted &&
 
                              // only assign training, unless unassign is ticked.
-                             animal.training.GetWanted( def ) != Training[def] &&
-                             (Training[def] || Training.UnassignTraining) )
+                             animal.training.GetWanted( def ) != Training[def] && (Training[def] || Training.UnassignTraining) )
                         {
                             if ( assign ) SetWanted_MI.Invoke( animal.training, new object[] {def, Training[def]} );
                             actionTaken = true;
