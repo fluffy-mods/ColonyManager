@@ -56,11 +56,7 @@ In theory there is no real limit to the number of manager jobs that can be creat
  - rw-chaos:	German translation (update)
  - Marcos Villar:	Portuguese (Brazilian) translation (update)
  - CrapoFR:	French translation update
- - maarxx:	Fix for settings persistance bug
-<<<<<<< HEAD
-=======
- - Chris Lewark:	
->>>>>>> maarxx/add_unassign_setting_2
+ - maarxx:	Fix for settings persistance bug, Add unassign training option
 
 # Think you found a bug? 
 Please read [this guide](http://steamcommunity.com/sharedfiles/filedetails/?id=725234314) before creating a bug report,
@@ -83,4 +79,4 @@ Show your appreciation by buying me a coffee (or contribute towards a nice singl
 [![I Have a Black Dog](https://i.ibb.co/ss59Rwy/New-Project-2.png)](https://www.youtube.com/watch?v=XiCrniLQGYc)
 
 # Version
-This is version 4.15.590, for RimWorld 1.0.2408.
+This is version 4.16.591, for RimWorld 1.0.2408.
