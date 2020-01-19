@@ -460,6 +460,13 @@ namespace FluffyManager
             DrawTrainingSelector( trainingRect );
             var height = ListEntryHeight;
 
+            var unassignTrainingRect = new Rect(pos.x, pos.y + height, width, ListEntryHeight);
+            DrawToggle(unassignTrainingRect,
+                        "FML.UnassignTraining".Translate(),
+                        "FML.UnassignTraining.Tip".Translate(),
+                        ref _selectedCurrent.Training.UnassignTraining);
+            height += ListEntryHeight;
+
             if ( _selectedCurrent.Training.Any )
             {
                 var trainYoungRect = new Rect( pos.x, pos.y + height, width, ListEntryHeight );

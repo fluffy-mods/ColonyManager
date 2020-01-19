@@ -70,6 +70,10 @@ rw-chaos:    German translation (update)
 Marcos Villar:    Portuguese (Brazilian) translation (update)
 CrapoFR:    French translation update
 maarxx:    Fix for settings persistance bug
+<<<<<<< HEAD
+=======
+Chris Lewark:    
+>>>>>>> maarxx/add_unassign_setting_2
 
 &lt;size=24&gt;Version&lt;/size&gt;
 This is version 4.15.590, for RimWorld 1.0.2408.

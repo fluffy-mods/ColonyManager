@@ -57,6 +57,10 @@ In theory there is no real limit to the number of manager jobs that can be creat
  - Marcos Villar:	Portuguese (Brazilian) translation (update)
  - CrapoFR:	French translation update
  - maarxx:	Fix for settings persistance bug
+<<<<<<< HEAD
+=======
+ - Chris Lewark:	
+>>>>>>> maarxx/add_unassign_setting_2
 
 # Think you found a bug? 
 Please read [this guide](http://steamcommunity.com/sharedfiles/filedetails/?id=725234314) before creating a bug report,
