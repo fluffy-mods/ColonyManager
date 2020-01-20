@@ -226,57 +226,60 @@ namespace FluffyManager
 
         private void DoAreaRestrictions( ref bool actionTaken )
         {
-            if ( RestrictToArea )
-                for ( var i = 0; i < Utilities_Livestock.AgeSexArray.Length; i++ )
-                    foreach ( var p in Trigger.pawnKind.GetTame( manager, Utilities_Livestock.AgeSexArray[i] ) )
-                        // slaughter
-                        if ( SendToSlaughterArea &&
-                             manager.map.designationManager.DesignationOn( p, DesignationDefOf.Slaughter ) != null )
-                        {
-                            actionTaken                      = p.playerSettings.AreaRestriction != SlaughterArea;
-                            p.playerSettings.AreaRestriction = SlaughterArea;
-                        }
+            for ( var i = 0; i < Utilities_Livestock.AgeSexArray.Length; i++ )
+            {
+                foreach ( var p in Trigger.pawnKind.GetTame( manager, Utilities_Livestock.AgeSexArray[i] ) )
+                {
+                    // slaughter
+                    if ( SendToSlaughterArea &&
+                         manager.map.designationManager.DesignationOn( p, DesignationDefOf.Slaughter ) != null )
+                    {
+                        actionTaken                      = p.playerSettings.AreaRestriction != SlaughterArea;
+                        p.playerSettings.AreaRestriction = SlaughterArea;
+                    }
 
-                        // milking
-                        else if ( SendToMilkingArea &&
-                                  p.GetComp<CompMilkable>() != null &&
-                                  p.GetComp<CompMilkable>().TicksTillHarvestable() < UpdateInterval.ticks )
-                        {
-                            if (p.playerSettings.AreaRestriction != MilkArea)
-                            {
-                                actionTaken = true;
-                                p.playerSettings.AreaRestriction = MilkArea;
-                            }
-                        }
-
-                        // shearing
-                        else if ( SendToShearingArea &&
-                                  p.GetComp<CompShearable>() != null &&
-                                  p.GetComp<CompShearable>().TicksTillHarvestable() < UpdateInterval.ticks )
-                        {
-                            if (p.playerSettings.AreaRestriction != ShearArea)
-                            {
-                                actionTaken = true;
-                                p.playerSettings.AreaRestriction = ShearArea;
-                            }
-                        }
-
-                        // training
-                        else if ( SendToTrainingArea && p.training.NextTrainableToTrain() != null )
-                        {
-                            if ( p.playerSettings.AreaRestriction != TrainingArea )
-                            {
-                                actionTaken                      = true;
-                                p.playerSettings.AreaRestriction = TrainingArea;
-                            }
-                        }
-
-                        // all
-                        else if ( p.playerSettings.AreaRestriction != RestrictArea[i] )
+                    // milking
+                    else if ( SendToMilkingArea                                        &&
+                              p.GetComp<CompMilkable>()                        != null &&
+                              p.GetComp<CompMilkable>().TicksTillHarvestable() < UpdateInterval.ticks )
+                    {
+                        if ( p.playerSettings.AreaRestriction != MilkArea )
                         {
                             actionTaken                      = true;
-                            p.playerSettings.AreaRestriction = RestrictArea[i];
+                            p.playerSettings.AreaRestriction = MilkArea;
                         }
+                    }
+
+                    // shearing
+                    else if ( SendToShearingArea                                        &&
+                              p.GetComp<CompShearable>()                        != null &&
+                              p.GetComp<CompShearable>().TicksTillHarvestable() < UpdateInterval.ticks )
+                    {
+                        if ( p.playerSettings.AreaRestriction != ShearArea )
+                        {
+                            actionTaken                      = true;
+                            p.playerSettings.AreaRestriction = ShearArea;
+                        }
+                    }
+
+                    // training
+                    else if ( SendToTrainingArea && p.training.NextTrainableToTrain() != null )
+                    {
+                        if ( p.playerSettings.AreaRestriction != TrainingArea )
+                        {
+                            actionTaken                      = true;
+                            p.playerSettings.AreaRestriction = TrainingArea;
+                        }
+                    }
+
+                    // all
+                    else if ( RestrictToArea && p.playerSettings.AreaRestriction != RestrictArea[i] )
+                    {
+                        actionTaken                      = true;
+                        p.playerSettings.AreaRestriction = RestrictArea[i];
+                    }
+                }
+            }
         }
 
         public void DoFollowSettings( ref bool actionTaken )
