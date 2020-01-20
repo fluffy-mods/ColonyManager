@@ -240,7 +240,7 @@ namespace FluffyManager
                         // milking
                         else if ( SendToMilkingArea &&
                                   p.GetComp<CompMilkable>() != null &&
-                                  p.GetComp<CompMilkable>().Fullness > 0.94 )
+                                  p.GetComp<CompMilkable>().TicksTillHarvestable() < UpdateInterval.ticks )
                         {
                             if (p.playerSettings.AreaRestriction != MilkArea)
                             {
@@ -252,7 +252,7 @@ namespace FluffyManager
                         // shearing
                         else if ( SendToShearingArea &&
                                   p.GetComp<CompShearable>() != null &&
-                                  p.GetComp<CompShearable>().Fullness > 0.94 )
+                                  p.GetComp<CompShearable>().TicksTillHarvestable() < UpdateInterval.ticks )
                         {
                             if (p.playerSettings.AreaRestriction != ShearArea)
                             {
