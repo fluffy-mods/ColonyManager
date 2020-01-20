@@ -32,9 +32,13 @@ namespace FluffyManager
         public                  List<Area>        RestrictArea;
         public                  bool              RestrictToArea;
         public                  bool              SendToSlaughterArea;
+        public                  bool              SendToMilkingArea;
+        public                  bool              SendToShearingArea;
         public                  bool              SendToTrainingArea;
         public                  bool              SetFollow;
         public                  Area              SlaughterArea;
+        public                  Area              MilkArea;
+        public                  Area              ShearArea;
         public                  Area              TameArea;
         public                  Pawn              Trainer;
         public                  MasterMode        Trainers;
@@ -75,6 +79,14 @@ namespace FluffyManager
             // set up sending animals designated for slaughter to an area (freezer)
             SendToSlaughterArea = false;
             SlaughterArea       = null;
+
+            // set up milking area
+            SendToMilkingArea = false;
+            MilkArea = null;
+
+            // set up shearing area
+            SendToShearingArea = false;
+            ShearArea = null;
 
             // set up training area
             SendToTrainingArea = false;
@@ -137,6 +149,8 @@ namespace FluffyManager
             // settings, references first!
             Scribe_References.Look( ref TameArea, "TameArea" );
             Scribe_References.Look( ref SlaughterArea, "SlaughterArea" );
+            Scribe_References.Look( ref MilkArea, "MilkArea" );
+            Scribe_References.Look( ref ShearArea, "ShearArea" );
             Scribe_References.Look( ref TrainingArea, "TrainingArea" );
             Scribe_References.Look( ref Master, "Master" );
             Scribe_References.Look( ref Trainer, "Trainer" );
@@ -150,6 +164,8 @@ namespace FluffyManager
             Scribe_Values.Look( ref ButcherBonded, "ButcherBonded" );
             Scribe_Values.Look( ref RestrictToArea, "RestrictToArea" );
             Scribe_Values.Look( ref SendToSlaughterArea, "SendToSlaughterArea" );
+            Scribe_Values.Look( ref SendToMilkingArea, "SendToMilkingArea" );
+            Scribe_Values.Look( ref SendToShearingArea, "SendToShearingArea" );
             Scribe_Values.Look( ref SendToTrainingArea, "SendToTrainingArea" );
             Scribe_Values.Look( ref TryTameMore, "TryTameMore" );
             Scribe_Values.Look( ref SetFollow, "SetFollow", true );
@@ -219,6 +235,30 @@ namespace FluffyManager
                         {
                             actionTaken                      = p.playerSettings.AreaRestriction != SlaughterArea;
                             p.playerSettings.AreaRestriction = SlaughterArea;
+                        }
+
+                        // milking
+                        else if ( SendToMilkingArea &&
+                                  p.GetComp<CompMilkable>() != null &&
+                                  p.GetComp<CompMilkable>().TicksTillHarvestable() < UpdateInterval.ticks )
+                        {
+                            if (p.playerSettings.AreaRestriction != MilkArea)
+                            {
+                                actionTaken = true;
+                                p.playerSettings.AreaRestriction = MilkArea;
+                            }
+                        }
+
+                        // shearing
+                        else if ( SendToShearingArea &&
+                                  p.GetComp<CompShearable>() != null &&
+                                  p.GetComp<CompShearable>().TicksTillHarvestable() < UpdateInterval.ticks )
+                        {
+                            if (p.playerSettings.AreaRestriction != ShearArea)
+                            {
+                                actionTaken = true;
+                                p.playerSettings.AreaRestriction = ShearArea;
+                            }
                         }
 
                         // training

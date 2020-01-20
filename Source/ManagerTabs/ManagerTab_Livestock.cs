@@ -426,6 +426,42 @@ namespace FluffyManager
                        color: Color.grey );
             }
 
+            if (_selectedCurrent.Trigger.pawnKind.Milkable())
+            {
+                var sendToMilkingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+                pos.y += ListEntryHeight;
+                DrawToggle(sendToMilkingAreaRect,
+                            "FML.SendToMilkingArea".Translate(),
+                            "FML.SendToMilkingArea.Tip".Translate(),
+                            ref _selectedCurrent.SendToMilkingArea);
+
+                if (_selectedCurrent.SendToMilkingArea)
+                {
+                    var milkingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+                    AreaAllowedGUI.DoAllowedAreaSelectors(milkingAreaRect, ref _selectedCurrent.MilkArea,
+                                                           manager);
+                    pos.y += ListEntryHeight;
+                }
+            }
+
+            if (_selectedCurrent.Trigger.pawnKind.Shearable())
+            {
+                var sendToShearingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+                pos.y += ListEntryHeight;
+                DrawToggle(sendToShearingAreaRect,
+                            "FML.SendToShearingArea".Translate(),
+                            "FML.SendToShearingArea.Tip".Translate(),
+                            ref _selectedCurrent.SendToShearingArea);
+
+                if (_selectedCurrent.SendToShearingArea)
+                {
+                    var shearingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+                    AreaAllowedGUI.DoAllowedAreaSelectors(shearingAreaRect, ref _selectedCurrent.ShearArea,
+                                                           manager);
+                    pos.y += ListEntryHeight;
+                }
+            }
+
             var sendToTrainingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
             pos.y += ListEntryHeight;
             if ( _selectedCurrent.Training.Any )

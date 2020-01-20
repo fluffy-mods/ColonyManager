@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Harmony;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -393,6 +394,20 @@ namespace FluffyManager
             object active              = false;
             if ( comp != null ) active = comp.GetPrivatePropertyValue( "Active" );
             return (bool) active;
+        }
+
+        public static int TicksTillHarvestable( this CompHasGatherableBodyResource comp )
+        {
+            var interval = Traverse.Create( comp ).Property( "GatherResourcesIntervalDays" ).GetValue<int>();
+            var growthRatePerTick  = 1f / ( interval * GenDate.TicksPerDay );
+            
+            var pawn     = comp.parent as Pawn;
+            if ( pawn == null ) throw new ArgumentException( "harvestable should always be on a Pawn" );
+            growthRatePerTick *= PawnUtility.BodyResourceGrowthSpeed( (Pawn) comp.parent );
+
+            // Logger.Debug( $"rate: {growthRatePerTick}, interval: {interval}");
+            
+            return Mathf.CeilToInt(( 1 - comp.Fullness ) / growthRatePerTick );
         }
     }
 }
