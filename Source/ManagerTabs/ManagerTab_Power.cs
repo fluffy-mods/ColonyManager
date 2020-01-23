@@ -157,6 +157,9 @@ namespace FluffyManager
                 Log.Message( string.Join( ", ", _traderDefs.Select( d => d.LabelCap ).ToArray() ) );
 #endif
 
+
+                // TODO: this block is using excessive CPU time!!!
+
                 // get all existing comps for all building defs that have power related comps (in essence, get all powertraders)
                 RefreshCompLists();
 
@@ -169,13 +172,13 @@ namespace FluffyManager
                                           (int)
                                           _batteries.Sum(
                                               list => list.Sum( battery => battery.Props.storedEnergyMax ) ) );
-            }
 
-            // update the history tracker.
-            var trade = GetCurrentTrade();
-            tradingHistory.Update( trade );
-            overallHistory.Update( trade.Where( i => i > 0 ).Sum(), trade.Where( i => i < 0 ).Sum( Math.Abs ),
-                                   GetCurrentBatteries().Sum() );
+                // update the history tracker.
+                var trade = GetCurrentTrade();
+                tradingHistory.Update( trade );
+                overallHistory.Update( trade.Where( i => i > 0 ).Sum(), trade.Where( i => i < 0 ).Sum( Math.Abs ),
+                                       GetCurrentBatteries().Sum() );
+            }
         }
 
         private void DrawConsumption( Rect canvas )
