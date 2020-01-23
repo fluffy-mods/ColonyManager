@@ -13,11 +13,6 @@ namespace FluffyManager
 {
     public class ManagerJob_Mining : ManagerJob
     {
-        public enum SyncDirection
-        {
-            FilterToAllowed,
-            AllowedToFilter
-        }
 
         private const    int                        RoofSupportGridSpacing = 5;
         private readonly Utilities.CachedValue<int> _chunksCachedValue     = new Utilities.CachedValue<int>();
@@ -32,7 +27,7 @@ namespace FluffyManager
         public bool                       DeconstructBuildings;
         public History                    History;
         public Area                       MiningArea;
-        public SyncDirection              Sync = SyncDirection.AllowedToFilter;
+        public Utilities.SyncDirection    Sync = Utilities.SyncDirection.AllowedToFilter;
 
         public     bool              SyncFilterAndAllowed = true;
         public new Trigger_Threshold Trigger;
@@ -277,7 +272,7 @@ namespace FluffyManager
 
             if ( SyncFilterAndAllowed && sync )
             {
-                Sync = SyncDirection.AllowedToFilter;
+                Sync = Utilities.SyncDirection.AllowedToFilter;
                 foreach ( var material in GetMaterialsInMineral( mineral ) )
                     if ( Trigger.ParentFilter.Allows( material ) )
                         Trigger.ThresholdFilter.SetAllow( material, allow );
@@ -319,7 +314,7 @@ namespace FluffyManager
 
             if ( SyncFilterAndAllowed && sync )
             {
-                Sync = SyncDirection.AllowedToFilter;
+                Sync = Utilities.SyncDirection.AllowedToFilter;
                 foreach ( var material in GetMaterialsInBuilding( building ) )
                     if ( Trigger.ParentFilter.Allows( material ) )
                         Trigger.ThresholdFilter.SetAllow( material, allow );
@@ -701,7 +696,7 @@ namespace FluffyManager
         public void Notify_ThresholdFilterChanged()
         {
             Logger.Debug( "Threshold changed." );
-            if ( !SyncFilterAndAllowed || Sync == SyncDirection.AllowedToFilter )
+            if ( !SyncFilterAndAllowed || Sync == Utilities.SyncDirection.AllowedToFilter )
                 return;
 
             foreach ( var building in new List<ThingDef>( AllowedBuildings.Keys ) )

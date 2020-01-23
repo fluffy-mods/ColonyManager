@@ -157,7 +157,7 @@ namespace FluffyManager
                                                  _selected.Designations,
                                                  delegate
                                                  {
-                                                     _selected.Sync = ManagerJob_Mining.SyncDirection.FilterToAllowed;
+                                                     _selected.Sync = Utilities.SyncDirection.FilterToAllowed;
                                                  },
                                                  _selected.DesignationLabel );
 

@@ -26,6 +26,7 @@ namespace FluffyManager
         public override IconAreas IconArea => IconAreas.Middle;
         public override string    Label    => "FMG.Foraging".Translate();
 
+
         public override ManagerJob Selected
         {
             get => _selected;
@@ -117,8 +118,13 @@ namespace FluffyManager
                                                      currentCount, designatedCount, targetCount ),
                                                  "FMG.TargetCountTooltip".Translate(
                                                      currentCount, designatedCount, targetCount ),
-                                                 _selected.Designations, null, _selected.DesignationLabel );
+                                                 _selected.Designations, () => _selected.Sync = Utilities.SyncDirection.FilterToAllowed,
+                                                 _selected.DesignationLabel );
 
+            Utilities.DrawToggle( ref pos, width,
+                                  "FM.Foraging.SyncFilterAndAllowed".Translate(),
+                                  "FM.Foraging.SyncFilterAndAllowed.Tip".Translate(),
+                                  ref _selected.SyncFilterAndAllowed );
             Utilities.DrawReachabilityToggle( ref pos, width, ref _selected.CheckReachable );
             Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(),
                                   "FM.PathBasedDistance.Tip".Translate(), ref _selected.PathBasedDistance,
@@ -149,7 +155,7 @@ namespace FluffyManager
             var start = pos;
 
             // list of keys in allowed trees list (all plans that yield wood in biome, static)
-            var allowedPlants = _selected.AllowedPlants;
+            Dictionary<ThingDef,bool> allowedPlants = _selected.AllowedPlants;
             var plants        = allowedPlants.Keys.ToList();
 
             var rowRect = new Rect(
@@ -165,8 +171,8 @@ namespace FluffyManager
                 string.Empty,
                 allowedPlants.Values.All( p => p ),
                 allowedPlants.Values.All( p => !p ),
-                () => plants.ForEach( p => allowedPlants[p] = true ),
-                () => plants.ForEach( p => allowedPlants[p] = false ) );
+                () => plants.ForEach( p => _selected.SetPlantAllowed( p, true ) ),
+                () => plants.ForEach( p => _selected.SetPlantAllowed( p, false ) ) );
 
             // toggle edible
             rowRect.y += ListEntryHeight;
@@ -177,8 +183,8 @@ namespace FluffyManager
                 "FM.Foraging.Edible.Tip".Translate(),
                 edible.All( p => allowedPlants[p] ),
                 edible.All( p => !allowedPlants[p] ),
-                () => edible.ForEach( p => allowedPlants[p] = true ),
-                () => edible.ForEach( p => allowedPlants[p] = false ) );
+                () => edible.ForEach( p => _selected.SetPlantAllowed( p, true ) ),
+                () => edible.ForEach( p => _selected.SetPlantAllowed( p, false ) ) );
 
             // toggle shrooms
             rowRect.y += ListEntryHeight;
@@ -189,8 +195,8 @@ namespace FluffyManager
                 "FM.Foraging.Mushrooms.Tip".Translate(),
                 shrooms.All( p => allowedPlants[p] ),
                 shrooms.All( p => !allowedPlants[p] ),
-                () => shrooms.ForEach( p => allowedPlants[p] = true ),
-                () => shrooms.ForEach( p => allowedPlants[p] = false ) );
+                () => shrooms.ForEach( p => _selected.SetPlantAllowed( p, true ) ),
+                () => shrooms.ForEach( p => _selected.SetPlantAllowed( p, false ) ) );
 
             return rowRect.yMax - start.y;
         }
@@ -200,7 +206,7 @@ namespace FluffyManager
             var start = pos;
 
             // list of keys in allowed trees list (all plans that yield wood in biome, static)
-            var allowedPlants = _selected.AllowedPlants;
+            Dictionary<ThingDef, bool> allowedPlants = _selected.AllowedPlants;
             var plants        = allowedPlants.Keys.ToList();
 
             var rowRect = new Rect(
@@ -213,7 +219,7 @@ namespace FluffyManager
             foreach ( var plant in plants.OrderBy( p => p.LabelCap ) )
             {
                 Utilities.DrawToggle( rowRect, plant.LabelCap, plant.description, _selected.AllowedPlants[plant],
-                                      () => _selected.AllowedPlants[plant] = !_selected.AllowedPlants[plant] );
+                                      () => _selected.SetPlantAllowed( plant, !_selected.AllowedPlants[plant] ) );
                 rowRect.y += ListEntryHeight;
             }
 
@@ -306,7 +312,9 @@ namespace FluffyManager
                 job.RefreshAllowedPlants();
 
             // update selected ( also update thingfilter _only_ if the job is not managed yet )
-            _selected?.RefreshAllowedPlants( !_selected.Managed );
+            _selected?.RefreshAllowedPlants();
         }
+
+
     }
 }

@@ -149,6 +149,9 @@
   <FM.Foraging.Edible.Tip>Select all edible plants</FM.Foraging.Edible.Tip>
   <FM.Foraging.Mushrooms>Mushrooms</FM.Foraging.Mushrooms>
   <FM.Foraging.Mushrooms.Tip>Select all mushrooms</FM.Foraging.Mushrooms.Tip>
+  <FM.Foraging.SyncFilterAndAllowed>Synchronize threshold</FM.Foraging.SyncFilterAndAllowed>
+  <FM.Foraging.SyncFilterAndAllowed.Tip>Enabling this will try to synchronize the counted materials in the threshold filter with the plants allowed for foraging, and vice versa.</FM.Foraging.SyncFilterAndAllowed.Tip>
+
 
   <!-- Thresholds -->
   <FMP.ThresholdCount>Threshold: {0}/{1}</FMP.ThresholdCount>

@@ -2,6 +2,7 @@
 // ManagerJob_Foraging.cs
 // 2016-12-09
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -20,8 +21,10 @@ namespace FluffyManager
         public     Dictionary<ThingDef, bool> AllowedPlants = new Dictionary<ThingDef, bool>();
         public     Area                       ForagingArea;
         public     bool                       ForceFullyMature;
-        public     History                    History;
+        public bool SyncFilterAndAllowed = true;
+        public History                    History;
         public new Trigger_Threshold          Trigger;
+        public Utilities.SyncDirection Sync = Utilities.SyncDirection.AllowedToFilter;
 
         public override bool IsValid => base.IsValid && Trigger != null && History != null;
 
@@ -76,8 +79,7 @@ namespace FluffyManager
 
         public override ManagerTab Tab => Manager.For( manager ).Tabs.Find( tab => tab is ManagerTab_Foraging );
 
-        public override string[] Targets
-            => AllowedPlants.Keys.Where( key => AllowedPlants[key] ).Select( plant => plant.LabelCap ).ToArray();
+        public override string[] Targets => AllowedPlants.Keys.Where( key => AllowedPlants[key] ).Select( plant => plant.LabelCap ).ToArray();
 
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Growing;
 
@@ -280,7 +282,7 @@ namespace FluffyManager
                 && IsReachable( target );
         }
 
-        public void RefreshAllowedPlants( bool firstTime = false )
+        public void RefreshAllowedPlants()
         {
             Logger.Debug( "Refreshing allowed plants" );
 
@@ -314,13 +316,42 @@ namespace FluffyManager
             foreach ( var plant in options )
                 if ( !AllowedPlants.ContainsKey( plant ) )
                     AllowedPlants.Add( plant, false );
+        }
 
-            if ( firstTime )
+        public void SetPlantAllowed( ThingDef plant, bool allow, bool sync = true )
+        {
+            if ( plant == null )
+                throw new ArgumentNullException( nameof( plant ) );
+
+            AllowedPlants[plant] = allow;
+
+            if ( SyncFilterAndAllowed && sync )
             {
-                Trigger.ThresholdFilter.SetDisallowAll();
-                foreach ( var plant in AllowedPlants.Keys )
-                    Trigger.ThresholdFilter.SetAllow( plant.plant.harvestedThingDef, true );
+                Sync = Utilities.SyncDirection.AllowedToFilter;
+
+                foreach ( var material in GetMaterialsInPlant( plant ) )
+                    if ( Trigger.ParentFilter.Allows( material ) )
+                        Trigger.ThresholdFilter.SetAllow( material, allow );
             }
+        }
+
+        public void Notify_ThresholdFilterChanged()
+        {
+            Logger.Debug( "Threshold changed." );
+            if ( !SyncFilterAndAllowed || Sync == Utilities.SyncDirection.AllowedToFilter )
+                return;
+
+            foreach ( var plant in new List<ThingDef>( AllowedPlants.Keys ) )
+                AllowedPlants[plant] = GetMaterialsInPlant( plant )
+                   .Any( material => Trigger.ThresholdFilter.Allows( material ) );
+        }
+
+        public List<ThingDef> GetMaterialsInPlant( ThingDef plantDef )
+        {
+            var plant = plantDef?.plant;
+            if ( plant == null ) throw new ArgumentNullException( "no valid plantdef defined" );
+
+            return new List<ThingDef>( new[] {plant.harvestedThingDef} );
         }
     }
 }

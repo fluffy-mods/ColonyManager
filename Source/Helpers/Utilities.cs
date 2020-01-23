@@ -21,6 +21,13 @@ namespace FluffyManager
 
         public static WorkTypeDef             WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
 
+
+        public enum SyncDirection
+        {
+            FilterToAllowed,
+            AllowedToFilter
+        }
+
         static Utilities()
         {
 

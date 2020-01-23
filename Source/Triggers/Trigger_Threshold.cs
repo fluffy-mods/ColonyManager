@@ -74,8 +74,11 @@ namespace FluffyManager
             Op                = Ops.LowerThan;
             MaxUpperThreshold = DefaultMaxUpperThreshold;
             TargetCount       = DefaultCount;
-            ThresholdFilter   = new ThingFilter();
+            ThresholdFilter = new ThingFilter( job.Notify_ThresholdFilterChanged );
             ThresholdFilter.SetDisallowAll();
+
+            ParentFilter = new ThingFilter();
+            ParentFilter.SetAllowAll( null );
         }
 
         public Trigger_Threshold( ManagerJob_Mining job ) : base( job.manager )
