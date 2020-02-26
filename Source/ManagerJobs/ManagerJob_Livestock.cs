@@ -135,7 +135,7 @@ namespace FluffyManager
                                           .Select( ageSex =>
                                                        ( "FMP." + ageSex.ToString() + "Count" ).Translate(
                                                            Trigger.pawnKind.GetTame( manager, ageSex ).Count(),
-                                                           Trigger.CountTargets[ageSex] ) )
+                                                           Trigger.CountTargets[ageSex] ).Resolve() )
                                           .ToArray();
             }
         }

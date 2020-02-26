@@ -3,7 +3,7 @@
 // 2017-05-27
 
 using System.Reflection;
-using Harmony;
+using HarmonyLib;
 using UnityEngine;
 using Verse;
 
@@ -15,7 +15,7 @@ namespace FluffyManager
         public Controller( ModContentPack content ) : base( content )
         {
             // apply fixes
-            var harmony = HarmonyInstance.Create( "fluffy.colonymanager" );
+            var harmony = new Harmony( "fluffy.colonymanager" );
             harmony.PatchAll( Assembly.GetExecutingAssembly() );
 
             mySettings = GetSettings<Settings>();

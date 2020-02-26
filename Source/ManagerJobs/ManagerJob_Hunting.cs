@@ -133,7 +133,7 @@ namespace FluffyManager
         {
             get
             {
-                return AllowedAnimals.Keys.Where( key => AllowedAnimals[key] ).Select( pk => pk.LabelCap ).ToArray();
+                return AllowedAnimals.Keys.Where( key => AllowedAnimals[key] ).Select( pk => pk.LabelCap.Resolve() ).ToArray();
             }
         }
 

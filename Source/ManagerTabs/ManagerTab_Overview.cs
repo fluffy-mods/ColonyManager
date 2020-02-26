@@ -328,7 +328,7 @@ namespace FluffyManager
         {
             var temp =
                 manager.map.mapPawns.FreeColonistsSpawned.Where(
-                    pawn => !pawn.story.WorkTypeIsDisabled( WorkTypeDef ) );
+                    pawn => !pawn.WorkTypeIsDisabled( WorkTypeDef ) );
 
             // sort by either specific skill def or average over job - depending on which is known.
             temp = SkillDef != null

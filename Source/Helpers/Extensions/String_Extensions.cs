@@ -26,9 +26,19 @@ namespace FluffyManager
             return result;
         }
 
+        public static string Italic( this TaggedString text )
+        {
+            return text.Resolve().Italic();
+        }
+
         public static string Italic( this string text )
         {
             return $"<i>{text}</i>";
+        }
+
+        public static string Bold( this TaggedString text )
+        {
+            return text.Resolve().Bold();
         }
 
         public static string Bold( this string text )

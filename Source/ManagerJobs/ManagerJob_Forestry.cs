@@ -105,16 +105,16 @@ namespace FluffyManager
                 switch ( Type )
                 {
                     case ForestryJobType.Logging:
-                        return AllowedTrees.Keys.Where( key => AllowedTrees[key] ).Select( tree => tree.LabelCap )
+                        return AllowedTrees.Keys.Where( key => AllowedTrees[key] ).Select( tree => tree.LabelCap.Resolve() )
                                            .ToArray();
                     default:
                         var targets = ClearAreas
                                      .Where( ca => ca.Value )
                                      .Select( ca => ca.Key.Label );
                         if ( ClearWindCells )
-                            targets = targets.Concat( "FMF.TurbineArea".Translate() );
+                            targets = targets.Concat( "FMF.TurbineArea".Translate().Resolve() );
                         if ( !targets.Any() )
-                            return new[] {"FM.None".Translate()};
+                            return new[] {"FM.None".Translate().RawText };
                         return targets.ToArray();
                 }
             }

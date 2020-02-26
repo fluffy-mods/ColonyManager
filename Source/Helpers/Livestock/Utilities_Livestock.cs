@@ -3,10 +3,9 @@
 // 2016-12-09
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Harmony;
+using HarmonyLib;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -119,7 +118,7 @@ namespace FluffyManager
             if ( pawn.equipment.Primary?.def.IsRangedWeapon ?? false )
                 mode = mode | MasterMode.Ranged;
 
-            if ( !pawn.story.WorkTagIsDisabled( WorkTags.Violent ) )
+            if ( !pawn.WorkTagIsDisabled( WorkTags.Violent ) )
                 mode = mode | MasterMode.Violent;
 
             else

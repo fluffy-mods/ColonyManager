@@ -7,6 +7,7 @@ using System.Linq;
 using RimWorld;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 using static FluffyManager.Constants;
 
 namespace FluffyManager
@@ -57,7 +58,7 @@ namespace FluffyManager
 
         public override string[] Targets => AllowedMinerals.Keys
                                                            .Where( key => AllowedMinerals[key] )
-                                                           .Select( pk => pk.LabelCap ).ToArray();
+                                                           .Select( pk => pk.LabelCap.Resolve() ).ToArray();
 
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Mining;
 
@@ -439,11 +440,9 @@ namespace FluffyManager
                 && IsInAllowedArea( target )
                 && IsRelevantMiningTarget( target )
                 && !IsARoomDivider( target )
-                 &&
-                   !IsARoofSupport_Basic(
-                       target ) // note, returns true if advanced checking is enabled - checks will then be done before designating
+                && !IsARoofSupport_Basic( target ) // note, returns true if advanced checking is enabled - checks will then be done before designating
 
-                   // can be reached
+                    // can be reached
                 && IsReachable( target );
         }
 

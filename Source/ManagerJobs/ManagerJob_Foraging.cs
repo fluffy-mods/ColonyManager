@@ -79,7 +79,7 @@ namespace FluffyManager
 
         public override ManagerTab Tab => Manager.For( manager ).Tabs.Find( tab => tab is ManagerTab_Foraging );
 
-        public override string[] Targets => AllowedPlants.Keys.Where( key => AllowedPlants[key] ).Select( plant => plant.LabelCap ).ToArray();
+        public override string[] Targets => AllowedPlants.Keys.Where( key => AllowedPlants[key] ).Select( plant => plant.LabelCap.Resolve() ).ToArray();
 
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Growing;
 
@@ -143,7 +143,7 @@ namespace FluffyManager
             if ( subtext.Fits( labelRect ) )
                 text += subtext.Italic();
             else
-                text += "multiple".Translate().Italic();
+                text += "multiple".Translate().Resolve().Italic();
 
             // do the drawing
             GUI.BeginGroup( rect );
