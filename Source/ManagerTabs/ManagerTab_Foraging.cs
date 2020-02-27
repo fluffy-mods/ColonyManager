@@ -216,7 +216,7 @@ namespace FluffyManager
                 ListEntryHeight );
 
             // toggle for each plant
-            foreach ( var plant in plants.OrderBy( p => p.LabelCap ) )
+            foreach ( var plant in plants )
             {
                 Utilities.DrawToggle( rowRect, plant.LabelCap, plant.description, _selected.AllowedPlants[plant],
                                       () => _selected.SetPlantAllowed( plant, !_selected.AllowedPlants[plant] ) );

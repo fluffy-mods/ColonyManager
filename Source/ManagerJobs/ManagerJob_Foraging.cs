@@ -316,6 +316,9 @@ namespace FluffyManager
             foreach ( var plant in options )
                 if ( !AllowedPlants.ContainsKey( plant ) )
                     AllowedPlants.Add( plant, false );
+
+            AllowedPlants = AllowedPlants.OrderBy( plant => plant.Key.LabelCap.RawText )
+                                         .ToDictionary( it => it.Key, it => it.Value );
         }
 
         public void SetPlantAllowed( ThingDef plant, bool allow, bool sync = true )

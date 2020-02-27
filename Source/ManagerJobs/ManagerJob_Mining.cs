@@ -678,7 +678,7 @@ namespace FluffyManager
                                                        && b.def.resourcesFractionWhenDeconstructed > 0 )
                                              .Select( b => b.def )
                                              .Distinct()
-                                             .OrderBy( b => b.LabelCap )
+                                             .OrderBy( b => b.LabelCap.RawText )
                                              .ToDictionary( d => d, AllowedBuilding );
 
             AllowedBuildings = deconstructibleDefs;
@@ -686,7 +686,7 @@ namespace FluffyManager
             var mineralDefs = DefDatabase<ThingDef>.AllDefsListForReading
                                                    .Where( d => d.building != null
                                                              && d.building.isNaturalRock )
-                                                   .OrderBy( d => d.LabelCap )
+                                                   .OrderBy( d => d.LabelCap.RawText )
                                                    .ToDictionary( d => d, AllowedMineral );
 
             AllowedMinerals = mineralDefs;

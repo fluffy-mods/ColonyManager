@@ -540,7 +540,7 @@ namespace FluffyManager
                     AllowedTrees.Add( tree, false );
 
             // sort
-            AllowedTrees = AllowedTrees.OrderBy( at => at.Key.LabelCap )
+            AllowedTrees = AllowedTrees.OrderBy( at => at.Key.LabelCap.RawText )
                                        .ToDictionary( at => at.Key, at => at.Value );
         }
     }

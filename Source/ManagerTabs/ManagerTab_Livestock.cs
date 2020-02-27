@@ -956,7 +956,7 @@ namespace FluffyManager
                                  .Where( pk => !_currentJobs.Select( job => job.Trigger.pawnKind ).Contains( pk ) )
 
                                   // order by label
-                                 .OrderBy( def => def.LabelCap )
+                                 .OrderBy( def => def.LabelCap.RawText )
                                  .ToList();
         }
     }
