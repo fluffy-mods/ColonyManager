@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Manifest>
-  <version>4.19.594</version>
-  <manifestUri>https://cdn.jsdelivr.net/gh/fluffy-mods/ColonyManager/About/Manifest.xml</manifestUri>
-  <downloadUri>https://github.com/fluffy-mods/ColonyManager/releases/v4.19.594</downloadUri>
+  <version>4.22.597</version>
+  <manifestUri>https://raw.githubusercontent.com/fluffy-mods/ColonyManager/1/About/Manifest.xml</manifestUri>
+  <downloadUri>https://github.com/fluffy-mods/ColonyManager/releases/v4.22.597</downloadUri>
 </Manifest>
