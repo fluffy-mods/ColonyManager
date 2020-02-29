@@ -79,4 +79,4 @@ Show your appreciation by buying me a coffee (or contribute towards a nice singl
 [![I Have a Black Dog](https://i.ibb.co/ss59Rwy/New-Project-2.png)](https://www.youtube.com/watch?v=XiCrniLQGYc)
 
 # Version
-This is version 4.22.597, for RimWorld 1.1.2558.
+This is version 4.23.598, for RimWorld 1.1.2558.
