@@ -72,11 +72,11 @@ CrapoFR:    French translation update
 maarxx:    Fix for settings persistance bug, add unassign training option, add restrict wool/milkable option
 
 &lt;size=24&gt;Version&lt;/size&gt;
-This is version 4.23.598, for RimWorld 1.1.2558.
+This is version 4.24.599, for RimWorld 1.1.2559.
 
 </description>
   <supportedVersions>
-    <li>1</li>
+    <li>1.1</li>
   </supportedVersions>
   <packageId>fluffy.colonymanager</packageId>
   <modDependencies>
