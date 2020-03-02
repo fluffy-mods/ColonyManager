@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <FM.Mining>Горное дело</FM.Mining>
+    <FM.Mining.MiningArea>Территория для выработки</FM.Mining.MiningArea>
+    <FM.Mining.HealthAndSafety>Здоровье и безопасность</FM.Mining.HealthAndSafety>
+    <FM.Mining.AllowedMinerals>Минералы</FM.Mining.AllowedMinerals>
+    <FM.Mining.AllowedBuildings>Строения</FM.Mining.AllowedBuildings>
+    <FM.Mining.DeconstructBuildings>Разбирать строения</FM.Mining.DeconstructBuildings>
+    <FM.Mining.DeconstructBuildings.Tip>Нужно ли разбирать заброшенные строения для своих нужд?</FM.Mining.DeconstructBuildings.Tip>
+    <FM.Mining.CheckRoofSupport>Оставлять опоры для крыши</FM.Mining.CheckRoofSupport>
+    <FM.Mining.CheckRoofSupport.Tip>Шахтёры будут оставлять опорные колоны через определённые промежутки.\n\nПРИМЕЧАНИЕ: Положение колонн предварительно рассчитано, но обвалы и обрушение крыши все еще могут произойти!</FM.Mining.CheckRoofSupport.Tip>
+    <FM.Mining.CheckRoofSupportAdvanced>Проверять опоры для крыши</FM.Mining.CheckRoofSupportAdvanced>
+    <FM.Mining.CheckRoofSupportAdvanced.Tip>Опоры для крыши будут расчитываться перед тем как назначать задачи по выработке и демонтажу. Значительно снижает риск обвалов и обрушения кровли.</FM.Mining.CheckRoofSupportAdvanced.Tip>
+    <FM.Mining.CheckRoofSupportAdvanced.DisabledTip>Отключено, так как проверка опор для крыши отключена.</FM.Mining.CheckRoofSupportAdvanced.DisabledTip>
+    <FM.Mining.CheckRoomDivision>Проверять границы комнат</FM.Mining.CheckRoomDivision>
+    <FM.Mining.CheckRoomDivision.Tip>Попытается предотвратить пролом межкомнатных стен или создание короткого пути.</FM.Mining.CheckRoomDivision.Tip>
+    <FM.Mining.SyncFilterAndAllowed>Синхронизировать лимит</FM.Mining.SyncFilterAndAllowed>
+    <FM.Mining.SyncFilterAndAllowed.Tip>При включении будет пытаться синхронизировать подсчитанные материалы в фильтре лимита с камнями и зданиями, разрешенными для добычи или разборки, и наоборот.</FM.Mining.SyncFilterAndAllowed.Tip>
+
+    <!-- cur, chunks, designated, target -->
+    <FM.Mining.TargetCount>Целевое значение: {0}+{1}+{2}/{3}</FM.Mining.TargetCount>
+    <FM.Mining.TargetCount.Tip>Цель: {3}\n{0} на складе\n{1} ожидается от обработки\n{2} ожидается с указанных.</FM.Mining.TargetCount.Tip>
+  
+    <!-- Jobs -->
+    <FM.Mining.NewJob>Новое задание</FM.Mining.NewJob>
+    <FM.Mining.NewJob.Tip>Создать новое задание для шахтёров.</FM.Mining.NewJob.Tip>
+
+    <!-- shortcuts -->
+    <FM.Mining.Stone>Камень</FM.Mining.Stone>
+    <FM.Mining.Stone.Tip>Выбрать все минералы дающие обломки</FM.Mining.Stone.Tip>
+    <FM.Mining.Metal>Метал</FM.Mining.Metal>
+    <FM.Mining.Metal.Tip>Выбрать все минералы дающие метал</FM.Mining.Metal.Tip>
+    <FM.Mining.Precious>Драгоценности</FM.Mining.Precious>
+    <FM.Mining.Precious.Tip>Выбрать все минералы дающие драгоценности</FM.Mining.Precious.Tip>
+</LanguageData>
