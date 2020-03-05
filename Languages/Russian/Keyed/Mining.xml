@@ -22,7 +22,7 @@
     <FM.Mining.TargetCount.Tip>Цель: {3}\n{0} на складе\n{1} ожидается от обработки\n{2} ожидается с указанных.</FM.Mining.TargetCount.Tip>
   
     <!-- Jobs -->
-    <FM.Mining.NewJob>Новое задание</FM.Mining.NewJob>
+    <FM.Mining.NewJob>_Новое задание</FM.Mining.NewJob>
     <FM.Mining.NewJob.Tip>Создать новое задание для шахтёров.</FM.Mining.NewJob.Tip>
 
     <!-- shortcuts -->

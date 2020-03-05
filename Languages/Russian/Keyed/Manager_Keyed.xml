@@ -81,7 +81,7 @@
 
   <!-- Hunting Tab -->
   <FMH.Hunting>Охота</FMH.Hunting>
-  <FMH.NewHuntingJob>Новое задание</FMH.NewHuntingJob>
+  <FMH.NewHuntingJob>_Новое задание</FMH.NewHuntingJob>
   <FMH.NewHuntingJobTooltip>Добавить новое охотничье задание</FMH.NewHuntingJobTooltip>
   <FMH.AllowHumanMeat>Считать человечину</FMH.AllowHumanMeat>
   <FMH.AllowHumanMeat.Tip>Нужно ли считать человечину?\n\nПРИМЕЧАНИЕ: Опция для быстрого включения в расчёты человечины. Вы можете установить дополнительные условия в настройках лимита.</FMH.AllowHumanMeat.Tip>
@@ -102,7 +102,7 @@
   
   <!-- Forestry Tab -->
   <FMF.Forestry>Лесозаготовка</FMF.Forestry>
-  <FMF.NewForestryJob>Новое задание</FMF.NewForestryJob>
+  <FMF.NewForestryJob>_Новое задание</FMF.NewForestryJob>
   <FMF.NewForestryJobTooltip>Добавить новое задание по заготовке</FMF.NewForestryJobTooltip>
   <FMF.Options>Опции</FMF.Options>
   <FMF.ClearWindCells>Очищать рабочую зону ветряков</FMF.ClearWindCells>
@@ -136,7 +136,7 @@
   
   <!-- Foraging (Gathering) tab -->
   <FMG.Foraging>Садоводство</FMG.Foraging>
-  <FMG.NewForagingJob>Новое задание</FMG.NewForagingJob>
+  <FMG.NewForagingJob>_Новое задание</FMG.NewForagingJob>
   <FMG.NewForagingJobTooltip>Добавить новое задание по сбору</FMG.NewForagingJobTooltip>
   <FMG.Options>Настройки</FMG.Options>
   <FMG.TargetCount>Целевое значение: {0}+{1}/{2}</FMG.TargetCount>
@@ -159,7 +159,7 @@
   <FMP.ThresholdDetails>Данные о лимите</FMP.ThresholdDetails>
 
   <!-- Tab headers -->
-  <FMP.Current>Текущий</FMP.Current>
+  <FMP.Current>Текущее</FMP.Current>
   <FMP.Available>Доступно</FMP.Available>
 
   <!-- Livestock tab -->
@@ -200,8 +200,8 @@
   <FML.SendToMilkingArea.Tip>Установить животным с молоком выше 94% отдельную область.</FML.SendToMilkingArea.Tip>
   <FML.SendToShearingArea>Установить область для стрижки.</FML.SendToShearingArea>
   <FML.SendToShearingArea.Tip>Установить животным с шерстью выше 94% отдельную область.</FML.SendToShearingArea.Tip>
-  <FM.Livestock.TargetCountsHeader>Target counts</FM.Livestock.TargetCountsHeader>
-  <FM.Livestock.AreaRestrictionsHeader>Area restrictions</FM.Livestock.AreaRestrictionsHeader>
+  <FM.Livestock.TargetCountsHeader>Целевое количество</FM.Livestock.TargetCountsHeader>
+  <FM.Livestock.AreaRestrictionsHeader>Загоны</FM.Livestock.AreaRestrictionsHeader>
   <FM.Livestock.TrainingHeader>Тренировка</FM.Livestock.TrainingHeader>
   <FM.Livestock.ButcherHeader>Забой</FM.Livestock.ButcherHeader>
   <FM.Livestock.TamingHeader>Приручение</FM.Livestock.TamingHeader>
