@@ -57,6 +57,7 @@ In theory there is no real limit to the number of manager jobs that can be creat
  - Marcos Villar:	Portuguese (Brazilian) translation (update)
  - CrapoFR:	French translation update
  - maarxx:	Fix for settings persistance bug, add unassign training option, add restrict wool/milkable option
+ - rimpy-custom:	Fix for Russian translation
 
 # Think you found a bug? 
 Please read [this guide](http://steamcommunity.com/sharedfiles/filedetails/?id=725234314) before creating a bug report,
