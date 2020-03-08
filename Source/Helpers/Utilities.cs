@@ -33,6 +33,13 @@ namespace FluffyManager
 
         }
 
+        public static int SafeAbs( int value )
+        {
+            if ( value >= 0 ) return value;
+            if ( value == Int32.MinValue ) return Int32.MaxValue;
+            return -value;
+        }
+
         private static List<UpdateInterval> _updateIntervalOptions;
         public static List<UpdateInterval> UpdateIntervalOptions
         {
@@ -113,7 +120,7 @@ namespace FluffyManager
             int days  = ticks                       / GenDate.TicksPerDay,
                 hours = ticks % GenDate.TicksPerDay / GenDate.TicksPerHour;
 
-            var s = string.Empty;
+            var s = String.Empty;
 
             if ( days > 0 ) s += days + "LetterDay".Translate() + " ";
             s += hours + "LetterHour".Translate();
@@ -193,7 +200,7 @@ namespace FluffyManager
 
         public static bool IsInt( this string text )
         {
-            return int.TryParse( text, out var num );
+            return Int32.TryParse( text, out var num );
         }
 
         public static void DrawStatusForListEntry<T>( this T job, Rect rect, Trigger trigger ) where T : ManagerJob
@@ -309,7 +316,7 @@ namespace FluffyManager
                 width,
                 ListEntryHeight );
             pos.y += ListEntryHeight;
-            DrawToggle( toggleRect, label, tooltip, checkOn, on, off, expensive, size, margin, wrap );
+            DrawToggle( toggleRect, label, tooltip, checkOn, @on, off, expensive, size, margin, wrap );
         }
 
         public static void DrawToggle( ref Vector2 pos, float width, string label, string tooltip, bool checkOn,
@@ -324,14 +331,14 @@ namespace FluffyManager
                 width,
                 ListEntryHeight );
             pos.y += ListEntryHeight;
-            DrawToggle( toggleRect, label, tooltip, checkOn, checkOff, on, off, expensive, size, margin, wrap );
+            DrawToggle( toggleRect, label, tooltip, checkOn, checkOff, @on, off, expensive, size, margin, wrap );
         }
 
         public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, Action on, Action off,
                                        bool expensive = false, float size = SmallIconSize, float margin = Margin,
                                        bool wrap = true )
         {
-            DrawToggle( rect, label, tooltip, checkOn, !checkOn, on, off, expensive, size, margin, wrap );
+            DrawToggle( rect, label, tooltip, checkOn, !checkOn, @on, off, expensive, size, margin, wrap );
         }
 
 
@@ -376,7 +383,7 @@ namespace FluffyManager
             if ( Widgets.ButtonInvisible( rect ) )
             {
                 if ( !checkOn )
-                    on();
+                    @on();
                 else
                     off();
             }
@@ -451,10 +458,10 @@ namespace FluffyManager
         {
             string text = null;
             if ( Scribe.mode == LoadSaveMode.Saving )
-                text = string.Join( ":", values.ConvertAll( i => i.ToString() ).ToArray() );
+                text = String.Join( ":", values.ConvertAll( i => i.ToString() ).ToArray() );
             Scribe_Values.Look( ref text, label );
             if ( Scribe.mode == LoadSaveMode.LoadingVars )
-                values = text.Split( ":".ToCharArray() ).ToList().ConvertAll( int.Parse );
+                values = text.Split( ":".ToCharArray() ).ToList().ConvertAll( Int32.Parse );
         }
 
         public struct MapStockpileFilter

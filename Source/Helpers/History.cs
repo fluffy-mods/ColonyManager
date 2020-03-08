@@ -661,8 +661,8 @@ namespace FluffyManager
                     if ( curTick % Interval( period ) == 0 )
                     {
                         pages[period].Add( count );
-                        if ( Mathf.Abs( count ) > _observedMax )
-                            _observedMax = Mathf.Abs( count );
+                        if ( Utilities.SafeAbs( count ) > _observedMax )
+                            _observedMax = Utilities.SafeAbs( count );
 
                         // cull the list back down to size.
                         while ( pages[period].Count > Size ) pages[period].RemoveAt( 0 );
