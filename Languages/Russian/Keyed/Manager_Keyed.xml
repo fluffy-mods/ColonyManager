@@ -81,7 +81,7 @@
 
   <!-- Hunting Tab -->
   <FMH.Hunting>Охота</FMH.Hunting>
-  <FMH.NewHuntingJob>_Новое задание</FMH.NewHuntingJob>
+  <FMH.NewHuntingJob>Новое задание</FMH.NewHuntingJob>
   <FMH.NewHuntingJobTooltip>Добавить новое охотничье задание</FMH.NewHuntingJobTooltip>
   <FMH.AllowHumanMeat>Считать человечину</FMH.AllowHumanMeat>
   <FMH.AllowHumanMeat.Tip>Нужно ли считать человечину?\n\nПРИМЕЧАНИЕ: Опция для быстрого включения в расчёты человечины. Вы можете установить дополнительные условия в настройках лимита.</FMH.AllowHumanMeat.Tip>
@@ -102,7 +102,7 @@
   
   <!-- Forestry Tab -->
   <FMF.Forestry>Лесозаготовка</FMF.Forestry>
-  <FMF.NewForestryJob>_Новое задание</FMF.NewForestryJob>
+  <FMF.NewForestryJob>Новое задание</FMF.NewForestryJob>
   <FMF.NewForestryJobTooltip>Добавить новое задание по заготовке</FMF.NewForestryJobTooltip>
   <FMF.Options>Опции</FMF.Options>
   <FMF.ClearWindCells>Очищать рабочую зону ветряков</FMF.ClearWindCells>
@@ -136,7 +136,7 @@
   
   <!-- Foraging (Gathering) tab -->
   <FMG.Foraging>Садоводство</FMG.Foraging>
-  <FMG.NewForagingJob>_Новое задание</FMG.NewForagingJob>
+  <FMG.NewForagingJob>Новое задание</FMG.NewForagingJob>
   <FMG.NewForagingJobTooltip>Добавить новое задание по сбору</FMG.NewForagingJobTooltip>
   <FMG.Options>Настройки</FMG.Options>
   <FMG.TargetCount>Целевое значение: {0}+{1}/{2}</FMG.TargetCount>
