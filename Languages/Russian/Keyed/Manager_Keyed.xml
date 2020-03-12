@@ -135,7 +135,7 @@
   
   
   <!-- Foraging (Gathering) tab -->
-  <FMG.Foraging>Садоводство</FMG.Foraging>
+  <FMG.Foraging>Собирательство</FMG.Foraging>
   <FMG.NewForagingJob>Новое задание</FMG.NewForagingJob>
   <FMG.NewForagingJobTooltip>Добавить новое задание по сбору</FMG.NewForagingJobTooltip>
   <FMG.Options>Настройки</FMG.Options>
