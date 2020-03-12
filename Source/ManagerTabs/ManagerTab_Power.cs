@@ -176,7 +176,7 @@ namespace FluffyManager
                 // update the history tracker.
                 var trade = GetCurrentTrade();
                 tradingHistory.Update( trade );
-                overallHistory.Update( trade.Where( i => i > 0 ).Sum(), trade.Where( i => i < 0 ).Sum( Math.Abs ),
+                overallHistory.Update( trade.Where( i => i > 0 ).Sum(), trade.Where( i => i < 0 ).Sum( Utilities.SafeAbs ),
                                        GetCurrentBatteries().Sum() );
             }
         }

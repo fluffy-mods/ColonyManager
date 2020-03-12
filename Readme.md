@@ -57,6 +57,7 @@ In theory there is no real limit to the number of manager jobs that can be creat
  - Marcos Villar:	Portuguese (Brazilian) translation (update)
  - CrapoFR:	French translation update
  - maarxx:	Fix for settings persistance bug, add unassign training option, add restrict wool/milkable option
+ - rimpy-custom:	Fix for Russian translation
 
 # Think you found a bug? 
 Please read [this guide](http://steamcommunity.com/sharedfiles/filedetails/?id=725234314) before creating a bug report,
@@ -79,4 +80,4 @@ Show your appreciation by buying me a coffee (or contribute towards a nice singl
 [![I Have a Black Dog](https://i.ibb.co/ss59Rwy/New-Project-2.png)](https://www.youtube.com/watch?v=XiCrniLQGYc)
 
 # Version
-This is version 4.24.599, for RimWorld 1.1.2559.
+This is version 4.28.603, for RimWorld 1.1.2567.
