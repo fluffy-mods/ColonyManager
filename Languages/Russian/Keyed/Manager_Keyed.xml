@@ -245,8 +245,8 @@
   <FM.Livestock.MasterMode.All>Все</FM.Livestock.MasterMode.All>
 
   <!-- Right click job fail reasons -->
-  <Fluffy.ColonyManager.CannotManage.NoPower>no power</Fluffy.ColonyManager.CannotManage.NoPower>
-  <Fluffy.ColonyManager.CannotManage.NoJobs>no jobs set</Fluffy.ColonyManager.CannotManage.NoJobs>
-  <Fluffy.ColonyManager.CannotManage.NoActiveJobs>all jobs are done</Fluffy.ColonyManager.CannotManage.NoActiveJobs>
+  <Fluffy.ColonyManager.CannotManage.NoPower>нет питания</Fluffy.ColonyManager.CannotManage.NoPower>
+  <Fluffy.ColonyManager.CannotManage.NoJobs>работы не заданы</Fluffy.ColonyManager.CannotManage.NoJobs>
+  <Fluffy.ColonyManager.CannotManage.NoActiveJobs>все работы выполнены</Fluffy.ColonyManager.CannotManage.NoActiveJobs>
 
 </LanguageData>
