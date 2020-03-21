@@ -31,6 +31,8 @@ namespace FluffyManager
 #endif
             if ( !( t is Building_ManagerStation ) ) return false;
 
+            if ( t is Building_AIManager ) return false;
+
             if ( t.TryGetComp<Comp_ManagerStation>() == null ) return false;
 
             if ( pawn.Dead        ||
