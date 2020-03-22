@@ -49,14 +49,14 @@ In theory there is no real limit to the number of manager jobs that can be creat
  - MossieuLeBlanc:	French translation
  - Lauri7x3:	German translation
  - Well-sp:	Russian translation (update)
- - Alex TD:	Bugfix in forestry jobs, implement suspend button
+ - Alex TD:	Various fixes and improvements
  - Firty:	Portuguese (Brazilian) translation
  - Suh. Junmin:	Korean translation
  - harrisongarya:	Research tab
  - rw-chaos:	German translation (update)
  - Marcos Villar:	Portuguese (Brazilian) translation (update)
  - CrapoFR:	French translation update
- - maarxx:	Fix for settings persistance bug, add unassign training option, add restrict wool/milkable option
+ - maarxx:	Various fixes and improvements
  - rimpy-custom:	Fix for Russian translation
 
 # Think you found a bug? 
@@ -80,4 +80,4 @@ Show your appreciation by buying me a coffee (or contribute towards a nice singl
 [![I Have a Black Dog](https://i.ibb.co/ss59Rwy/New-Project-2.png)](https://www.youtube.com/watch?v=XiCrniLQGYc)
 
 # Version
-This is version 4.28.603, for RimWorld 1.1.2567.
+This is version 4.29.604, for RimWorld 1.1.2579.
