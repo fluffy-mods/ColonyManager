@@ -58,6 +58,7 @@ In theory there is no real limit to the number of manager jobs that can be creat
  - CrapoFR:	French translation update
  - maarxx:	Various fixes and improvements
  - rimpy-custom:	Fix for Russian translation
+ - dodther:	
 
 # Think you found a bug? 
 Please read [this guide](http://steamcommunity.com/sharedfiles/filedetails/?id=725234314) before creating a bug report,
@@ -80,4 +81,4 @@ Show your appreciation by buying me a coffee (or contribute towards a nice singl
 [![I Have a Black Dog](https://i.ibb.co/ss59Rwy/New-Project-2.png)](https://www.youtube.com/watch?v=XiCrniLQGYc)
 
 # Version
-This is version 4.29.604, for RimWorld 1.1.2579.
+This is version 4.30.605, for RimWorld 1.1.2579.
