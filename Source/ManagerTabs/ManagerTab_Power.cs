@@ -57,7 +57,12 @@ namespace FluffyManager
                     DrawMaxMarkers   = true
                 };
 
-            overallHistory = new History( new[] {"Production", "Consumption", "Batteries"} )
+            overallHistory = new History( new[]
+            {
+                I18n.HistoryProduction, 
+                I18n.HistoryConsumption,
+                I18n.HistoryBatteries
+            } )
             {
                 DrawOptions      = false,
                 DrawInlineLegend = false,

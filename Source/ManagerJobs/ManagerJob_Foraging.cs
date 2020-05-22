@@ -31,7 +31,7 @@ namespace FluffyManager
             Trigger = new Trigger_Threshold( this );
 
             // create History tracker
-            History = new History( new[] {"stock", "designated"}, new[] {Color.white, Color.grey} );
+            History = new History( new[] {I18n.HistoryStock, I18n.HistoryDesignated }, new[] {Color.white, Color.grey} );
 
             // init stuff if we're not loading
             // todo: please, please refactor this into something less clumsy!

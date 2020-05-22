@@ -54,7 +54,7 @@ namespace FluffyManager
             // initialize clearAreas list with current areas
             UpdateClearAreas();
 
-            History = new History( new[] {"stock", "designated"}, new[] {Color.white, Color.grey} );
+            History = new History( new[] {I18n.HistoryStock, I18n.HistoryDesignated}, new[] {Color.white, Color.grey} );
 
 
             // init stuff if we're not loading

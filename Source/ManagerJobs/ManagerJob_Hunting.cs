@@ -41,7 +41,7 @@ namespace FluffyManager
             Trigger.ThresholdFilter.SetAllow( Utilities_Hunting.InsectMeat, false );
 
             // start the history tracker;
-            History = new History( new[] {"stock", "corpses", "designated"},
+            History = new History( new[] {I18n.HistoryStock, I18n.HistoryCorpses, I18n.HistoryDesignated },
                                    new[] {Color.white, new Color( .7f, .7f, .7f ), new Color( .4f, .4f, .4f )} );
 
             // init stuff if we're not loading
