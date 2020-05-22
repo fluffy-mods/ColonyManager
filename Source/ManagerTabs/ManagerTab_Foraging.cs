@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// ManagerTab_Foraging.cs
-// 2016-12-09
+﻿// ManagerTab_Foraging.cs
+// Copyright Karel Kroeze, 2020-2020
 
 using System.Collections.Generic;
 using System.Linq;
@@ -106,126 +105,6 @@ namespace FluffyManager
             }
         }
 
-        public float DrawThreshold( Vector2 pos, float width )
-        {
-            var currentCount    = _selected.Trigger.CurrentCount;
-            var designatedCount = _selected.CurrentDesignatedCount;
-            var targetCount     = _selected.Trigger.TargetCount;
-            var start           = pos;
-
-            _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight,
-                                                 "FMG.TargetCount".Translate(
-                                                     currentCount, designatedCount, targetCount ),
-                                                 "FMG.TargetCountTooltip".Translate(
-                                                     currentCount, designatedCount, targetCount ),
-                                                 _selected.Designations, () => _selected.Sync = Utilities.SyncDirection.FilterToAllowed,
-                                                 _selected.DesignationLabel );
-
-            Utilities.DrawToggle( ref pos, width,
-                                  "FM.Foraging.SyncFilterAndAllowed".Translate(),
-                                  "FM.Foraging.SyncFilterAndAllowed.Tip".Translate(),
-                                  ref _selected.SyncFilterAndAllowed );
-            Utilities.DrawReachabilityToggle( ref pos, width, ref _selected.CheckReachable );
-            Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(),
-                                  "FM.PathBasedDistance.Tip".Translate(), ref _selected.PathBasedDistance,
-                                  true );
-
-            return pos.y - start.y;
-        }
-
-        public float DrawMaturePlants( Vector2 pos, float width )
-        {
-            // Force mature plants only (2)
-            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            Utilities.DrawToggle( rowRect, "FMG.ForceMature".Translate(), "FMG.ForceMature.Tip".Translate(),
-                                  ref _selected.ForceFullyMature );
-
-            return ListEntryHeight;
-        }
-
-        public float DrawAreaRestriction( Vector2 pos, float width )
-        {
-            var start = pos;
-            AreaAllowedGUI.DoAllowedAreaSelectors( ref pos, width, ref _selected.ForagingArea, manager );
-            return pos.y - start.y;
-        }
-
-        public float DrawPlantShortcuts( Vector2 pos, float width )
-        {
-            var start = pos;
-
-            // list of keys in allowed trees list (all plans that yield wood in biome, static)
-            Dictionary<ThingDef,bool> allowedPlants = _selected.AllowedPlants;
-            var plants        = allowedPlants.Keys.ToList();
-
-            var rowRect = new Rect(
-                pos.x,
-                pos.y,
-                width,
-                ListEntryHeight );
-
-            // toggle all
-            Utilities.DrawToggle(
-                rowRect,
-                "<i>" + "FM.All".Translate() + "</i>",
-                string.Empty,
-                allowedPlants.Values.All( p => p ),
-                allowedPlants.Values.All( p => !p ),
-                () => plants.ForEach( p => _selected.SetPlantAllowed( p, true ) ),
-                () => plants.ForEach( p => _selected.SetPlantAllowed( p, false ) ) );
-
-            // toggle edible
-            rowRect.y += ListEntryHeight;
-            var edible = plants.Where( p => p.plant.harvestedThingDef.IsNutritionGivingIngestible ).ToList();
-            Utilities.DrawToggle(
-                rowRect,
-                "<i>" + "FM.Foraging.Edible".Translate() + "</i>",
-                "FM.Foraging.Edible.Tip".Translate(),
-                edible.All( p => allowedPlants[p] ),
-                edible.All( p => !allowedPlants[p] ),
-                () => edible.ForEach( p => _selected.SetPlantAllowed( p, true ) ),
-                () => edible.ForEach( p => _selected.SetPlantAllowed( p, false ) ) );
-
-            // toggle shrooms
-            rowRect.y += ListEntryHeight;
-            var shrooms = plants.Where( p => p.plant.cavePlant ).ToList();
-            Utilities.DrawToggle(
-                rowRect,
-                "<i>" + "FM.Foraging.Mushrooms".Translate() + "</i>",
-                "FM.Foraging.Mushrooms.Tip".Translate(),
-                shrooms.All( p => allowedPlants[p] ),
-                shrooms.All( p => !allowedPlants[p] ),
-                () => shrooms.ForEach( p => _selected.SetPlantAllowed( p, true ) ),
-                () => shrooms.ForEach( p => _selected.SetPlantAllowed( p, false ) ) );
-
-            return rowRect.yMax - start.y;
-        }
-
-        public float DrawPlantList( Vector2 pos, float width )
-        {
-            var start = pos;
-
-            // list of keys in allowed trees list (all plans that yield wood in biome, static)
-            Dictionary<ThingDef, bool> allowedPlants = _selected.AllowedPlants;
-            var plants        = allowedPlants.Keys.ToList();
-
-            var rowRect = new Rect(
-                pos.x,
-                pos.y,
-                width,
-                ListEntryHeight );
-
-            // toggle for each plant
-            foreach ( var plant in plants )
-            {
-                Utilities.DrawToggle( rowRect, plant.LabelCap, plant.description, _selected.AllowedPlants[plant],
-                                      () => _selected.SetPlantAllowed( plant, !_selected.AllowedPlants[plant] ) );
-                rowRect.y += ListEntryHeight;
-            }
-
-            return rowRect.yMin - start.y;
-        }
-
         public void DoLeftRow( Rect rect )
         {
             Widgets.DrawMenuSection( rect );
@@ -298,6 +177,127 @@ namespace FluffyManager
             if ( Selected != null ) DoContent( contentCanvas );
         }
 
+        public float DrawAreaRestriction( Vector2 pos, float width )
+        {
+            var start = pos;
+            AreaAllowedGUI.DoAllowedAreaSelectors( ref pos, width, ref _selected.ForagingArea, manager );
+            return pos.y - start.y;
+        }
+
+        public float DrawMaturePlants( Vector2 pos, float width )
+        {
+            // Force mature plants only (2)
+            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            Utilities.DrawToggle( rowRect, "FMG.ForceMature".Translate(), "FMG.ForceMature.Tip".Translate(),
+                                  ref _selected.ForceFullyMature );
+
+            return ListEntryHeight;
+        }
+
+        public float DrawPlantList( Vector2 pos, float width )
+        {
+            var start = pos;
+
+            // list of keys in allowed trees list (all plans that yield wood in biome, static)
+            var allowedPlants = _selected.AllowedPlants;
+            var plants        = allowedPlants.Keys.ToList();
+
+            var rowRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                ListEntryHeight );
+
+            // toggle for each plant
+            foreach ( var plant in plants )
+            {
+                Utilities.DrawToggle( rowRect, plant.LabelCap, plant.description, _selected.AllowedPlants[plant],
+                                      () => _selected.SetPlantAllowed( plant, !_selected.AllowedPlants[plant] ) );
+                rowRect.y += ListEntryHeight;
+            }
+
+            return rowRect.yMin - start.y;
+        }
+
+        public float DrawPlantShortcuts( Vector2 pos, float width )
+        {
+            var start = pos;
+
+            // list of keys in allowed trees list (all plans that yield wood in biome, static)
+            var allowedPlants = _selected.AllowedPlants;
+            var plants        = allowedPlants.Keys.ToList();
+
+            var rowRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                ListEntryHeight );
+
+            // toggle all
+            Utilities.DrawToggle(
+                rowRect,
+                "<i>" + "FM.All".Translate() + "</i>",
+                string.Empty,
+                allowedPlants.Values.All( p => p ),
+                allowedPlants.Values.All( p => !p ),
+                () => plants.ForEach( p => _selected.SetPlantAllowed( p, true ) ),
+                () => plants.ForEach( p => _selected.SetPlantAllowed( p, false ) ) );
+
+            // toggle edible
+            rowRect.y += ListEntryHeight;
+            var edible = plants.Where( p => p.plant?.harvestedThingDef?.IsNutritionGivingIngestible ?? false ).ToList();
+            Utilities.DrawToggle(
+                rowRect,
+                "<i>" + "FM.Foraging.Edible".Translate() + "</i>",
+                "FM.Foraging.Edible.Tip".Translate(),
+                edible.All( p => allowedPlants[p] ),
+                edible.All( p => !allowedPlants[p] ),
+                () => edible.ForEach( p => _selected.SetPlantAllowed( p, true ) ),
+                () => edible.ForEach( p => _selected.SetPlantAllowed( p, false ) ) );
+
+            // toggle shrooms
+            rowRect.y += ListEntryHeight;
+            var shrooms = plants.Where( p => p.plant?.cavePlant ?? false ).ToList();
+            Utilities.DrawToggle(
+                rowRect,
+                "<i>" + "FM.Foraging.Mushrooms".Translate() + "</i>",
+                "FM.Foraging.Mushrooms.Tip".Translate(),
+                shrooms.All( p => allowedPlants[p] ),
+                shrooms.All( p => !allowedPlants[p] ),
+                () => shrooms.ForEach( p => _selected.SetPlantAllowed( p, true ) ),
+                () => shrooms.ForEach( p => _selected.SetPlantAllowed( p, false ) ) );
+
+            return rowRect.yMax - start.y;
+        }
+
+        public float DrawThreshold( Vector2 pos, float width )
+        {
+            var currentCount    = _selected.Trigger.CurrentCount;
+            var designatedCount = _selected.CurrentDesignatedCount;
+            var targetCount     = _selected.Trigger.TargetCount;
+            var start           = pos;
+
+            _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight,
+                                                 "FMG.TargetCount".Translate(
+                                                     currentCount, designatedCount, targetCount ),
+                                                 "FMG.TargetCountTooltip".Translate(
+                                                     currentCount, designatedCount, targetCount ),
+                                                 _selected.Designations,
+                                                 () => _selected.Sync = Utilities.SyncDirection.FilterToAllowed,
+                                                 _selected.DesignationLabel );
+
+            Utilities.DrawToggle( ref pos, width,
+                                  "FM.Foraging.SyncFilterAndAllowed".Translate(),
+                                  "FM.Foraging.SyncFilterAndAllowed.Tip".Translate(),
+                                  ref _selected.SyncFilterAndAllowed );
+            Utilities.DrawReachabilityToggle( ref pos, width, ref _selected.CheckReachable );
+            Utilities.DrawToggle( ref pos, width, "FM.PathBasedDistance".Translate(),
+                                  "FM.PathBasedDistance.Tip".Translate(), ref _selected.PathBasedDistance,
+                                  true );
+
+            return pos.y - start.y;
+        }
+
         public override void PreOpen()
         {
             Refresh();
@@ -314,7 +314,5 @@ namespace FluffyManager
             // update selected ( also update thingfilter _only_ if the job is not managed yet )
             _selected?.RefreshAllowedPlants();
         }
-
-
     }
 }
