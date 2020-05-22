@@ -28,7 +28,8 @@ namespace FluffyManager
         {
             get
             {
-                return Utilities_Livestock.AgeSexArray.Select( ageSex => pawnKind.GetTame( manager, ageSex ).Count() )
+                return Utilities_Livestock.AgeSexArray
+                                          .Select( ageSex => pawnKind.GetTame( manager, ageSex ).Count() )
                                           .ToArray();
             }
         }

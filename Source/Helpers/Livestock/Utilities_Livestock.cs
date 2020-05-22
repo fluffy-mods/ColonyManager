@@ -320,23 +320,28 @@ namespace FluffyManager
 
         public static bool PawnIsOfAgeSex( this Pawn p, AgeAndSex ageSex )
         {
-            // we're making the assumption here that anything with a lifestage index of 2 or greater is adult - so 3 lifestages.
-            // this works for vanilla and all modded animals that I know off.
+            // note; we're making the assumption here that anything with a lifestage
+            // index of 2 or greater is adult - so baby, juvenile, adult, ... this
+            // works for vanilla and all modded animals that I know off.
+
+            // note; we're treating anything non-male as female. I know, I'm sorry.
 
             switch ( ageSex )
             {
                 case AgeAndSex.AdultFemale:
-                    return p.gender == Gender.Female && p.ageTracker.CurLifeStageIndex >= 2;
+                    return p.gender != Gender.Male && p.ageTracker.CurLifeStageIndex >= 2;
 
                 case AgeAndSex.AdultMale:
                     return p.gender == Gender.Male && p.ageTracker.CurLifeStageIndex >= 2;
 
                 case AgeAndSex.JuvenileFemale:
-                    return p.gender == Gender.Female && p.ageTracker.CurLifeStageIndex < 2;
+                    return p.gender != Gender.Male && p.ageTracker.CurLifeStageIndex < 2;
 
                 case AgeAndSex.JuvenileMale:
-                default:
                     return p.gender == Gender.Male && p.ageTracker.CurLifeStageIndex < 2;
+
+                default:
+                    throw new ArgumentOutOfRangeException( nameof( ageSex ), ageSex, null );
             }
         }
 
