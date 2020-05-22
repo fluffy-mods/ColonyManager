@@ -88,9 +88,12 @@ namespace FluffyManager
 
             // if not, set up a cache
             Func<IEnumerable<Pawn>> getter = () => map.mapPawns.AllPawns
-                                                      .Where( p => p.RaceProps.Animal       // is animal
-                                                                && !p.Dead                  // is alive
-                                                                && p.kindDef == pawnKind ); // is our managed pawnkind
+                                                      .Where( p => p.RaceProps.Animal    // is animal
+                                                                && !p.Dead               // is alive
+                                                                && p.kindDef == pawnKind // is our managed pawnkind
+                                                                && !( p.Faction == Faction.OfPlayer &&
+                                                                      p.HasExtraHomeFaction()
+                                                                       ) ); // was not borrowed to us
 
             AllCache.Add( key, getter );
             return getter();
