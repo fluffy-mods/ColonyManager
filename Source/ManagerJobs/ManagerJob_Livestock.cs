@@ -248,7 +248,7 @@ namespace FluffyManager
 
         public void DoFollowSettings( ref bool actionTaken )
         {
-            foreach ( var animal in Trigger.pawnKind.GetTame( manager ) )
+            foreach ( var animal in Trigger.pawnKind.GetTame( manager ).ToList() )
             {
                 // training
                 Logger.Follow( animal.LabelShort );
