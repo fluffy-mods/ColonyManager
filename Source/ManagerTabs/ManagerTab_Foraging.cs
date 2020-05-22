@@ -149,12 +149,12 @@ namespace FluffyManager
             if ( i % 2 == 1 ) Widgets.DrawAltRect( newRect );
 
             Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label( newRect, "<" + "FMG.NewForagingJob".Translate() + ">" );
+            Widgets.Label( newRect, "<" + "FMG.NewForagingJob".Translate().Resolve() + ">" );
             Text.Anchor = TextAnchor.UpperLeft;
 
             if ( Widgets.ButtonInvisible( newRect ) ) Selected = new ManagerJob_Foraging( manager );
 
-            TooltipHandler.TipRegion( newRect, "FMG.NewForagingJobTooltip".Translate() );
+            TooltipHandler.TipRegion( newRect, "FMG.NewForagingJobTooltip".Translate().Resolve() );
 
             cur.y += LargeListEntryHeight;
 

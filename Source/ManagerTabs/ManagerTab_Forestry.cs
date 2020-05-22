@@ -155,7 +155,7 @@ namespace FluffyManager
             if ( i % 2 == 1 ) Widgets.DrawAltRect( newRect );
 
             Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label( newRect, "<" + "FMF.NewForestryJob".Translate() + ">" );
+            Widgets.Label( newRect, "<" + "FMF.NewForestryJob".Translate().Resolve() + ">" );
             Text.Anchor = TextAnchor.UpperLeft;
 
             if ( Widgets.ButtonInvisible( newRect ) ) Selected = new ManagerJob_Forestry( manager );

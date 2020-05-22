@@ -55,7 +55,7 @@
   <FME.Power>Power</FME.Power>
   <FME.NotResearched>Power management has not been researched</FME.NotResearched>
   <FME.NoPoweredStation>No managing station has power</FME.NoPoweredStation>
-  
+
   <!-- Overview Tab -->
   <FM.Overview>Overview</FM.Overview>
   <FM.NoJobs>No jobs set.</FM.NoJobs>
@@ -67,7 +67,7 @@
   <FM.UnsuspendJobTooltip>Job has been suspended.\n\nClick to unsuspend.</FM.UnsuspendJobTooltip>
   <FM.SuspendJobTooltip>Click to suspend this job.</FM.SuspendJobTooltip>
   <FM.PluralSuffix>s</FM.PluralSuffix>
-  
+
   <!--Import/Export Tab-->
   <FM.ImportExport>Import &amp; Export</FM.ImportExport>
   <FM.CurrentJobs>Current Jobs:</FM.CurrentJobs>
@@ -118,7 +118,7 @@
   <FMF.JobType.ClearArea.Tip>Clearing areas to keep wind turbines running smoothly, and deny enemies any possible cover in the killing fields</FMF.JobType.ClearArea.Tip>
   <FMF.JobType.Logging>Wood logging</FMF.JobType.Logging>
   <FMF.JobType.Logging.Tip>Chop trees for wood</FMF.JobType.Logging.Tip>
-  
+
   <FMF.Clear>Clear {0}</FMF.Clear>
   <FMF.TurbineArea>wind turbines</FMF.TurbineArea>
 
@@ -132,7 +132,6 @@
   <FMF.ProvidesCover.Tip>Select all plants that provide cover</FMF.ProvidesCover.Tip>
   <FMF.BlocksWind>Blocks wind</FMF.BlocksWind>
   <FMF.BlocksWind.Tip>Select all plants that block wind</FMF.BlocksWind.Tip>
-
 
   <!-- Foraging (Gathering) tab -->
   <FMG.Foraging>Foraging</FMG.Foraging>
@@ -190,8 +189,8 @@
   <FML.MilkHeader>Progress till next milking</FML.MilkHeader>
   <FML.WoolHeader>Progress till next shearing</FML.WoolHeader>
   <FML.Yields>Expected yield: {0} x{1}</FML.Yields>
-	<FML.UnassignTraining>Unassign training</FML.UnassignTraining>
-	<FML.UnassignTraining.Tip>Unassign training targets for animals</FML.UnassignTraining.Tip>
+  <FML.UnassignTraining>Unassign training</FML.UnassignTraining>
+  <FML.UnassignTraining.Tip>Unassign training targets for animals</FML.UnassignTraining.Tip>
   <FML.TrainYoung>Train young animals</FML.TrainYoung>
   <FML.SendToSlaughterArea>Restrict animals marked for slaughter</FML.SendToSlaughterArea>
   <FML.SendToSlaughterArea.Tip>Restrict animals designated for slaughtering to a specific area</FML.SendToSlaughterArea.Tip>
@@ -231,7 +230,8 @@
   <FM.Livestock.FollowTraining.Tip>Make animals marked for training try to follow their trainer.</FM.Livestock.FollowTraining.Tip>
   <FM.Livestock.MasterTraining>Assign trainer(s)</FM.Livestock.MasterTraining>
   <FM.Livestock.MasterTraining.Tip>Assign animals marked for training to a specific master (trainer), or to all trainers. May overwrite user settings when enabled.</FM.Livestock.MasterTraining.Tip>
-  <FM.Livestock.Master>{0} ({1})</FM.Livestock.Master> <!-- 0; pawn name, 1; skill level -->
+  <FM.Livestock.Master>{0} ({1})</FM.Livestock.Master>
+  <!-- 0; pawn name, 1; skill level -->
 
   <!-- MasterMode enum -->
   <FM.Livestock.MasterMode.Default>Manual</FM.Livestock.MasterMode.Default>
@@ -247,5 +247,14 @@
   <Fluffy.ColonyManager.CannotManage.NoPower>no power</Fluffy.ColonyManager.CannotManage.NoPower>
   <Fluffy.ColonyManager.CannotManage.NoJobs>no jobs set</Fluffy.ColonyManager.CannotManage.NoJobs>
   <Fluffy.ColonyManager.CannotManage.NoActiveJobs>all jobs are done</Fluffy.ColonyManager.CannotManage.NoActiveJobs>
+
+  <!-- History chapter labels -->
+  <Fluffy.ColonyManager.HistoryStock>stock</Fluffy.ColonyManager.HistoryStock>
+  <Fluffy.ColonyManager.HistoryDesignated>designated</Fluffy.ColonyManager.HistoryDesignated>
+  <Fluffy.ColonyManager.HistoryCorpses>corpses</Fluffy.ColonyManager.HistoryCorpses>
+  <Fluffy.ColonyManager.HistoryChunks>chunks</Fluffy.ColonyManager.HistoryChunks>
+  <Fluffy.ColonyManager.HistoryProduction>production</Fluffy.ColonyManager.HistoryProduction>
+  <Fluffy.ColonyManager.HistoryConsumption>consumption</Fluffy.ColonyManager.HistoryConsumption>
+  <Fluffy.ColonyManager.HistoryBatteries>batteries</Fluffy.ColonyManager.HistoryBatteries>
 
 </LanguageData>
