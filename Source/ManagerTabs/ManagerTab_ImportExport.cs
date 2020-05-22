@@ -1,6 +1,5 @@
-﻿//// Karel Kroeze
-//// ManagerTab_ImportExport.cs
-//// 2016-12-09
+﻿// ManagerTab_ImportExport.cs
+// Copyright Karel Kroeze, 2018-2020
 
 //using RimWorld;
 //using System;

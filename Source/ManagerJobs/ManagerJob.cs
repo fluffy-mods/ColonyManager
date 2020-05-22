@@ -1,8 +1,6 @@
-﻿// Karel Kroeze
-// ManagerJob.cs
-// 2016-12-09
+﻿// ManagerJob.cs
+// Copyright Karel Kroeze, 2018-2020
 
-using System.Linq;
 using System.Text;
 using RimWorld;
 using UnityEngine;
@@ -23,9 +21,6 @@ namespace FluffyManager
                             ProgressRectWidth   = 10f,
                             StatusRectWidth     = SuspendStampWidth + LastUpdateRectWidth + ProgressRectWidth;
 
-        private UpdateInterval _updateInterval;
-        private bool _suspended;
-
         public bool CheckReachable = true;
 
         public int lastAction;
@@ -35,8 +30,11 @@ namespace FluffyManager
 
         public int priority;
 
-        public Trigger Trigger;
-        private int _updateIntervalScribe;
+        public  Trigger Trigger;
+        private bool    _suspended;
+
+        private UpdateInterval _updateInterval;
+        private int            _updateIntervalScribe;
 
         public ManagerJob( Manager manager )
         {
@@ -44,14 +42,8 @@ namespace FluffyManager
             Touch(); // set last updated to current time.
         }
 
-        public virtual UpdateInterval UpdateInterval
-        {
-            get => _updateInterval ?? Settings.DefaultUpdateInterval;
-            set => _updateInterval = value;
-        }
-
         public abstract bool   Completed { get; }
-        public virtual  bool   IsValid => manager != null;
+        public virtual  bool   IsValid   => manager != null;
         public abstract string Label     { get; }
         public virtual  bool   Managed   { get; set; }
 
@@ -67,8 +59,15 @@ namespace FluffyManager
             set => _suspended = value;
         }
 
-        public abstract ManagerTab  Tab         { get; }
-        public abstract string[]    Targets     { get; }
+        public abstract ManagerTab Tab     { get; }
+        public abstract string[]   Targets { get; }
+
+        public virtual UpdateInterval UpdateInterval
+        {
+            get => _updateInterval ?? Settings.DefaultUpdateInterval;
+            set => _updateInterval = value;
+        }
+
         public abstract WorkTypeDef WorkTypeDef { get; }
 
         public virtual void ExposeData()
@@ -102,12 +101,13 @@ namespace FluffyManager
 
         public abstract bool TryDoJob();
 
-        public virtual bool IsReachable( Thing target )
+        public abstract void CleanUp();
+
+        public virtual void Delete( bool cleanup = true )
         {
-            return !target.Position.Fogged( manager.map )
-                && ( !CheckReachable ||
-                     manager.map.mapPawns.FreeColonistsSpawned.Any(
-                         p => p.CanReach( target, PathEndMode.Touch, Danger.Some ) ) );
+            if ( cleanup )
+                CleanUp();
+            Manager.For( manager ).JobStack.Delete( this, false );
         }
 
         public virtual float Distance( Thing target, IntVec3 source )
@@ -125,18 +125,17 @@ namespace FluffyManager
             return Mathf.Sqrt( source.DistanceToSquared( target.Position ) ) * 2;
         }
 
-        public abstract void CleanUp();
-
-        public virtual void Delete( bool cleanup = true )
-        {
-            if ( cleanup )
-                CleanUp();
-            Manager.For( manager ).JobStack.Delete( this, false );
-        }
-
         public abstract void DrawListEntry( Rect rect, bool overview = true, bool active = true );
 
         public abstract void DrawOverviewDetails( Rect rect );
+
+        public virtual bool IsReachable( Thing target )
+        {
+            return !target.Position.Fogged( manager.map )
+                && ( !CheckReachable ||
+                     manager.map.mapPawns.FreeColonistsSpawned.Any(
+                         p => p.CanReach( target, PathEndMode.Touch, Danger.Some ) ) );
+        }
 
         public virtual void Tick()
         {

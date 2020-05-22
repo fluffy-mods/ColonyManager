@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// Logger.cs
-// 2017-06-10
+﻿// Logger.cs
+// Copyright Karel Kroeze, 2017-2020
 
 using System.Diagnostics;
 using Verse;

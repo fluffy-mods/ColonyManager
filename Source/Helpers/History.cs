@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// History.cs
-// 2016-12-09
+﻿// History.cs
+// Copyright Karel Kroeze, 2020-2020
 
 using System;
 using System.Collections.Generic;
@@ -22,20 +21,17 @@ namespace FluffyManager
             Year
         }
 
+        public static Color    DefaultLineColor = Color.white;
+        public static Period[] periods          = (Period[]) Enum.GetValues( typeof( Period ) );
+
         private const int Breaks     = 4;
         private const int DashLength = 3;
         private const int Size       = 100;
 
-        public static Color DefaultLineColor = Color.white;
-
         // interval per period
         private static readonly Dictionary<Period, int> _intervals = new Dictionary<Period, int>();
 
-        private static readonly float    _yAxisMargin = 40f;
-        public static           Period[] periods      = (Period[]) Enum.GetValues( typeof( Period ) );
-
-        // each chapter holds the history for all periods.
-        private List<Chapter> _chapters = new List<Chapter>();
+        private static readonly float _yAxisMargin = 40f;
 
         private readonly List<Chapter> _chaptersShown = new List<Chapter>();
 
@@ -55,6 +51,9 @@ namespace FluffyManager
         public bool   MaxPerChapter;
         public Period periodShown = Period.Day;
         public string Suffix      = string.Empty;
+
+        // each chapter holds the history for all periods.
+        private List<Chapter> _chapters = new List<Chapter>();
 
         // for scribe.
         public History()
@@ -180,52 +179,157 @@ namespace FluffyManager
             return Mathf.CeilToInt( x / unit ) * unit;
         }
 
-        public string FormatCount( float x, int unit = 1000, string[] suffixes = null )
+        public void DrawDetailedLegend( Rect canvas, ref Vector2 scrollPos, int? max, bool positiveOnly = false,
+                                        bool negativeOnly = false )
         {
-            if ( suffixes == null )
-                suffixes = new[] {"", "k", "M", "G"};
-            var i = 0;
-            while ( x > unit && i < suffixes.Length )
+            // set sign
+            var sign = negativeOnly ? -1 : 1;
+
+            var ChaptersOrdered = _chapters
+                                 .Where( chapter => !positiveOnly || chapter.pages[periodShown].Any( i => i > 0 ) )
+                                 .Where( chapter => !negativeOnly || chapter.pages[periodShown].Any( i => i < 0 ) )
+                                 .OrderByDescending( chapter => chapter.Last( periodShown ) * sign ).ToList();
+
+            // get out early if no chapters.
+            if ( ChaptersOrdered.Count == 0 )
             {
-                x /= unit;
-                i++;
+                GUI.DrawTexture( canvas.ContractedBy( Margin ), Resources.SlightlyDarkBackground );
+                Widgets_Labels.Label( canvas, "FM.HistoryNoChapters".Translate(), TextAnchor.MiddleCenter,
+                                      color: Color.grey );
+                return;
             }
 
-            return x.ToString( "0.#" + suffixes[i] + Suffix );
-        }
+            // max
+            float _max = max ?? ( DrawMaxMarkers
+                             ? ChaptersOrdered.Max( chapter => chapter.TrueMax )
+                             : ChaptersOrdered.FirstOrDefault()?.Last( periodShown ) * sign )
+                      ?? 0;
 
-        public void Update( params int[] counts )
-        {
-            if ( counts.Length != _chapters.Count ) Log.Warning( "History updated with incorrect number of chapters" );
+            // cell height
+            var height    = 30f;
+            var barHeight = 18f;
 
-            for ( var i = 0; i < counts.Length; i++ ) _chapters[i].Add( counts[i] );
-        }
+            // n rows
+            var n = ChaptersOrdered.Count;
 
-        public void UpdateThingCounts( params int[] counts )
-        {
-            if ( counts.Length != _chapters.Count ) Log.Warning( "History updated with incorrect number of chapters" );
+            // scrolling region
+            var viewRect = canvas;
+            viewRect.height = n * height;
+            if ( viewRect.height > canvas.height )
+            {
+                viewRect.width -= 16f + Margin;
+                canvas.width   -= Margin;
+                canvas.height  -= 1f;
+            }
 
-            for ( var i = 0; i < counts.Length; i++ ) _chapters[i].ThingDefCount.count = counts[i];
-        }
+            Widgets.BeginScrollView( canvas, ref scrollPos, viewRect );
+            for ( var i = 0; i < n; i++ )
+            {
+                // set up rects
+                var row = new Rect( 0f, height * i, viewRect.width,
+                                    height );
+                var icon = new Rect( Margin, height * i, height, height ).ContractedBy( Margin / 2f );
+                // icon is square, size defined by height.
+                var bar = new Rect( Margin + height, height * i, viewRect.width - height - Margin,
+                                    height );
 
-        public void UpdateMax( params int[] maxes )
-        {
-            if ( maxes.Length != _chapters.Count ) Log.Warning( "History updated with incorrect number of chapters" );
+                // if icons should not be drawn make the bar full size.
+                if ( !DrawIcons )
+                    bar.xMin -= height + Margin;
 
-            for ( var i = 0; i < maxes.Length; i++ ) _chapters[i].TrueMax = maxes[i];
-        }
+                // bar details.
+                var barBox   = bar.ContractedBy( ( height - barHeight ) / 2f );
+                var barFill  = barBox.ContractedBy( 2f );
+                var maxWidth = barFill.width;
+                if ( MaxPerChapter )
+                    barFill.width *= ChaptersOrdered[i].Last( periodShown ) * sign / (float) ChaptersOrdered[i].TrueMax;
+                else
+                    barFill.width *= ChaptersOrdered[i].Last( periodShown ) * sign / _max;
 
-        public void UpdateThingCountAndMax( int[] counts, int[] maxes )
-        {
-            if ( maxes.Length != _chapters.Count || maxes.Length != _chapters.Count )
-                Log.Warning( "History updated with incorrect number of chapters" );
+                GUI.BeginGroup( viewRect );
 
-            for ( var i = 0; i < maxes.Length; i++ )
-                if ( _chapters[i].ThingDefCount.count != counts[i] )
+                // if DrawIcons and a thing is set, draw the icon.
+                var thing = ChaptersOrdered[i].ThingDefCount.thingDef;
+                if ( DrawIcons && thing != null )
                 {
-                    _chapters[i].TrueMax             = maxes[i];
-                    _chapters[i].ThingDefCount.count = counts[i];
+                    // draw the icon in correct proportions
+                    var proportion = GenUI.IconDrawScale( thing );
+                    Widgets.DrawTextureFitted( icon, thing.uiIcon, proportion );
+
+                    // draw counts in upper left corner
+                    if ( DrawCounts )
+                        Utilities.LabelOutline( icon, ChaptersOrdered[i].ThingDefCount.count.ToString(), null,
+                                                TextAnchor.UpperLeft, 0f, GameFont.Tiny, Color.white, Color.black );
                 }
+
+                // if desired, draw ghost bar
+                if ( DrawMaxMarkers )
+                {
+                    var ghostBarFill = barFill;
+                    ghostBarFill.width = MaxPerChapter ? maxWidth : maxWidth * ( ChaptersOrdered[i].TrueMax / _max );
+                    GUI.color          = new Color( 1f, 1f, 1f, .2f );
+                    GUI.DrawTexture( ghostBarFill, ChaptersOrdered[i].Texture ); // coloured texture
+                    GUI.color = Color.white;
+                }
+
+                // draw the main bar.
+                GUI.DrawTexture( barBox, Resources.SlightlyDarkBackground );
+                GUI.DrawTexture( barFill, ChaptersOrdered[i].Texture ); // coloured texture
+                GUI.DrawTexture( barFill, Resources.BarShader );        // slightly fancy overlay (emboss).
+
+                // draw on bar info
+                if ( DrawInfoInBar )
+                {
+                    var info = ChaptersOrdered[i].label + ": " +
+                               FormatCount( ChaptersOrdered[i].Last( periodShown ) * sign );
+
+                    if ( DrawMaxMarkers ) info += " / " + FormatCount( ChaptersOrdered[i].TrueMax );
+
+                    // offset label a bit downwards and to the right
+                    var rowInfoRect = row;
+                    rowInfoRect.y += 3f;
+                    rowInfoRect.x += Margin * 2;
+
+                    // x offset
+                    var xOffset = DrawIcons && thing != null ? height + Margin * 2 : Margin * 2;
+
+                    Utilities.LabelOutline( rowInfoRect, info, null, TextAnchor.MiddleLeft, xOffset, GameFont.Tiny,
+                                            Color.white, Color.black );
+                }
+
+                // are we currently showing this line?
+                var shown = _chaptersShown.Contains( ChaptersOrdered[i] );
+
+                // tooltip on entire row
+                var tooltip = ChaptersOrdered[i].label + ": " +
+                              FormatCount( Mathf.Abs( ChaptersOrdered[i].Last( periodShown ) ) );
+                tooltip += "FM.HistoryClickToEnable".Translate( shown ? "hide" : "show", ChaptersOrdered[i].label );
+                TooltipHandler.TipRegion( row, tooltip );
+
+                // handle input
+                if ( Widgets.ButtonInvisible( row ) )
+                {
+                    if ( Event.current.button == 0 )
+                    {
+                        if ( shown )
+                            _chaptersShown.Remove( ChaptersOrdered[i] );
+                        else
+                            _chaptersShown.Add( ChaptersOrdered[i] );
+                    }
+                    else if ( Event.current.button == 1 )
+                    {
+                        _chaptersShown.Clear();
+                        _chaptersShown.Add( ChaptersOrdered[i] );
+                    }
+                }
+
+                // UI feedback for disabled row
+                if ( !shown ) GUI.DrawTexture( row, Resources.SlightlyDarkBackground );
+
+                GUI.EndGroup();
+            }
+
+            Widgets.EndScrollView();
         }
 
         public void DrawPlot( Rect rect, int target = 0, string label = "", bool positiveOnly = false,
@@ -409,169 +513,64 @@ namespace FluffyManager
             GUI.EndGroup();
         }
 
-        public void DrawDetailedLegend( Rect canvas, ref Vector2 scrollPos, int? max, bool positiveOnly = false,
-                                        bool negativeOnly = false )
+        public string FormatCount( float x, int unit = 1000, string[] suffixes = null )
         {
-            // set sign
-            var sign = negativeOnly ? -1 : 1;
-
-            var ChaptersOrdered = _chapters
-                                 .Where( chapter => !positiveOnly || chapter.pages[periodShown].Any( i => i > 0 ) )
-                                 .Where( chapter => !negativeOnly || chapter.pages[periodShown].Any( i => i < 0 ) )
-                                 .OrderByDescending( chapter => chapter.Last( periodShown ) * sign ).ToList();
-
-            // get out early if no chapters.
-            if ( ChaptersOrdered.Count == 0 )
+            if ( suffixes == null )
+                suffixes = new[] {"", "k", "M", "G"};
+            var i = 0;
+            while ( x > unit && i < suffixes.Length )
             {
-                GUI.DrawTexture( canvas.ContractedBy( Margin ), Resources.SlightlyDarkBackground );
-                Widgets_Labels.Label( canvas, "FM.HistoryNoChapters".Translate(), TextAnchor.MiddleCenter,
-                                      color: Color.grey );
-                return;
+                x /= unit;
+                i++;
             }
 
-            // max
-            float _max = max ?? ( DrawMaxMarkers
-                             ? ChaptersOrdered.Max( chapter => chapter.TrueMax )
-                             : ChaptersOrdered.FirstOrDefault()?.Last( periodShown ) * sign )
-                      ?? 0;
+            return x.ToString( "0.#" + suffixes[i] + Suffix );
+        }
 
-            // cell height
-            var height    = 30f;
-            var barHeight = 18f;
+        public void Update( params int[] counts )
+        {
+            if ( counts.Length != _chapters.Count ) Log.Warning( "History updated with incorrect number of chapters" );
 
-            // n rows
-            var n = ChaptersOrdered.Count;
+            for ( var i = 0; i < counts.Length; i++ ) _chapters[i].Add( counts[i] );
+        }
 
-            // scrolling region
-            var viewRect = canvas;
-            viewRect.height = n * height;
-            if ( viewRect.height > canvas.height )
-            {
-                viewRect.width -= 16f + Margin;
-                canvas.width   -= Margin;
-                canvas.height  -= 1f;
-            }
+        public void UpdateMax( params int[] maxes )
+        {
+            if ( maxes.Length != _chapters.Count ) Log.Warning( "History updated with incorrect number of chapters" );
 
-            Widgets.BeginScrollView( canvas, ref scrollPos, viewRect );
-            for ( var i = 0; i < n; i++ )
-            {
-                // set up rects
-                var row = new Rect( 0f, height * i, viewRect.width,
-                                     height );
-                var icon = new Rect( Margin, height * i, height, height ).ContractedBy( Margin / 2f );
-                // icon is square, size defined by height.
-                var bar = new Rect( Margin + height, height * i, viewRect.width - height - Margin,
-                                    height );
+            for ( var i = 0; i < maxes.Length; i++ ) _chapters[i].TrueMax = maxes[i];
+        }
 
-                // if icons should not be drawn make the bar full size.
-                if ( !DrawIcons )
-                    bar.xMin -= height + Margin;
+        public void UpdateThingCountAndMax( int[] counts, int[] maxes )
+        {
+            if ( maxes.Length != _chapters.Count || maxes.Length != _chapters.Count )
+                Log.Warning( "History updated with incorrect number of chapters" );
 
-                // bar details.
-                var barBox   = bar.ContractedBy( ( height - barHeight ) / 2f );
-                var barFill  = barBox.ContractedBy( 2f );
-                var maxWidth = barFill.width;
-                if ( MaxPerChapter )
-                    barFill.width *= ChaptersOrdered[i].Last( periodShown ) * sign / (float) ChaptersOrdered[i].TrueMax;
-                else
-                    barFill.width *= ChaptersOrdered[i].Last( periodShown ) * sign / _max;
-
-                GUI.BeginGroup( viewRect );
-
-                // if DrawIcons and a thing is set, draw the icon.
-                var thing = ChaptersOrdered[i].ThingDefCount.thingDef;
-                if ( DrawIcons && thing != null )
+            for ( var i = 0; i < maxes.Length; i++ )
+                if ( _chapters[i].ThingDefCount.count != counts[i] )
                 {
-                    // draw the icon in correct proportions
-                    var proportion = GenUI.IconDrawScale( thing );
-                    Widgets.DrawTextureFitted( icon, thing.uiIcon, proportion );
-
-                    // draw counts in upper left corner
-                    if ( DrawCounts )
-                        Utilities.LabelOutline( icon, ChaptersOrdered[i].ThingDefCount.count.ToString(), null,
-                                                TextAnchor.UpperLeft, 0f, GameFont.Tiny, Color.white, Color.black );
+                    _chapters[i].TrueMax             = maxes[i];
+                    _chapters[i].ThingDefCount.count = counts[i];
                 }
+        }
 
-                // if desired, draw ghost bar
-                if ( DrawMaxMarkers )
-                {
-                    var ghostBarFill = barFill;
-                    ghostBarFill.width = MaxPerChapter ? maxWidth : maxWidth * ( ChaptersOrdered[i].TrueMax / _max );
-                    GUI.color          = new Color( 1f, 1f, 1f, .2f );
-                    GUI.DrawTexture( ghostBarFill, ChaptersOrdered[i].Texture ); // coloured texture
-                    GUI.color = Color.white;
-                }
+        public void UpdateThingCounts( params int[] counts )
+        {
+            if ( counts.Length != _chapters.Count ) Log.Warning( "History updated with incorrect number of chapters" );
 
-                // draw the main bar.
-                GUI.DrawTexture( barBox, Resources.SlightlyDarkBackground );
-                GUI.DrawTexture( barFill, ChaptersOrdered[i].Texture ); // coloured texture
-                GUI.DrawTexture( barFill, Resources.BarShader );        // slightly fancy overlay (emboss).
-
-                // draw on bar info
-                if ( DrawInfoInBar )
-                {
-                    var info = ChaptersOrdered[i].label + ": " +
-                               FormatCount( ChaptersOrdered[i].Last( periodShown ) * sign );
-
-                    if ( DrawMaxMarkers ) info += " / " + FormatCount( ChaptersOrdered[i].TrueMax );
-
-                    // offset label a bit downwards and to the right
-                    var rowInfoRect = row;
-                    rowInfoRect.y += 3f;
-                    rowInfoRect.x += Margin * 2;
-
-                    // x offset
-                    var xOffset = DrawIcons && thing != null ? height + Margin * 2 : Margin * 2;
-
-                    Utilities.LabelOutline( rowInfoRect, info, null, TextAnchor.MiddleLeft, xOffset, GameFont.Tiny,
-                                            Color.white, Color.black );
-                }
-
-                // are we currently showing this line?
-                var shown = _chaptersShown.Contains( ChaptersOrdered[i] );
-
-                // tooltip on entire row
-                var tooltip = ChaptersOrdered[i].label + ": " +
-                              FormatCount( Mathf.Abs( ChaptersOrdered[i].Last( periodShown ) ) );
-                tooltip += "FM.HistoryClickToEnable".Translate( shown ? "hide" : "show", ChaptersOrdered[i].label );
-                TooltipHandler.TipRegion( row, tooltip );
-
-                // handle input
-                if ( Widgets.ButtonInvisible( row ) )
-                {
-                    if ( Event.current.button == 0 )
-                    {
-                        if ( shown )
-                            _chaptersShown.Remove( ChaptersOrdered[i] );
-                        else
-                            _chaptersShown.Add( ChaptersOrdered[i] );
-                    }
-                    else if ( Event.current.button == 1 )
-                    {
-                        _chaptersShown.Clear();
-                        _chaptersShown.Add( ChaptersOrdered[i] );
-                    }
-                }
-
-                // UI feedback for disabled row
-                if ( !shown ) GUI.DrawTexture( row, Resources.SlightlyDarkBackground );
-
-                GUI.EndGroup();
-            }
-
-            Widgets.EndScrollView();
+            for ( var i = 0; i < counts.Length; i++ ) _chapters[i].ThingDefCount.count = counts[i];
         }
 
         public class Chapter : IExposable
         {
-            private int                           _observedMax = -1;
-            private int                           _specificMax = -1;
             public  Texture2D                     _texture;
             public  string                        label         = string.Empty;
             public  Color                         lineColor     = DefaultLineColor;
             public  Dictionary<Period, List<int>> pages         = new Dictionary<Period, List<int>>();
             public  int                           size          = Size;
             public  ThingDefCountClass            ThingDefCount = new ThingDefCountClass();
+            private int                           _observedMax  = -1;
+            private int                           _specificMax  = -1;
 
             public Chapter()
             {
@@ -641,19 +640,6 @@ namespace FluffyManager
                 return pages[period].Any( v => v > 0 );
             }
 
-            public int Last( Period period )
-            {
-                return pages[period].Last();
-            }
-
-            public int ValueAt( Period period, int x, int sign = 1 )
-            {
-                if ( x < 0 || x >= pages[period].Count )
-                    return -1;
-
-                return pages[period][x] * sign;
-            }
-
             public void Add( int count )
             {
                 var curTick = Find.TickManager.TicksGame;
@@ -667,6 +653,11 @@ namespace FluffyManager
                         // cull the list back down to size.
                         while ( pages[period].Count > Size ) pages[period].RemoveAt( 0 );
                     }
+            }
+
+            public int Last( Period period )
+            {
+                return pages[period].Last();
             }
 
             public int Max( Period period, bool positive = true )
@@ -686,6 +677,14 @@ namespace FluffyManager
                         Widgets.DrawLine( start, end, lineColor, 1f );
                     }
                 }
+            }
+
+            public int ValueAt( Period period, int x, int sign = 1 )
+            {
+                if ( x < 0 || x >= pages[period].Count )
+                    return -1;
+
+                return pages[period][x] * sign;
             }
         }
     }

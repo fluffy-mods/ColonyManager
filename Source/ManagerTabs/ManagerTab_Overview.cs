@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// ManagerTab_Overview.cs
-// 2016-12-09
+﻿// ManagerTab_Overview.cs
+// Copyright Karel Kroeze, 2020-2020
 
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +12,14 @@ namespace FluffyManager
 {
     internal class ManagerTab_Overview : ManagerTab
     {
-        public const float       OverviewWidthRatio      = .6f;
-        private      Vector2     _overviewScrollPosition = Vector2.zero;
-        private      ManagerJob  _selectedJob;
-        private      Vector2     _workersScrollPosition = Vector2.zero;
-        private      WorkTypeDef _workType;
+        public const float OverviewWidthRatio = .6f;
 
-        public  float      OverviewHeight = 9999f;
-        private List<Pawn> Workers        = new List<Pawn>();
+        public  float       OverviewHeight          = 9999f;
+        private Vector2     _overviewScrollPosition = Vector2.zero;
+        private ManagerJob  _selectedJob;
+        private Vector2     _workersScrollPosition = Vector2.zero;
+        private WorkTypeDef _workType;
+        private List<Pawn>  Workers = new List<Pawn>();
 
         public ManagerTab_Overview( Manager manager ) : base( manager )
         {

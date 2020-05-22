@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// JobStack.cs
-// 2016-12-09
+﻿// JobStack.cs
+// Copyright Karel Kroeze, 2017-2020
 
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +9,8 @@ namespace FluffyManager
 {
     public class JobStack : IExposable
     {
+        public  Manager          manager;
         private List<ManagerJob> _stack;
-
-        public Manager manager;
 
         /// <summary>
         ///     Full jobstack, in order of assignment
@@ -41,13 +39,12 @@ namespace FluffyManager
             Scribe_Collections.Look( ref _stack, "JobStack", LookMode.Deep, manager );
 
             if ( Scribe.mode == LoadSaveMode.PostLoadInit )
-            {
                 if ( _stack.Any( j => !j.IsValid ) )
                 {
-                    Log.Error( $"Colony Manager :: Removing {_stack.Count( j => !j.IsValid )} invalid manager jobs. If this keeps happening, please report it."  );
+                    Log.Error(
+                        $"Colony Manager :: Removing {_stack.Count( j => !j.IsValid )} invalid manager jobs. If this keeps happening, please report it." );
                     _stack = _stack.Where( job => job.IsValid ).ToList();
                 }
-            }
         }
 
         /// <summary>

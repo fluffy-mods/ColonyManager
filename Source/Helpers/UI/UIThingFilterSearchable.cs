@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// UIThingFilterSearchable.cs
-// 2016-12-09
+﻿// UIThingFilterSearchable.cs
+// Copyright Karel Kroeze, 2018-2020
 
 using UnityEngine;
 using Verse;
@@ -11,6 +10,32 @@ namespace FluffyManager
     public class ThingFilterUI
     {
         private float viewHeight;
+
+        private static void DrawHitPointsFilterConfig( ref float y, float width, ThingFilter filter )
+        {
+            if ( !filter.allowedHitPointsConfigurable ) return;
+
+            var rect                     = new Rect( 20f, y, width - 20f, 26f );
+            var allowedHitPointsPercents = filter.AllowedHitPointsPercents;
+            Widgets.FloatRange( rect, 1, ref allowedHitPointsPercents, 0f, 1f, "HitPoints", ToStringStyle.PercentZero );
+            filter.AllowedHitPointsPercents =  allowedHitPointsPercents;
+            y                               += 26f;
+            y                               += 5f;
+            Text.Font                       =  GameFont.Small;
+        }
+
+        private static void DrawQualityFilterConfig( ref float y, float width, ThingFilter filter )
+        {
+            if ( !filter.allowedQualitiesConfigurable ) return;
+
+            var rect                 = new Rect( 20f, y, width - 20f, 26f );
+            var allowedQualityLevels = filter.AllowedQualityLevels;
+            Widgets.QualityRange( rect, 2, ref allowedQualityLevels );
+            filter.AllowedQualityLevels =  allowedQualityLevels;
+            y                           += 26f;
+            y                           += 5f;
+            Text.Font                   =  GameFont.Small;
+        }
 
         public void DoThingFilterConfigWindow( Rect canvas, ref Vector2 scrollPosition, ThingFilter filter,
                                                ThingFilter parentFilter = null, int openMask = 1,
@@ -73,32 +98,6 @@ namespace FluffyManager
             viewHeight = curY + listingTreeThingFilter.CurHeight;
             Widgets.EndScrollView();
             GUI.EndGroup();
-        }
-
-        private static void DrawHitPointsFilterConfig( ref float y, float width, ThingFilter filter )
-        {
-            if ( !filter.allowedHitPointsConfigurable ) return;
-
-            var rect                     = new Rect( 20f, y, width - 20f, 26f );
-            var allowedHitPointsPercents = filter.AllowedHitPointsPercents;
-            Widgets.FloatRange( rect, 1, ref allowedHitPointsPercents, 0f, 1f, "HitPoints", ToStringStyle.PercentZero );
-            filter.AllowedHitPointsPercents =  allowedHitPointsPercents;
-            y                               += 26f;
-            y                               += 5f;
-            Text.Font                       =  GameFont.Small;
-        }
-
-        private static void DrawQualityFilterConfig( ref float y, float width, ThingFilter filter )
-        {
-            if ( !filter.allowedQualitiesConfigurable ) return;
-
-            var rect                 = new Rect( 20f, y, width - 20f, 26f );
-            var allowedQualityLevels = filter.AllowedQualityLevels;
-            Widgets.QualityRange( rect, 2, ref allowedQualityLevels );
-            filter.AllowedQualityLevels =  allowedQualityLevels;
-            y                           += 26f;
-            y                           += 5f;
-            Text.Font                   =  GameFont.Small;
         }
     }
 }

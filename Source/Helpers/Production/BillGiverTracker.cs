@@ -1,6 +1,5 @@
-﻿//// Karel Kroeze
-//// BillGiverTracker.cs
-//// 2016-12-09
+﻿// BillGiverTracker.cs
+// Copyright Karel Kroeze, 2018-2020
 
 //using RimWorld;
 //using System;

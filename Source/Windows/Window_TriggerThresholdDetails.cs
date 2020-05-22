@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// Window_TriggerThresholdDetails.cs
-// 2016-12-09
+﻿// Window_TriggerThresholdDetails.cs
+// Copyright Karel Kroeze, 2017-2020
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,8 +9,8 @@ namespace FluffyManager
 {
     public class WindowTriggerThresholdDetails : Window
     {
-        public           Vector2           FilterScrollPosition = Vector2.zero;
         private readonly ThingFilterUI     filterUI             = new ThingFilterUI();
+        public           Vector2           FilterScrollPosition = Vector2.zero;
         public           string            Input;
         public           Trigger_Threshold Trigger;
 

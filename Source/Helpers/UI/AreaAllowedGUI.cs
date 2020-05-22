@@ -1,10 +1,8 @@
-﻿// Karel Kroeze
-// AreaAllowedGUI.cs
-// 2016-12-09
+﻿// AreaAllowedGUI.cs
+// Copyright Karel Kroeze, 2020-2020
 
 using System.Collections.Generic;
 using RimWorld;
-using UnityEngine;
 using UnityEngine;
 using Verse;
 using Verse.Sound;

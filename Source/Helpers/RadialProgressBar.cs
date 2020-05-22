@@ -1,5 +1,5 @@
 ﻿// RadialProgressBar.cs
-// Copyright Karel Kroeze, 2019-2019
+// Copyright Karel Kroeze, 2019-2020
 
 /**
  * Radial progress bar renderer - doesn't actually work.
@@ -11,19 +11,13 @@ using Verse;
 
 namespace FluffyManager
 {
-
     public class RadialRenderer : MonoBehaviour
     {
-        private        Mesh   mesh;
+        private Mesh mesh;
 
         public RadialRenderer()
         {
             Logger.Debug( "RadialRenderer()" );
-        }
-
-        public void Start()
-        { 
-            Logger.Debug( "RadialRenderer.Start()" );
         }
 
         public void OnPostRender()
@@ -35,7 +29,7 @@ namespace FluffyManager
 
         public void Render( Mesh mesh, RenderTexture renderTexture )
         {
-            Logger.Debug( $"RadialRenderer.Render({(isActiveAndEnabled ? "active" : "inactive")})" );
+            Logger.Debug( $"RadialRenderer.Render({( isActiveAndEnabled ? "active" : "inactive" )})" );
             RadialProgressBar.Camera.targetTexture    = renderTexture;
             this.mesh                                 = mesh;
             RadialProgressBar.Camera.orthographicSize = mesh.bounds.size.y / 2f;
@@ -43,14 +37,19 @@ namespace FluffyManager
             this.mesh                              = null;
             RadialProgressBar.Camera.targetTexture = null;
         }
+
+        public void Start()
+        {
+            Logger.Debug( "RadialRenderer.Start()" );
+        }
     }
 
     public static class RadialProgressBar
     {
+        private static Camera _camera;
+
         private static readonly Dictionary<RadialBarSettings, Mesh> _meshCache =
             new Dictionary<RadialBarSettings, Mesh>();
-
-        private static Camera _camera;
 
         private static readonly Dictionary<RadialBarSettings, RenderTexture> _renderTextureCache =
             new Dictionary<RadialBarSettings, RenderTexture>();
@@ -70,7 +69,7 @@ namespace FluffyManager
                     renderer.enabled = true;
 
                     var camera = gameObject.GetComponent<Camera>();
-                    camera.enabled = true;
+                    camera.enabled             = true;
                     camera.transform.position  = new Vector3( 0f, 0f, 0f );
                     camera.transform.rotation  = Quaternion.Euler( 90f, 0f, 0f );
                     camera.orthographic        = true;
@@ -106,15 +105,9 @@ namespace FluffyManager
             return texture;
         }
 
-        private static Mesh GetMesh( RadialBarSettings settings )
+        public static Vector2 GetPoint( float radians )
         {
-            if ( _meshCache.TryGetValue( settings, out var mesh ) )
-                return mesh;
-
-            mesh = CreateMesh( settings );
-            _meshCache.Add( settings, mesh );
-            Logger.Debug( $"Mesh created: {mesh.name}" );
-            return mesh;
+            return new Vector2( Mathf.Cos( radians ), Mathf.Sin( radians ) );
         }
 
         private static Mesh CreateMesh( RadialBarSettings settings )
@@ -162,7 +155,8 @@ namespace FluffyManager
 
             return new Mesh
             {
-                name = $"radialMesh({settings.Radius}, {settings.Width}, {settings.Progress}, {settings.RadiansPerSection})",
+                name =
+                    $"radialMesh({settings.Radius}, {settings.Width}, {settings.Progress}, {settings.RadiansPerSection})",
                 vertices  = vertices,
                 triangles = triangles,
                 colors    = colors,
@@ -170,9 +164,15 @@ namespace FluffyManager
             };
         }
 
-        public static Vector2 GetPoint( float radians )
+        private static Mesh GetMesh( RadialBarSettings settings )
         {
-            return new Vector2( Mathf.Cos( radians ), Mathf.Sin( radians ) );
+            if ( _meshCache.TryGetValue( settings, out var mesh ) )
+                return mesh;
+
+            mesh = CreateMesh( settings );
+            _meshCache.Add( settings, mesh );
+            Logger.Debug( $"Mesh created: {mesh.name}" );
+            return mesh;
         }
 
         private struct RadialBarSettings : IEqualityComparer<RadialBarSettings>

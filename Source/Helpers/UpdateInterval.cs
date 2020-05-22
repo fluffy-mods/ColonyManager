@@ -1,5 +1,5 @@
 ﻿// UpdateInterval.cs
-// Copyright Karel Kroeze, -2019
+// Copyright Karel Kroeze, 2019-2020
 
 using System.Collections.Generic;
 using RimWorld;
@@ -10,8 +10,9 @@ namespace FluffyManager
 {
     public class UpdateInterval
     {
-        public int       ticks;
-        public string    label;
+        private static UpdateInterval _daily;
+        public         string         label;
+        public         int            ticks;
 
         public UpdateInterval( int ticks, string label )
         {
@@ -19,17 +20,11 @@ namespace FluffyManager
             this.label = label;
         }
 
-        private static UpdateInterval _daily;
-
         public static UpdateInterval Daily
         {
             get
             {
-                if ( _daily == null )
-                {
-
-                    _daily = new UpdateInterval( GenDate.TicksPerDay, "FM.Daily".Translate() );
-                }
+                if ( _daily == null ) _daily = new UpdateInterval( GenDate.TicksPerDay, "FM.Daily".Translate() );
 
                 return _daily;
             }
@@ -41,7 +36,7 @@ namespace FluffyManager
 
             // how many hours have passed since the last update?
             var lastUpdate = Find.TickManager.TicksGame - job.lastAction;
-            var progress = (float)lastUpdate / GenDate.TicksPerHour;
+            var progress   = (float) lastUpdate               / GenDate.TicksPerHour;
             var nextUpdate = (float) job.UpdateInterval.ticks / GenDate.TicksPerHour;
 
             // how far over time are we? Draw redder if further over time.
@@ -58,7 +53,8 @@ namespace FluffyManager
             }
             else
             {
-                var nextUpdateMarker = new CalendarMarker( nextUpdate / GenDate.HoursPerDay, GenUI.MouseoverColor, false );
+                var nextUpdateMarker =
+                    new CalendarMarker( nextUpdate / GenDate.HoursPerDay, GenUI.MouseoverColor, false );
                 var progressMarker = new CalendarMarker( progress / GenDate.HoursPerDay, progressColour, true );
                 Calendar.Draw( canvas.ContractedBy( 2f ), progressMarker, nextUpdateMarker );
             }
@@ -73,9 +69,7 @@ namespace FluffyManager
             {
                 var options = new List<FloatMenuOption>();
                 foreach ( var interval in Utilities.UpdateIntervalOptions )
-                {
                     options.Add( new FloatMenuOption( interval.label, () => job.UpdateInterval = interval ) );
-                }
 
                 Find.WindowStack.Add( new FloatMenu( options ) );
             }

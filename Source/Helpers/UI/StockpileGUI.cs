@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// StockpileGUI.cs
-// 2016-12-09
+﻿// StockpileGUI.cs
+// Copyright Karel Kroeze, 2018-2020
 
 using System.Collections.Generic;
 using System.Linq;

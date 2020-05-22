@@ -1,5 +1,5 @@
 ﻿// Calendar.cs
-// Copyright Karel Kroeze, -2019
+// Copyright Karel Kroeze, 2019-2020
 
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +19,12 @@ namespace FluffyManager
             Debug = debug;
         }
 
-        public float Days  { get; }
         public Color Color { get; }
-        public bool  Fill  { get; }
+
+        public float Days { get; }
 
         public bool Debug { get; }
+        public bool Fill  { get; }
     }
 
     public static class Calendar
@@ -65,8 +66,8 @@ namespace FluffyManager
 
         private static void DrawDay( int col, int row, int size, Vector2 pos, float progress, Color color )
         {
-            var canvas = new Rect( (int) ( col * size + pos.x ),
-                                   (int) ( row * size + pos.y ),
+            var canvas = new Rect( (int) ( col * size                 + pos.x ),
+                                   (int) ( row * size                 + pos.y ),
                                    Mathf.Clamp01( progress ) * ( size - 1 ),
                                    size - 1 );
             Widgets.DrawBoxSolid( canvas, color );

@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// Manager.cs
-// 2016-12-09
+﻿// Manager.cs
+// Copyright Karel Kroeze, 2018-2020
 
 using System;
 using System.Collections.Generic;
@@ -17,16 +16,17 @@ namespace FluffyManager
             Normal
         }
 
+        public static bool HelpShown;
+
         public static Modes LoadSaveMode = Modes.Normal;
-        public static bool  HelpShown;
+
+        public List<ManagerTab> Tabs;
 
         private List<ManagerTab> _managerTabsLeft;
         private List<ManagerTab> _managerTabsMiddle;
         private List<ManagerTab> _managerTabsRight;
         private JobStack         _stack;
         private int              id = -1;
-
-        public List<ManagerTab> Tabs;
 
         public Manager( Map map ) : base( map )
         {
@@ -47,6 +47,8 @@ namespace FluffyManager
             // if not created in SavingLoading, give yourself the ID of the map you were constructed on.
             if ( Scribe.mode == Verse.LoadSaveMode.Inactive ) id = map.uniqueID;
         }
+
+        public JobStack JobStack => _stack ?? ( _stack = new JobStack( this ) );
 
         public List<ManagerTab> ManagerTabsLeft
         {
@@ -80,16 +82,9 @@ namespace FluffyManager
             }
         }
 
-        public JobStack JobStack => _stack ?? ( _stack = new JobStack( this ) );
-
         public string GetUniqueLoadID()
         {
             return "ColonyManager_" + id;
-        }
-
-        public static implicit operator Map( Manager manager )
-        {
-            return manager.map;
         }
 
         public static Manager For( Map map )
@@ -101,6 +96,11 @@ namespace FluffyManager
             instance = new Manager( map );
             map.components.Add( instance );
             return instance;
+        }
+
+        public static implicit operator Map( Manager manager )
+        {
+            return manager.map;
         }
 
         public override void ExposeData()
@@ -119,32 +119,30 @@ namespace FluffyManager
             if ( _stack == null ) _stack = new JobStack( this );
         }
 
-        public bool TryDoWork()
-        {
-            return JobStack.TryDoNextJob();
-        }
-
         public override void MapComponentTick()
         {
             base.MapComponentTick();
 
             // tick jobs
             foreach ( var job in JobStack.FullStack() )
-            {
                 if ( !job.Suspended )
-                {
                     try
                     {
                         job.Tick();
-                    } catch ( Exception err ) {
+                    }
+                    catch ( Exception err )
+                    {
                         Log.Error( $"Suspending manager job because it error-ed on tick: \n{err}" );
                     }
-                }
-            }
 
             // tick tabs
             foreach ( var tab in Tabs )
                 tab.Tick();
+        }
+
+        public bool TryDoWork()
+        {
+            return JobStack.TryDoNextJob();
         }
 
 

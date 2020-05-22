@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// JobDriver_ManagingAtManagingStation.cs
-// 2016-12-09
+﻿// JobDriver_ManagingAtManagingStation.cs
+// Copyright Karel Kroeze, 2018-2020
 
 using System.Collections.Generic;
 using RimWorld;
@@ -13,6 +12,14 @@ namespace FluffyManager
     {
         private float workDone;
         private float workNeeded;
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+
+            Scribe_Values.Look( ref workNeeded, "WorkNeeded", 100 );
+            Scribe_Values.Look( ref workDone, "WorkDone" );
+        }
 
         public override bool TryMakePreToilReservations( bool errorOnFailed )
         {
@@ -29,14 +36,6 @@ namespace FluffyManager
             // if made to by player, keep doing that untill we're out of jobs
             yield return Toils_Jump.JumpIf(
                 manage, () => GetActor().CurJob.playerForced && Manager.For( Map ).JobStack.NextJob != null );
-        }
-
-        public override void ExposeData()
-        {
-            base.ExposeData();
-
-            Scribe_Values.Look( ref workNeeded, "WorkNeeded", 100 );
-            Scribe_Values.Look( ref workDone, "WorkDone" );
         }
 
         private Toil Manage( TargetIndex targetIndex )

@@ -1,5 +1,5 @@
-﻿// Label.cs
-// Copyright Karel Kroeze, 2017-2017
+﻿// Widgets_Labels.cs
+// Copyright Karel Kroeze, 2017-2020
 
 using UnityEngine;
 using Verse;

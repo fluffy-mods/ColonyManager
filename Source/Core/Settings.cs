@@ -1,9 +1,7 @@
-﻿// Karel Kroeze
-// Settings.cs
-// 2017-05-27
+﻿// Settings.cs
+// Copyright Karel Kroeze, 2020-2020
 
 using System.Collections.Generic;
-using System.Linq;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -16,26 +14,8 @@ namespace FluffyManager
 
         public static UpdateInterval DefaultUpdateInterval
         {
-            get
-            {
-                return ticksToInterval(_defaultUpdateIntervalTicks_Scribe);
-            }
-            set
-            {
-                _defaultUpdateIntervalTicks_Scribe = value.ticks;
-            }
-        }
-
-        private static UpdateInterval ticksToInterval(int ticks)
-        {
-            foreach (var interval in Utilities.UpdateIntervalOptions)
-            {
-                if (interval.ticks == ticks)
-                {
-                    return interval;
-                }
-            }
-            return null;
+            get => ticksToInterval( _defaultUpdateIntervalTicks_Scribe );
+            set => _defaultUpdateIntervalTicks_Scribe = value.ticks;
         }
 
         public static void DoSettingsWindowContents( Rect rect )
@@ -55,12 +35,18 @@ namespace FluffyManager
             {
                 var options = new List<FloatMenuOption>();
                 foreach ( var interval in Utilities.UpdateIntervalOptions )
-                {
                     options.Add( new FloatMenuOption( interval.label, () => DefaultUpdateInterval = interval ) );
-                }
 
                 Find.WindowStack.Add( new FloatMenu( options ) );
             }
+        }
+
+        private static UpdateInterval ticksToInterval( int ticks )
+        {
+            foreach ( var interval in Utilities.UpdateIntervalOptions )
+                if ( interval.ticks == ticks )
+                    return interval;
+            return null;
         }
 
         public override void ExposeData()

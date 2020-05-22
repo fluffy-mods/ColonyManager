@@ -1,8 +1,6 @@
-﻿// Karel Kroeze
-// ManagerTab_Power.cs
-// 2016-12-09
+﻿// ManagerTab_Power.cs
+// Copyright Karel Kroeze, 2020-2020
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -14,18 +12,18 @@ namespace FluffyManager
 {
     public class ManagerTab_Power : ManagerTab, IExposable
     {
-        public static bool                         unlocked = false;
-        private       List<List<CompPowerBattery>> _batteries;
+        public static bool unlocked = false;
 
         private readonly List<ThingDef> _batteryDefs;
+
+        private readonly List<ThingDef>               _traderDefs;
+        private          List<List<CompPowerBattery>> _batteries;
 
         private Vector2 _consumptionScrollPos = Vector2.zero;
 
         private Vector2 _overallScrollPos = Vector2.zero;
 
         private Vector2 _productionScrollPos = Vector2.zero;
-
-        private readonly List<ThingDef> _traderDefs;
 
         private List<List<CompPowerTrader>> _traders;
 
@@ -83,16 +81,6 @@ namespace FluffyManager
             }
         }
 
-        public override Texture2D Icon => Resources.IconPower;
-
-        public override IconAreas IconArea => IconAreas.Middle;
-
-        public override string Label => "FME.Power".Translate();
-
-        public override ManagerJob Selected { get; set; }
-
-        public override bool Enabled => unlocked && AnyPoweredStationOnline;
-
         public override string DisabledReason
         {
             get
@@ -104,6 +92,16 @@ namespace FluffyManager
                 return "Not sure. It should be enabled? Send a bug report.";
             }
         }
+
+        public override bool Enabled => unlocked && AnyPoweredStationOnline;
+
+        public override Texture2D Icon => Resources.IconPower;
+
+        public override IconAreas IconArea => IconAreas.Middle;
+
+        public override string Label => "FME.Power".Translate();
+
+        public override ManagerJob Selected { get; set; }
 
         public void ExposeData()
         {
@@ -176,7 +174,8 @@ namespace FluffyManager
                 // update the history tracker.
                 var trade = GetCurrentTrade();
                 tradingHistory.Update( trade );
-                overallHistory.Update( trade.Where( i => i > 0 ).Sum(), trade.Where( i => i < 0 ).Sum( Utilities.SafeAbs ),
+                overallHistory.Update( trade.Where( i => i > 0 ).Sum(),
+                                       trade.Where( i => i < 0 ).Sum( Utilities.SafeAbs ),
                                        GetCurrentBatteries().Sum() );
             }
         }

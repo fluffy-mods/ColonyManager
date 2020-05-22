@@ -1,6 +1,5 @@
-﻿//// Karel Kroeze
-//// MainProductTracker.cs
-//// 2016-12-09
+﻿// MainProductTracker.cs
+// Copyright Karel Kroeze, 2017-2020
 
 //using RimWorld;
 //using System;

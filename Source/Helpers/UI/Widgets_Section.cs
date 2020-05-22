@@ -1,5 +1,5 @@
 ﻿// Widgets_Section.cs
-// Copyright Karel Kroeze, 2017-2017
+// Copyright Karel Kroeze, 2018-2020
 
 using System;
 using System.Collections.Generic;
@@ -44,28 +44,6 @@ namespace FluffyManager
             _columnHeights[identifier] = position.y;
         }
 
-        private static float GetHeight( string identifier )
-        {
-            float height;
-            if ( _columnHeights.TryGetValue( identifier, out height ) )
-                return height;
-
-            height                     = 0f;
-            _columnHeights[identifier] = height;
-            return height;
-        }
-
-        private static Vector2 GetScrollPosition( string identifier )
-        {
-            Vector2 scrollposition;
-            if ( _columnScrollPositions.TryGetValue( identifier, out scrollposition ) )
-                return scrollposition;
-
-            scrollposition                     = Vector2.zero;
-            _columnScrollPositions[identifier] = scrollposition;
-            return scrollposition;
-        }
-
         public static void Section( ref Vector2 position, float width, Func<Vector2, float, float> drawerFunc,
                                     string header = null, int id = 0 )
         {
@@ -94,11 +72,33 @@ namespace FluffyManager
             _heights[id] =  height;
         }
 
+        private static float GetHeight( string identifier )
+        {
+            float height;
+            if ( _columnHeights.TryGetValue( identifier, out height ) )
+                return height;
+
+            height                     = 0f;
+            _columnHeights[identifier] = height;
+            return height;
+        }
+
         private static float GetHeight( int id )
         {
             float height;
             _heights.TryGetValue( id, out height );
             return height;
+        }
+
+        private static Vector2 GetScrollPosition( string identifier )
+        {
+            Vector2 scrollposition;
+            if ( _columnScrollPositions.TryGetValue( identifier, out scrollposition ) )
+                return scrollposition;
+
+            scrollposition                     = Vector2.zero;
+            _columnScrollPositions[identifier] = scrollposition;
+            return scrollposition;
         }
     }
 }

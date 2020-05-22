@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// Comp_ManagerStation.cs
-// 2016-12-09
+﻿// Comp_ManagerStation.cs
+// Copyright Karel Kroeze, 2018-2020
 
 using Verse;
 

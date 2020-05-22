@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// CompGlower_Extensions.cs
-// 2016-12-09
+﻿// CompGlower_Extensions.cs
+// Copyright Karel Kroeze, 2017-2020
 
 using System;
 using System.Reflection;

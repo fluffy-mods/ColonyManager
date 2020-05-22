@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// WorkGiver_Manager.cs
-// 2016-12-09
+﻿// WorkGiver_Manager.cs
+// Copyright Karel Kroeze, 2017-2020
 
 using System.Collections.Generic;
 using System.Linq;

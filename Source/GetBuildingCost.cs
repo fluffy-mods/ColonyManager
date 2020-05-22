@@ -1,3 +1,6 @@
+// GetBuildingCost.cs
+// Copyright Karel Kroeze, 2020-2020
+
 //using Harmony;
 //using HarmonyLib;
 //using Verse;
@@ -26,3 +29,4 @@
 //        }
 //    }
 //}
+

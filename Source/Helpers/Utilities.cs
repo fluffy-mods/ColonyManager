@@ -1,11 +1,11 @@
-﻿// Karel Kroeze
-// Utilities.cs
-// 2016-12-09
+﻿// Utilities.cs
+// Copyright Karel Kroeze, 2020-2020
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -16,31 +16,23 @@ namespace FluffyManager
 {
     public static class Utilities
     {
-        public static Dictionary<MapStockpileFilter, FilterCountCache> CountCache =
-            new Dictionary<MapStockpileFilter, FilterCountCache>();
-
-        public static WorkTypeDef             WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
-
-
         public enum SyncDirection
         {
             FilterToAllowed,
             AllowedToFilter
         }
 
-        static Utilities()
-        {
+        public static Dictionary<MapStockpileFilter, FilterCountCache> CountCache =
+            new Dictionary<MapStockpileFilter, FilterCountCache>();
 
-        }
-
-        public static int SafeAbs( int value )
-        {
-            if ( value >= 0 ) return value;
-            if ( value == Int32.MinValue ) return Int32.MaxValue;
-            return -value;
-        }
+        public static WorkTypeDef WorkTypeDefOf_Managing = DefDatabase<WorkTypeDef>.GetNamed( "Managing" );
 
         private static List<UpdateInterval> _updateIntervalOptions;
+
+        static Utilities()
+        {
+        }
+
         public static List<UpdateInterval> UpdateIntervalOptions
         {
             get
@@ -49,95 +41,33 @@ namespace FluffyManager
                 {
                     _updateIntervalOptions = new List<UpdateInterval>();
                     _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerHour, "FM.Hourly".Translate() ) );
-                    _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerHour * 2, "FM.MultiHourly".Translate( 2 ) ) );
-                    _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerHour * 4, "FM.MultiHourly".Translate( 4 ) ) );
-                    _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerHour * 8, "FM.MultiHourly".Translate( 8 ) ) );
+                    _updateIntervalOptions.Add(
+                        new UpdateInterval( GenDate.TicksPerHour * 2, "FM.MultiHourly".Translate( 2 ) ) );
+                    _updateIntervalOptions.Add(
+                        new UpdateInterval( GenDate.TicksPerHour * 4, "FM.MultiHourly".Translate( 4 ) ) );
+                    _updateIntervalOptions.Add(
+                        new UpdateInterval( GenDate.TicksPerHour * 8, "FM.MultiHourly".Translate( 8 ) ) );
                     _updateIntervalOptions.Add( UpdateInterval.Daily );
-                    _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerTwelfth, "FM.Monthly".Translate() ) );
+                    _updateIntervalOptions.Add(
+                        new UpdateInterval( GenDate.TicksPerTwelfth, "FM.Monthly".Translate() ) );
                     _updateIntervalOptions.Add( new UpdateInterval( GenDate.TicksPerYear, "FM.Yearly".Translate() ) );
                 }
 
                 return _updateIntervalOptions;
             }
         }
-
-        public static bool HasCompOrChildCompOf( this ThingDef def, Type compType )
-        {
-            for ( var index = 0; index < def.comps.Count; ++index )
-                if ( compType.IsAssignableFrom( def.comps[index].compClass ) )
-                    return true;
-
-            return false;
-        }
-
-        public static IntVec3 GetBaseCenter( this Map map )
-        {
-            // we need to define a 'base' position to calculate distances.
-            // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
-            var position = IntVec3.Zero;
-            Building managerStation = map.listerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>()
-                                         .FirstOrDefault();
-            if ( managerStation != null ) return managerStation.InteractionCell;
-
-            // otherwise, use the average of the home area. Not ideal, but it'll do.
-            var homeCells =
-                map.areaManager.Get<Area_Home>().ActiveCells.ToList();
-            for ( var i = 0; i < homeCells.Count; i++ ) position += homeCells[i];
-
-            position.x /= homeCells.Count;
-            position.y /= homeCells.Count;
-            position.z /= homeCells.Count;
-            var standableCell = position;
-
-            // find the closest traversable cell to the center
-            for ( var i = 0; !standableCell.Walkable( map ); i++ )
-                standableCell = position + GenRadial.RadialPattern[i];
-            return standableCell;
-        }
-
-        private static bool TryGetCached( MapStockpileFilter mapStockpileFilter, out int count )
-        {
-            if ( CountCache.ContainsKey( mapStockpileFilter ) )
-            {
-                var filterCountCache = CountCache[mapStockpileFilter];
-                if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 && // less than 250 ticks ago
-                     Find.TickManager.TicksGame                            > filterCountCache.TimeSet )
-                    // cache is not from future (switching games without restarting could cause this).
-                {
-                    count = filterCountCache.Cache;
-                    return true;
-                }
-            }
-#if DEBUG_COUNTS
-            Log.Message("not cached");
-#endif
-            count = 0;
-            return false;
-        }
-
-        public static string TimeString( this int ticks )
-        {
-            int days  = ticks                       / GenDate.TicksPerDay,
-                hours = ticks % GenDate.TicksPerDay / GenDate.TicksPerHour;
-
-            var s = String.Empty;
-
-            if ( days > 0 ) s += days + "LetterDay".Translate() + " ";
-            s += hours + "LetterHour".Translate();
-
-            return s;
-        }
-
-        public static int CountProducts( this Map map, ThingFilter filter, Zone_Stockpile stockpile = null,
+        
+        public static int CountProducts( [NotNull] this Map map, [NotNull] ThingFilter filter, [CanBeNull] Zone_Stockpile stockpile = null,
                                          bool countAllOnMap = false )
         {
-            var count = 0;
-
-            // copout if filter is null
-            if ( filter == null ) return count;
+            if ( map == null )
+                throw new NullReferenceException( nameof( map ) );
+            
+            if ( filter == null )
+                throw new NullReferenceException( nameof( filter ) );
 
             var key = new MapStockpileFilter( map, filter, stockpile, countAllOnMap );
-            if ( TryGetCached( key, out count ) ) return count;
+            if ( TryGetCached( key, out var count ) ) return count;
 
             foreach ( var td in filter.AllowedThingDefs )
             {
@@ -198,9 +128,10 @@ namespace FluffyManager
             return count;
         }
 
-        public static bool IsInt( this string text )
+        public static void DrawReachabilityToggle( ref Vector2 pos, float width, ref bool reachability )
         {
-            return Int32.TryParse( text, out var num );
+            DrawToggle( ref pos, width, "FM.CheckReachability".Translate(), "FM.CheckReachability.Tip".Translate(),
+                        ref reachability, true );
         }
 
         public static void DrawStatusForListEntry<T>( this T job, Rect rect, Trigger trigger ) where T : ManagerJob
@@ -316,7 +247,7 @@ namespace FluffyManager
                 width,
                 ListEntryHeight );
             pos.y += ListEntryHeight;
-            DrawToggle( toggleRect, label, tooltip, checkOn, @on, off, expensive, size, margin, wrap );
+            DrawToggle( toggleRect, label, tooltip, checkOn, on, off, expensive, size, margin, wrap );
         }
 
         public static void DrawToggle( ref Vector2 pos, float width, string label, string tooltip, bool checkOn,
@@ -331,14 +262,14 @@ namespace FluffyManager
                 width,
                 ListEntryHeight );
             pos.y += ListEntryHeight;
-            DrawToggle( toggleRect, label, tooltip, checkOn, checkOff, @on, off, expensive, size, margin, wrap );
+            DrawToggle( toggleRect, label, tooltip, checkOn, checkOff, on, off, expensive, size, margin, wrap );
         }
 
         public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, Action on, Action off,
                                        bool expensive = false, float size = SmallIconSize, float margin = Margin,
                                        bool wrap = true )
         {
-            DrawToggle( rect, label, tooltip, checkOn, !checkOn, @on, off, expensive, size, margin, wrap );
+            DrawToggle( rect, label, tooltip, checkOn, !checkOn, on, off, expensive, size, margin, wrap );
         }
 
 
@@ -383,7 +314,7 @@ namespace FluffyManager
             if ( Widgets.ButtonInvisible( rect ) )
             {
                 if ( !checkOn )
-                    @on();
+                    on();
                 else
                     off();
             }
@@ -396,10 +327,98 @@ namespace FluffyManager
             DrawToggle( rect, label, tooltip, checkOn, toggle, toggle, expensive, size );
         }
 
-        public static void DrawReachabilityToggle( ref Vector2 pos, float width, ref bool reachability )
+        public static IntVec3 GetBaseCenter( this Map map )
         {
-            DrawToggle( ref pos, width, "FM.CheckReachability".Translate(), "FM.CheckReachability.Tip".Translate(),
-                        ref reachability, true );
+            // we need to define a 'base' position to calculate distances.
+            // Try to find a managerstation (in all non-debug cases this method will only fire if there is such a station).
+            var position = IntVec3.Zero;
+            Building managerStation = map.listerBuildings.AllBuildingsColonistOfClass<Building_ManagerStation>()
+                                         .FirstOrDefault();
+            if ( managerStation != null ) return managerStation.InteractionCell;
+
+            // otherwise, use the average of the home area. Not ideal, but it'll do.
+            var homeCells =
+                map.areaManager.Get<Area_Home>().ActiveCells.ToList();
+            for ( var i = 0; i < homeCells.Count; i++ ) position += homeCells[i];
+
+            position.x /= homeCells.Count;
+            position.y /= homeCells.Count;
+            position.z /= homeCells.Count;
+            var standableCell = position;
+
+            // find the closest traversable cell to the center
+            for ( var i = 0; !standableCell.Walkable( map ); i++ )
+                standableCell = position + GenRadial.RadialPattern[i];
+            return standableCell;
+        }
+
+        public static object GetPrivatePropertyValue( this object src, string propName,
+                                                      BindingFlags flags =
+                                                          BindingFlags.Instance | BindingFlags.NonPublic )
+        {
+            return src.GetType().GetProperty( propName, flags ).GetValue( src, null );
+        }
+
+        public static bool HasCompOrChildCompOf( this ThingDef def, Type compType )
+        {
+            for ( var index = 0; index < def.comps.Count; ++index )
+                if ( compType.IsAssignableFrom( def.comps[index].compClass ) )
+                    return true;
+
+            return false;
+        }
+
+        public static bool IsInt( this string text )
+        {
+            return int.TryParse( text, out var num );
+        }
+
+        public static void LabelOutline( Rect icon, string label, string tooltip, TextAnchor anchor, float margin,
+                                         GameFont font, Color textColour, Color outlineColour )
+        {
+            // horribly inefficient way of getting an outline to show - draw 4 background coloured labels with a 1px offset, then draw the foreground on top.
+            int[] offsets = {-1, 0, 1};
+
+            foreach ( var xOffset in offsets )
+                foreach ( var yOffset in offsets )
+                {
+                    var offsetIcon = icon;
+                    offsetIcon.x += xOffset;
+                    offsetIcon.y += yOffset;
+                    Label( offsetIcon, label, anchor, font, outlineColour, margin );
+                }
+
+            Label( icon, label, tooltip, anchor, font, textColour, margin );
+        }
+
+        public static int SafeAbs( int value )
+        {
+            if ( value >= 0 ) return value;
+            if ( value == int.MinValue ) return int.MaxValue;
+            return -value;
+        }
+
+        public static void Scribe_IntArray( ref List<int> values, string label )
+        {
+            string text = null;
+            if ( Scribe.mode == LoadSaveMode.Saving )
+                text = string.Join( ":", values.ConvertAll( i => i.ToString() ).ToArray() );
+            Scribe_Values.Look( ref text, label );
+            if ( Scribe.mode == LoadSaveMode.LoadingVars )
+                values = text.Split( ":".ToCharArray() ).ToList().ConvertAll( int.Parse );
+        }
+
+        public static string TimeString( this int ticks )
+        {
+            int days  = ticks                       / GenDate.TicksPerDay,
+                hours = ticks % GenDate.TicksPerDay / GenDate.TicksPerHour;
+
+            var s = string.Empty;
+
+            if ( days > 0 ) s += days + "LetterDay".Translate() + " ";
+            s += hours + "LetterHour".Translate();
+
+            return s;
         }
 
         public static bool TryGetPrivateField( Type type, object instance, string fieldName, out object value,
@@ -429,39 +448,24 @@ namespace FluffyManager
             return test == value;
         }
 
-        public static object GetPrivatePropertyValue( this object src, string propName,
-                                                      BindingFlags flags =
-                                                          BindingFlags.Instance | BindingFlags.NonPublic )
+        private static bool TryGetCached( MapStockpileFilter mapStockpileFilter, out int count )
         {
-            return src.GetType().GetProperty( propName, flags ).GetValue( src, null );
-        }
-
-        public static void LabelOutline( Rect icon, string label, string tooltip, TextAnchor anchor, float margin,
-                                         GameFont font, Color textColour, Color outlineColour )
-        {
-            // horribly inefficient way of getting an outline to show - draw 4 background coloured labels with a 1px offset, then draw the foreground on top.
-            int[] offsets = {-1, 0, 1};
-
-            foreach ( var xOffset in offsets )
-                foreach ( var yOffset in offsets )
+            if ( CountCache.ContainsKey( mapStockpileFilter ) )
+            {
+                var filterCountCache = CountCache[mapStockpileFilter];
+                if ( Find.TickManager.TicksGame - filterCountCache.TimeSet < 250 && // less than 250 ticks ago
+                     Find.TickManager.TicksGame                            > filterCountCache.TimeSet )
+                    // cache is not from future (switching games without restarting could cause this).
                 {
-                    var offsetIcon = icon;
-                    offsetIcon.x += xOffset;
-                    offsetIcon.y += yOffset;
-                    Label( offsetIcon, label, anchor, font, outlineColour, margin );
+                    count = filterCountCache.Cache;
+                    return true;
                 }
-
-            Label( icon, label, tooltip, anchor, font, textColour, margin );
-        }
-
-        public static void Scribe_IntArray( ref List<int> values, string label )
-        {
-            string text = null;
-            if ( Scribe.mode == LoadSaveMode.Saving )
-                text = String.Join( ":", values.ConvertAll( i => i.ToString() ).ToArray() );
-            Scribe_Values.Look( ref text, label );
-            if ( Scribe.mode == LoadSaveMode.LoadingVars )
-                values = text.Split( ":".ToCharArray() ).ToList().ConvertAll( Int32.Parse );
+            }
+#if DEBUG_COUNTS
+            Log.Message("not cached");
+#endif
+            count = 0;
+            return false;
         }
 
         public struct MapStockpileFilter
@@ -483,40 +487,12 @@ namespace FluffyManager
 
         public class CachedValues<T, V>
         {
-            private          Dictionary<T, CachedValue<V>> _cache;
+            private readonly Dictionary<T, CachedValue<V>> _cache;
             private readonly int                           updateInterval;
 
             public CachedValues( int updateInterval = 250 )
             {
                 _cache = new Dictionary<T, CachedValue<V>>();
-            }
-
-            public bool TryGetValue( T key, out V value )
-            {
-                if ( _cache.TryGetValue( key, out var cachedValue ) )
-                {
-                    return cachedValue.TryGetValue( out value );
-                }
-
-                value = default( V );
-                return false;
-            }
-
-            public void Add( T key, Func<V> updater )
-            {
-                // Log.Message( $"Adding cached value for: {key}", true );
-
-                V value = updater();
-                var cached = new CachedValue<V>( value, updateInterval, updater );
-                _cache.Add( key, cached );
-            }
-
-            public void Update( T key, V value )
-            {
-                if ( _cache.TryGetValue( key, out var cachedValue ) )
-                    cachedValue.Update( value );
-                else 
-                    _cache.Add( key, new CachedValue<V>( value, updateInterval ) );
             }
 
             public V this[ T index ]
@@ -528,15 +504,40 @@ namespace FluffyManager
                 }
                 set => Update( index, value );
             }
+
+            public void Add( T key, Func<V> updater )
+            {
+                // Log.Message( $"Adding cached value for: {key}", true );
+
+                var value  = updater();
+                var cached = new CachedValue<V>( value, updateInterval, updater );
+                _cache.Add( key, cached );
+            }
+
+            public bool TryGetValue( T key, out V value )
+            {
+                if ( _cache.TryGetValue( key, out var cachedValue ) ) return cachedValue.TryGetValue( out value );
+
+                value = default;
+                return false;
+            }
+
+            public void Update( T key, V value )
+            {
+                if ( _cache.TryGetValue( key, out var cachedValue ) )
+                    cachedValue.Update( value );
+                else
+                    _cache.Add( key, new CachedValue<V>( value, updateInterval ) );
+            }
         }
 
         public class CachedValue<T>
         {
-            private          T       _cached;
             private readonly T       _default;
-            private          int     _timeSet;
             private readonly int     _updateInterval;
             private readonly Func<T> _updater;
+            private          T       _cached;
+            private          int     _timeSet;
 
             public CachedValue( T @default = default, int updateInterval = 250, Func<T> updater = null )
             {
@@ -544,6 +545,17 @@ namespace FluffyManager
                 _cached         = _default = @default;
                 _updater        = updater;
                 _timeSet        = Find.TickManager.TicksGame;
+            }
+
+            public T Value
+            {
+                get
+                {
+                    if ( TryGetValue( out var value ) )
+                        return value;
+                    throw new InvalidOperationException(
+                        "get_Value() on a CachedValue that is out of date, and has no updater." );
+                }
             }
 
             public bool TryGetValue( out T value )
@@ -565,26 +577,16 @@ namespace FluffyManager
                 return false;
             }
 
-            public T Value
-            {
-                get
-                {
-                    if ( TryGetValue( out T value ) )
-                        return value;
-                    throw new InvalidOperationException( "get_Value() on a CachedValue that is out of date, and has no updater." );
-                }
-            }
-
             public void Update( T value )
             {
-                _cached = value;
+                _cached  = value;
                 _timeSet = Find.TickManager.TicksGame;
             }
 
             public void Update()
             {
                 // Log.Message( $"Running Update()", true );
-                 
+
                 if ( _updater == null )
                     Log.Error( "Calling Update() without updater" );
                 else

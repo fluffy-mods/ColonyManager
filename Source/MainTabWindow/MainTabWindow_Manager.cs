@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// MainTabWindow_Manager.cs
-// 2016-12-09
+﻿// MainTabWindow_Manager.cs
+// Copyright Karel Kroeze, 2018-2020
 
 using RimWorld;
 using UnityEngine;

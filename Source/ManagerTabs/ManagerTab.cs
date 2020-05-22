@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// ManagerTab.cs
-// 2016-12-09
+﻿// ManagerTab.cs
+// Copyright Karel Kroeze, 2018-2020
 
 using UnityEngine;
 
@@ -24,6 +23,10 @@ namespace FluffyManager
             this.manager = manager;
         }
 
+        public virtual string DisabledReason => "";
+
+        public virtual bool Enabled => true;
+
         public virtual Texture2D Icon => Resources.IconHammer;
 
         public virtual IconAreas IconArea => IconAreas.Middle;
@@ -31,10 +34,6 @@ namespace FluffyManager
         public virtual string Label => GetType().ToString();
 
         public abstract ManagerJob Selected { get; set; }
-
-        public virtual bool Enabled => true;
-
-        public virtual string DisabledReason => "";
 
         public abstract void DoWindowContents( Rect canvas );
 

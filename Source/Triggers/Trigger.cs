@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// Trigger.cs
-// 2016-12-09
+﻿// Trigger.cs
+// Copyright Karel Kroeze, 2018-2020
 
 using System;
 using System.Collections.Generic;

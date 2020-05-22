@@ -1,6 +1,5 @@
-﻿//// Karel Kroeze
-//// Dialog_CreateJobsForIngredients.cs
-//// 2016-12-09
+﻿// Dialog_CreateJobsForIngredients.cs
+// Copyright Karel Kroeze, 2018-2020
 
 //using RimWorld;
 //using System;

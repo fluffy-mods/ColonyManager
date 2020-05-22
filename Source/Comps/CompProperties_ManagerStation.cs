@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// CompProperties_ManagerStation.cs
-// 2016-12-09
+﻿// CompProperties_ManagerStation.cs
+// Copyright Karel Kroeze, 2017-2020
 
 using System;
 using Verse;
@@ -9,6 +8,8 @@ namespace FluffyManager
 {
     public class CompProperties_ManagerStation : CompProperties
     {
+        public int speed = 250;
+
         public CompProperties_ManagerStation()
         {
         }
@@ -16,7 +17,5 @@ namespace FluffyManager
         public CompProperties_ManagerStation( Type compClass ) : base( compClass )
         {
         }
-
-        public int speed = 250;
     }
 }

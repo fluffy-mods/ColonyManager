@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// HSV_Helper.cs
-// 2016-12-09
+﻿// HSV_Helper.cs
+// Copyright Karel Kroeze, 2016-2020
 
 using UnityEngine;
 

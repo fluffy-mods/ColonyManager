@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// ManagerJob_Hunting.cs
-// 2016-12-09
+﻿// ManagerJob_Hunting.cs
+// Copyright Karel Kroeze, 2020-2020
 
 using System.Collections.Generic;
 using System.Linq;
@@ -13,21 +12,19 @@ namespace FluffyManager
 {
     public class ManagerJob_Hunting : ManagerJob
     {
-        private bool _allowHumanLikeMeat;
-
-        private          bool                       _allowInsectMeat;
         private readonly Utilities.CachedValue<int> _corpseCachedValue     = new Utilities.CachedValue<int>();
         private readonly Utilities.CachedValue<int> _designatedCachedValue = new Utilities.CachedValue<int>();
-        private          List<Designation>          _designations          = new List<Designation>();
-        private          List<ThingDef>             _humanLikeMeatDefs;
 
         public     Dictionary<PawnKindDef, bool> AllowedAnimals = new Dictionary<PawnKindDef, bool>();
         public     History                       History;
         public     Area                          HuntingGrounds;
         public new Trigger_Threshold             Trigger;
         public     bool                          UnforbidCorpses = true;
+        private    bool                          _allowHumanLikeMeat;
 
-        public override bool IsValid => base.IsValid && History != null && Trigger != null;
+        private bool              _allowInsectMeat;
+        private List<Designation> _designations = new List<Designation>();
+        private List<ThingDef>    _humanLikeMeatDefs;
 
         public ManagerJob_Hunting( Manager manager ) : base( manager )
         {
@@ -51,10 +48,6 @@ namespace FluffyManager
             if ( Scribe.mode == LoadSaveMode.Inactive )
                 RefreshAllowedAnimals();
         }
-
-        public List<Designation> Designations => new List<Designation>( _designations );
-
-        public override bool Completed => !Trigger.State;
 
         public bool AllowHumanLikeMeat
         {
@@ -87,6 +80,8 @@ namespace FluffyManager
             }
         }
 
+        public override bool Completed => !Trigger.State;
+
         public List<Corpse> Corpses
         {
             get
@@ -103,6 +98,8 @@ namespace FluffyManager
                                  AllowedAnimals[thing.InnerPawn.kindDef] ).ToList();
             }
         }
+
+        public List<Designation> Designations => new List<Designation>( _designations );
 
         public List<ThingDef> HumanLikeMeatDefs
         {
@@ -122,6 +119,8 @@ namespace FluffyManager
             }
         }
 
+        public override bool IsValid => base.IsValid && History != null && Trigger != null;
+
         public override string Label => "FMH.Hunting".Translate();
 
         public override ManagerTab Tab
@@ -133,22 +132,12 @@ namespace FluffyManager
         {
             get
             {
-                return AllowedAnimals.Keys.Where( key => AllowedAnimals[key] ).Select( pk => pk.LabelCap.Resolve() ).ToArray();
+                return AllowedAnimals.Keys.Where( key => AllowedAnimals[key] ).Select( pk => pk.LabelCap.Resolve() )
+                                     .ToArray();
             }
         }
 
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Hunting;
-
-        public string DesignationLabel( Designation designation )
-        {
-            // label, dist, yield.
-            var thing = designation.target.Thing;
-            return "Fluffy.Manager.DesignationLabel".Translate(
-                thing.LabelCap,
-                Distance( thing, manager.map.GetBaseCenter() ).ToString( "F0" ),
-                thing.GetStatValue( StatDefOf.MeatAmount ).ToString( "F0" ),
-                thing.def.race.meatDef.LabelCap );
-        }
 
         /// <summary>
         ///     Remove obsolete designations from the list.
@@ -172,6 +161,17 @@ namespace FluffyManager
 
             // clear the list completely
             _designations.Clear();
+        }
+
+        public string DesignationLabel( Designation designation )
+        {
+            // label, dist, yield.
+            var thing = designation.target.Thing;
+            return "Fluffy.Manager.DesignationLabel".Translate(
+                thing.LabelCap,
+                Distance( thing, manager.map.GetBaseCenter() ).ToString( "F0" ),
+                thing.GetStatValue( StatDefOf.MeatAmount ).ToString( "F0" ),
+                thing.def.race.meatDef.LabelCap );
         }
 
         public override void DrawListEntry( Rect rect, bool overview = true, bool active = true )
@@ -290,6 +290,25 @@ namespace FluffyManager
             _designatedCachedValue.Update( count );
 
             return count;
+        }
+
+        public void RefreshAllowedAnimals()
+        {
+            // add animals that were not already in the list, disallow by default.
+            foreach ( var pawnKind in manager.map.Biome.AllWildAnimals
+                                             .Concat( manager.map.mapPawns.AllPawns
+                                                             .Where( p => ( p.RaceProps?.Animal ?? false )
+                                                                       && !( manager.map.fogGrid?.IsFogged(
+                                                                                 p.Position ) ?? true ) )
+                                                             .Select( p => p.kindDef ) )
+                                             .Distinct()
+                                             .OrderBy( pk => pk.label ) )
+                if ( !AllowedAnimals.ContainsKey( pawnKind ) )
+                    AllowedAnimals.Add( pawnKind, false );
+
+            AllowedAnimals = AllowedAnimals
+                            .OrderBy( x => x.Key.label )
+                            .ToDictionary( k => k.Key, v => v.Value );
         }
 
         public override void Tick()
@@ -428,25 +447,6 @@ namespace FluffyManager
                 && ( HuntingGrounds == null ||
                      HuntingGrounds.ActiveCells.Contains( target.Position ) )
                 && IsReachable( target );
-        }
-
-        public void RefreshAllowedAnimals()
-        {
-            // add animals that were not already in the list, disallow by default.
-            foreach ( var pawnKind in manager.map.Biome.AllWildAnimals
-                                             .Concat( manager.map.mapPawns.AllPawns
-                                                             .Where( p => ( p.RaceProps?.Animal ?? false )
-                                                                       && !( manager.map.fogGrid?.IsFogged(
-                                                                                 p.Position ) ?? true ) )
-                                                             .Select( p => p.kindDef ) )
-                                             .Distinct()
-                                             .OrderBy( pk => pk.label ) )
-                if ( !AllowedAnimals.ContainsKey( pawnKind ) )
-                    AllowedAnimals.Add( pawnKind, false );
-
-            AllowedAnimals = AllowedAnimals
-                            .OrderBy( x => x.Key.label )
-                            .ToDictionary( k => k.Key, v => v.Value );
         }
     }
 }

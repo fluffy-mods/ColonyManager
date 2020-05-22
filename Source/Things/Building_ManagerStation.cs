@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// Building_ManagerStation.cs
-// 2016-12-09
+﻿// Building_ManagerStation.cs
+// Copyright Karel Kroeze, 2017-2020
 
 using RimWorld;
 using UnityEngine;

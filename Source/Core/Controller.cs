@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// Controller.cs
-// 2017-05-27
+﻿// Controller.cs
+// Copyright Karel Kroeze, 2020-2020
 
 using System.Reflection;
 using HarmonyLib;
@@ -12,6 +11,7 @@ namespace FluffyManager
     public class Controller : Mod
     {
         private Settings mySettings;
+
         public Controller( ModContentPack content ) : base( content )
         {
             // apply fixes
@@ -21,14 +21,14 @@ namespace FluffyManager
             mySettings = GetSettings<Settings>();
         }
 
-        public override string SettingsCategory()
-        {
-            return "FM.HelpTitle".Translate();
-        }
-
         public override void DoSettingsWindowContents( Rect inRect )
         {
             Settings.DoSettingsWindowContents( inRect );
+        }
+
+        public override string SettingsCategory()
+        {
+            return "FM.HelpTitle".Translate();
         }
     }
 }

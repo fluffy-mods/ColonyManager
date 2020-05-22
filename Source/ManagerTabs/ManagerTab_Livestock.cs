@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// ManagerTab_Livestock.cs
-// 2016-12-09
+﻿// ManagerTab_Livestock.cs
+// Copyright Karel Kroeze, 2020-2020
 
 using System;
 using System.Collections.Generic;
@@ -67,6 +66,56 @@ namespace FluffyManager
 
             DoLeftRow( leftRow );
             DoContent( contentCanvas );
+        }
+
+        public void DrawTrainingSelector( Rect rect )
+        {
+            var cellCount = _selectedCurrent.Training.Count;
+            var cellWidth = ( rect.width - Margin * ( cellCount - 1 ) ) / cellCount;
+            var keys      = _selectedCurrent.Training.Defs;
+
+            GUI.BeginGroup( rect );
+            for ( var i = 0; i < _selectedCurrent.Training.Count; i++ )
+            {
+                var  cell = new Rect( i * ( cellWidth + Margin ), 0f, cellWidth, rect.height );
+                bool visible;
+                var  report = _selectedCurrent.CanBeTrained( _selectedCurrent.Trigger.pawnKind, keys[i], out visible );
+                if ( visible && report.Accepted )
+                {
+                    var checkOn = _selectedCurrent.Training[keys[i]];
+                    DrawToggle( cell, keys[i].LabelCap, keys[i].description, ref checkOn, size: 16f,
+                                font: GameFont.Tiny, wrap: false );
+                    _selectedCurrent.Training[keys[i]] = checkOn;
+                }
+                else if ( visible )
+                {
+                    Label( cell, keys[i].LabelCap, report.Reason, TextAnchor.MiddleCenter, GameFont.Tiny, Color.grey );
+                }
+            }
+
+            GUI.EndGroup();
+        }
+
+        public string GetMasterLabel()
+        {
+            switch ( _selectedCurrent.Masters )
+            {
+                case MasterMode.Specific:
+                    return _selectedCurrent.Master?.LabelShort ?? "FM.None".Translate();
+                default:
+                    return $"FM.Livestock.MasterMode.{_selectedCurrent.Masters}".Translate();
+            }
+        }
+
+        public string GetTrainerLabel()
+        {
+            switch ( _selectedCurrent.Trainers )
+            {
+                case MasterMode.Specific:
+                    return _selectedCurrent.Trainer.LabelShort;
+                default:
+                    return $"FM.Livestock.MasterMode.{_selectedCurrent.Trainers}".Translate();
+            }
         }
 
         public override void PreOpen()
@@ -164,483 +213,6 @@ namespace FluffyManager
 
                 TooltipHandler.TipRegion( buttonRect, "FMP.ManageBillTooltip".Translate() );
             }
-        }
-
-        private float DrawTargetCountsSection( Vector2 pos, float width )
-        {
-            // counts table
-            var     cols    = 3;
-            var     rows    = 3;
-            var     fifth   = width / 5;
-            float[] widths  = {fifth, fifth        * 2, fifth * 2};
-            float[] heights = {ListEntryHeight * 2 / 3, ListEntryHeight, ListEntryHeight};
-
-            // set up a 3x3 table of rects
-            var countRects = new Rect[rows, cols];
-            for ( var x = 0; x < cols; x++ )
-            {
-                for ( var y = 0; y < rows; y++ )
-                    // kindof overkill for a 3x3 table, but ok.
-                    countRects[y, x] = new Rect(
-                        pos.x + widths.Take( x ).Sum(),
-                        pos.y + heights.Take( y ).Sum(),
-                        widths[x],
-                        heights[y] );
-            }
-
-            // headers
-            Label( countRects[0, 1], Gender.Female.ToString(), TextAnchor.LowerCenter, GameFont.Tiny );
-            Label( countRects[0, 2], Gender.Male.ToString(), TextAnchor.LowerCenter, GameFont.Tiny );
-            Label( countRects[1, 0], "FML.Adult".Translate(), TextAnchor.MiddleRight, GameFont.Tiny );
-            Label( countRects[2, 0], "FML.Juvenile".Translate(), TextAnchor.MiddleRight, GameFont.Tiny );
-
-            // fields
-            DoCountField( countRects[1, 1], AgeAndSex.AdultFemale );
-            DoCountField( countRects[1, 2], AgeAndSex.AdultMale );
-            DoCountField( countRects[2, 1], AgeAndSex.JuvenileFemale );
-            DoCountField( countRects[2, 2], AgeAndSex.JuvenileMale );
-
-            return 3 * ListEntryHeight;
-        }
-
-        private float DrawFollowSection( Vector2 pos, float width )
-        {
-            var start   = pos;
-            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            var buttonRect = new Rect(
-                    rowRect.xMax * 3 / 4,
-                    0f,
-                    width           * 1 / 4,
-                    ListEntryHeight * 2 / 3 )
-               .CenteredOnYIn( rowRect );
-
-            // master selection
-            Label( rowRect, "FM.Livestock.MasterDefault".Translate(), "FM.Livestock.MasterDefault.Tip".Translate(),
-                   TextAnchor.MiddleLeft, margin: Margin );
-            if ( Widgets.ButtonText( buttonRect, GetMasterLabel() ) )
-            {
-                var options = new List<FloatMenuOption>();
-
-                // modes
-                foreach ( var _mode in GetMasterModes.Where( mm => ( mm & MasterMode.All ) == mm ) )
-                    options.Add( new FloatMenuOption( $"FM.Livestock.MasterMode.{_mode}".Translate(),
-                                                      () => _selectedCurrent.Masters = _mode ) );
-
-                // specific pawns
-                foreach ( var pawn in _selectedCurrent.Trigger.pawnKind.GetMasterOptions( manager, MasterMode.All ) )
-                    options.Add( new FloatMenuOption(
-                                     "FM.Livestock.Master".Translate( pawn.LabelShort,
-                                                                      pawn.skills.AverageOfRelevantSkillsFor(
-                                                                          WorkTypeDefOf.Handling ) ),
-                                     () =>
-                                     {
-                                         _selectedCurrent.Master  = pawn;
-                                         _selectedCurrent.Masters = MasterMode.Specific;
-                                     } ) );
-
-                Find.WindowStack.Add( new FloatMenu( options ) );
-            }
-
-            // respect bonds?
-            rowRect.y += ListEntryHeight;
-            if ( _selectedCurrent.Masters != MasterMode.Default && _selectedCurrent.Masters != MasterMode.Specific )
-                DrawToggle( rowRect,
-                            "FM.Livestock.RespectBonds".Translate(),
-                            "FM.Livestock.RespectBonds.Tip".Translate(),
-                            ref _selectedCurrent.RespectBonds );
-            else
-                Label( rowRect,
-                       "FM.Livestock.RespectBonds".Translate(),
-                       "FM.Livestock.RespectBonds.DisabledBecauseMastersNotSet".Translate(),
-                       color: Color.grey, margin: Margin );
-
-            // default follow
-            rowRect.y += ListEntryHeight;
-            DrawToggle( rowRect,
-                        "FM.Livestock.Follow".Translate(),
-                        "FM.Livestock.Follow.Tip".Translate(),
-                        ref _selectedCurrent.SetFollow );
-
-            if ( _selectedCurrent.SetFollow )
-            {
-                rowRect.y += ListEntryHeight;
-                var followRect = rowRect;
-                followRect.width /= 2f;
-                DrawToggle( followRect,
-                            "FM.Livestock.FollowDrafted".Translate(),
-                            "FM.Livestock.FollowDrafted.Tip".Translate(),
-                            ref _selectedCurrent.FollowDrafted,
-                            font: GameFont.Tiny );
-                followRect.x += followRect.width;
-                DrawToggle( followRect,
-                            "FM.Livestock.FollowFieldwork".Translate(),
-                            "FM.Livestock.FollowFieldwork.Tip".Translate(),
-                            ref _selectedCurrent.FollowFieldwork,
-                            font: GameFont.Tiny );
-            }
-
-            // follow when training
-            rowRect.y += ListEntryHeight;
-            TooltipHandler.TipRegion( rowRect, "FM.Livestock.FollowTraining.Tip".Translate() );
-            DrawToggle( rowRect,
-                        "FM.Livestock.FollowTraining".Translate(),
-                        "FM.Livestock.FollowTraining.Tip".Translate(),
-                        ref _selectedCurrent.FollowTraining );
-
-            // master selection
-            if ( _selectedCurrent.FollowTraining )
-            {
-                rowRect.y += ListEntryHeight;
-                Label( rowRect, "FM.Livestock.MasterTraining".Translate(),
-                       "FM.Livestock.MasterTraining.Tip".Translate(),
-                       TextAnchor.MiddleLeft, margin: Margin );
-
-                buttonRect = buttonRect.CenteredOnYIn( rowRect );
-                if ( Widgets.ButtonText( buttonRect, GetTrainerLabel() ) )
-                {
-                    var options = new List<FloatMenuOption>();
-
-                    // modes
-                    foreach ( var _mode in GetMasterModes.Where( mm => ( mm & MasterMode.Trainers ) == mm ) )
-                        options.Add( new FloatMenuOption( $"FM.Livestock.MasterMode.{_mode}".Translate(),
-                                                          () => _selectedCurrent.Trainers = _mode ) );
-
-                    // specific pawns
-                    foreach ( var pawn in _selectedCurrent.Trigger.pawnKind.GetTrainers( manager, MasterMode.Trainers )
-                    )
-                        options.Add( new FloatMenuOption(
-                                         "FM.Livestock.Master".Translate( pawn.LabelShort,
-                                                                          pawn.skills.AverageOfRelevantSkillsFor(
-                                                                              WorkTypeDefOf.Handling ) ),
-                                         () =>
-                                         {
-                                             _selectedCurrent.Trainer  = pawn;
-                                             _selectedCurrent.Trainers = MasterMode.Specific;
-                                         } ) );
-
-                    Find.WindowStack.Add( new FloatMenu( options ) );
-                }
-            }
-
-            return rowRect.yMax - start.y;
-        }
-
-        public string GetMasterLabel()
-        {
-            switch ( _selectedCurrent.Masters )
-            {
-                case MasterMode.Specific:
-                    return _selectedCurrent.Master?.LabelShort ?? "FM.None".Translate();
-                default:
-                    return $"FM.Livestock.MasterMode.{_selectedCurrent.Masters}".Translate();
-            }
-        }
-
-        public string GetTrainerLabel()
-        {
-            switch ( _selectedCurrent.Trainers )
-            {
-                case MasterMode.Specific:
-                    return _selectedCurrent.Trainer.LabelShort;
-                default:
-                    return $"FM.Livestock.MasterMode.{_selectedCurrent.Trainers}".Translate();
-            }
-        }
-
-        private float DrawAreaRestrictionsSection( Vector2 pos, float width )
-        {
-            var start = pos;
-            // restrict to area
-            var restrictAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-
-            DrawToggle( restrictAreaRect,
-                        "FML.RestrictToArea".Translate(),
-                        "FML.RestrictToArea.Tip".Translate(),
-                        ref _selectedCurrent.RestrictToArea );
-            pos.y += ListEntryHeight;
-
-            if ( _selectedCurrent.RestrictToArea )
-            {
-                // area selectors table
-                // set up a 3x3 table of rects
-                var     cols    = 3;
-                var     fifth   = width / 5;
-                float[] widths  = {fifth, fifth        * 2, fifth * 2};
-                float[] heights = {ListEntryHeight * 2 / 3, ListEntryHeight, ListEntryHeight};
-
-                var areaRects = new Rect[cols, cols];
-                for ( var x = 0; x < cols; x++ )
-                    for ( var y = 0; y < cols; y++ )
-                        areaRects[x, y] = new Rect(
-                            widths.Take( x ).Sum(),
-                            pos.y + heights.Take( y ).Sum(),
-                            widths[x],
-                            heights[y] );
-
-                // headers
-                Label( areaRects[1, 0], Gender.Female.ToString(), TextAnchor.LowerCenter, GameFont.Tiny );
-                Label( areaRects[2, 0], Gender.Male.ToString(), TextAnchor.LowerCenter, GameFont.Tiny );
-                Label( areaRects[0, 1], "FML.Adult".Translate(), TextAnchor.MiddleRight, GameFont.Tiny );
-                Label( areaRects[0, 2], "FML.Juvenile".Translate(), TextAnchor.MiddleRight, GameFont.Tiny );
-
-                // do the selectors
-                _selectedCurrent.RestrictArea[0] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 1],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              0], manager, Margin );
-                _selectedCurrent.RestrictArea[1] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 1],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              1], manager, Margin );
-                _selectedCurrent.RestrictArea[2] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 2],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              2], manager, Margin );
-                _selectedCurrent.RestrictArea[3] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 2],
-                                                                                          _selectedCurrent.RestrictArea[
-                                                                                              3], manager, Margin );
-
-                Text.Anchor =  TextAnchor.UpperLeft; // DoAllowedAreaMode leaves the anchor in an incorrect state.
-                pos.y       += 3 * ListEntryHeight;
-            }
-
-            var sendToSlaughterAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            pos.y += ListEntryHeight;
-            if ( _selectedCurrent.ButcherExcess )
-            {
-                DrawToggle( sendToSlaughterAreaRect,
-                            "FML.SendToSlaughterArea".Translate(),
-                            "FML.SendToSlaughterArea.Tip".Translate(),
-                            ref _selectedCurrent.SendToSlaughterArea );
-
-                if ( _selectedCurrent.SendToSlaughterArea )
-                {
-                    var slaughterAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-                    AreaAllowedGUI.DoAllowedAreaSelectors( slaughterAreaRect, ref _selectedCurrent.SlaughterArea,
-                                                           manager );
-                    pos.y += ListEntryHeight;
-                }
-            }
-            else
-            {
-                sendToSlaughterAreaRect.xMin += Margin;
-                Label( sendToSlaughterAreaRect, "FML.SendToSlaughterArea".Translate(),
-                       "FM.Livestock.DisabledBecauseSlaughterExcessDisabled".Translate(), TextAnchor.MiddleLeft,
-                       color: Color.grey );
-            }
-
-            if (_selectedCurrent.Trigger.pawnKind.Milkable())
-            {
-                var sendToMilkingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-                pos.y += ListEntryHeight;
-                DrawToggle(sendToMilkingAreaRect,
-                            "FML.SendToMilkingArea".Translate(),
-                            "FML.SendToMilkingArea.Tip".Translate(),
-                            ref _selectedCurrent.SendToMilkingArea);
-
-                if (_selectedCurrent.SendToMilkingArea)
-                {
-                    var milkingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-                    AreaAllowedGUI.DoAllowedAreaSelectors(milkingAreaRect, ref _selectedCurrent.MilkArea,
-                                                           manager);
-                    pos.y += ListEntryHeight;
-                }
-            }
-
-            if (_selectedCurrent.Trigger.pawnKind.Shearable())
-            {
-                var sendToShearingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-                pos.y += ListEntryHeight;
-                DrawToggle(sendToShearingAreaRect,
-                            "FML.SendToShearingArea".Translate(),
-                            "FML.SendToShearingArea.Tip".Translate(),
-                            ref _selectedCurrent.SendToShearingArea);
-
-                if (_selectedCurrent.SendToShearingArea)
-                {
-                    var shearingAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-                    AreaAllowedGUI.DoAllowedAreaSelectors(shearingAreaRect, ref _selectedCurrent.ShearArea,
-                                                           manager);
-                    pos.y += ListEntryHeight;
-                }
-            }
-
-            var sendToTrainingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            pos.y += ListEntryHeight;
-            if ( _selectedCurrent.Training.Any )
-            {
-                DrawToggle( sendToTrainingAreaRect,
-                            "FML.SendToTrainingArea".Translate(),
-                            "FML.SendToTrainingArea.Tip".Translate(),
-                            ref _selectedCurrent.SendToTrainingArea );
-
-                if ( _selectedCurrent.SendToTrainingArea )
-                {
-                    var trainingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-                    AreaAllowedGUI.DoAllowedAreaSelectors( trainingAreaRect, ref _selectedCurrent.TrainingArea,
-                                                           manager );
-                    pos.y += ListEntryHeight;
-                }
-            }
-            else
-            {
-                sendToTrainingAreaRect.xMin += Margin;
-                Label( sendToTrainingAreaRect, "FML.SendToTrainingArea".Translate(),
-                       "FM.Livestock.DisabledBecauseNoTrainingSet".Translate(), TextAnchor.MiddleLeft,
-                       color: Color.grey );
-            }
-
-            return pos.y - start.y;
-        }
-
-        private float DrawTrainingSection( Vector2 pos, float width )
-        {
-            var trainingRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            DrawTrainingSelector( trainingRect );
-            var height = ListEntryHeight;
-
-            var unassignTrainingRect = new Rect(pos.x, pos.y + height, width, ListEntryHeight);
-            DrawToggle(unassignTrainingRect,
-                        "FML.UnassignTraining".Translate(),
-                        "FML.UnassignTraining.Tip".Translate(),
-                        ref _selectedCurrent.Training.UnassignTraining);
-            height += ListEntryHeight;
-
-            if ( _selectedCurrent.Training.Any )
-            {
-                var trainYoungRect = new Rect( pos.x, pos.y + height, width, ListEntryHeight );
-                DrawToggle( trainYoungRect,
-                            "FML.TrainYoung".Translate(),
-                            "FML.TrainYoung.Tip".Translate(),
-                            ref _selectedCurrent.Training.TrainYoung );
-                height += ListEntryHeight;
-            }
-
-            return height;
-        }
-
-        public void DrawTrainingSelector( Rect rect )
-        {
-            var cellCount = _selectedCurrent.Training.Count;
-            var cellWidth = ( rect.width - Margin * ( cellCount - 1 ) ) / cellCount;
-            var keys      = _selectedCurrent.Training.Defs;
-
-            GUI.BeginGroup( rect );
-            for ( var i = 0; i < _selectedCurrent.Training.Count; i++ )
-            {
-                var  cell = new Rect( i * ( cellWidth + Margin ), 0f, cellWidth, rect.height );
-                bool visible;
-                var  report = _selectedCurrent.CanBeTrained( _selectedCurrent.Trigger.pawnKind, keys[i], out visible );
-                if ( visible && report.Accepted )
-                {
-                    var checkOn = _selectedCurrent.Training[keys[i]];
-                    DrawToggle( cell, keys[i].LabelCap, keys[i].description, ref checkOn, size: 16f,
-                                font: GameFont.Tiny, wrap: false );
-                    _selectedCurrent.Training[keys[i]] = checkOn;
-                }
-                else if ( visible )
-                {
-                    Label( cell, keys[i].LabelCap, report.Reason, TextAnchor.MiddleCenter, GameFont.Tiny, Color.grey );
-                }
-            }
-
-            GUI.EndGroup();
-        }
-
-        private float DrawButcherSection( Vector2 pos, float width )
-        {
-            var start = pos;
-
-            // butchery stuff
-            var butcherExcessRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            DrawToggle( butcherExcessRect,
-                        "FML.ButcherExcess".Translate(),
-                        "FML.ButcherExcess.Tip".Translate(),
-                        ref _selectedCurrent.ButcherExcess );
-            pos.y += ListEntryHeight;
-
-            if ( _selectedCurrent.ButcherExcess )
-            {
-                var cellWidth         = ( width - Margin * 2 ) / 3f;
-                var butcherOptionRect = new Rect( pos.x, pos.y, cellWidth, ListEntryHeight );
-
-                DrawToggle( butcherOptionRect,
-                            "FML.ButcherTrained".Translate(),
-                            "FML.ButcherTrained.Tip".Translate(),
-                            ref _selectedCurrent.ButcherTrained, font: GameFont.Tiny, wrap: false );
-                butcherOptionRect.x += cellWidth + Margin;
-
-                DrawToggle( butcherOptionRect,
-                            "FML.ButcherPregnant".Translate(),
-                            "FML.ButcherPregnant.Tip".Translate(),
-                            ref _selectedCurrent.ButcherPregnant, font: GameFont.Tiny, wrap: false );
-                butcherOptionRect.x += cellWidth + Margin;
-
-                DrawToggle( butcherOptionRect,
-                            "FML.ButcherBonded".Translate(),
-                            "FML.ButcherBonded.Tip".Translate(),
-                            ref _selectedCurrent.ButcherBonded, font: GameFont.Tiny, wrap: false );
-
-                pos.y += ListEntryHeight;
-            }
-
-            return pos.y - start.y;
-        }
-
-        private float DrawTamingSection( Vector2 pos, float width )
-        {
-            var start = pos;
-            DrawToggle( ref pos, width,
-                        "FML.TameMore".Translate(),
-                        "FML.TameMore.Tip".Translate(),
-                        ref _selectedCurrent.TryTameMore );
-
-            // area to tame from (if taming more);
-            if ( _selectedCurrent.TryTameMore )
-            {
-                AreaAllowedGUI.DoAllowedAreaSelectors( ref pos, width, ref _selectedCurrent.TameArea, manager );
-                DrawReachabilityToggle( ref pos, width, ref _selectedCurrent.CheckReachable );
-                DrawToggle( ref pos, width,
-                            "FM.PathBasedDistance".Translate(),
-                            "FM.PathBasedDistance.Tip".Translate(),
-                            ref _selectedCurrent.PathBasedDistance, true );
-            }
-
-            return pos.y - start.y;
-        }
-
-        private float DrawTamedAnimalSection( Vector2 pos, float width )
-        {
-            var pawnKind = _selectedCurrent.Trigger.pawnKind;
-            var animals  = pawnKind?.GetTame( manager );
-            return DrawAnimalSection( ref pos, width, "FML.Tame".Translate(), pawnKind, animals );
-        }
-
-        private float DrawWildAnimalSection( Vector2 pos, float width )
-        {
-            var pawnKind = _selectedCurrent.Trigger.pawnKind;
-            var animals  = pawnKind?.GetWild( manager );
-            return DrawAnimalSection( ref pos, width, "FML.Wild".Translate(), pawnKind, animals );
-        }
-
-        private float DrawAnimalSection( ref Vector2 pos, float width, string type, PawnKindDef pawnKind,
-                                         IEnumerable<Pawn> animals )
-        {
-            if ( animals == null )
-                return 0;
-
-            var start = pos;
-            DrawAnimalListheader( ref pos, new Vector2( width, ListEntryHeight / 3 * 2 ), pawnKind );
-
-            if ( !animals.Any() )
-            {
-                Label( new Rect( pos.x, pos.y, width, ListEntryHeight ),
-                       "FML.NoAnimals".Translate( type, pawnKind.GetLabelPlural() ),
-                       TextAnchor.MiddleCenter, color: Color.grey );
-                pos.y += ListEntryHeight;
-            }
-
-            foreach ( var animal in animals )
-                DrawAnimalRow( ref pos, new Vector2( width, ListEntryHeight ), animal );
-
-            return pos.y - start.y;
         }
 
         private void DoCountField( Rect rect, AgeAndSex ageSex )
@@ -865,6 +437,172 @@ namespace FluffyManager
             pos.y += size.y;
         }
 
+        private float DrawAnimalSection( ref Vector2 pos, float width, string type, PawnKindDef pawnKind,
+                                         IEnumerable<Pawn> animals )
+        {
+            if ( animals == null )
+                return 0;
+
+            var start = pos;
+            DrawAnimalListheader( ref pos, new Vector2( width, ListEntryHeight / 3 * 2 ), pawnKind );
+
+            if ( !animals.Any() )
+            {
+                Label( new Rect( pos.x, pos.y, width, ListEntryHeight ),
+                       "FML.NoAnimals".Translate( type, pawnKind.GetLabelPlural() ),
+                       TextAnchor.MiddleCenter, color: Color.grey );
+                pos.y += ListEntryHeight;
+            }
+
+            foreach ( var animal in animals )
+                DrawAnimalRow( ref pos, new Vector2( width, ListEntryHeight ), animal );
+
+            return pos.y - start.y;
+        }
+
+        private float DrawAreaRestrictionsSection( Vector2 pos, float width )
+        {
+            var start = pos;
+            // restrict to area
+            var restrictAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+
+            DrawToggle( restrictAreaRect,
+                        "FML.RestrictToArea".Translate(),
+                        "FML.RestrictToArea.Tip".Translate(),
+                        ref _selectedCurrent.RestrictToArea );
+            pos.y += ListEntryHeight;
+
+            if ( _selectedCurrent.RestrictToArea )
+            {
+                // area selectors table
+                // set up a 3x3 table of rects
+                var     cols    = 3;
+                var     fifth   = width / 5;
+                float[] widths  = {fifth, fifth        * 2, fifth * 2};
+                float[] heights = {ListEntryHeight * 2 / 3, ListEntryHeight, ListEntryHeight};
+
+                var areaRects = new Rect[cols, cols];
+                for ( var x = 0; x < cols; x++ )
+                    for ( var y = 0; y < cols; y++ )
+                        areaRects[x, y] = new Rect(
+                            widths.Take( x ).Sum(),
+                            pos.y + heights.Take( y ).Sum(),
+                            widths[x],
+                            heights[y] );
+
+                // headers
+                Label( areaRects[1, 0], Gender.Female.ToString(), TextAnchor.LowerCenter, GameFont.Tiny );
+                Label( areaRects[2, 0], Gender.Male.ToString(), TextAnchor.LowerCenter, GameFont.Tiny );
+                Label( areaRects[0, 1], "FML.Adult".Translate(), TextAnchor.MiddleRight, GameFont.Tiny );
+                Label( areaRects[0, 2], "FML.Juvenile".Translate(), TextAnchor.MiddleRight, GameFont.Tiny );
+
+                // do the selectors
+                _selectedCurrent.RestrictArea[0] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 1],
+                                                                                          _selectedCurrent.RestrictArea[
+                                                                                              0], manager, Margin );
+                _selectedCurrent.RestrictArea[1] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 1],
+                                                                                          _selectedCurrent.RestrictArea[
+                                                                                              1], manager, Margin );
+                _selectedCurrent.RestrictArea[2] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[1, 2],
+                                                                                          _selectedCurrent.RestrictArea[
+                                                                                              2], manager, Margin );
+                _selectedCurrent.RestrictArea[3] = AreaAllowedGUI.DoAllowedAreaSelectors( areaRects[2, 2],
+                                                                                          _selectedCurrent.RestrictArea[
+                                                                                              3], manager, Margin );
+
+                Text.Anchor =  TextAnchor.UpperLeft; // DoAllowedAreaMode leaves the anchor in an incorrect state.
+                pos.y       += 3 * ListEntryHeight;
+            }
+
+            var sendToSlaughterAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            pos.y += ListEntryHeight;
+            if ( _selectedCurrent.ButcherExcess )
+            {
+                DrawToggle( sendToSlaughterAreaRect,
+                            "FML.SendToSlaughterArea".Translate(),
+                            "FML.SendToSlaughterArea.Tip".Translate(),
+                            ref _selectedCurrent.SendToSlaughterArea );
+
+                if ( _selectedCurrent.SendToSlaughterArea )
+                {
+                    var slaughterAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+                    AreaAllowedGUI.DoAllowedAreaSelectors( slaughterAreaRect, ref _selectedCurrent.SlaughterArea,
+                                                           manager );
+                    pos.y += ListEntryHeight;
+                }
+            }
+            else
+            {
+                sendToSlaughterAreaRect.xMin += Margin;
+                Label( sendToSlaughterAreaRect, "FML.SendToSlaughterArea".Translate(),
+                       "FM.Livestock.DisabledBecauseSlaughterExcessDisabled".Translate(), TextAnchor.MiddleLeft,
+                       color: Color.grey );
+            }
+
+            if ( _selectedCurrent.Trigger.pawnKind.Milkable() )
+            {
+                var sendToMilkingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+                pos.y += ListEntryHeight;
+                DrawToggle( sendToMilkingAreaRect,
+                            "FML.SendToMilkingArea".Translate(),
+                            "FML.SendToMilkingArea.Tip".Translate(),
+                            ref _selectedCurrent.SendToMilkingArea );
+
+                if ( _selectedCurrent.SendToMilkingArea )
+                {
+                    var milkingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+                    AreaAllowedGUI.DoAllowedAreaSelectors( milkingAreaRect, ref _selectedCurrent.MilkArea,
+                                                           manager );
+                    pos.y += ListEntryHeight;
+                }
+            }
+
+            if ( _selectedCurrent.Trigger.pawnKind.Shearable() )
+            {
+                var sendToShearingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+                pos.y += ListEntryHeight;
+                DrawToggle( sendToShearingAreaRect,
+                            "FML.SendToShearingArea".Translate(),
+                            "FML.SendToShearingArea.Tip".Translate(),
+                            ref _selectedCurrent.SendToShearingArea );
+
+                if ( _selectedCurrent.SendToShearingArea )
+                {
+                    var shearingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+                    AreaAllowedGUI.DoAllowedAreaSelectors( shearingAreaRect, ref _selectedCurrent.ShearArea,
+                                                           manager );
+                    pos.y += ListEntryHeight;
+                }
+            }
+
+            var sendToTrainingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            pos.y += ListEntryHeight;
+            if ( _selectedCurrent.Training.Any )
+            {
+                DrawToggle( sendToTrainingAreaRect,
+                            "FML.SendToTrainingArea".Translate(),
+                            "FML.SendToTrainingArea.Tip".Translate(),
+                            ref _selectedCurrent.SendToTrainingArea );
+
+                if ( _selectedCurrent.SendToTrainingArea )
+                {
+                    var trainingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+                    AreaAllowedGUI.DoAllowedAreaSelectors( trainingAreaRect, ref _selectedCurrent.TrainingArea,
+                                                           manager );
+                    pos.y += ListEntryHeight;
+                }
+            }
+            else
+            {
+                sendToTrainingAreaRect.xMin += Margin;
+                Label( sendToTrainingAreaRect, "FML.SendToTrainingArea".Translate(),
+                       "FM.Livestock.DisabledBecauseNoTrainingSet".Translate(), TextAnchor.MiddleLeft,
+                       color: Color.grey );
+            }
+
+            return pos.y - start.y;
+        }
+
         private void DrawAvailableJobList( Rect outRect, Rect viewRect )
         {
             // set sizes
@@ -905,6 +643,46 @@ namespace FluffyManager
             Widgets.EndScrollView();
         }
 
+        private float DrawButcherSection( Vector2 pos, float width )
+        {
+            var start = pos;
+
+            // butchery stuff
+            var butcherExcessRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            DrawToggle( butcherExcessRect,
+                        "FML.ButcherExcess".Translate(),
+                        "FML.ButcherExcess.Tip".Translate(),
+                        ref _selectedCurrent.ButcherExcess );
+            pos.y += ListEntryHeight;
+
+            if ( _selectedCurrent.ButcherExcess )
+            {
+                var cellWidth         = ( width - Margin * 2 ) / 3f;
+                var butcherOptionRect = new Rect( pos.x, pos.y, cellWidth, ListEntryHeight );
+
+                DrawToggle( butcherOptionRect,
+                            "FML.ButcherTrained".Translate(),
+                            "FML.ButcherTrained.Tip".Translate(),
+                            ref _selectedCurrent.ButcherTrained, font: GameFont.Tiny, wrap: false );
+                butcherOptionRect.x += cellWidth + Margin;
+
+                DrawToggle( butcherOptionRect,
+                            "FML.ButcherPregnant".Translate(),
+                            "FML.ButcherPregnant.Tip".Translate(),
+                            ref _selectedCurrent.ButcherPregnant, font: GameFont.Tiny, wrap: false );
+                butcherOptionRect.x += cellWidth + Margin;
+
+                DrawToggle( butcherOptionRect,
+                            "FML.ButcherBonded".Translate(),
+                            "FML.ButcherBonded.Tip".Translate(),
+                            ref _selectedCurrent.ButcherBonded, font: GameFont.Tiny, wrap: false );
+
+                pos.y += ListEntryHeight;
+            }
+
+            return pos.y - start.y;
+        }
+
         private void DrawCurrentJobList( Rect outRect, Rect viewRect )
         {
             // set sizes
@@ -934,6 +712,227 @@ namespace FluffyManager
 
             GUI.EndGroup();
             Widgets.EndScrollView();
+        }
+
+        private float DrawFollowSection( Vector2 pos, float width )
+        {
+            var start   = pos;
+            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            var buttonRect = new Rect(
+                    rowRect.xMax * 3 / 4,
+                    0f,
+                    width           * 1 / 4,
+                    ListEntryHeight * 2 / 3 )
+               .CenteredOnYIn( rowRect );
+
+            // master selection
+            Label( rowRect, "FM.Livestock.MasterDefault".Translate(), "FM.Livestock.MasterDefault.Tip".Translate(),
+                   TextAnchor.MiddleLeft, margin: Margin );
+            if ( Widgets.ButtonText( buttonRect, GetMasterLabel() ) )
+            {
+                var options = new List<FloatMenuOption>();
+
+                // modes
+                foreach ( var _mode in GetMasterModes.Where( mm => ( mm & MasterMode.All ) == mm ) )
+                    options.Add( new FloatMenuOption( $"FM.Livestock.MasterMode.{_mode}".Translate(),
+                                                      () => _selectedCurrent.Masters = _mode ) );
+
+                // specific pawns
+                foreach ( var pawn in _selectedCurrent.Trigger.pawnKind.GetMasterOptions( manager, MasterMode.All ) )
+                    options.Add( new FloatMenuOption(
+                                     "FM.Livestock.Master".Translate( pawn.LabelShort,
+                                                                      pawn.skills.AverageOfRelevantSkillsFor(
+                                                                          WorkTypeDefOf.Handling ) ),
+                                     () =>
+                                     {
+                                         _selectedCurrent.Master  = pawn;
+                                         _selectedCurrent.Masters = MasterMode.Specific;
+                                     } ) );
+
+                Find.WindowStack.Add( new FloatMenu( options ) );
+            }
+
+            // respect bonds?
+            rowRect.y += ListEntryHeight;
+            if ( _selectedCurrent.Masters != MasterMode.Default && _selectedCurrent.Masters != MasterMode.Specific )
+                DrawToggle( rowRect,
+                            "FM.Livestock.RespectBonds".Translate(),
+                            "FM.Livestock.RespectBonds.Tip".Translate(),
+                            ref _selectedCurrent.RespectBonds );
+            else
+                Label( rowRect,
+                       "FM.Livestock.RespectBonds".Translate(),
+                       "FM.Livestock.RespectBonds.DisabledBecauseMastersNotSet".Translate(),
+                       color: Color.grey, margin: Margin );
+
+            // default follow
+            rowRect.y += ListEntryHeight;
+            DrawToggle( rowRect,
+                        "FM.Livestock.Follow".Translate(),
+                        "FM.Livestock.Follow.Tip".Translate(),
+                        ref _selectedCurrent.SetFollow );
+
+            if ( _selectedCurrent.SetFollow )
+            {
+                rowRect.y += ListEntryHeight;
+                var followRect = rowRect;
+                followRect.width /= 2f;
+                DrawToggle( followRect,
+                            "FM.Livestock.FollowDrafted".Translate(),
+                            "FM.Livestock.FollowDrafted.Tip".Translate(),
+                            ref _selectedCurrent.FollowDrafted,
+                            font: GameFont.Tiny );
+                followRect.x += followRect.width;
+                DrawToggle( followRect,
+                            "FM.Livestock.FollowFieldwork".Translate(),
+                            "FM.Livestock.FollowFieldwork.Tip".Translate(),
+                            ref _selectedCurrent.FollowFieldwork,
+                            font: GameFont.Tiny );
+            }
+
+            // follow when training
+            rowRect.y += ListEntryHeight;
+            TooltipHandler.TipRegion( rowRect, "FM.Livestock.FollowTraining.Tip".Translate() );
+            DrawToggle( rowRect,
+                        "FM.Livestock.FollowTraining".Translate(),
+                        "FM.Livestock.FollowTraining.Tip".Translate(),
+                        ref _selectedCurrent.FollowTraining );
+
+            // master selection
+            if ( _selectedCurrent.FollowTraining )
+            {
+                rowRect.y += ListEntryHeight;
+                Label( rowRect, "FM.Livestock.MasterTraining".Translate(),
+                       "FM.Livestock.MasterTraining.Tip".Translate(),
+                       TextAnchor.MiddleLeft, margin: Margin );
+
+                buttonRect = buttonRect.CenteredOnYIn( rowRect );
+                if ( Widgets.ButtonText( buttonRect, GetTrainerLabel() ) )
+                {
+                    var options = new List<FloatMenuOption>();
+
+                    // modes
+                    foreach ( var _mode in GetMasterModes.Where( mm => ( mm & MasterMode.Trainers ) == mm ) )
+                        options.Add( new FloatMenuOption( $"FM.Livestock.MasterMode.{_mode}".Translate(),
+                                                          () => _selectedCurrent.Trainers = _mode ) );
+
+                    // specific pawns
+                    foreach ( var pawn in _selectedCurrent.Trigger.pawnKind.GetTrainers( manager, MasterMode.Trainers )
+                    )
+                        options.Add( new FloatMenuOption(
+                                         "FM.Livestock.Master".Translate( pawn.LabelShort,
+                                                                          pawn.skills.AverageOfRelevantSkillsFor(
+                                                                              WorkTypeDefOf.Handling ) ),
+                                         () =>
+                                         {
+                                             _selectedCurrent.Trainer  = pawn;
+                                             _selectedCurrent.Trainers = MasterMode.Specific;
+                                         } ) );
+
+                    Find.WindowStack.Add( new FloatMenu( options ) );
+                }
+            }
+
+            return rowRect.yMax - start.y;
+        }
+
+        private float DrawTamedAnimalSection( Vector2 pos, float width )
+        {
+            var pawnKind = _selectedCurrent.Trigger.pawnKind;
+            var animals  = pawnKind?.GetTame( manager );
+            return DrawAnimalSection( ref pos, width, "FML.Tame".Translate(), pawnKind, animals );
+        }
+
+        private float DrawTamingSection( Vector2 pos, float width )
+        {
+            var start = pos;
+            DrawToggle( ref pos, width,
+                        "FML.TameMore".Translate(),
+                        "FML.TameMore.Tip".Translate(),
+                        ref _selectedCurrent.TryTameMore );
+
+            // area to tame from (if taming more);
+            if ( _selectedCurrent.TryTameMore )
+            {
+                AreaAllowedGUI.DoAllowedAreaSelectors( ref pos, width, ref _selectedCurrent.TameArea, manager );
+                DrawReachabilityToggle( ref pos, width, ref _selectedCurrent.CheckReachable );
+                DrawToggle( ref pos, width,
+                            "FM.PathBasedDistance".Translate(),
+                            "FM.PathBasedDistance.Tip".Translate(),
+                            ref _selectedCurrent.PathBasedDistance, true );
+            }
+
+            return pos.y - start.y;
+        }
+
+        private float DrawTargetCountsSection( Vector2 pos, float width )
+        {
+            // counts table
+            var     cols    = 3;
+            var     rows    = 3;
+            var     fifth   = width / 5;
+            float[] widths  = {fifth, fifth        * 2, fifth * 2};
+            float[] heights = {ListEntryHeight * 2 / 3, ListEntryHeight, ListEntryHeight};
+
+            // set up a 3x3 table of rects
+            var countRects = new Rect[rows, cols];
+            for ( var x = 0; x < cols; x++ )
+            {
+                for ( var y = 0; y < rows; y++ )
+                    // kindof overkill for a 3x3 table, but ok.
+                    countRects[y, x] = new Rect(
+                        pos.x + widths.Take( x ).Sum(),
+                        pos.y + heights.Take( y ).Sum(),
+                        widths[x],
+                        heights[y] );
+            }
+
+            // headers
+            Label( countRects[0, 1], Gender.Female.ToString(), TextAnchor.LowerCenter, GameFont.Tiny );
+            Label( countRects[0, 2], Gender.Male.ToString(), TextAnchor.LowerCenter, GameFont.Tiny );
+            Label( countRects[1, 0], "FML.Adult".Translate(), TextAnchor.MiddleRight, GameFont.Tiny );
+            Label( countRects[2, 0], "FML.Juvenile".Translate(), TextAnchor.MiddleRight, GameFont.Tiny );
+
+            // fields
+            DoCountField( countRects[1, 1], AgeAndSex.AdultFemale );
+            DoCountField( countRects[1, 2], AgeAndSex.AdultMale );
+            DoCountField( countRects[2, 1], AgeAndSex.JuvenileFemale );
+            DoCountField( countRects[2, 2], AgeAndSex.JuvenileMale );
+
+            return 3 * ListEntryHeight;
+        }
+
+        private float DrawTrainingSection( Vector2 pos, float width )
+        {
+            var trainingRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            DrawTrainingSelector( trainingRect );
+            var height = ListEntryHeight;
+
+            var unassignTrainingRect = new Rect( pos.x, pos.y + height, width, ListEntryHeight );
+            DrawToggle( unassignTrainingRect,
+                        "FML.UnassignTraining".Translate(),
+                        "FML.UnassignTraining.Tip".Translate(),
+                        ref _selectedCurrent.Training.UnassignTraining );
+            height += ListEntryHeight;
+
+            if ( _selectedCurrent.Training.Any )
+            {
+                var trainYoungRect = new Rect( pos.x, pos.y + height, width, ListEntryHeight );
+                DrawToggle( trainYoungRect,
+                            "FML.TrainYoung".Translate(),
+                            "FML.TrainYoung.Tip".Translate(),
+                            ref _selectedCurrent.Training.TrainYoung );
+                height += ListEntryHeight;
+            }
+
+            return height;
+        }
+
+        private float DrawWildAnimalSection( Vector2 pos, float width )
+        {
+            var pawnKind = _selectedCurrent.Trigger.pawnKind;
+            var animals  = pawnKind?.GetWild( manager );
+            return DrawAnimalSection( ref pos, width, "FML.Wild".Translate(), pawnKind, animals );
         }
 
         private void Refresh()

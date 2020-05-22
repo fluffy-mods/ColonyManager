@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// Resources.cs
-// 2016-12-09
+﻿// Resources.cs
+// Copyright Karel Kroeze, 2020-2020
 
 using UnityEngine;
 using Verse;
@@ -10,8 +9,6 @@ namespace FluffyManager
     [StaticConstructorOnStartup]
     public static class Resources
     {
-        public static readonly Color Orange, SlightlyDarkBackgroundColour;
-
         public static Texture2D
             // sorting arrows
             ArrowTop,
@@ -58,6 +55,8 @@ namespace FluffyManager
             MeatIcon,
             UnkownIcon;
 
+        public static readonly Color Orange, SlightlyDarkBackgroundColour;
+
         //public static Texture2D[] LifeStages = {StageA, StageB, StageC};
 
         static Resources()
@@ -69,12 +68,12 @@ namespace FluffyManager
             ArrowUp     = ContentFinder<Texture2D>.Get( "UI/Buttons/ArrowUp" );
             ArrowDown   = ContentFinder<Texture2D>.Get( "UI/Buttons/ArrowDown" );
             ArrowBottom = ContentFinder<Texture2D>.Get( "UI/Buttons/ArrowBottom" );
-            
+
             // stamps
             StampCompleted = ContentFinder<Texture2D>.Get( "UI/Stamps/Completed" );
             StampSuspended = ContentFinder<Texture2D>.Get( "UI/Stamps/Suspended" );
             StampStart     = ContentFinder<Texture2D>.Get( "UI/Stamps/Start" );
-            
+
             // tab icons
             IconOverview     = ContentFinder<Texture2D>.Get( "UI/Icons/Overview" );
             IconHammer       = ContentFinder<Texture2D>.Get( "UI/Icons/Hammer" );
@@ -86,9 +85,9 @@ namespace FluffyManager
             IconPower        = ContentFinder<Texture2D>.Get( "UI/Icons/Power" );
             IconTrading      = ContentFinder<Texture2D>.Get( "UI/Icons/Power" );
             IconMining       = ContentFinder<Texture2D>.Get( "UI/Icons/mining" );
-            
+
             // misc
-            SlightlyDarkBackground       = SolidColorMaterials.NewSolidColorTexture(SlightlyDarkBackgroundColour );
+            SlightlyDarkBackground       = SolidColorMaterials.NewSolidColorTexture( SlightlyDarkBackgroundColour );
             DeleteX                      = ContentFinder<Texture2D>.Get( "UI/Buttons/Delete" );
             Cog                          = ContentFinder<Texture2D>.Get( "UI/Buttons/Cog" );
             BarBackgroundActiveTexture   = SolidColorMaterials.NewSolidColorTexture( new Color( 0.2f, 0.8f, 0.85f ) );
@@ -97,7 +96,7 @@ namespace FluffyManager
             BarShader                    = ContentFinder<Texture2D>.Get( "UI/Misc/BarShader" );
             Refresh                      = ContentFinder<Texture2D>.Get( "UI/Icons/refresh" );
             Stopwatch                    = ContentFinder<Texture2D>.Get( "UI/Icons/stopwatch" );
-            
+
             // livestock header icons
             WoolIcon   = ContentFinder<Texture2D>.Get( "UI/Icons/wool" );
             MilkIcon   = ContentFinder<Texture2D>.Get( "UI/Icons/milk" );

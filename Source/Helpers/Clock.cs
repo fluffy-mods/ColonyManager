@@ -1,5 +1,5 @@
 ﻿// Clock.cs
-// Copyright Karel Kroeze, 2019-2019
+// Copyright Karel Kroeze, 2020-2020
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,9 +27,10 @@ namespace FluffyManager
             Color     = color ?? Color.grey;
         }
 
+        public Color Color { get; }
+
         public float Length    { get; }
         public float Thickness { get; }
-        public Color Color     { get; }
     }
 
     public static class Clock
@@ -59,11 +60,6 @@ namespace FluffyManager
             DrawMarker( canvas, handle.Hours, handle.Thickness, handle.Color, 0f, handle.Length );
         }
 
-        public static void DrawTick( Rect canvas, HourTick tick, float hour )
-        {
-            DrawMarker( canvas, hour, tick.Thickness, tick.Color, 1f - tick.Length, 1f );
-        }
-
         public static void DrawMarker( Rect canvas, float hour, float thickness, Color color, float start, float end )
         {
             var angle  = ( hour / 6 - .5f )                       * Mathf.PI; // should start at top...
@@ -73,6 +69,11 @@ namespace FluffyManager
             var to     = radius * end   * vector + canvas.center;
 //            Logger.Debug( $"{canvas}, {from}, {to}" );
             Widgets.DrawLine( from, to, color, thickness );
+        }
+
+        public static void DrawTick( Rect canvas, HourTick tick, float hour )
+        {
+            DrawMarker( canvas, hour, tick.Thickness, tick.Color, 1f - tick.Length, 1f );
         }
     }
 }

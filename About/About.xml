@@ -2,7 +2,7 @@
 <ModMetaData>
   <name>Colony Manager</name>
   <author>Fluffy</author>
-  <url>https://ludeon.com/forums/index.php?topic=16120.0</url>
+  <url>https://ludeon.com/forums/index.php?topic=16120</url>
   <description>Colony Manager allows you to make colonists do the more tedious parts of managing a colony, making sure you’re never out of vital resources again*. 
 
 &lt;size=24&gt;Important&lt;/size&gt;
@@ -58,7 +58,6 @@ Requires a new save. Adds a worktype, which in my tests gave errors on old saveg
 KapTaiN KaVerN:    Minifiable research benches
 Moumix3:    Research tweaks
 duduluu:    Chinese translation
-Kirill:    
 MossieuLeBlanc:    French translation
 Lauri7x3:    German translation
 Well-sp:    Russian translation (update)
@@ -71,10 +70,9 @@ Marcos Villar:    Portuguese (Brazilian) translation (update)
 CrapoFR:    French translation update
 maarxx:    Various fixes and improvements
 rimpy-custom:    Fix for Russian translation
-dodther:    
 
 &lt;size=24&gt;Version&lt;/size&gt;
-This is version 4.30.605, for RimWorld 1.1.2579.
+This is version 4.30.606, for RimWorld 1.1.2624.
 
 </description>
   <supportedVersions>

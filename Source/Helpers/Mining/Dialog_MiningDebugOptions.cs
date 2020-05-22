@@ -1,5 +1,5 @@
 ﻿// Dialog_MiningDebugOptions.cs
-// Copyright Karel Kroeze, 2017-2017
+// Copyright Karel Kroeze, 2018-2020
 
 using System.Linq;
 using RimWorld;

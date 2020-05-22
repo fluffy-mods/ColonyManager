@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// ResearchWorkers.cs
-// 2016-12-09
+﻿// ResearchWorkers.cs
+// Copyright Karel Kroeze, 2017-2020
 
 using Verse;
 

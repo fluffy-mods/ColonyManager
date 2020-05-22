@@ -1,5 +1,5 @@
 ﻿// Triplet.cs
-// Copyright Karel Kroeze, 2017-2017
+// Copyright Karel Kroeze, 2017-2020
 
 using System;
 using System.Collections.Generic;
@@ -52,7 +52,7 @@ namespace FluffyManager
 
         public static bool operator !=( Triplet<T1, T2, T3> left, Triplet<T1, T2, T3> right )
         {
-            return !(left == right );
+            return !( left == right );
         }
     }
 }

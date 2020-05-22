@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// Trigger_Threshold.cs
-// 2016-12-09
+﻿// Trigger_Threshold.cs
+// Copyright Karel Kroeze, 2018-2020
 
 using System;
 using System.Collections.Generic;
@@ -25,8 +24,6 @@ namespace FluffyManager
 
         public static int DefaultMaxUpperThreshold = 3000;
 
-        private string _stockpile_scribe;
-
         public bool countAllOnMap;
 
         public int MaxUpperThreshold;
@@ -40,6 +37,8 @@ namespace FluffyManager
         public int TargetCount;
 
         public ThingFilter ThresholdFilter;
+
+        private string _stockpile_scribe;
 
         public Trigger_Threshold( Manager manager ) : base( manager )
         {
@@ -74,7 +73,7 @@ namespace FluffyManager
             Op                = Ops.LowerThan;
             MaxUpperThreshold = DefaultMaxUpperThreshold;
             TargetCount       = DefaultCount;
-            ThresholdFilter = new ThingFilter( job.Notify_ThresholdFilterChanged );
+            ThresholdFilter   = new ThingFilter( job.Notify_ThresholdFilterChanged );
             ThresholdFilter.SetDisallowAll();
 
             ParentFilter = new ThingFilter();
@@ -187,7 +186,7 @@ namespace FluffyManager
             // draw a mark at the treshold
             Widgets.DrawLineHorizontal( rect.xMin, markHeight, rect.width );
 
-            TooltipHandler.TipRegion( rect, ( ) => StatusTooltip, GetHashCode() );
+            TooltipHandler.TipRegion( rect, () => StatusTooltip, GetHashCode() );
         }
 
         public override void DrawTriggerConfig( ref Vector2 cur, float width, float entryHeight, string label = null,

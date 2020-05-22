@@ -1,5 +1,5 @@
 ﻿// ManagerTab_Mining.cs
-// Copyright Karel Kroeze, 2017-2017
+// Copyright Karel Kroeze, 2018-2020
 
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +21,11 @@ namespace FluffyManager
                                                                                                                 StuffCategoryDefOf
                                                                                                                    .Metallic ) ) );
 
+        public List<ManagerJob_Mining> Jobs;
+
         private float             _jobListHeight;
         private Vector2           _jobListScrollPosition = Vector2.zero;
         private ManagerJob_Mining _selected;
-
-        public List<ManagerJob_Mining> Jobs;
 
         public ManagerTab_Mining( Manager manager ) : base( manager )
         {
@@ -58,6 +58,215 @@ namespace FluffyManager
             DoJobList( jobListRect );
             if ( Selected != null )
                 DoJobDetails( jobDetailsRect );
+        }
+
+        public float DrawAllowedBuildings( Vector2 pos, float width )
+        {
+            var start = pos;
+
+            var allowedBuildings = _selected.AllowedBuildings;
+            var buildings        = new List<ThingDef>( allowedBuildings.Keys );
+
+            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            foreach ( var building in buildings )
+            {
+                Utilities.DrawToggle( rowRect, building.LabelCap, building.description, allowedBuildings[building],
+                                      () => _selected.SetAllowBuilding( building, !allowedBuildings[building] ) );
+                rowRect.y += ListEntryHeight;
+            }
+
+            return rowRect.yMin - start.y;
+        }
+
+
+        public float DrawAllowedBuildingsShortcuts( Vector2 pos, float width )
+        {
+            var start = pos;
+
+            // list of keys in allowed animals list (all animals in biome + visible animals on map)
+            var allowedBuildings = _selected.AllowedBuildings;
+            var buildings        = new List<ThingDef>( allowedBuildings.Keys );
+
+            // toggle all
+            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            Utilities.DrawToggle( rowRect,
+                                  "FM.All".Translate().Italic(),
+                                  string.Empty,
+                                  allowedBuildings.Values.All( v => v ),
+                                  allowedBuildings.Values.All( v => !v ),
+                                  () => buildings.ForEach( b => _selected.SetAllowBuilding( b, true ) ),
+                                  () => buildings.ForEach( b => _selected.SetAllowBuilding( b, false ) ) );
+
+            return rowRect.yMax - start.y;
+        }
+
+        public float DrawAllowedMinerals( Vector2 pos, float width )
+        {
+            var start = pos;
+            // list of keys in allowed animals list (all animals in biome + visible animals on map)
+            var allowedMinerals = _selected.AllowedMinerals;
+            var minerals        = new List<ThingDef>( allowedMinerals.Keys );
+
+            // toggle for each animal
+            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            foreach ( var mineral in minerals )
+            {
+                // draw the toggle
+                Utilities.DrawToggle( rowRect, mineral.LabelCap, mineral.description,
+                                      _selected.AllowedMinerals[mineral],
+                                      () => _selected.SetAllowMineral( mineral, !_selected.AllowedMinerals[mineral] ) );
+                rowRect.y += ListEntryHeight;
+            }
+
+            return rowRect.yMin - start.y;
+        }
+
+        public float DrawAllowedMineralsShortcuts( Vector2 pos, float width )
+        {
+            var start = pos;
+
+            // list of keys in allowed animals list (all animals in biome + visible animals on map)
+            var allowedMinerals = _selected.AllowedMinerals;
+            var minerals        = new List<ThingDef>( allowedMinerals.Keys );
+
+            // toggle all
+            Utilities.DrawToggle( ref pos, width,
+                                  "FM.All".Translate().Italic(),
+                                  string.Empty,
+                                  _selected.AllowedMinerals.Values.All( v => v ),
+                                  _selected.AllowedMinerals.Values.All( v => !v ),
+                                  () => minerals.ForEach( p => _selected.SetAllowMineral( p, true ) ),
+                                  () => minerals.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
+
+            // toggle stone
+            var stone = minerals.Where( m => !m.building.isResourceRock ).ToList();
+            Utilities.DrawToggle( ref pos, width,
+                                  "FM.Mining.Stone".Translate().Italic(),
+                                  "FM.Mining.Stone.Tip".Translate(),
+                                  stone.All( p => allowedMinerals[p] ),
+                                  stone.All( p => !allowedMinerals[p] ),
+                                  () => stone.ForEach( p => _selected.SetAllowMineral( p, true ) ),
+                                  () => stone.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
+
+            // toggle metal
+            var metal = minerals.Where( m => m.building.isResourceRock && IsMetal( m.building.mineableThing ) )
+                                .ToList();
+            Utilities.DrawToggle( ref pos, width,
+                                  "FM.Mining.Metal".Translate().Italic(),
+                                  "FM.Mining.Metal.Tip".Translate(),
+                                  metal.All( p => allowedMinerals[p] ),
+                                  metal.All( p => !allowedMinerals[p] ),
+                                  () => metal.ForEach( p => _selected.SetAllowMineral( p, true ) ),
+                                  () => metal.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
+
+            // toggle precious
+            var precious = minerals
+                          .Where( m => m.building.isResourceRock && ( m.building.mineableThing?.smallVolume ?? false ) )
+                          .ToList();
+            Utilities.DrawToggle( ref pos, width,
+                                  "FM.Mining.Precious".Translate().Italic(),
+                                  "FM.Mining.Precious.Tip".Translate(),
+                                  precious.All( p => allowedMinerals[p] ),
+                                  precious.All( p => !allowedMinerals[p] ),
+                                  () => precious.ForEach( p => _selected.SetAllowMineral( p, true ) ),
+                                  () => precious.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
+
+            return pos.y - start.y;
+        }
+
+        public float DrawDeconstructBuildings( Vector2 pos, float width )
+        {
+            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            Utilities.DrawToggle( rowRect,
+                                  "FM.Mining.DeconstructBuildings".Translate(),
+                                  "FM.Mining.DeconstructBuildings.Tip".Translate(),
+                                  ref _selected.DeconstructBuildings );
+            return ListEntryHeight;
+        }
+
+        public float DrawMiningArea( Vector2 pos, float width )
+        {
+            var start = pos;
+            AreaAllowedGUI.DoAllowedAreaSelectors( ref pos, width, ref _selected.MiningArea, manager );
+            return pos.y - start.y;
+        }
+
+        public float DrawRoofRoomChecks( Vector2 pos, float width )
+        {
+            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+            Utilities.DrawToggle( rowRect, "FM.Mining.CheckRoofSupport".Translate(),
+                                  "FM.Mining.CheckRoofSupport.Tip".Translate(), ref _selected.CheckRoofSupport );
+
+            rowRect.y += ListEntryHeight;
+            if ( _selected.CheckRoofSupport )
+                Utilities.DrawToggle( rowRect, "FM.Mining.CheckRoofSupportAdvanced".Translate(),
+                                      "FM.Mining.CheckRoofSupportAdvanced.Tip".Translate(),
+                                      ref _selected.CheckRoofSupportAdvanced, true );
+            else
+                Widgets_Labels.Label( rowRect, "FM.Mining.CheckRoofSupportAdvanced".Translate(),
+                                      "FM.Mining.CheckRoofSupportAdvanced.Disabled.Tip".Translate(),
+                                      TextAnchor.MiddleLeft, margin: Margin,
+                                      color: Color.grey );
+
+            rowRect.y += ListEntryHeight;
+            Utilities.DrawToggle( rowRect, "FM.Mining.CheckRoomDivision".Translate(),
+                                  "FM.Mining.CheckRoomDivision.Tip".Translate(), ref _selected.CheckRoomDivision,
+                                  true );
+
+            return rowRect.yMax - pos.y;
+        }
+
+        public float DrawThresholdSettings( Vector2 pos, float width )
+        {
+            var start = pos;
+
+            var currentCount    = _selected.Trigger.CurrentCount;
+            var chunkCount      = _selected.GetCountInChunks();
+            var designatedCount = _selected.GetCountInDesignations();
+            var targetCount     = _selected.Trigger.TargetCount;
+
+            _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight,
+                                                 "FM.Mining.TargetCount".Translate(
+                                                     currentCount, chunkCount, designatedCount, targetCount ),
+                                                 "FM.Mining.TargetCount.Tip".Translate(
+                                                     currentCount, chunkCount, designatedCount, targetCount ),
+                                                 _selected.Designations,
+                                                 delegate { _selected.Sync = Utilities.SyncDirection.FilterToAllowed; },
+                                                 _selected.DesignationLabel );
+
+            Utilities.DrawToggle( ref pos, width,
+                                  "FM.Mining.SyncFilterAndAllowed".Translate(),
+                                  "FM.Mining.SyncFilterAndAllowed.Tip".Translate(),
+                                  ref _selected.SyncFilterAndAllowed );
+            Utilities.DrawReachabilityToggle( ref pos, width, ref _selected.CheckReachable );
+            Utilities.DrawToggle( ref pos, width,
+                                  "FM.PathBasedDistance".Translate(),
+                                  "FM.PathBasedDistance.Tip".Translate(),
+                                  ref _selected.PathBasedDistance,
+                                  true );
+
+            return pos.y - start.y;
+        }
+
+        public bool IsMetal( ThingDef def )
+        {
+            return def != null && _metals.Contains( def );
+        }
+
+        public override void PreOpen()
+        {
+            Refresh();
+        }
+
+        public void Refresh()
+        {
+            // upate our list of jobs
+            Jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Mining>();
+
+            // update pawnkind options
+            foreach ( var job in Jobs )
+                job.RefreshAllowedMinerals();
+            _selected?.RefreshAllowedMinerals();
         }
 
         private void DoJobDetails( Rect rect )
@@ -140,202 +349,6 @@ namespace FluffyManager
             }
         }
 
-        public float DrawThresholdSettings( Vector2 pos, float width )
-        {
-            var start = pos;
-
-            var currentCount    = _selected.Trigger.CurrentCount;
-            var chunkCount      = _selected.GetCountInChunks();
-            var designatedCount = _selected.GetCountInDesignations();
-            var targetCount     = _selected.Trigger.TargetCount;
-
-            _selected.Trigger.DrawTriggerConfig( ref pos, width, ListEntryHeight,
-                                                 "FM.Mining.TargetCount".Translate(
-                                                     currentCount, chunkCount, designatedCount, targetCount ),
-                                                 "FM.Mining.TargetCount.Tip".Translate(
-                                                     currentCount, chunkCount, designatedCount, targetCount ),
-                                                 _selected.Designations,
-                                                 delegate
-                                                 {
-                                                     _selected.Sync = Utilities.SyncDirection.FilterToAllowed;
-                                                 },
-                                                 _selected.DesignationLabel );
-
-            Utilities.DrawToggle( ref pos, width,
-                                  "FM.Mining.SyncFilterAndAllowed".Translate(),
-                                  "FM.Mining.SyncFilterAndAllowed.Tip".Translate(),
-                                  ref _selected.SyncFilterAndAllowed );
-            Utilities.DrawReachabilityToggle( ref pos, width, ref _selected.CheckReachable );
-            Utilities.DrawToggle( ref pos, width,
-                                  "FM.PathBasedDistance".Translate(),
-                                  "FM.PathBasedDistance.Tip".Translate(),
-                                  ref _selected.PathBasedDistance,
-                                  true );
-
-            return pos.y - start.y;
-        }
-
-        public float DrawMiningArea( Vector2 pos, float width )
-        {
-            var start = pos;
-            AreaAllowedGUI.DoAllowedAreaSelectors( ref pos, width, ref _selected.MiningArea, manager );
-            return pos.y - start.y;
-        }
-
-        public float DrawDeconstructBuildings( Vector2 pos, float width )
-        {
-            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            Utilities.DrawToggle( rowRect,
-                                  "FM.Mining.DeconstructBuildings".Translate(),
-                                  "FM.Mining.DeconstructBuildings.Tip".Translate(),
-                                  ref _selected.DeconstructBuildings );
-            return ListEntryHeight;
-        }
-
-        public float DrawRoofRoomChecks( Vector2 pos, float width )
-        {
-            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            Utilities.DrawToggle( rowRect, "FM.Mining.CheckRoofSupport".Translate(),
-                                  "FM.Mining.CheckRoofSupport.Tip".Translate(), ref _selected.CheckRoofSupport );
-
-            rowRect.y += ListEntryHeight;
-            if ( _selected.CheckRoofSupport )
-                Utilities.DrawToggle( rowRect, "FM.Mining.CheckRoofSupportAdvanced".Translate(),
-                                      "FM.Mining.CheckRoofSupportAdvanced.Tip".Translate(),
-                                      ref _selected.CheckRoofSupportAdvanced, true );
-            else
-                Widgets_Labels.Label( rowRect, "FM.Mining.CheckRoofSupportAdvanced".Translate(),
-                                      "FM.Mining.CheckRoofSupportAdvanced.Disabled.Tip".Translate(),
-                                      TextAnchor.MiddleLeft, margin: Margin,
-                                      color: Color.grey );
-
-            rowRect.y += ListEntryHeight;
-            Utilities.DrawToggle( rowRect, "FM.Mining.CheckRoomDivision".Translate(),
-                                  "FM.Mining.CheckRoomDivision.Tip".Translate(), ref _selected.CheckRoomDivision,
-                                  true );
-
-            return rowRect.yMax - pos.y;
-        }
-
-        public float DrawAllowedMineralsShortcuts( Vector2 pos, float width )
-        {
-            var start = pos;
-
-            // list of keys in allowed animals list (all animals in biome + visible animals on map)
-            var allowedMinerals = _selected.AllowedMinerals;
-            var minerals        = new List<ThingDef>( allowedMinerals.Keys );
-
-            // toggle all
-            Utilities.DrawToggle( ref pos, width,
-                                  "FM.All".Translate().Italic(),
-                                  string.Empty,
-                                  _selected.AllowedMinerals.Values.All( v => v ),
-                                  _selected.AllowedMinerals.Values.All( v => !v ),
-                                  () => minerals.ForEach( p => _selected.SetAllowMineral( p, true ) ),
-                                  () => minerals.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
-
-            // toggle stone
-            var stone = minerals.Where( m => !m.building.isResourceRock ).ToList();
-            Utilities.DrawToggle( ref pos, width,
-                                  "FM.Mining.Stone".Translate().Italic(),
-                                  "FM.Mining.Stone.Tip".Translate(),
-                                  stone.All( p => allowedMinerals[p] ),
-                                  stone.All( p => !allowedMinerals[p] ),
-                                  () => stone.ForEach( p => _selected.SetAllowMineral( p, true ) ),
-                                  () => stone.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
-
-            // toggle metal
-            var metal = minerals.Where( m => m.building.isResourceRock && IsMetal( m.building.mineableThing ) )
-                                .ToList();
-            Utilities.DrawToggle( ref pos, width,
-                                  "FM.Mining.Metal".Translate().Italic(),
-                                  "FM.Mining.Metal.Tip".Translate(),
-                                  metal.All( p => allowedMinerals[p] ),
-                                  metal.All( p => !allowedMinerals[p] ),
-                                  () => metal.ForEach( p => _selected.SetAllowMineral( p, true ) ),
-                                  () => metal.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
-
-            // toggle precious
-            var precious = minerals
-                          .Where( m => m.building.isResourceRock && ( m.building.mineableThing?.smallVolume ?? false ) )
-                          .ToList();
-            Utilities.DrawToggle( ref pos, width,
-                                  "FM.Mining.Precious".Translate().Italic(),
-                                  "FM.Mining.Precious.Tip".Translate(),
-                                  precious.All( p => allowedMinerals[p] ),
-                                  precious.All( p => !allowedMinerals[p] ),
-                                  () => precious.ForEach( p => _selected.SetAllowMineral( p, true ) ),
-                                  () => precious.ForEach( p => _selected.SetAllowMineral( p, false ) ) );
-
-            return pos.y - start.y;
-        }
-
-        public bool IsMetal( ThingDef def )
-        {
-            return def != null && _metals.Contains( def );
-        }
-
-        public float DrawAllowedMinerals( Vector2 pos, float width )
-        {
-            var start = pos;
-            // list of keys in allowed animals list (all animals in biome + visible animals on map)
-            var allowedMinerals = _selected.AllowedMinerals;
-            var minerals        = new List<ThingDef>( allowedMinerals.Keys );
-
-            // toggle for each animal
-            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            foreach ( var mineral in minerals )
-            {
-                // draw the toggle
-                Utilities.DrawToggle( rowRect, mineral.LabelCap, mineral.description,
-                                      _selected.AllowedMinerals[mineral],
-                                      () => _selected.SetAllowMineral( mineral, !_selected.AllowedMinerals[mineral] ) );
-                rowRect.y += ListEntryHeight;
-            }
-
-            return rowRect.yMin - start.y;
-        }
-
-
-        public float DrawAllowedBuildingsShortcuts( Vector2 pos, float width )
-        {
-            var start = pos;
-
-            // list of keys in allowed animals list (all animals in biome + visible animals on map)
-            var allowedBuildings = _selected.AllowedBuildings;
-            var buildings        = new List<ThingDef>( allowedBuildings.Keys );
-
-            // toggle all
-            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            Utilities.DrawToggle( rowRect,
-                                  "FM.All".Translate().Italic(),
-                                  string.Empty,
-                                  allowedBuildings.Values.All( v => v ),
-                                  allowedBuildings.Values.All( v => !v ),
-                                  () => buildings.ForEach( b => _selected.SetAllowBuilding( b, true ) ),
-                                  () => buildings.ForEach( b => _selected.SetAllowBuilding( b, false ) ) );
-
-            return rowRect.yMax - start.y;
-        }
-
-        public float DrawAllowedBuildings( Vector2 pos, float width )
-        {
-            var start = pos;
-
-            var allowedBuildings = _selected.AllowedBuildings;
-            var buildings        = new List<ThingDef>( allowedBuildings.Keys );
-
-            var rowRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-            foreach ( var building in buildings )
-            {
-                Utilities.DrawToggle( rowRect, building.LabelCap, building.description, allowedBuildings[building],
-                                      () => _selected.SetAllowBuilding( building, !allowedBuildings[building] ) );
-                rowRect.y += ListEntryHeight;
-            }
-
-            return rowRect.yMin - start.y;
-        }
-
         private void DoJobList( Rect rect )
         {
             Widgets.DrawMenuSection( rect );
@@ -392,22 +405,6 @@ namespace FluffyManager
             _jobListHeight = cur.y;
             GUI.EndGroup();
             Widgets.EndScrollView();
-        }
-
-        public override void PreOpen()
-        {
-            Refresh();
-        }
-
-        public void Refresh()
-        {
-            // upate our list of jobs
-            Jobs = Manager.For( manager ).JobStack.FullStack<ManagerJob_Mining>();
-
-            // update pawnkind options
-            foreach ( var job in Jobs )
-                job.RefreshAllowedMinerals();
-            _selected?.RefreshAllowedMinerals();
         }
     }
 }

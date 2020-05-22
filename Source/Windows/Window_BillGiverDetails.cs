@@ -1,6 +1,5 @@
-﻿//// Karel Kroeze
-//// Window_BillGiverDetails.cs
-//// 2016-12-09
+﻿// Window_BillGiverDetails.cs
+// Copyright Karel Kroeze, 2018-2020
 
 //using RimWorld;
 //using UnityEngine;

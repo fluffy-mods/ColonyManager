@@ -1,6 +1,5 @@
-﻿// // Karel Kroeze
-// // ManagerTab_Trading.cs
-// // 2016-12-09
+﻿// ManagerTab_Trading.cs
+// Copyright Karel Kroeze, 2018-2020
 
 // using RimWorld;
 // using System.Collections.Generic;

@@ -1,6 +1,5 @@
-﻿// Karel Kroeze
-// ManagerJob_Foraging.cs
-// 2016-12-09
+﻿// ManagerJob_Foraging.cs
+// Copyright Karel Kroeze, 2020-2020
 
 using System;
 using System.Collections.Generic;
@@ -16,17 +15,15 @@ namespace FluffyManager
     {
         private readonly Utilities.CachedValue<int> _cachedCurrentDesignatedCount = new Utilities.CachedValue<int>();
 
-        private List<Designation> _designations = new List<Designation>();
-
         public     Dictionary<ThingDef, bool> AllowedPlants = new Dictionary<ThingDef, bool>();
         public     Area                       ForagingArea;
         public     bool                       ForceFullyMature;
-        public bool SyncFilterAndAllowed = true;
-        public History                    History;
+        public     History                    History;
+        public     Utilities.SyncDirection    Sync                 = Utilities.SyncDirection.AllowedToFilter;
+        public     bool                       SyncFilterAndAllowed = true;
         public new Trigger_Threshold          Trigger;
-        public Utilities.SyncDirection Sync = Utilities.SyncDirection.AllowedToFilter;
 
-        public override bool IsValid => base.IsValid && Trigger != null && History != null;
+        private List<Designation> _designations = new List<Designation>();
 
         public ManagerJob_Foraging( Manager manager ) : base( manager )
         {
@@ -41,8 +38,6 @@ namespace FluffyManager
             if ( Scribe.mode == LoadSaveMode.Inactive )
                 RefreshAllowedPlants();
         }
-
-        public List<Designation> Designations => new List<Designation>( _designations );
 
         public override bool Completed => !Trigger.State;
 
@@ -75,24 +70,19 @@ namespace FluffyManager
             }
         }
 
+        public List<Designation> Designations => new List<Designation>( _designations );
+
+        public override bool IsValid => base.IsValid && Trigger != null && History != null;
+
         public override string Label => "FMG.Foraging".Translate();
 
         public override ManagerTab Tab => Manager.For( manager ).Tabs.Find( tab => tab is ManagerTab_Foraging );
 
-        public override string[] Targets => AllowedPlants.Keys.Where( key => AllowedPlants[key] ).Select( plant => plant.LabelCap.Resolve() ).ToArray();
+        public override string[] Targets => AllowedPlants
+                                           .Keys.Where( key => AllowedPlants[key] )
+                                           .Select( plant => plant.LabelCap.Resolve() ).ToArray();
 
         public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Growing;
-
-        public string DesignationLabel( Designation designation )
-        {
-            // label, dist, yield.
-            var plant = designation.target.Thing as Plant;
-            return "Fluffy.Manager.DesignationLabel".Translate(
-                plant.LabelCap,
-                Distance( plant, manager.map.GetBaseCenter() ).ToString( "F0" ),
-                plant.YieldNow(),
-                plant.def.plant.harvestedThingDef.LabelCap );
-        }
 
         public void AddRelevantGameDesignations()
         {
@@ -123,6 +113,17 @@ namespace FluffyManager
             foreach ( var des in _designations ) des.Delete();
 
             _designations.Clear();
+        }
+
+        public string DesignationLabel( Designation designation )
+        {
+            // label, dist, yield.
+            var plant = designation.target.Thing as Plant;
+            return "Fluffy.Manager.DesignationLabel".Translate(
+                plant.LabelCap,
+                Distance( plant, manager.map.GetBaseCenter() ).ToString( "F0" ),
+                plant.YieldNow(),
+                plant.def.plant.harvestedThingDef.LabelCap );
         }
 
         public override void DrawListEntry( Rect rect, bool overview = true, bool active = true )
@@ -175,6 +176,81 @@ namespace FluffyManager
             if ( Manager.LoadSaveMode == Manager.Modes.Normal )
                 // scribe history
                 Scribe_Deep.Look( ref History, "History" );
+        }
+
+        public List<ThingDef> GetMaterialsInPlant( ThingDef plantDef )
+        {
+            var plant = plantDef?.plant;
+            if ( plant == null ) throw new ArgumentNullException( "no valid plantdef defined" );
+
+            return new List<ThingDef>( new[] {plant.harvestedThingDef} );
+        }
+
+        public void Notify_ThresholdFilterChanged()
+        {
+            Logger.Debug( "Threshold changed." );
+            if ( !SyncFilterAndAllowed || Sync == Utilities.SyncDirection.AllowedToFilter )
+                return;
+
+            foreach ( var plant in new List<ThingDef>( AllowedPlants.Keys ) )
+                AllowedPlants[plant] = GetMaterialsInPlant( plant )
+                   .Any( material => Trigger.ThresholdFilter.Allows( material ) );
+        }
+
+        public void RefreshAllowedPlants()
+        {
+            Logger.Debug( "Refreshing allowed plants" );
+
+            // all plants that yield something, and it isn't wood.
+            var options = manager.map.Biome.AllWildPlants
+
+                                  // cave plants (shrooms)
+                                 .Concat( DefDatabase<ThingDef>.AllDefsListForReading
+                                                               .Where( td => td.plant?.cavePlant ?? false ) )
+
+                                  // ambrosia
+                                 .Concat( ThingDefOf.Plant_Ambrosia )
+
+                                  // and anything on the map that is not in a plant zone/planter
+                                 .Concat( manager.map.listerThings.AllThings.OfType<Plant>()
+                                                 .Where( p => p.Spawned &&
+                                                              !( manager.map.zoneManager.ZoneAt( p.Position ) is
+                                                                  IPlantToGrowSettable ) &&
+                                                              manager.map.thingGrid.ThingsAt( p.Position )
+                                                                     .FirstOrDefault(
+                                                                          t => t is Building_PlantGrower ) == null )
+                                                 .Select( p => p.def )
+                                                 .Distinct() )
+
+                                  // that yield something that is not wood
+                                 .Where( plant => plant.plant.harvestYield      > 0     &&
+                                                  plant.plant.harvestedThingDef != null &&
+                                                  plant.plant.harvestTag        != "Wood" )
+                                 .Distinct();
+
+            foreach ( var plant in options )
+                if ( !AllowedPlants.ContainsKey( plant ) )
+                    AllowedPlants.Add( plant, false );
+
+            AllowedPlants = AllowedPlants.OrderBy( plant => plant.Key.LabelCap.RawText )
+                                         .ToDictionary( it => it.Key, it => it.Value );
+        }
+
+        public void SetPlantAllowed( ThingDef plant, bool allow, bool sync = true )
+        {
+            if ( plant == null )
+                throw new ArgumentNullException( nameof( plant ) );
+
+            AllowedPlants[plant] = allow;
+
+            if ( SyncFilterAndAllowed && sync )
+            {
+                Sync = Utilities.SyncDirection.AllowedToFilter;
+
+                foreach ( var material in GetMaterialsInPlant( plant ) )
+                    if ( Trigger.ParentFilter.Allows( material ) )
+                        Trigger.ThresholdFilter.SetAllow( material, allow );
+            }
         }
 
         public override void Tick()
@@ -280,81 +356,6 @@ namespace FluffyManager
 
                    // reachable
                 && IsReachable( target );
-        }
-
-        public void RefreshAllowedPlants()
-        {
-            Logger.Debug( "Refreshing allowed plants" );
-
-            // all plants that yield something, and it isn't wood.
-            var options = manager.map.Biome.AllWildPlants
-
-                                  // cave plants (shrooms)
-                                 .Concat( DefDatabase<ThingDef>.AllDefsListForReading
-                                                               .Where( td => td.plant?.cavePlant ?? false ) )
-
-                                  // ambrosia
-                                 .Concat( ThingDefOf.Plant_Ambrosia )
-
-                                  // and anything on the map that is not in a plant zone/planter
-                                 .Concat( manager.map.listerThings.AllThings.OfType<Plant>()
-                                                 .Where( p => p.Spawned &&
-                                                              !( manager.map.zoneManager.ZoneAt( p.Position ) is
-                                                                  IPlantToGrowSettable ) &&
-                                                              manager.map.thingGrid.ThingsAt( p.Position )
-                                                                     .FirstOrDefault(
-                                                                          t => t is Building_PlantGrower ) == null )
-                                                 .Select( p => p.def )
-                                                 .Distinct() )
-
-                                  // that yield something that is not wood
-                                 .Where( plant => plant.plant.harvestYield      > 0     &&
-                                                  plant.plant.harvestedThingDef != null &&
-                                                  plant.plant.harvestTag        != "Wood" )
-                                 .Distinct();
-
-            foreach ( var plant in options )
-                if ( !AllowedPlants.ContainsKey( plant ) )
-                    AllowedPlants.Add( plant, false );
-
-            AllowedPlants = AllowedPlants.OrderBy( plant => plant.Key.LabelCap.RawText )
-                                         .ToDictionary( it => it.Key, it => it.Value );
-        }
-
-        public void SetPlantAllowed( ThingDef plant, bool allow, bool sync = true )
-        {
-            if ( plant == null )
-                throw new ArgumentNullException( nameof( plant ) );
-
-            AllowedPlants[plant] = allow;
-
-            if ( SyncFilterAndAllowed && sync )
-            {
-                Sync = Utilities.SyncDirection.AllowedToFilter;
-
-                foreach ( var material in GetMaterialsInPlant( plant ) )
-                    if ( Trigger.ParentFilter.Allows( material ) )
-                        Trigger.ThresholdFilter.SetAllow( material, allow );
-            }
-        }
-
-        public void Notify_ThresholdFilterChanged()
-        {
-            Logger.Debug( "Threshold changed." );
-            if ( !SyncFilterAndAllowed || Sync == Utilities.SyncDirection.AllowedToFilter )
-                return;
-
-            foreach ( var plant in new List<ThingDef>( AllowedPlants.Keys ) )
-                AllowedPlants[plant] = GetMaterialsInPlant( plant )
-                   .Any( material => Trigger.ThresholdFilter.Allows( material ) );
-        }
-
-        public List<ThingDef> GetMaterialsInPlant( ThingDef plantDef )
-        {
-            var plant = plantDef?.plant;
-            if ( plant == null ) throw new ArgumentNullException( "no valid plantdef defined" );
-
-            return new List<ThingDef>( new[] {plant.harvestedThingDef} );
         }
     }
 }

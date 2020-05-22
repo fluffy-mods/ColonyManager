@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿// String_Extensions.cs
+// Copyright Karel Kroeze, 2020-2020
+
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -8,6 +11,16 @@ namespace FluffyManager
     {
         private static readonly Dictionary<Pair<string, Rect>, bool> _fitsCache =
             new Dictionary<Pair<string, Rect>, bool>();
+
+        public static string Bold( this TaggedString text )
+        {
+            return text.Resolve().Bold();
+        }
+
+        public static string Bold( this string text )
+        {
+            return $"<b>{text}</b>";
+        }
 
         public static bool Fits( this string text, Rect rect )
         {
@@ -34,16 +47,6 @@ namespace FluffyManager
         public static string Italic( this string text )
         {
             return $"<i>{text}</i>";
-        }
-
-        public static string Bold( this TaggedString text )
-        {
-            return text.Resolve().Bold();
-        }
-
-        public static string Bold( this string text )
-        {
-            return $"<b>{text}</b>";
         }
     }
 }
