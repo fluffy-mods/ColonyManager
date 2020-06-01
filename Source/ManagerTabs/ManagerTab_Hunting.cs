@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -195,12 +196,81 @@ namespace FluffyManager
             foreach ( var animal in animals )
             {
                 // draw the toggle
-                Utilities.DrawToggle( rowRect, animal.LabelCap, animal.race.description, allowed[animal],
+                Utilities.DrawToggle( rowRect, animal.LabelCap, new TipSignal( GetAnimalKindTooltip( animal ), animal.GetHashCode() ), allowed[animal],
                                       () => allowed[animal] = !allowed[animal] );
                 rowRect.y += ListEntryHeight;
             }
 
             return rowRect.yMin - start.y;
+        }
+
+        public static string GetAnimalKindTooltip( PawnKindDef kind )
+        {
+            var sb = new StringBuilder();
+            sb.Append( kind.race.description );
+            if ( kind?.race?.race != null )
+            {
+                sb.Append( "\n\n" );
+
+                var yields = new List<string>();
+                yields.Add( YieldLine( kind.EstimatedMeatCount(), kind.race.race.meatDef.label ) );
+
+                // butcherProducts (only used for buildings in vanilla)
+                if ( !kind.race.butcherProducts.NullOrEmpty() )
+                    foreach ( var product in kind.race.butcherProducts )
+                        yields.Add( YieldLine( product.count, product.thingDef.label ) );
+
+                // killedLeavings (only used for buildings in vanilla)
+                if ( !kind.race.killedLeavings.NullOrEmpty() )
+                    foreach ( var leaving in kind.race.killedLeavings )
+                        yields.Add( YieldLine( leaving.count, leaving.thingDef.label ) );
+
+                // butcherBodyPart(s)
+                if ( !kind.lifeStages.NullOrEmpty() )
+                {
+                    for ( int i = 0; i < kind.lifeStages.Count; i++ )
+                    {
+                        var stage = kind.lifeStages[i];
+                        var part  = stage?.butcherBodyPart;
+                        if ( part == null ) continue;
+
+                        var label = stage.label;
+                        if ( label.NullOrEmpty() ) label = kind.race.race.lifeStageAges[i].def.label;
+                        if ( part.allowFemale && !part.allowMale )
+                        {
+                            label += ", ";
+                            label += kind.labelFemale.NullOrEmpty()
+                                ? I18n.Gender( Gender.Female )
+                                : kind.labelFemale;
+                        }
+                        else if ( part.allowMale && !part.allowFemale )
+                        {
+                            label += ", ";
+                            label += kind.labelMale.NullOrEmpty()
+                                ? I18n.Gender( Gender.Male )
+                                : kind.labelFemale;
+                        }
+
+                        yields.Add( $"{part.thing.label} ({label})" );
+                    }
+                }
+
+                foreach ( var @yield in yields )
+                    Log.Message( yield, true  );
+
+                if ( yields.Count == 1 )
+                    sb.AppendLine( I18n.YieldOne( yields.First() ) );
+                else if ( yields.Count > 1 )
+                    sb.AppendLine( I18n.YieldMany( yields ) );
+                sb.Append( I18n.Aggressiveness( kind.race.race.manhunterOnDamageChance ) );
+            }
+
+            return sb.ToString();
+        }
+
+        public static string YieldLine( int count, string label )
+        {
+            return count > 1 ? $"{count}x {label}" : label;
         }
 
         public float DrawAnimalShortcuts( Vector2 pos, float width )

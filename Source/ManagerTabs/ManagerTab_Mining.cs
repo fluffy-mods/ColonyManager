@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -40,6 +41,36 @@ namespace FluffyManager
         {
             get => _selected;
             set => _selected = value as ManagerJob_Mining;
+        }
+
+        public static string GetMineralTooltip( ThingDef mineral )
+        {
+            var sb = new StringBuilder();
+            sb.Append( mineral.description );
+
+            var resource = mineral.building?.mineableThing;
+            if ( resource != null )
+            {
+                sb.Append( "\n\n" );
+                var yield = string.Empty;
+                // stone chunks
+                if ( resource.IsChunk() )
+                {
+                    yield = $"\n{resource.label}" +
+                            $"\n - {I18n.ChanceToDrop( mineral.building.mineableDropChance )}" +
+                            $"\n - {resource.butcherProducts.Select( tc => tc.Label ).ToCommaList()}";
+                }
+                // other
+                else
+                {
+                    yield = $"{resource.label} x{mineral.building.mineableYield * Find.Storyteller.difficulty.mineYieldFactor}" +
+                            $"\n - {I18n.ChanceToDrop( mineral.building.mineableDropChance )}";
+                }
+
+                sb.Append( I18n.YieldOne( yield ) );
+            }
+
+            return sb.ToString();
         }
 
         public override void DoWindowContents( Rect canvas )
@@ -112,7 +143,8 @@ namespace FluffyManager
             foreach ( var mineral in minerals )
             {
                 // draw the toggle
-                Utilities.DrawToggle( rowRect, mineral.LabelCap, mineral.description,
+                Utilities.DrawToggle( rowRect, mineral.LabelCap,
+                                      new TipSignal( () => GetMineralTooltip( mineral ), mineral.GetHashCode() ),
                                       _selected.AllowedMinerals[mineral],
                                       () => _selected.SetAllowMineral( mineral, !_selected.AllowedMinerals[mineral] ) );
                 rowRect.y += ListEntryHeight;
@@ -393,7 +425,7 @@ namespace FluffyManager
             if ( i++ % 2 == 1 ) Widgets.DrawAltRect( newRect );
 
             Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label( newRect, "<" + "FM.Mining.NewJob".Translate().Resolve() + ">" );
+            Widgets.Label( newRect, "<" + "FM.Mining.NewJob".Translate() + ">" );
             Text.Anchor = TextAnchor.UpperLeft;
 
             if ( Widgets.ButtonInvisible( newRect ) ) Selected = new ManagerJob_Mining( manager );

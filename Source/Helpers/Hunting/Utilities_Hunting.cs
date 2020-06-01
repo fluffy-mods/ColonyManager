@@ -13,6 +13,11 @@ namespace FluffyManager
         public static ThingDef         InsectMeat = ThingDef.Named( "Megaspider" ).race.meatDef;
         public static ThingCategoryDef MeatRaw    = DefDatabase<ThingCategoryDef>.GetNamed( "MeatRaw" );
 
+        public static int EstimatedMeatCount( this PawnKindDef kind )
+        {
+            return (int)kind.race.GetStatValueAbstract( StatDefOf.MeatAmount );
+        }
+
         public static int EstimatedMeatCount( this Pawn p )
         {
             return (int) p.GetStatValue( StatDefOf.MeatAmount );

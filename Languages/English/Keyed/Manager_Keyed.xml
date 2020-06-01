@@ -257,4 +257,9 @@
   <Fluffy.ColonyManager.HistoryConsumption>consumption</Fluffy.ColonyManager.HistoryConsumption>
   <Fluffy.ColonyManager.HistoryBatteries>batteries</Fluffy.ColonyManager.HistoryBatteries>
 
+  <!-- manager tab target list extra info labels -->
+  <Fluffy.ColonyManager.Yield>Expected yield:</Fluffy.ColonyManager.Yield>
+  <Fluffy.ColonyManager.Aggressiveness>Aggressiveness: {0}</Fluffy.ColonyManager.Aggressiveness>
+  <Fluffy.ColonyManager.Gender.Male>male</Fluffy.ColonyManager.Gender.Male>
+  <Fluffy.ColonyManager.Gender.Female>female</Fluffy.ColonyManager.Gender.Female>
 </LanguageData>

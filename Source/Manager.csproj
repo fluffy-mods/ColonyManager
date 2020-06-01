@@ -82,8 +82,8 @@
     <Compile Include="Helpers\Hunting\Utilities_Hunting.cs" />
     <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\Mining\Dialog_MiningDebugOptions.cs" />
+    <Compile Include="Helpers\Mining\Utilities_Mining.cs" />
     <Compile Include="Helpers\Production\Dialog_CreateJobsForIngredients.cs" />
-    <Compile Include="Helpers\RadialProgressBar.cs" />
     <Compile Include="Helpers\Research\ResearchWorkers.cs" />
     <Compile Include="Helpers\Resources.cs" />
     <Compile Include="Helpers\Triplet.cs" />

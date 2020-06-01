@@ -281,7 +281,7 @@ namespace FluffyManager
             count = manager.map.listerThings.AllThings
                            .Where( t => t.Faction == Faction.OfPlayer
                                      && !t.IsForbidden( Faction.OfPlayer )
-                                     && IsChunk( t.def ) )
+                                     && t.def.IsChunk() )
                            .Sum( GetCountInChunk );
 
             _chunksCachedValue.Update( count );
@@ -326,7 +326,7 @@ namespace FluffyManager
                 return 0;
 
             // stone chunks
-            if ( IsChunk( resource ) )
+            if ( resource.IsChunk() )
                 return (int) ( GetCountInChunk( resource ) * rock.building.mineableDropChance );
 
             // metals
@@ -383,7 +383,7 @@ namespace FluffyManager
                 return new List<ThingDef>();
 
             // stone chunks
-            if ( IsChunk( resource ) )
+            if ( resource.IsChunk() )
                 return GetMaterialsInChunk( resource );
 
             // metals
@@ -466,12 +466,6 @@ namespace FluffyManager
             }
 
             return false;
-        }
-
-        public bool IsChunk( ThingDef def )
-        {
-            return def?.thingCategories?.Any( c => ThingCategoryDefOf.Chunks.ThisAndChildCategoryDefs.Contains( c ) ) ??
-                   false;
         }
 
 

@@ -185,7 +185,7 @@ namespace FluffyManager
             job.UpdateInterval?.Draw( lastUpdateRect, job );
         }
 
-        public static void DrawToggle( ref Vector2 pos, float width, string label, string tooltip, ref bool checkOn,
+        public static void DrawToggle( ref Vector2 pos, float width, string label, TipSignal tooltip, ref bool checkOn,
                                        bool expensive = false, float size = SmallIconSize, float margin = Margin,
                                        GameFont font = GameFont.Small,
                                        bool wrap = true )
@@ -199,7 +199,7 @@ namespace FluffyManager
             DrawToggle( toggleRect, label, tooltip, ref checkOn, expensive, size, margin, font, wrap );
         }
 
-        public static void DrawToggle( Rect rect, string label, string tooltip, ref bool checkOn,
+        public static void DrawToggle( Rect rect, string label, TipSignal tooltip, ref bool checkOn,
                                        bool expensive = false, float size = SmallIconSize, float margin = Margin,
                                        GameFont font = GameFont.Small, bool wrap = true )
         {
@@ -212,7 +212,7 @@ namespace FluffyManager
             Label( labelRect, label, TextAnchor.MiddleLeft, font, margin: margin, wrap: wrap );
 
             // tooltip
-            if ( !tooltip.NullOrEmpty() ) TooltipHandler.TipRegion( rect, tooltip );
+            TooltipHandler.TipRegion( rect, tooltip );
 
             // draw check
             if ( checkOn )
@@ -235,7 +235,7 @@ namespace FluffyManager
             if ( Widgets.ButtonInvisible( rect ) ) checkOn = !checkOn;
         }
 
-        public static void DrawToggle( ref Vector2 pos, float width, string label, string tooltip, bool checkOn,
+        public static void DrawToggle( ref Vector2 pos, float width, string label, TipSignal tooltip, bool checkOn,
                                        Action on, Action off,
                                        bool expensive = false, float size = SmallIconSize, float margin = Margin,
                                        GameFont font = GameFont.Small,
@@ -250,7 +250,7 @@ namespace FluffyManager
             DrawToggle( toggleRect, label, tooltip, checkOn, on, off, expensive, size, margin, wrap );
         }
 
-        public static void DrawToggle( ref Vector2 pos, float width, string label, string tooltip, bool checkOn,
+        public static void DrawToggle( ref Vector2 pos, float width, string label, TipSignal tooltip, bool checkOn,
                                        bool checkOff, Action on, Action off,
                                        bool expensive = false, float size = SmallIconSize, float margin = Margin,
                                        GameFont font = GameFont.Small,
@@ -265,7 +265,7 @@ namespace FluffyManager
             DrawToggle( toggleRect, label, tooltip, checkOn, checkOff, on, off, expensive, size, margin, wrap );
         }
 
-        public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, Action on, Action off,
+        public static void DrawToggle( Rect rect, string label, TipSignal tooltip, bool checkOn, Action on, Action off,
                                        bool expensive = false, float size = SmallIconSize, float margin = Margin,
                                        bool wrap = true )
         {
@@ -273,7 +273,7 @@ namespace FluffyManager
         }
 
 
-        public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, bool checkOff, Action on,
+        public static void DrawToggle( Rect rect, string label, TipSignal? tooltip, bool checkOn, bool checkOff, Action on,
                                        Action off, bool expensive = false, float size = SmallIconSize,
                                        float margin = Margin, bool wrap = true )
         {
@@ -289,7 +289,7 @@ namespace FluffyManager
             Label( rect, label, TextAnchor.MiddleLeft, GameFont.Small, margin: margin, wrap: wrap );
 
             // tooltip
-            if ( !tooltip.NullOrEmpty() ) TooltipHandler.TipRegion( rect, tooltip );
+            if ( tooltip.HasValue ) TooltipHandler.TipRegion( rect, tooltip.Value );
 
             // draw check
             if ( checkOn )
@@ -320,7 +320,7 @@ namespace FluffyManager
             }
         }
 
-        public static void DrawToggle( Rect rect, string label, string tooltip, bool checkOn, Action toggle,
+        public static void DrawToggle( Rect rect, string label, TipSignal tooltip, bool checkOn, Action toggle,
                                        bool expensive = false,
                                        float size = SmallIconSize, float margin = Margin )
         {

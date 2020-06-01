@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using Verse;
 using static FluffyManager.Constants;
@@ -211,12 +212,24 @@ namespace FluffyManager
             // toggle for each plant
             foreach ( var plant in plants )
             {
-                Utilities.DrawToggle( rowRect, plant.LabelCap, plant.description, _selected.AllowedPlants[plant],
+                Utilities.DrawToggle( rowRect, plant.LabelCap, new TipSignal( () => GetPlantTooltip( plant), plant.GetHashCode() ), _selected.AllowedPlants[plant],
                                       () => _selected.SetPlantAllowed( plant, !_selected.AllowedPlants[plant] ) );
                 rowRect.y += ListEntryHeight;
             }
 
             return rowRect.yMin - start.y;
+        }
+
+        public static string GetPlantTooltip( ThingDef plant )
+        {
+            var sb = new StringBuilder();
+            sb.Append( plant.description );
+            if ( plant.plant != null && plant.plant.harvestYield >= 1f && plant.plant.harvestedThingDef != null )
+            {
+                sb.Append( "\n\n" );
+                sb.Append( I18n.YieldOne( plant.plant.harvestYield, plant.plant.harvestedThingDef ) );
+            }
+            return sb.ToString();
         }
 
         public float DrawPlantShortcuts( Vector2 pos, float width )

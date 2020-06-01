@@ -36,6 +36,11 @@ namespace FluffyManager
             set => _selected = (ManagerJob_Forestry) value;
         }
 
+        public static string GetTreeTooltip( ThingDef tree )
+        {
+            return ManagerTab_Foraging.GetPlantTooltip( tree );
+        }
+
         public void DoContent( Rect rect )
         {
             // layout: settings | trees
@@ -317,7 +322,9 @@ namespace FluffyManager
             // toggle for each tree
             foreach ( var def in trees )
             {
-                Utilities.DrawToggle( rowRect, def.LabelCap, def.description, _selected.AllowedTrees[def],
+                Utilities.DrawToggle( rowRect, def.LabelCap,
+                                      new TipSignal( () => GetTreeTooltip( def ), def.GetHashCode() ),
+                                      _selected.AllowedTrees[def],
                                       () => _selected.AllowedTrees[def] = !_selected.AllowedTrees[def] );
                 rowRect.y += ListEntryHeight;
             }
