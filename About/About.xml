@@ -72,11 +72,11 @@ maarxx:    Various fixes and improvements
 rimpy-custom:    Fix for Russian translation
 
 &lt;size=24&gt;Version&lt;/size&gt;
-This is version 4.30.644, for RimWorld 1.1.2654.
+This is version 4.31.645, for RimWorld 1.2.2719.
 
 </description>
   <supportedVersions>
-    <li>1.1</li>
+    <li>1.2</li>
   </supportedVersions>
   <packageId>fluffy.colonymanager</packageId>
   <modDependencies>
