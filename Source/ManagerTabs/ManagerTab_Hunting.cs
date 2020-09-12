@@ -256,7 +256,7 @@ namespace FluffyManager
                 }
 
                 foreach ( var @yield in yields )
-                    Log.Message( yield, true  );
+                    Logger.Debug( yield );
 
                 if ( yields.Count == 1 )
                     sb.AppendLine( I18n.YieldOne( yields.First() ) );

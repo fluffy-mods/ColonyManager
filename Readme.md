@@ -2,14 +2,16 @@
 
 Colony Manager allows you to make colonists do the more tedious parts of managing a colony, making sure you're never out of vital resources again\*.
 
-![Important](https://banners.karel-kroeze.nl/title/Important.png)  
+![Important](https://banners.karel-kroeze.nl/title/Important.png)
+
 **Requires a new save game.**
 Adds a worktype, which is stored in the world, which means you need to start a new game after adding/removing this mod.
 
 **Production & Import/Export tabs missing.**
 The Production and Import & Export tabs are still disabled due to a lack of time.
 
-![Features](https://banners.karel-kroeze.nl/title/Features.png)  
+![Features](https://banners.karel-kroeze.nl/title/Features.png)
+
 **Hunting jobs**
 
 - Set a target for meat, and never worry about designating hunting manually again!
@@ -37,12 +39,14 @@ The Production and Import & Export tabs are still disabled due to a lack of time
 **Import & Export**
 == coming back soon(tm) ==
 
-![How does it work?](https://banners.karel-kroeze.nl/title/How%20does%20it%20work%3F.png)  
+![How does it work?](https://banners.karel-kroeze.nl/title/How%20does%20it%20work%3F.png)
+
 You can manually set jobs in the new Manager tab on the bottom of the screen. Once set, a colonist with the manager skill and worktype enabled will go to a manager station to figure out the best way to assign designations.
 Periodically, the manager will check if the assigned designations are still up-to-date, and make changes or delete designations where required. The manager will not touch designations that are set manually, nor will managers create jobs. You're still the overlord.
 In theory there is no real limit to the number of manager jobs that can be created.
 
-![Notes](https://banners.karel-kroeze.nl/title/Notes.png)  
+![Notes](https://banners.karel-kroeze.nl/title/Notes.png)
+
 - Requires a new save. Adds a worktype, which in my tests gave errors on old savegames. If you also have my Work Tab mod, you should be able to add this mod in an ongoing save.
 
 
@@ -62,6 +66,7 @@ In theory there is no real limit to the number of manager jobs that can be creat
  - CrapoFR:	French translation update
  - maarxx:	Various fixes and improvements
  - rimpy-custom:	Fix for Russian translation
+ - InsanityPrelude:	Add AllWork tag to Managing WorkTypeDef (#181)
 
 ![Think you found a bug?](https://banners.karel-kroeze.nl/title/Think%20you%20found%20a%20bug%3F.png)  
 Please read [this guide](http://steamcommunity.com/sharedfiles/filedetails/?id=725234314) before creating a bug report,
@@ -87,4 +92,4 @@ Become a supporter and show your appreciation by buying me a coffee (or contribu
 
 
 ![Version](https://banners.karel-kroeze.nl/title/Version.png)  
-This is version 4.32.646, for RimWorld 1.2.2723.
+This is version 4.33.649, for RimWorld 1.2.2753.
