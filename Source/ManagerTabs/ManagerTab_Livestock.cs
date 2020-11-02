@@ -557,6 +557,26 @@ namespace FluffyManager
                 }
             }
 
+            //do we assume that all animals can get hungry and eat, or check for existence of something?
+            //if (_selectedCurrent.Trigger.pawnKind.invFoodDef != null)
+            if (true)
+            {
+                var sendToHungryAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+                pos.y += ListEntryHeight;
+                DrawToggle(sendToHungryAreaRect,
+                            "FML.SendToHungryArea".Translate(),
+                            "FML.SendToHungryArea.Tip".Translate(),
+                            ref _selectedCurrent.SendToHungryArea);
+
+                if (_selectedCurrent.SendToHungryArea)
+                {
+                    var hungryAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+                    AreaAllowedGUI.DoAllowedAreaSelectors(hungryAreaRect, ref _selectedCurrent.HungryArea,
+                                                           manager);
+                    pos.y += ListEntryHeight;
+                }
+            }
+
             if ( _selectedCurrent.Trigger.pawnKind.Shearable() )
             {
                 var sendToShearingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );

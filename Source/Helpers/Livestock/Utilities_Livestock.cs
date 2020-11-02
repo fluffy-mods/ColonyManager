@@ -399,6 +399,13 @@ namespace FluffyManager
             return Mathf.CeilToInt( ( 1 - comp.Fullness ) / growthRatePerTick );
         }
 
+        public static bool Hungry( this Pawn p )
+        {
+            //perhaps, like TicksTillHarvestable, this should estimate whether or not the animal will
+            //hit 0 food need before the next manage job interval.
+            return (p.needs.food.CurLevel <= 0.1f);
+        }
+
         public static bool VisiblyPregnant( this Pawn pawn )
         {
             return pawn?.health.hediffSet.GetHediffs<Hediff_Pregnant>().Any( hp => hp.Visible ) ?? false;
