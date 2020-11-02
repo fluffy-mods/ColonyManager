@@ -399,11 +399,11 @@ namespace FluffyManager
             return Mathf.CeilToInt( ( 1 - comp.Fullness ) / growthRatePerTick );
         }
 
-        public static bool Hungry( this Pawn p )
+        public static int TicksUntilStarving( this Pawn pawn )
         {
-            //perhaps, like TicksTillHarvestable, this should estimate whether or not the animal will
-            //hit 0 food need before the next manage job interval.
-            return (p.needs.food.CurLevel <= 0.1f);
+            // this isn't perfect. we assume this is linear when it isn't. the real calculation is more complicated.
+            // check out "Need_Food.FoodFallPerTickAssumingCategory(...)" for more details
+            return Mathf.CeilToInt(pawn.needs.food.CurLevel / pawn.needs.food.FoodFallPerTick);
         }
 
         public static bool VisiblyPregnant( this Pawn pawn )

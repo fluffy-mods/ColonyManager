@@ -557,9 +557,7 @@ namespace FluffyManager
                 }
             }
 
-            //do we assume that all animals can get hungry and eat, or check for existence of something?
-            //if (_selectedCurrent.Trigger.pawnKind.invFoodDef != null)
-            if (true)
+            if (_selectedCurrent.Trigger.pawnKind.RaceProps.EatsFood)
             {
                 var sendToHungryAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
                 pos.y += ListEntryHeight;

@@ -519,7 +519,8 @@ namespace FluffyManager
                     }
 
                     // hungry
-                    else if (SendToHungryArea && p.Hungry())
+                    else if ( SendToHungryArea && 
+                              p.TicksUntilStarving() < UpdateInterval.ticks )
                     {
                         if (p.playerSettings.AreaRestriction != HungryArea)
                         {
