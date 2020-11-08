@@ -316,7 +316,7 @@ namespace FluffyManager
             Scribe_References.Look( ref MilkArea, "MilkArea" );
             Scribe_References.Look( ref ShearArea, "ShearArea" );
             Scribe_References.Look( ref TrainingArea, "TrainingArea" );
-            Scribe_References.Look(ref HungryArea, "HungryArea");
+            Scribe_References.Look( ref HungryArea, "HungryArea" );
             Scribe_References.Look( ref Master, "Master" );
             Scribe_References.Look( ref Trainer, "Trainer" );
             Scribe_Collections.Look( ref RestrictArea, "AreaRestrictions", LookMode.Reference );

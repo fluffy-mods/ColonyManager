@@ -539,24 +539,6 @@ namespace FluffyManager
                        color: Color.grey );
             }
 
-            if ( _selectedCurrent.Trigger.pawnKind.Milkable() )
-            {
-                var sendToMilkingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-                pos.y += ListEntryHeight;
-                DrawToggle( sendToMilkingAreaRect,
-                            "FML.SendToMilkingArea".Translate(),
-                            "FML.SendToMilkingArea.Tip".Translate(),
-                            ref _selectedCurrent.SendToMilkingArea );
-
-                if ( _selectedCurrent.SendToMilkingArea )
-                {
-                    var milkingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
-                    AreaAllowedGUI.DoAllowedAreaSelectors( milkingAreaRect, ref _selectedCurrent.MilkArea,
-                                                           manager );
-                    pos.y += ListEntryHeight;
-                }
-            }
-
             if (_selectedCurrent.Trigger.pawnKind.RaceProps.EatsFood)
             {
                 var sendToHungryAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
@@ -571,6 +553,24 @@ namespace FluffyManager
                     var hungryAreaRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
                     AreaAllowedGUI.DoAllowedAreaSelectors(hungryAreaRect, ref _selectedCurrent.HungryArea,
                                                            manager);
+                    pos.y += ListEntryHeight;
+                }
+            }
+
+            if ( _selectedCurrent.Trigger.pawnKind.Milkable() )
+            {
+                var sendToMilkingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+                pos.y += ListEntryHeight;
+                DrawToggle( sendToMilkingAreaRect,
+                            "FML.SendToMilkingArea".Translate(),
+                            "FML.SendToMilkingArea.Tip".Translate(),
+                            ref _selectedCurrent.SendToMilkingArea );
+
+                if ( _selectedCurrent.SendToMilkingArea )
+                {
+                    var milkingAreaRect = new Rect( pos.x, pos.y, width, ListEntryHeight );
+                    AreaAllowedGUI.DoAllowedAreaSelectors( milkingAreaRect, ref _selectedCurrent.MilkArea,
+                                                           manager );
                     pos.y += ListEntryHeight;
                 }
             }
