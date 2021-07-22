@@ -441,7 +441,7 @@ namespace FluffyManager
                                      .ToArray();
 
             // check if there are more than two rooms in the surrounding cells.
-            var rooms = adjacent.Select( c => c.GetRoom( manager.map, RegionType.Normal ) )
+            var rooms = adjacent.Select( c => c.GetRoom( manager.map) )
                                 .Where( r => r != null )
                                 .Distinct()
                                 .ToList();
