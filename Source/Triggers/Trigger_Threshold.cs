@@ -255,13 +255,13 @@ namespace FluffyManager
                     {
                         var    option  = string.Empty;
                         Action onClick = () => Find.WindowStack.TryRemove( typeof( MainTabWindow_Manager ), false );
-                        Action onHover = null;
+                        Action<UnityEngine.Rect> onHover = null;
                         if ( designation.target.HasThing )
                         {
                             var thing = designation.target.Thing;
                             option  =  designationLabelGetter?.Invoke( designation ) ?? thing.LabelCap;
                             onClick += () => CameraJumper.TryJumpAndSelect( thing );
-                            onHover += () => CameraJumper.TryJump( thing );
+                            onHover += (c) => CameraJumper.TryJump( thing );
                         }
                         else
                         {
@@ -271,7 +271,7 @@ namespace FluffyManager
                             // so I suppose it doesn't matter -- Fluffy.
                             option  =  designationLabelGetter?.Invoke( designation ) ?? cell.GetTerrain( map ).LabelCap;
                             onClick += () => CameraJumper.TryJump( cell, map );
-                            onHover += () => CameraJumper.TryJump( cell, map );
+                            onHover += (c) => CameraJumper.TryJump( cell, map );
                         }
 
                         options.Add( new FloatMenuOption( option, onClick, MenuOptionPriority.Default, onHover ) );

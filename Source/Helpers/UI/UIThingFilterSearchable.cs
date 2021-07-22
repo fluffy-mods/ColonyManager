@@ -81,7 +81,7 @@ namespace FluffyManager
 
             // main listing
             var listingRect            = new Rect( 0f, curY, viewRect.width, 9999f );
-            var listingTreeThingFilter = new Listing_TreeThingFilter( filter, parentFilter, null, null, null );
+            var listingTreeThingFilter = new Listing_TreeThingFilter( filter, parentFilter, null, null, null, new RimWorld.QuickSearchFilter() );
             listingTreeThingFilter.Begin( listingRect );
             var node = ThingCategoryNodeDatabase.RootNode;
             if ( parentFilter != null )
@@ -91,7 +91,7 @@ namespace FluffyManager
             }
 
             // draw the actual thing
-            listingTreeThingFilter.DoCategoryChildren( node, 0, openMask, Find.CurrentMap, true );
+            listingTreeThingFilter.ListCategoryChildren(node, openMask, Find.CurrentMap, new Rect(0f, curY+2f, viewRect.width-2f, 9999f));//DoCategoryChildren( node, 0, openMask, Find.CurrentMap, true );
             listingTreeThingFilter.End();
 
             // update height.
