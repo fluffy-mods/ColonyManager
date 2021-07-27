@@ -6,7 +6,7 @@
     "version": {
         "major": 5,
         "minor": 0,
-        "build": 663
+        "build": 664
     },
     "author": {
         "name": "Fluffy",
@@ -19,6 +19,15 @@
         "url": "https://github.com/fluffy-mods/ColonyManager"
     },
     "changelog": [
+        {
+            "date": "2021-07-27T16:08:10.000Z",
+            "message": "update preview image",
+            "author": {
+                "name": "Fluffy",
+                "email": "fluffy.l2032@gmail.com"
+            },
+            "hash": "a34393ab46feb6d6bea24c3c9d0d0ed1a0cf3954"
+        },
         {
             "date": "2021-07-27T15:15:06.000Z",
             "message": "remove area management for roaming animals",

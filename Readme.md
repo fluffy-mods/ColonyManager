@@ -77,6 +77,9 @@ All original content (e.g. text, imagery, sounds) in this mod is licensed under 
 
 Parts of the code in this mod, and some of the content may be licensed by their original authors. If this is the case, the original author & license will either be given in the source code, or be in a LICENSE file next to the content. Please do not decompile my mods, but use the original source code available on [GitHub](https://github.com/fluffy-mods/ColonyManager/), so license information in the source code is preserved.
 
+Parts of this mod were created by, or derived from works created by;
+- DinosoftLabs: mustache icon ([BY-NC](https://www.flaticon.com/authors/dinosoftlabs))
+- Smashicons: top hat icon ([BY-NC](https://www.flaticon.com/authors/smashicons))
 
 
 ![Are you enjoying my mods?](https://banners.karel-kroeze.nl/title/Are%20you%20enjoying%20my%20mods%3F.png)  

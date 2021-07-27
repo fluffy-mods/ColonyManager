@@ -469,7 +469,7 @@ namespace FluffyManager
             {
                 var unavailableLabelRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
                 unavailableLabelRect.xMin += Margin;
-                Label(unavailableLabelRect, "FM.Livestock.DisabledBecauseRoamingAnimal".Translate(), "FM.Livestock.DisabledBecauseRoamingAnimalTip".Translate(), TextAnchor.MiddleLeft,
+                Label(unavailableLabelRect, "FM.Livestock.DisabledBecauseRoamingAnimal".Translate(_selectedCurrent.Trigger.pawnKind.GetLabelPlural()), "FM.Livestock.DisabledBecauseRoamingAnimalTip".Translate(_selectedCurrent.Trigger.pawnKind.GetLabelPlural()), TextAnchor.MiddleLeft,
                        color: Color.grey);
                 return ListEntryHeight;
             }
