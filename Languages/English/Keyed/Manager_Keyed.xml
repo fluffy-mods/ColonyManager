@@ -213,7 +213,7 @@
   <FM.Livestock.DisabledBecauseNoTrainingSet>Disabled because no training target is set.</FM.Livestock.DisabledBecauseNoTrainingSet>
   <FM.Livestock.CannotTrainTooSmall>{0} are too small to train this.</FM.Livestock.CannotTrainTooSmall>
   <FM.Livestock.DisabledBecauseRoamingAnimal>{0} cannot be restricted</FM.Livestock.DisabledBecauseRoamingAnimal>
-  <FM.Livestock.DisabledBecauseRoamingAnimalTip>{0} cannot be restricted to an area because it is a roaming animal.</FM.Livestock.DisabledBecauseRoamingAnimalTip>
+  <FM.Livestock.DisabledBecauseRoamingAnimalTip>{0} cannot be restricted to an area because they are a roaming animal. Try penning them in an enclosure instead.</FM.Livestock.DisabledBecauseRoamingAnimalTip>
 
   <!-- following -->
   <FM.Livestock.FollowHeader>Following</FM.Livestock.FollowHeader>

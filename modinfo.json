@@ -5,7 +5,7 @@
     "url": "https://github.com/fluffy-mods/ColonyManager",
     "version": {
         "major": 5,
-        "minor": 0,
+        "minor": 1,
         "build": 664
     },
     "author": {
@@ -19,6 +19,15 @@
         "url": "https://github.com/fluffy-mods/ColonyManager"
     },
     "changelog": [
+        {
+            "date": "2021-07-27T16:10:31.000Z",
+            "message": "add unavailable labels for restricting roamers",
+            "author": {
+                "name": "Fluffy",
+                "email": "fluffy.l2032@gmail.com"
+            },
+            "hash": "4dae1e7c11b7426296c9ff368e91fdbaca3f7600"
+        },
         {
             "date": "2021-07-27T16:08:10.000Z",
             "message": "update preview image",
