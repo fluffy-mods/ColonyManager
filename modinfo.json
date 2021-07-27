@@ -6,7 +6,7 @@
     "version": {
         "major": 5,
         "minor": 0,
-        "build": 658
+        "build": 662
     },
     "author": {
         "name": "Fluffy",
@@ -19,6 +19,15 @@
         "url": "https://github.com/fluffy-mods/ColonyManager"
     },
     "changelog": [
+        {
+            "date": "2021-07-27T09:17:29.000Z",
+            "message": "req squiglies be gone, switch to sdk style project",
+            "author": {
+                "name": "Fluffy",
+                "email": "fluffy.l2032@gmail.com"
+            },
+            "hash": "334cce3db7b65cd52b0dd1da24e974580755d53a"
+        },
         {
             "date": "2021-07-24T20:37:40.000Z",
             "message": "changed version in About.xml",
@@ -60,22 +69,25 @@
         {
             "hash": "7e8f6ca644461bfe9d800bdf26de900388155a49",
             "author": "Lion Kerger",
-            "description": "changed version in About.xml"
+            "description": "changed version in About.xml",
+            "suppressed": true
         },
         {
             "hash": "fbc9d1d195575cd27877a70ae4c2795050d23ade",
             "author": "Lion Kerger",
-            "description": "corrected misplaced using-directive"
+            "description": "corrected misplaced using-directive",
+            "suppressed": true
         },
         {
             "hash": "1c3cd63279a42e5e65046f7dc84a569d8454f3f2",
             "author": "Lion Kerger",
-            "description": "updated package-reference to 2.1.0"
+            "description": "updated package-reference to 2.1.0",
+            "suppressed": true
         },
         {
             "hash": "ff78394d8f0b5d72375fd4171188cfc09147fc9b",
             "author": "Lion Kerger",
-            "description": "Fixed minor UI/Window bugs"
+            "description": "Initial update for 1.3"
         },
         {
             "hash": "2cec8c107c17fff71ffb809fed9dff706f42b24e",
@@ -100,7 +112,8 @@
         {
             "hash": "ffd77e202de2c624538174317e71a2f02f4bb22f",
             "author": "maarxx",
-            "description": "Change Order to Milk -> Shear -> Train"
+            "description": "Change Order to Milk -> Shear -> Train",
+            "suppressed": true
         },
         {
             "hash": "b638b376dd0bf67e6808f74e65da3b685c1b1b57",
@@ -110,7 +123,8 @@
         {
             "hash": "a0c451a56e6a1672b5a5ab99c968a0347f054356",
             "author": "maarxx",
-            "description": "Fix settings not persisting, fix resultant \"No language\" translation errors. (#145)"
+            "description": "Fix settings not persisting, fix resultant \"No language\" translation errors. (#145)",
+            "suppressed": true
         },
         {
             "hash": "9171dfc951792439fb818e34f5110dff2073855e",
@@ -150,7 +164,8 @@
         {
             "hash": "775396c602584f24ce44c15202c7f26801359dc3",
             "author": "duduluu",
-            "description": "Update Chinese translations (#84)"
+            "description": "Update Chinese translations (#84)",
+            "suppressed": true
         },
         {
             "hash": "12d4e484a7fe3cd8895632ac0f5300867f9ea28c",
@@ -160,7 +175,8 @@
         {
             "hash": "b731a01db3b5bd6805e456f30abfcb0123c66237",
             "author": "Kirill",
-            "description": "Russian translation, pt. 2"
+            "description": "Russian translation, pt. 2",
+            "suppressed": true
         },
         {
             "hash": "3fa14f8d18b1a77741b4bce471ed3b324bf6c946",
@@ -186,24 +202,9 @@
     "contributors": {
         "Lion Kerger": [
             {
-                "hash": "7e8f6ca",
-                "author": "Lion Kerger",
-                "description": "changed version in About.xml"
-            },
-            {
-                "hash": "fbc9d1d",
-                "author": "Lion Kerger",
-                "description": "corrected misplaced using-directive"
-            },
-            {
-                "hash": "1c3cd63",
-                "author": "Lion Kerger",
-                "description": "updated package-reference to 2.1.0"
-            },
-            {
                 "hash": "ff78394",
                 "author": "Lion Kerger",
-                "description": "Fixed minor UI/Window bugs"
+                "description": "Initial update for 1.3"
             }
         ],
         "InsanityPrelude": [
@@ -234,19 +235,9 @@
                 "description": "Add Husbandry job option to Unassign Training"
             },
             {
-                "hash": "ffd77e2",
-                "author": "maarxx",
-                "description": "Change Order to Milk -> Shear -> Train"
-            },
-            {
                 "hash": "b638b37",
                 "author": "maarxx",
                 "description": "Add Feature to Restrict Animals Ready for Milking or Shearing"
-            },
-            {
-                "hash": "a0c451a",
-                "author": "maarxx",
-                "description": "Fix settings not persisting, fix resultant \"No language\" translation errors. (#145)"
             }
         ],
         "Marcos Villar": [
@@ -298,11 +289,6 @@
         ],
         "duduluu": [
             {
-                "hash": "775396c",
-                "author": "duduluu",
-                "description": "Update Chinese translations (#84)"
-            },
-            {
                 "hash": "12d4e48",
                 "author": "duduluu",
                 "description": "Update Chinese translations"
@@ -314,11 +300,6 @@
             }
         ],
         "Kirill": [
-            {
-                "hash": "b731a01",
-                "author": "Kirill",
-                "description": "Russian translation, pt. 2"
-            },
             {
                 "hash": "3fa14f8",
                 "author": "Kirill",

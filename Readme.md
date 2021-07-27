@@ -44,19 +44,19 @@ In theory there is no real limit to the number of manager jobs that can be creat
 - Requires a new save. Adds a worktype, which in my tests gave errors on old savegames. If you also have my Work Tab mod, you should be able to add this mod in an ongoing save.
 
 ![Contributors](https://banners.karel-kroeze.nl/title/Contributors.png)  
-Lion Kerger: [changed version in About.xml](https://github.com/fluffy-mods/ColonyManager/commit/7e8f6ca), [corrected misplaced using-directive](https://github.com/fluffy-mods/ColonyManager/commit/fbc9d1d), [updated package-reference to 2.1.0](https://github.com/fluffy-mods/ColonyManager/commit/1c3cd63), [Fixed minor UI/Window bugs](https://github.com/fluffy-mods/ColonyManager/commit/ff78394)
+Lion Kerger: [Initial update for 1.3](https://github.com/fluffy-mods/ColonyManager/commit/ff78394)
 InsanityPrelude: [Add AllWork tag to Managing WorkTypeDef (#181)](https://github.com/fluffy-mods/ColonyManager/commit/2cec8c1)
 dodther: [Update russian translate (#165)](https://github.com/fluffy-mods/ColonyManager/commit/9c92f16)
 CrapoFR: [French translation - update (#149)](https://github.com/fluffy-mods/ColonyManager/commit/89da83d)
-maarxx: [Add Husbandry job option to Unassign Training](https://github.com/fluffy-mods/ColonyManager/commit/cdc8702), [Change Order to Milk -&gt; Shear -&gt; Train](https://github.com/fluffy-mods/ColonyManager/commit/ffd77e2), [Add Feature to Restrict Animals Ready for Milking or Shearing](https://github.com/fluffy-mods/ColonyManager/commit/b638b37), [Fix settings not persisting, fix resultant &quot;No language&quot; translation errors. (#145)](https://github.com/fluffy-mods/ColonyManager/commit/a0c451a)
+maarxx: [Add Husbandry job option to Unassign Training](https://github.com/fluffy-mods/ColonyManager/commit/cdc8702), [Add Feature to Restrict Animals Ready for Milking or Shearing](https://github.com/fluffy-mods/ColonyManager/commit/b638b37)
 Marcos Villar: [Updated BrazilianPortuguese (#136)](https://github.com/fluffy-mods/ColonyManager/commit/9171dfc)
 Suh. Junmin: [Add partial korean translation (#131)](https://github.com/fluffy-mods/ColonyManager/commit/9d559a1)
 rw-chaos: [Updated German translation (#130)](https://github.com/fluffy-mods/ColonyManager/commit/ccf3cef)
 harrisongarya: [Add research tab](https://github.com/fluffy-mods/ColonyManager/commit/5b946ad)
 Alex TD: [Button to suspend any managing job (#123)](https://github.com/fluffy-mods/ColonyManager/commit/ceb5d46), [Fix Forestry in growing zones (#113)](https://github.com/fluffy-mods/ColonyManager/commit/dceaafb)
 Firty: [Add PT-BR translation (#117)](https://github.com/fluffy-mods/ColonyManager/commit/511736d)
-duduluu: [Update Chinese translations (#84)](https://github.com/fluffy-mods/ColonyManager/commit/775396c), [Update Chinese translations](https://github.com/fluffy-mods/ColonyManager/commit/12d4e48), [Add Chinese Translation (#37)](https://github.com/fluffy-mods/ColonyManager/commit/a1667c4)
-Kirill: [Russian translation, pt. 2](https://github.com/fluffy-mods/ColonyManager/commit/b731a01), [Russian translation](https://github.com/fluffy-mods/ColonyManager/commit/3fa14f8)
+duduluu: [Update Chinese translations](https://github.com/fluffy-mods/ColonyManager/commit/12d4e48), [Add Chinese Translation (#37)](https://github.com/fluffy-mods/ColonyManager/commit/a1667c4)
+Kirill: [Russian translation](https://github.com/fluffy-mods/ColonyManager/commit/3fa14f8)
 Moumix3: [Update ManagerStations_Research.xml](https://github.com/fluffy-mods/ColonyManager/commit/176a581)
 KapTaiN KaVerN: [Add minified attribute to Benchbase](https://github.com/fluffy-mods/ColonyManager/commit/075a414)
 
