@@ -6,7 +6,7 @@
     "version": {
         "major": 5,
         "minor": 0,
-        "build": 662
+        "build": 663
     },
     "author": {
         "name": "Fluffy",
@@ -19,6 +19,15 @@
         "url": "https://github.com/fluffy-mods/ColonyManager"
     },
     "changelog": [
+        {
+            "date": "2021-07-27T15:15:06.000Z",
+            "message": "remove area management for roaming animals",
+            "author": {
+                "name": "Fluffy",
+                "email": "fluffy.l2032@gmail.com"
+            },
+            "hash": "21b41395089762c3a23af3a969378387e7192bf8"
+        },
         {
             "date": "2021-07-27T09:17:29.000Z",
             "message": "req squiglies be gone, switch to sdk style project",
@@ -320,5 +329,19 @@
                 "description": "Add minified attribute to Benchbase"
             }
         ]
-    }
+    },
+    "attributions": [
+        {
+            "description": "mustache icon",
+            "author": "DinosoftLabs",
+            "license": "BY-NC",
+            "url": "https://www.flaticon.com/authors/dinosoftlabs"
+        },
+        {
+            "description": "top hat icon",
+            "author": "Smashicons",
+            "license": "BY-NC",
+            "url": "https://www.flaticon.com/authors/smashicons"
+        }
+    ]
 }

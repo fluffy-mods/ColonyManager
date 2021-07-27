@@ -465,8 +465,14 @@ namespace FluffyManager
             var start = pos;
 
             // skip for animals that can't be restricted
-            if (_selectedCurrent.Trigger.pawnKind.race.race.Roamer)
-                return 0f;
+            if (_selectedCurrent.Trigger.pawnKind.RaceProps.Roamer)
+            {
+                var unavailableLabelRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+                unavailableLabelRect.xMin += Margin;
+                Label(unavailableLabelRect, "FM.Livestock.DisabledBecauseRoamingAnimal".Translate(), "FM.Livestock.DisabledBecauseRoamingAnimalTip".Translate(), TextAnchor.MiddleLeft,
+                       color: Color.grey);
+                return ListEntryHeight;
+            }
 
 
             // restrict to area
