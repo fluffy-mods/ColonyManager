@@ -1,152 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{25FE2988-9C8E-4470-A810-6A0F6F1940DB}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Fluffy_Manager</RootNamespace>
-    <AssemblyName>Fluffy_ColonyManager</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>net472</TargetFramework>
+    <RuntimeIdentifier>win</RuntimeIdentifier>
+    <AssemblyTitle>ColonyManager</AssemblyTitle>
+    <Product>ColonyManager</Product>
+    <Copyright>Copyright © 2015-2021</Copyright>
+    <OutputPath>..\Assemblies\</OutputPath>
+    <DebugType>portable</DebugType>
+    <OutputPath>..\Assemblies\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <PostBuildEvent>mod update</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>false</DebugSymbols>
-    <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\Assemblies\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELOADER, DEBUG_PERFORMANCE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>0</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>DEBUG</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\Assemblies\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.0.6, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Lib.Harmony.2.0.0.6\lib\net472\0Harmony.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+    <PackageReference Include="Krafs.Rimworld.Ref" Version="1.3.3072" />
+    <PackageReference Include="Lib.Harmony" Version="2.1.1" ExcludeAssets="runtime" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Core\Alerts.cs" />
-    <Compile Include="Core\Controller.cs" />
-    <Compile Include="Core\Settings.cs" />
-    <Compile Include="GetBuildingCost.cs" />
-    <Compile Include="Helpers\Calendar.cs" />
-    <Compile Include="Helpers\Clock.cs" />
-    <Compile Include="Helpers\Constants.cs" />
-    <Compile Include="Helpers\Extensions\CompGlower_Extensions.cs" />
-    <Compile Include="Helpers\Extensions\Rect_Extensions.cs" />
-    <Compile Include="Helpers\Extensions\String_Extensions.cs" />
-    <Compile Include="Helpers\I18n.cs" />
-    <Compile Include="Helpers\Livestock\Utilities_Livestock.cs" />
-    <Compile Include="Helpers\Color\HSV_Helper.cs" />
-    <Compile Include="Helpers\History.cs" />
-    <Compile Include="Helpers\Hunting\Utilities_Hunting.cs" />
-    <Compile Include="Helpers\Logger.cs" />
-    <Compile Include="Helpers\Mining\Dialog_MiningDebugOptions.cs" />
-    <Compile Include="Helpers\Mining\Utilities_Mining.cs" />
-    <Compile Include="Helpers\Production\Dialog_CreateJobsForIngredients.cs" />
-    <Compile Include="Helpers\Research\ResearchWorkers.cs" />
-    <Compile Include="Helpers\Resources.cs" />
-    <Compile Include="Helpers\Triplet.cs" />
-    <Compile Include="Helpers\UI\Widgets_Labels.cs" />
-    <Compile Include="Helpers\UI\StockpileGUI.cs" />
-    <Compile Include="Helpers\UI\Widgets_Section.cs" />
-    <Compile Include="Helpers\UpdateInterval.cs" />
-    <Compile Include="ManagerJobs\ManagerJob_Foraging.cs" />
-    <Compile Include="ManagerJobs\ManagerJob_Forestry.cs" />
-    <Compile Include="ManagerJobs\ManagerJob_Hunting.cs" />
-    <Compile Include="ManagerJobs\ManagerJob_Livestock.cs" />
-    <Compile Include="ManagerJobs\ManagerJob_Mining.cs" />
-    <Compile Include="ManagerJobs\ManagerJob_Trading.cs" />
-    <Compile Include="ManagerTabs\ManagerTab_Foraging.cs" />
-    <Compile Include="ManagerTabs\ManagerTab_Mining.cs" />
-    <Compile Include="ManagerTabs\ManagerTab_Power.cs" />
-    <Compile Include="ManagerTabs\ManagerTab_Trading.cs" />
-    <Compile Include="Triggers\Trigger_PawnKind.cs" />
-    <Compile Include="ManagerTabs\ManagerTab_Forestry.cs" />
-    <Compile Include="ManagerTabs\ManagerTab_Hunting.cs" />
-    <Compile Include="ManagerTabs\ManagerTab_ImportExport.cs" />
-    <Compile Include="ManagerTabs\ManagerTab_Livestock.cs" />
-    <Compile Include="Things\Building_ManagerStation.cs" />
-    <Compile Include="Comps\CompProperties_ManagerStation.cs" />
-    <Compile Include="Comps\Comp_ManagerStation.cs" />
-    <Compile Include="Core\JobStack.cs" />
-    <Compile Include="Triggers\Trigger.cs" />
-    <Compile Include="JobDrivers\JobDriver_ManagingAtManagingStation.cs" />
-    <Compile Include="WorkGivers\WorkGiver_Manager.cs" />
-    <Compile Include="ManagerTabs\ManagerTab_Overview.cs" />
-    <Compile Include="Triggers\Trigger_Threshold.cs" />
-    <Compile Include="Core\Manager.cs" />
-    <Compile Include="ManagerJobs\ManagerJob.cs" />
-    <Compile Include="Helpers\UI\AreaAllowedGUI.cs" />
-    <Compile Include="Helpers\UI\UIThingFilterSearchable.cs" />
-    <Compile Include="Windows\Window_TriggerThresholdDetails.cs" />
-    <Compile Include="Helpers\Utilities.cs" />
-    <Compile Include="MainTabWindow\MainTabWindow_Manager.cs" />
-    <Compile Include="ManagerTabs\ManagerTab.cs" />
-    <Compile Include="Helpers\Production\BillGiverTracker.cs" />
-    <Compile Include="Helpers\Production\MainProductTracker.cs" />
-    <Compile Include="ManagerJobs\ManagerJob_Production.cs" />
-    <Compile Include="ManagerTabs\ManagerTab_Production.cs" />
-    <Compile Include="Windows\Window_BillGiverDetails.cs" />
-    <Compile Include="Helpers\Production\Utilities_Production.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>mod update -n "Colony Manager" -x</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

@@ -1,0 +1,343 @@
+{
+    "name": "Colony Manager",
+    "sourceDir": ".",
+    "targetDir": "ColonyManager",
+    "url": "https://github.com/fluffy-mods/ColonyManager",
+    "version": {
+        "major": 5,
+        "minor": 0,
+        "build": 658
+    },
+    "author": {
+        "name": "Fluffy",
+        "url": "https://github.com/fluffy-mods/",
+        "email": "fluffy.l2032@gmail.com"
+    },
+    "git": {
+        "owner": "fluffy-mods",
+        "repo": "ColonyManager",
+        "url": "https://github.com/fluffy-mods/ColonyManager"
+    },
+    "changelog": [
+        {
+            "date": "2021-07-24T20:37:40.000Z",
+            "message": "changed version in About.xml",
+            "author": {
+                "name": "Lion Kerger",
+                "email": "steam.portal2@yahoo.de"
+            },
+            "hash": "7e8f6ca644461bfe9d800bdf26de900388155a49"
+        },
+        {
+            "date": "2021-07-23T20:28:33.000Z",
+            "message": "corrected misplaced using-directive",
+            "author": {
+                "name": "Lion Kerger",
+                "email": "steam.portal2@yahoo.de"
+            },
+            "hash": "fbc9d1d195575cd27877a70ae4c2795050d23ade"
+        },
+        {
+            "date": "2021-07-23T20:18:54.000Z",
+            "message": "updated package-reference to 2.1.0",
+            "author": {
+                "name": "Lion Kerger",
+                "email": "steam.portal2@yahoo.de"
+            },
+            "hash": "1c3cd63279a42e5e65046f7dc84a569d8454f3f2"
+        },
+        {
+            "date": "2021-07-22T23:58:20.000Z",
+            "message": "Fixed minor UI/Window bugs",
+            "author": {
+                "name": "Lion Kerger",
+                "email": "steam.portal2@yahoo.de"
+            },
+            "hash": "ff78394d8f0b5d72375fd4171188cfc09147fc9b"
+        }
+    ],
+    "contributions": [
+        {
+            "hash": "7e8f6ca644461bfe9d800bdf26de900388155a49",
+            "author": "Lion Kerger",
+            "description": "changed version in About.xml"
+        },
+        {
+            "hash": "fbc9d1d195575cd27877a70ae4c2795050d23ade",
+            "author": "Lion Kerger",
+            "description": "corrected misplaced using-directive"
+        },
+        {
+            "hash": "1c3cd63279a42e5e65046f7dc84a569d8454f3f2",
+            "author": "Lion Kerger",
+            "description": "updated package-reference to 2.1.0"
+        },
+        {
+            "hash": "ff78394d8f0b5d72375fd4171188cfc09147fc9b",
+            "author": "Lion Kerger",
+            "description": "Fixed minor UI/Window bugs"
+        },
+        {
+            "hash": "2cec8c107c17fff71ffb809fed9dff706f42b24e",
+            "author": "InsanityPrelude",
+            "description": "Add AllWork tag to Managing WorkTypeDef (#181)"
+        },
+        {
+            "hash": "9c92f16f916850c204458dcc804306594c949201",
+            "author": "dodther",
+            "description": "Update russian translate (#165)"
+        },
+        {
+            "hash": "89da83dbe4494e63130cf86779944239ff180c17",
+            "author": "CrapoFR",
+            "description": "French translation - update (#149)"
+        },
+        {
+            "hash": "cdc8702e3cac2d4c8863dee7e367a15f58fff3b3",
+            "author": "maarxx",
+            "description": "Add Husbandry job option to Unassign Training"
+        },
+        {
+            "hash": "ffd77e202de2c624538174317e71a2f02f4bb22f",
+            "author": "maarxx",
+            "description": "Change Order to Milk -> Shear -> Train"
+        },
+        {
+            "hash": "b638b376dd0bf67e6808f74e65da3b685c1b1b57",
+            "author": "maarxx",
+            "description": "Add Feature to Restrict Animals Ready for Milking or Shearing"
+        },
+        {
+            "hash": "a0c451a56e6a1672b5a5ab99c968a0347f054356",
+            "author": "maarxx",
+            "description": "Fix settings not persisting, fix resultant \"No language\" translation errors. (#145)"
+        },
+        {
+            "hash": "9171dfc951792439fb818e34f5110dff2073855e",
+            "author": "Marcos Villar",
+            "description": "Updated BrazilianPortuguese (#136)"
+        },
+        {
+            "hash": "9d559a1165756baa8761c35d9a5f78508c1f8a38",
+            "author": "Suh. Junmin",
+            "description": "Add partial korean translation (#131)"
+        },
+        {
+            "hash": "ccf3cef5ba46ac0def7873135f33998fcac11b92",
+            "author": "rw-chaos",
+            "description": "Updated German translation (#130)"
+        },
+        {
+            "hash": "5b946ad04c3aced7af2082c8f24fff10d4e4a1e4",
+            "author": "harrisongarya",
+            "description": "Add research tab"
+        },
+        {
+            "hash": "ceb5d463ad4e4c1a17fbe92ffdbdddb3c607bc42",
+            "author": "Alex TD",
+            "description": "Button to suspend any managing job (#123)"
+        },
+        {
+            "hash": "511736d46d4868507ea8bc7a1290e6bf712a3e53",
+            "author": "Firty",
+            "description": "Add PT-BR translation (#117)"
+        },
+        {
+            "hash": "dceaafb9dbd5f4fcdbc593bc1ef39bbf874385f9",
+            "author": "Alex TD",
+            "description": "Fix Forestry in growing zones (#113)"
+        },
+        {
+            "hash": "775396c602584f24ce44c15202c7f26801359dc3",
+            "author": "duduluu",
+            "description": "Update Chinese translations (#84)"
+        },
+        {
+            "hash": "12d4e484a7fe3cd8895632ac0f5300867f9ea28c",
+            "author": "duduluu",
+            "description": "Update Chinese translations"
+        },
+        {
+            "hash": "b731a01db3b5bd6805e456f30abfcb0123c66237",
+            "author": "Kirill",
+            "description": "Russian translation, pt. 2"
+        },
+        {
+            "hash": "3fa14f8d18b1a77741b4bce471ed3b324bf6c946",
+            "author": "Kirill",
+            "description": "Russian translation"
+        },
+        {
+            "hash": "a1667c4de3864cb056134090b0ceff91b48b0fbe",
+            "author": "duduluu",
+            "description": "Add Chinese Translation (#37)"
+        },
+        {
+            "hash": "176a5811c7e8599335ffcc3cc71bca808280b761",
+            "author": "Moumix3",
+            "description": "Update ManagerStations_Research.xml"
+        },
+        {
+            "hash": "075a4145a973a61e87eb50f21ba3e8d0760fa378",
+            "author": "KapTaiN KaVerN",
+            "description": "Add minified attribute to Benchbase"
+        }
+    ],
+    "contributors": {
+        "Lion Kerger": [
+            {
+                "hash": "7e8f6ca",
+                "author": "Lion Kerger",
+                "description": "changed version in About.xml"
+            },
+            {
+                "hash": "fbc9d1d",
+                "author": "Lion Kerger",
+                "description": "corrected misplaced using-directive"
+            },
+            {
+                "hash": "1c3cd63",
+                "author": "Lion Kerger",
+                "description": "updated package-reference to 2.1.0"
+            },
+            {
+                "hash": "ff78394",
+                "author": "Lion Kerger",
+                "description": "Fixed minor UI/Window bugs"
+            }
+        ],
+        "InsanityPrelude": [
+            {
+                "hash": "2cec8c1",
+                "author": "InsanityPrelude",
+                "description": "Add AllWork tag to Managing WorkTypeDef (#181)"
+            }
+        ],
+        "dodther": [
+            {
+                "hash": "9c92f16",
+                "author": "dodther",
+                "description": "Update russian translate (#165)"
+            }
+        ],
+        "CrapoFR": [
+            {
+                "hash": "89da83d",
+                "author": "CrapoFR",
+                "description": "French translation - update (#149)"
+            }
+        ],
+        "maarxx": [
+            {
+                "hash": "cdc8702",
+                "author": "maarxx",
+                "description": "Add Husbandry job option to Unassign Training"
+            },
+            {
+                "hash": "ffd77e2",
+                "author": "maarxx",
+                "description": "Change Order to Milk -> Shear -> Train"
+            },
+            {
+                "hash": "b638b37",
+                "author": "maarxx",
+                "description": "Add Feature to Restrict Animals Ready for Milking or Shearing"
+            },
+            {
+                "hash": "a0c451a",
+                "author": "maarxx",
+                "description": "Fix settings not persisting, fix resultant \"No language\" translation errors. (#145)"
+            }
+        ],
+        "Marcos Villar": [
+            {
+                "hash": "9171dfc",
+                "author": "Marcos Villar",
+                "description": "Updated BrazilianPortuguese (#136)"
+            }
+        ],
+        "Suh. Junmin": [
+            {
+                "hash": "9d559a1",
+                "author": "Suh. Junmin",
+                "description": "Add partial korean translation (#131)"
+            }
+        ],
+        "rw-chaos": [
+            {
+                "hash": "ccf3cef",
+                "author": "rw-chaos",
+                "description": "Updated German translation (#130)"
+            }
+        ],
+        "harrisongarya": [
+            {
+                "hash": "5b946ad",
+                "author": "harrisongarya",
+                "description": "Add research tab"
+            }
+        ],
+        "Alex TD": [
+            {
+                "hash": "ceb5d46",
+                "author": "Alex TD",
+                "description": "Button to suspend any managing job (#123)"
+            },
+            {
+                "hash": "dceaafb",
+                "author": "Alex TD",
+                "description": "Fix Forestry in growing zones (#113)"
+            }
+        ],
+        "Firty": [
+            {
+                "hash": "511736d",
+                "author": "Firty",
+                "description": "Add PT-BR translation (#117)"
+            }
+        ],
+        "duduluu": [
+            {
+                "hash": "775396c",
+                "author": "duduluu",
+                "description": "Update Chinese translations (#84)"
+            },
+            {
+                "hash": "12d4e48",
+                "author": "duduluu",
+                "description": "Update Chinese translations"
+            },
+            {
+                "hash": "a1667c4",
+                "author": "duduluu",
+                "description": "Add Chinese Translation (#37)"
+            }
+        ],
+        "Kirill": [
+            {
+                "hash": "b731a01",
+                "author": "Kirill",
+                "description": "Russian translation, pt. 2"
+            },
+            {
+                "hash": "3fa14f8",
+                "author": "Kirill",
+                "description": "Russian translation"
+            }
+        ],
+        "Moumix3": [
+            {
+                "hash": "176a581",
+                "author": "Moumix3",
+                "description": "Update ManagerStations_Research.xml"
+            }
+        ],
+        "KapTaiN KaVerN": [
+            {
+                "hash": "075a414",
+                "author": "KapTaiN KaVerN",
+                "description": "Add minified attribute to Benchbase"
+            }
+        ]
+    }
+}

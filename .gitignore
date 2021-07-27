@@ -1,6 +1,8 @@
 ModConfig.json
 SteamConfig.vdf
 .mailmap
+packages/
+.idea
 
 **/packages/*
 
