@@ -1,13 +1,13 @@
 Colony Manager allows you to make colonists do the more tedious parts of managing a colony, making sure you're never out of vital resources again\*.
 
-![Important](https://banners.karel-kroeze.nl/title/Important.png)  
+![Important](https://headers.karel-kroeze.nl/title/Important.png)  
 **Requires a new save game.**
 Adds a worktype, which is stored in the world, which means you need to start a new game after adding/removing this mod.
 
 **Production & Import/Export tabs missing.**
 The Production and Import & Export tabs are still disabled due to a lack of time.
 
-![Features](https://banners.karel-kroeze.nl/title/Features.png)  
+![Features](https://headers.karel-kroeze.nl/title/Features.png)  
 **Hunting jobs**
 
 - Set a target for meat, and never worry about designating hunting manually again!
@@ -35,42 +35,24 @@ The Production and Import & Export tabs are still disabled due to a lack of time
 **Import & Export**
 == coming back soon(tm) ==
 
-![How does it work?](https://banners.karel-kroeze.nl/title/How%20does%20it%20work%3F.png)  
+![How does it work?](https://headers.karel-kroeze.nl/title/How%20does%20it%20work%3F.png)  
 You can manually set jobs in the new Manager tab on the bottom of the screen. Once set, a colonist with the manager skill and worktype enabled will go to a manager station to figure out the best way to assign designations.
 Periodically, the manager will check if the assigned designations are still up-to-date, and make changes or delete designations where required. The manager will not touch designations that are set manually, nor will managers create jobs. You're still the overlord.
 In theory there is no real limit to the number of manager jobs that can be created.
 
-![Notes](https://banners.karel-kroeze.nl/title/Notes.png)  
+![Notes](https://headers.karel-kroeze.nl/title/Notes.png)  
 - Requires a new save. Adds a worktype, which in my tests gave errors on old savegames. If you also have my Work Tab mod, you should be able to add this mod in an ongoing save.
 
-![Contributors](https://banners.karel-kroeze.nl/title/Contributors.png)  
-Lion Kerger: [Initial update for 1.3](https://github.com/fluffy-mods/ColonyManager/commit/ff78394)
-InsanityPrelude: [Add AllWork tag to Managing WorkTypeDef (#181)](https://github.com/fluffy-mods/ColonyManager/commit/2cec8c1)
-dodther: [Update russian translate (#165)](https://github.com/fluffy-mods/ColonyManager/commit/9c92f16)
-CrapoFR: [French translation - update (#149)](https://github.com/fluffy-mods/ColonyManager/commit/89da83d)
-maarxx: [Add Husbandry job option to Unassign Training](https://github.com/fluffy-mods/ColonyManager/commit/cdc8702), [Add Feature to Restrict Animals Ready for Milking or Shearing](https://github.com/fluffy-mods/ColonyManager/commit/b638b37)
-Marcos Villar: [Updated BrazilianPortuguese (#136)](https://github.com/fluffy-mods/ColonyManager/commit/9171dfc)
-Suh. Junmin: [Add partial korean translation (#131)](https://github.com/fluffy-mods/ColonyManager/commit/9d559a1)
-rw-chaos: [Updated German translation (#130)](https://github.com/fluffy-mods/ColonyManager/commit/ccf3cef)
-harrisongarya: [Add research tab](https://github.com/fluffy-mods/ColonyManager/commit/5b946ad)
-Alex TD: [Button to suspend any managing job (#123)](https://github.com/fluffy-mods/ColonyManager/commit/ceb5d46), [Fix Forestry in growing zones (#113)](https://github.com/fluffy-mods/ColonyManager/commit/dceaafb)
-Firty: [Add PT-BR translation (#117)](https://github.com/fluffy-mods/ColonyManager/commit/511736d)
-duduluu: [Update Chinese translations](https://github.com/fluffy-mods/ColonyManager/commit/12d4e48), [Add Chinese Translation (#37)](https://github.com/fluffy-mods/ColonyManager/commit/a1667c4)
-Kirill: [Russian translation](https://github.com/fluffy-mods/ColonyManager/commit/3fa14f8)
-Moumix3: [Update ManagerStations_Research.xml](https://github.com/fluffy-mods/ColonyManager/commit/176a581)
-KapTaiN KaVerN: [Add minified attribute to Benchbase](https://github.com/fluffy-mods/ColonyManager/commit/075a414)
-
-
-![Think you found a bug?](https://banners.karel-kroeze.nl/title/Think%20you%20found%20a%20bug%3F.png)  
+![Think you found a bug?](https://headers.karel-kroeze.nl/title/Think%20you%20found%20a%20bug%3F.png)  
 
 Please read [this guide](http://steamcommunity.com/sharedfiles/filedetails/?id=725234314) before creating a bug report,
 and then create a bug report [here](https://github.com/fluffy-mods/ColonyManager/issues)
 
-![Older versions](https://banners.karel-kroeze.nl/title/Older%20versions.png)  
+![Older versions](https://headers.karel-kroeze.nl/title/Older%20versions.png)  
 
 All current and past versions of this mod can be downloaded from [GitHub](https://github.com/fluffy-mods/ColonyManager/releases).
 
-![License](https://banners.karel-kroeze.nl/title/License.png)  
+![License](https://headers.karel-kroeze.nl/title/License.png)  
 
 All original code in this mod is licensed under the [MIT license](https://opensource.org/licenses/MIT). Do what you want, but give me credit.
 All original content (e.g. text, imagery, sounds) in this mod is licensed under the [CC-BY-SA 4.0 license](http://creativecommons.org/licenses/by-sa/4.0/).
@@ -82,12 +64,26 @@ Parts of this mod were created by, or derived from works created by;
 - Smashicons: top hat icon ([BY-NC](https://www.flaticon.com/authors/smashicons))
 
 
-![Are you enjoying my mods?](https://banners.karel-kroeze.nl/title/Are%20you%20enjoying%20my%20mods%3F.png)  
+![Are you enjoying my mods?](https://headers.karel-kroeze.nl/title/Are%20you%20enjoying%20my%20mods%3F.png)  
 
-Become a supporter and show your appreciation by buying me a coffee (or contribute towards a nice single malt).
+Normally, this is where I ask you to show you appreciation by buying me a coffee.
 
-[![Supporters](https://banners.karel-kroeze.nl/donations.png)](https://ko-fi.com/fluffymods)
+These are not normal times. Ukraine is being invaded by Russia, at the whim of a ruthless dictator. Innocent people are loosing their lives, and fighting for their continued freedom.
 
-[![Buy Me a Coffee](https://i.imgur.com/6P7Ap79.gif)](https://ko-fi.com/fluffymods)
+This is not a matter of politics. This is not a debate. Putins' bloody campaign in Ukraine is illegal, and he will stop at nothing to get what he wants, when he wants it, no matter the cost. The Russian army is invading a country without provocation, bombing civilians and murdering innocents.
 
-[![I Have a Black Dog](https://i.ibb.co/ss59Rwy/New-Project-2.png)](https://www.youtube.com/watch?v=XiCrniLQGYc)
+The prospect of waking up to see my country at war is alien to me, as it must have seemed to most Ukrainians. I can do little to influence the outcome of current affairs, but I will do whatever I can.
+
+**I ask you to join me in supporting the people of Ukraine**
+
+![Humanitarian Aid](https://headers.karel-kroeze.nl/title/Humanitarian%20Aid.png)  
+
+If you can, donate to the various charities providing humanitarian aid. If you don't know where to donate, Global Citizen maintains a list of charitable organizations active in the region.
+
+<https://www.globalcitizen.org/en/content/ways-to-help-ukraine-conflict/>
+
+![Speak up](https://headers.karel-kroeze.nl/title/Speak%20up.png)  
+
+Leaders around the world are deciding on how to respond to Putins' aggression. They are balancing their conscience, and their desire to be re-elected. Many are afraid to impose heavy sanctions because the economic repercussions might loose them votes. The Dutch government, my government, has hinted that they are unwilling to accept Ukranian refugees, and has played a part in allowing Russia to have continued access to international finance. I am ashamed of these actions, taken in my name.
+
+Whereever your live, please let your government know you care more about supporting the people of Ukraine than you do about the price of gas. Join a protest, write letters, call your representatives, and show them that you care about justice!
