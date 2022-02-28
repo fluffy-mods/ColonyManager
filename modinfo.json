@@ -6,7 +6,7 @@
     "version": {
         "major": 5,
         "minor": 2,
-        "build": 667
+        "build": 668
     },
     "author": {
         "name": "Fluffy",
@@ -19,6 +19,15 @@
         "url": "https://github.com/fluffy-mods/ColonyManager"
     },
     "changelog": [
+        {
+            "date": "2022-02-26T16:07:13.000Z",
+            "message": "Update description",
+            "author": {
+                "name": "Fluffy",
+                "email": "fluffy.l2032@gmail.com"
+            },
+            "hash": "c5b419b2446eebba5d9c8cefaea434e287b30475"
+        },
         {
             "date": "2021-07-27T20:46:59.000Z",
             "message": "release v5.1.666",
