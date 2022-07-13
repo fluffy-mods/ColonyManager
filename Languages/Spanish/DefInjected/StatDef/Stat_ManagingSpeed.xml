@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+
+    <ManagingSpeed.label>velocidad de gestión</ManagingSpeed.label>
+    <ManagingSpeed.description>Multiplicador de la velocidad a la que una persona se encarga de la gestión.</ManagingSpeed.description>
+
+</LanguageData>
