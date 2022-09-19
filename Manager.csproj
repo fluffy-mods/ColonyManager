@@ -5,9 +5,8 @@
     <AssemblyTitle>ColonyManager</AssemblyTitle>
     <Product>ColonyManager</Product>
     <Copyright>Copyright © 2015-2021</Copyright>
-    <OutputPath>..\Assemblies\</OutputPath>
     <DebugType>portable</DebugType>
-    <OutputPath>..\Assemblies\</OutputPath>
+    <OutputPath>Assemblies\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <PostBuildEvent>mod update</PostBuildEvent>

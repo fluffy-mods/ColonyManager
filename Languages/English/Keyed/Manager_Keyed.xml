@@ -1,267 +1,270 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <LanguageData>
-  <!-- Main Manager Tab -->
-  <FM.Manager>Manager</FM.Manager>
-  <FM.Details>Details</FM.Details>
-  <FM.Manage>Manage!</FM.Manage>
-  <FM.Delete>Delete</FM.Delete>
-  <FM.All>All</FM.All>
-  <FM.TabDisabledBecause>(disabled: {0})</FM.TabDisabledBecause>
+    <!-- Main Manager Tab -->
+    <FM.Manager>Manager</FM.Manager>
+    <FM.Details>Details</FM.Details>
+    <FM.Manage>Manage!</FM.Manage>
+    <FM.Delete>Delete</FM.Delete>
+    <FM.All>All</FM.All>
+    <FM.TabDisabledBecause>(disabled: {0})</FM.TabDisabledBecause>
 
-  <!-- Help and alert messages for the lexically challenged. -->
-  <FM.HelpTitle>Colony Manager V2</FM.HelpTitle>
-  <FM.HelpMessage>Welcome to the Colony Manager V2!\n\nThe colony manager allows you to set targets for production, hunting, logging and animal husbandry. Each of these can be set through the various manager screens, and accessed through the buttons at the top of the window, as well as some other handy screens. \n\nWhen you set a target, a pawn with the manager job enabled will occasionally review your targets and the colony's stockpiles at a manager's desk, and update bills and designations accordingly.\n\nIn order for the mod to work, you need two things:\n    - A pawn with the manager job enabled.\n    - A manager's desk.\n\nHappy hunting!</FM.HelpMessage>
-  <FM.AlertNoTableLabel>Need manager's desk</FM.AlertNoTableLabel>
-  <FM.AlertNoTable>Manager targets are set, but no manager's desk is available</FM.AlertNoTable>
-  <FM.AlertNoManagerLabel>Need manager</FM.AlertNoManagerLabel>
-  <FM.AlertNoManager>Manager targets are set, but no pawn has the managing job enabled</FM.AlertNoManager>
+    <!-- Help and alert messages for the lexically challenged. -->
+    <FM.HelpTitle>Colony Manager V2</FM.HelpTitle>
+    <FM.HelpMessage>Welcome to the Colony Manager V2!\n\nThe colony manager allows you to set targets for production, hunting, logging and animal husbandry. Each of these can be set through the various manager screens, and accessed through the buttons at the top of the window, as well as some other handy screens. \n\nWhen you set a target, a pawn with the manager job enabled will occasionally review your targets and the colony's stockpiles at a manager's desk, and update bills and designations accordingly.\n\nIn order for the mod to work, you need two things:\n    - A pawn with the manager job enabled.\n    - A manager's desk.\n\nHappy hunting!</FM.HelpMessage>
+    <FM.AlertNoTableLabel>Need manager's desk</FM.AlertNoTableLabel>
+    <FM.AlertNoTable>Manager targets are set, but no manager's desk is available</FM.AlertNoTable>
+    <FM.AlertNoManagerLabel>Need manager</FM.AlertNoManagerLabel>
+    <FM.AlertNoManager>Manager targets are set, but no pawn has the managing job enabled</FM.AlertNoManager>
 
-  <!-- Common -->
-  <FM.LastUpdateTooltip>This job was last updated {0} ago, and is scheduled to be updated every {1}.\n\nClick to change update interval.</FM.LastUpdateTooltip>
-  <FM.OrderUp>Increase job priority</FM.OrderUp>
-  <FM.OrderDown>Decrease job priority</FM.OrderDown>
-  <FM.OrderTop>Maximum priority</FM.OrderTop>
-  <FM.OrderBottom>Minimum priority</FM.OrderBottom>
-  <multiple>[multiple]</multiple>
-  <FM.Threshold>Threshold</FM.Threshold>
-  <FM.CheckReachability>Check if targets are reachable</FM.CheckReachability>
-  <FM.CheckReachability.Tip>Calculate if a path to the target exists (for any pawn) before creating a designation.</FM.CheckReachability.Tip>
-  <FM.Expensive.Tip>Enabling this setting may decrease performance, particularly on large maps, mountainous maps, jobs with many potential targets, and colonies with high numbers of colonists.</FM.Expensive.Tip>
-  <FM.PathBasedDistance>Calculate distance based on actual path</FM.PathBasedDistance>
-  <FM.PathBasedDistance.Tip>If enabled, distances will be calculated based on real paths. If disabled, distances will be calculated 'as the crow flies'. \n\nNOTE: Enabling this option on jobs with a large amount of possible targets may lead to significant lag spikes.</FM.PathBasedDistance.Tip>
-  <FM.CountAllOnMap>Count all on map</FM.CountAllOnMap>
-  <FM.CountAllOnMap.Tip>If enabled, counts all items allowed by the threshold filter on the map. If disabled, counts only those in stockpiles and storage buildings.</FM.CountAllOnMap.Tip>
-  <FM.None>None</FM.None>
-  <!-- 0: target (thing), 1: distance (int), 2: yield amount (int), 3: yield type (def) -->
-  <Fluffy.Manager.DesignationLabel>{0}\n  distance: {1}\n  yield: {2}x {3}</Fluffy.Manager.DesignationLabel>
+    <!-- Common -->
+    <FM.LastUpdateTooltip>This job was last updated {0} ago, and is scheduled to be updated every {1}.\n\nClick to change update interval.</FM.LastUpdateTooltip>
+    <FM.OrderUp>Increase job priority</FM.OrderUp>
+    <FM.OrderDown>Decrease job priority</FM.OrderDown>
+    <FM.OrderTop>Maximum priority</FM.OrderTop>
+    <FM.OrderBottom>Minimum priority</FM.OrderBottom>
+    <multiple>[multiple]</multiple>
+    <FM.Threshold>Threshold</FM.Threshold>
+    <FM.CheckReachability>Check if targets are reachable</FM.CheckReachability>
+    <FM.CheckReachability.Tip>Calculate if a path to the target exists (for any pawn) before creating a designation.</FM.CheckReachability.Tip>
+    <FM.Expensive.Tip>Enabling this setting may decrease performance, particularly on large maps, mountainous maps, jobs with many potential targets, and colonies with high numbers of colonists.</FM.Expensive.Tip>
+    <FM.PathBasedDistance>Calculate distance based on actual path</FM.PathBasedDistance>
+    <FM.PathBasedDistance.Tip>If enabled, distances will be calculated based on real paths. If disabled, distances will be calculated 'as the crow flies'. \n\nNOTE: Enabling this option on jobs with a large amount of possible targets may lead to significant lag spikes.</FM.PathBasedDistance.Tip>
+    <FM.CountAllOnMap>Count all on map</FM.CountAllOnMap>
+    <FM.CountAllOnMap.Tip>If enabled, counts all items allowed by the threshold filter on the map. If disabled, counts only those in stockpiles and storage buildings.</FM.CountAllOnMap.Tip>
+    <FM.None>None</FM.None>
+    <!-- 0: target (thing), 1: distance (int), 2: yield amount (int), 3: yield type (def) -->
+    <Fluffy.Manager.DesignationLabel>{0}\n  distance: {1}\n  yield: {2}x {3}</Fluffy.Manager.DesignationLabel>
 
-  <!-- time periods for update interval -->
-  <FM.DefaultUpdateInterval>Default update interval</FM.DefaultUpdateInterval>
-  <FM.Hourly>Every hour</FM.Hourly>
-  <FM.MultiHourly>Every {0} hours</FM.MultiHourly>
-  <FM.Daily>Daily</FM.Daily>
-  <FM.Monthly>Monthly</FM.Monthly>
-  <FM.Yearly>Yearly</FM.Yearly>
+    <!-- time periods for update interval -->
+    <FM.DefaultUpdateInterval>Default update interval</FM.DefaultUpdateInterval>
+    <FM.Hourly>Every hour</FM.Hourly>
+    <FM.MultiHourly>Every {0} hours</FM.MultiHourly>
+    <FM.Daily>Daily</FM.Daily>
+    <FM.Monthly>Monthly</FM.Monthly>
+    <FM.Yearly>Yearly</FM.Yearly>
 
-  <!-- History graphs -->
-  <FM.HistoryPeriod>Period</FM.HistoryPeriod>
-  <FM.HistoryShowHideLegend>Show/Hide legend</FM.HistoryShowHideLegend>
-  <FM.HistoryClickToEnable>\n\nClick to {0} {1} in plot.\nRight click to show only {1}.</FM.HistoryClickToEnable>
-  <FM.HistoryNoChapters>Nothing to show!</FM.HistoryNoChapters>
+    <!-- History graphs -->
+    <FM.HistoryPeriod>Period</FM.HistoryPeriod>
+    <FM.HistoryShowHideLegend>Show/Hide legend</FM.HistoryShowHideLegend>
+    <FM.HistoryClickToEnable>\n\nClick to {0} {1} in plot.\nRight click to show only {1}.</FM.HistoryClickToEnable>
+    <FM.HistoryNoChapters>Nothing to show!</FM.HistoryNoChapters>
 
-  <!-- Power Tab (E for energy) -->
-  <FME.PeriodShown>Period: {0}</FME.PeriodShown>
-  <FME.PeriodShownTooltip>Currently showing power production and consumption for the last {0}.\n\nClick to change the period.</FME.PeriodShownTooltip>
-  <FME.Power>Power</FME.Power>
-  <FME.NotResearched>Power management has not been researched</FME.NotResearched>
-  <FME.NoPoweredStation>No managing station has power</FME.NoPoweredStation>
+    <!-- Power Tab (E for energy) -->
+    <FME.PeriodShown>Period: {0}</FME.PeriodShown>
+    <FME.PeriodShownTooltip>Currently showing power production and consumption for the last {0}.\n\nClick to change the period.</FME.PeriodShownTooltip>
+    <FME.Power>Power</FME.Power>
+    <FME.NotResearched>Power management has not been researched</FME.NotResearched>
+    <FME.NoPoweredStation>No managing station has power</FME.NoPoweredStation>
 
-  <!-- Overview Tab -->
-  <FM.Overview>Overview</FM.Overview>
-  <FM.NoJobs>No jobs set.</FM.NoJobs>
-  <FM.Activity>Current activity</FM.Activity>
-  <FM.Enabled>Work</FM.Enabled>
-  <FM.Priority>Work</FM.Priority>
-  <FM.ClickToJumpTo>Click to jump to {0}</FM.ClickToJumpTo>
-  <FM.JobCompletedTooltip>Job threshold has been reached.\n\nClick to suspend this job.</FM.JobCompletedTooltip>
-  <FM.UnsuspendJobTooltip>Job has been suspended.\n\nClick to unsuspend.</FM.UnsuspendJobTooltip>
-  <FM.SuspendJobTooltip>Click to suspend this job.</FM.SuspendJobTooltip>
-  <FM.PluralSuffix>s</FM.PluralSuffix>
+    <!-- Overview Tab -->
+    <FM.Overview>Overview</FM.Overview>
+    <FM.NoJobs>No jobs set.</FM.NoJobs>
+    <FM.Activity>Current activity</FM.Activity>
+    <FM.Enabled>Work</FM.Enabled>
+    <FM.Priority>Work</FM.Priority>
+    <FM.ClickToJumpTo>Click to jump to {0}</FM.ClickToJumpTo>
+    <FM.JobCompletedTooltip>Job threshold has been reached.\n\nClick to suspend this job.</FM.JobCompletedTooltip>
+    <FM.UnsuspendJobTooltip>Job has been suspended.\n\nClick to unsuspend.</FM.UnsuspendJobTooltip>
+    <FM.SuspendJobTooltip>Click to suspend this job.</FM.SuspendJobTooltip>
+    <FM.PluralSuffix>s</FM.PluralSuffix>
 
-  <!--Import/Export Tab-->
-  <FM.ImportExport>Import &amp; Export</FM.ImportExport>
-  <FM.CurrentJobs>Current Jobs:</FM.CurrentJobs>
-  <FM.Export>Export</FM.Export>
-  <FM.ConfirmOverwrite>{0} exists.\n\nAre you sure you want to overwrite?</FM.ConfirmOverwrite>
-  <FM.JobsExported>{0} jobs exported</FM.JobsExported>
-  <FM.JobsImported>{0} jobs imported</FM.JobsImported>
-  <FM.InvalidJobsDeleted>{0} invalid jobs removed</FM.InvalidJobsDeleted>
-  <FM.Import>Import</FM.Import>
-  <FM.NoSaves>No exports found.</FM.NoSaves>
+    <!--Import/Export Tab-->
+    <FM.ImportExport>Import &amp; Export</FM.ImportExport>
+    <FM.CurrentJobs>Current Jobs:</FM.CurrentJobs>
+    <FM.Export>Export</FM.Export>
+    <FM.ConfirmOverwrite>{0} exists.\n\nAre you sure you want to overwrite?</FM.ConfirmOverwrite>
+    <FM.JobsExported>{0} jobs exported</FM.JobsExported>
+    <FM.JobsImported>{0} jobs imported</FM.JobsImported>
+    <FM.InvalidJobsDeleted>{0} invalid jobs removed</FM.InvalidJobsDeleted>
+    <FM.Import>Import</FM.Import>
+    <FM.NoSaves>No exports found.</FM.NoSaves>
 
-  <!-- Hunting Tab -->
-  <FMH.Hunting>Hunting</FMH.Hunting>
-  <FMH.NewHuntingJob>New job</FMH.NewHuntingJob>
-  <FMH.NewHuntingJobTooltip>Create a new hunting job</FMH.NewHuntingJobTooltip>
-  <FMH.AllowHumanMeat>Count human meat</FMH.AllowHumanMeat>
-  <FMH.AllowHumanMeat.Tip>Should human meat be counted? \n\nNOTE: This is a shortcut for toggling humanoid meats in the threshold filter. You can set more options in the threshold details.</FMH.AllowHumanMeat.Tip>
-  <FMH.AllowInsectMeat>Count insect meat</FMH.AllowInsectMeat>
-  <FMH.AllowInsectMeat.Tip>Should insect meat be counted? \n\nNOTE: This is a shortcut for toggling insect meat in the threshold filter. You can set more options in the threshold details.</FMH.AllowInsectMeat.Tip>
-  <FMH.UnforbidCorpses>Unforbid corpses</FMH.UnforbidCorpses>
-  <FMH.UnforbidCorpses.Tip>Automatically unforbid (fresh) corpses of animal types set to be hunted.</FMH.UnforbidCorpses.Tip>
-  <FMH.Animals>Allowed animals</FMH.Animals>
-  <FMH.TargetCount>Target count: {0}+{1}+{2}/{3}</FMH.TargetCount>
-  <FMH.TargetCountTooltip>Target: {3}\n{0} in storage\n{1} expected from butchery\n{2} expected from current designations.</FMH.TargetCountTooltip>
-  <FM.Hunting.Predators>Predators</FM.Hunting.Predators>
-  <FM.Hunting.Predators.Tip>Toggle all predators</FM.Hunting.Predators.Tip>
-  <FM.Hunting.HerdAnimals>Herd animals</FM.Hunting.HerdAnimals>
-  <FM.Hunting.HerdAnimals.Tip>Toggle all herd animals</FM.Hunting.HerdAnimals.Tip>
-  <FM.Hunting.Exploding>Exploding</FM.Hunting.Exploding>
-  <FM.Hunting.Exploding.Tip>Toggle all exploding animals</FM.Hunting.Exploding.Tip>
-  <FM.Hunting.AreaRestriction>Restrict hunting to</FM.Hunting.AreaRestriction>
+    <!-- Hunting Tab -->
+    <FMH.Hunting>Hunting</FMH.Hunting>
+    <FMH.NewHuntingJob>New job</FMH.NewHuntingJob>
+    <FMH.NewHuntingJobTooltip>Create a new hunting job</FMH.NewHuntingJobTooltip>
+    <FMH.AllowHumanMeat>Count human meat</FMH.AllowHumanMeat>
+    <FMH.AllowHumanMeat.Tip>Should human meat be counted? \n\nNOTE: This is a shortcut for toggling humanoid meats in the threshold filter. You can set more options in the threshold details.</FMH.AllowHumanMeat.Tip>
+    <FMH.AllowInsectMeat>Count insect meat</FMH.AllowInsectMeat>
+    <FMH.AllowInsectMeat.Tip>Should insect meat be counted? \n\nNOTE: This is a shortcut for toggling insect meat in the threshold filter. You can set more options in the threshold details.</FMH.AllowInsectMeat.Tip>
+    <FMH.UnforbidCorpses>Unforbid corpses</FMH.UnforbidCorpses>
+    <FMH.UnforbidCorpses.Tip>Automatically unforbid (fresh) corpses of animal types set to be hunted.</FMH.UnforbidCorpses.Tip>
+    <FMH.Animals>Allowed animals</FMH.Animals>
+    <FMH.TargetCount>Target count: {0}+{1}+{2}/{3}</FMH.TargetCount>
+    <FMH.TargetCountTooltip>Target: {3}\n{0} in storage\n{1} expected from butchery\n{2} expected from current designations.</FMH.TargetCountTooltip>
+    <FM.Hunting.Predators>Predators</FM.Hunting.Predators>
+    <FM.Hunting.Predators.Tip>Toggle all predators</FM.Hunting.Predators.Tip>
+    <FM.Hunting.HerdAnimals>Herd animals</FM.Hunting.HerdAnimals>
+    <FM.Hunting.HerdAnimals.Tip>Toggle all herd animals</FM.Hunting.HerdAnimals.Tip>
+    <FM.Hunting.Exploding>Exploding</FM.Hunting.Exploding>
+    <FM.Hunting.Exploding.Tip>Toggle all exploding animals</FM.Hunting.Exploding.Tip>
+    <FM.Hunting.AreaRestriction>Restrict hunting to</FM.Hunting.AreaRestriction>
+    <FM.Hunting.Aggressive>Aggressive</FM.Hunting.Aggressive>
+    <FM.Hunting.Aggressive.Tip>Toggle all aggressive animals</FM.Hunting.Aggressive.Tip>
 
-  <!-- Forestry Tab -->
-  <FMF.Forestry>Forestry</FMF.Forestry>
-  <FMF.NewForestryJob>New job</FMF.NewForestryJob>
-  <FMF.NewForestryJobTooltip>Create a new forestry job</FMF.NewForestryJobTooltip>
-  <FMF.Options>Options</FMF.Options>
-  <FMF.ClearWindCells>Clear wind turbine cells</FMF.ClearWindCells>
-  <FMF.ClearWindCells.Tip>Clear all cells that are in wind turbines' catchment area</FMF.ClearWindCells.Tip>
-  <FMF.AllowSaplings>Only fully matured trees</FMF.AllowSaplings>
-  <FMF.AllowSaplings.Tip>Should forestry be limited to fully mature trees only?</FMF.AllowSaplings.Tip>
-  <FMF.LoggingArea>Allow logging in:</FMF.LoggingArea>
-  <FMF.TargetCount>Target count: {0}+{1}/{2}</FMF.TargetCount>
-  <FMF.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMF.TargetCountTooltip>
-  <FMF.ClearAreas>Clear areas of all vegetation:</FMF.ClearAreas>
-  <FMF.JobType>Job type</FMF.JobType>
-  <FMF.JobType.ClearArea>Clear areas</FMF.JobType.ClearArea>
-  <FMF.JobType.ClearArea.Tip>Clearing areas to keep wind turbines running smoothly, and deny enemies any possible cover in the killing fields</FMF.JobType.ClearArea.Tip>
-  <FMF.JobType.Logging>Wood logging</FMF.JobType.Logging>
-  <FMF.JobType.Logging.Tip>Chop trees for wood</FMF.JobType.Logging.Tip>
+    <!-- Forestry Tab -->
+    <FMF.Forestry>Forestry</FMF.Forestry>
+    <FMF.NewForestryJob>New job</FMF.NewForestryJob>
+    <FMF.NewForestryJobTooltip>Create a new forestry job</FMF.NewForestryJobTooltip>
+    <FMF.Options>Options</FMF.Options>
+    <FMF.ClearWindCells>Clear wind turbine cells</FMF.ClearWindCells>
+    <FMF.ClearWindCells.Tip>Clear all cells that are in wind turbines' catchment area</FMF.ClearWindCells.Tip>
+    <FMF.AllowSaplings>Only fully matured trees</FMF.AllowSaplings>
+    <FMF.AllowSaplings.Tip>Should forestry be limited to fully mature trees only?</FMF.AllowSaplings.Tip>
+    <FMF.LoggingArea>Allow logging in:</FMF.LoggingArea>
+    <FMF.TargetCount>Target count: {0}+{1}/{2}</FMF.TargetCount>
+    <FMF.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMF.TargetCountTooltip>
+    <FMF.ClearAreas>Clear areas of all vegetation:</FMF.ClearAreas>
+    <FMF.JobType>Job type</FMF.JobType>
+    <FMF.JobType.ClearArea>Clear areas</FMF.JobType.ClearArea>
+    <FMF.JobType.ClearArea.Tip>Clearing areas to keep wind turbines running smoothly, and deny enemies any possible cover in the killing fields</FMF.JobType.ClearArea.Tip>
+    <FMF.JobType.Logging>Wood logging</FMF.JobType.Logging>
+    <FMF.JobType.Logging.Tip>Chop trees for wood</FMF.JobType.Logging.Tip>
 
-  <FMF.Clear>Clear {0}</FMF.Clear>
-  <FMF.TurbineArea>wind turbines</FMF.TurbineArea>
+    <FMF.Clear>Clear {0}</FMF.Clear>
+    <FMF.TurbineArea>wind turbines</FMF.TurbineArea>
 
-  <FMF.Trees>Trees</FMF.Trees>
-  <FMF.Trees.Tip>Select all trees</FMF.Trees.Tip>
-  <FMF.Flammable>Flammable</FMF.Flammable>
-  <FMF.Flammable.Tip>Select all flammable plants</FMF.Flammable.Tip>
-  <FMF.Ugly>Ugly</FMF.Ugly>
-  <FMF.Ugly.Tip>Select all ugly plants</FMF.Ugly.Tip>
-  <FMF.ProvidesCover>Cover</FMF.ProvidesCover>
-  <FMF.ProvidesCover.Tip>Select all plants that provide cover</FMF.ProvidesCover.Tip>
-  <FMF.BlocksWind>Blocks wind</FMF.BlocksWind>
-  <FMF.BlocksWind.Tip>Select all plants that block wind</FMF.BlocksWind.Tip>
+    <FMF.Trees>Trees</FMF.Trees>
+    <FMF.Trees.Tip>Select all trees</FMF.Trees.Tip>
+    <FMF.Flammable>Flammable</FMF.Flammable>
+    <FMF.Flammable.Tip>Select all flammable plants</FMF.Flammable.Tip>
+    <FMF.Ugly>Ugly</FMF.Ugly>
+    <FMF.Ugly.Tip>Select all ugly plants</FMF.Ugly.Tip>
+    <FMF.ProvidesCover>Cover</FMF.ProvidesCover>
+    <FMF.ProvidesCover.Tip>Select all plants that provide cover</FMF.ProvidesCover.Tip>
+    <FMF.BlocksWind>Blocks wind</FMF.BlocksWind>
+    <FMF.BlocksWind.Tip>Select all plants that block wind</FMF.BlocksWind.Tip>
 
-  <!-- Foraging (Gathering) tab -->
-  <FMG.Foraging>Foraging</FMG.Foraging>
-  <FMG.NewForagingJob>New job</FMG.NewForagingJob>
-  <FMG.NewForagingJobTooltip>Create a new foraging job</FMG.NewForagingJobTooltip>
-  <FMG.Options>Options</FMG.Options>
-  <FMG.TargetCount>Target count: {0}+{1}/{2}</FMG.TargetCount>
-  <FMG.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMG.TargetCountTooltip>
-  <FMG.ForceMature>Only fully matured plants</FMG.ForceMature>
-  <FMG.ForceMature.Tip>Should foraging be limited to fully mature plants only?</FMG.ForceMature.Tip>
-  <FMG.ForagingArea>Allow foraging in:</FMG.ForagingArea>
-  <FMG.Plants>Allowed plants</FMG.Plants>
-  <FM.Foraging.Edible>Edible plants</FM.Foraging.Edible>
-  <FM.Foraging.Edible.Tip>Select all edible plants</FM.Foraging.Edible.Tip>
-  <FM.Foraging.Mushrooms>Mushrooms</FM.Foraging.Mushrooms>
-  <FM.Foraging.Mushrooms.Tip>Select all mushrooms</FM.Foraging.Mushrooms.Tip>
-  <FM.Foraging.SyncFilterAndAllowed>Synchronize threshold</FM.Foraging.SyncFilterAndAllowed>
-  <FM.Foraging.SyncFilterAndAllowed.Tip>Enabling this will try to synchronize the counted materials in the threshold filter with the plants allowed for foraging, and vice versa.</FM.Foraging.SyncFilterAndAllowed.Tip>
+    <!-- Foraging (Gathering) tab -->
+    <FMG.Foraging>Foraging</FMG.Foraging>
+    <FMG.NewForagingJob>New job</FMG.NewForagingJob>
+    <FMG.NewForagingJobTooltip>Create a new foraging job</FMG.NewForagingJobTooltip>
+    <FMG.Options>Options</FMG.Options>
+    <FMG.TargetCount>Target count: {0}+{1}/{2}</FMG.TargetCount>
+    <FMG.TargetCountTooltip>Target: {2}\n{0} in storage\n{1} expected from current designations.</FMG.TargetCountTooltip>
+    <FMG.ForceMature>Only fully matured plants</FMG.ForceMature>
+    <FMG.ForceMature.Tip>Should foraging be limited to fully mature plants only?</FMG.ForceMature.Tip>
+    <FMG.ForagingArea>Allow foraging in:</FMG.ForagingArea>
+    <FMG.Plants>Allowed plants</FMG.Plants>
+    <FM.Foraging.Edible>Edible plants</FM.Foraging.Edible>
+    <FM.Foraging.Edible.Tip>Select all edible plants</FM.Foraging.Edible.Tip>
+    <FM.Foraging.Mushrooms>Mushrooms</FM.Foraging.Mushrooms>
+    <FM.Foraging.Mushrooms.Tip>Select all mushrooms</FM.Foraging.Mushrooms.Tip>
+    <FM.Foraging.SyncFilterAndAllowed>Synchronize threshold</FM.Foraging.SyncFilterAndAllowed>
+    <FM.Foraging.SyncFilterAndAllowed.Tip>Enabling this will try to synchronize the counted materials in the threshold filter with the plants allowed for foraging, and vice versa.</FM.Foraging.SyncFilterAndAllowed.Tip>
 
 
-  <!-- Thresholds -->
-  <FMP.ThresholdCount>Threshold: {0}/{1}</FMP.ThresholdCount>
-  <FMP.ThresholdCountTooltip>Click to open threshold details.\n\nTarget: {1}\nIn production: {0}</FMP.ThresholdCountTooltip>
-  <FMP.ThresholdDetails>Theshold details</FMP.ThresholdDetails>
+    <!-- Thresholds -->
+    <FMP.ThresholdCount>Threshold: {0}/{1}</FMP.ThresholdCount>
+    <FMP.ThresholdCountTooltip>Click to open threshold details.\n\nTarget: {1}\nIn production: {0}</FMP.ThresholdCountTooltip>
+    <FMP.ThresholdDetails>Theshold details</FMP.ThresholdDetails>
 
-  <!-- Tab headers -->
-  <FMP.Current>Current</FMP.Current>
-  <FMP.Available>Available</FMP.Available>
+    <!-- Tab headers -->
+    <FMP.Current>Current</FMP.Current>
+    <FMP.Available>Available</FMP.Available>
 
-  <!-- Livestock tab -->
-  <FML.Livestock>Livestock</FML.Livestock>
-  <FML.TargetCounts>Target counts</FML.TargetCounts>
-  <FML.Adult>Adult</FML.Adult>
-  <FML.Juvenile>Juvenile</FML.Juvenile>
-  <FML.Training>Training</FML.Training>
-  <FML.RestrictToArea>Restrict animals to area?</FML.RestrictToArea>
-  <FML.RestrictToArea.Tip>Restrict animals to a specific area, optionally separated by gender and lifestage</FML.RestrictToArea.Tip>
-  <FML.ButcherExcess>Butcher excess livestock</FML.ButcherExcess>
-  <FML.ButcherExcess.Tip>Should excess livestock be butchered for meat?</FML.ButcherExcess.Tip>
-  <FML.ButcherTrained>Trained</FML.ButcherTrained>
-  <FML.ButcherTrained.Tip>Are trained animals allowed to be butchered?</FML.ButcherTrained.Tip>
-  <FML.ButcherPregnant>Pregnant</FML.ButcherPregnant>
-  <FML.ButcherPregnant.Tip>Are pregnant animals allowed to be butchered?</FML.ButcherPregnant.Tip>
-  <FML.ButcherBonded>Bonded</FML.ButcherBonded>
-  <FML.ButcherBonded.Tip>Are bonded animals allowed to be butchered?</FML.ButcherBonded.Tip>
-  <FML.TameMore>Auto-designate animals to be tamed</FML.TameMore>
-  <FML.TameMore.Tip>Should the manager designate wild animals to be tamed?</FML.TameMore.Tip>
-  <FML.TameArea>Allow taming in:</FML.TameArea>
-  <FML.ListEntryTooltip>{0}s:\n{1}/{5} adult females\n{2}/{6} adult males\n{3}/{7} juvenile females\n{4}/{8} juvenile males</FML.ListEntryTooltip>
-  <FML.TameWildCount>{0} tamed, {1} in the wild.</FML.TameWildCount>
-  <FML.NoAnimals>no {0} {1}</FML.NoAnimals>
-  <FML.GenderHeader>Gender</FML.GenderHeader>
-  <FML.AgeHeader>Age (Lifestage)</FML.AgeHeader>
-  <FML.MeatHeader>Expected meat amount when butchered</FML.MeatHeader>
-  <FML.MilkHeader>Progress till next milking</FML.MilkHeader>
-  <FML.WoolHeader>Progress till next shearing</FML.WoolHeader>
-  <FML.Yields>Expected yield: {0} x{1}</FML.Yields>
-  <FML.UnassignTraining>Unassign training</FML.UnassignTraining>
-  <FML.UnassignTraining.Tip>Unassign training targets for animals</FML.UnassignTraining.Tip>
-  <FML.TrainYoung>Train young animals</FML.TrainYoung>
-  <FML.SendToSlaughterArea>Restrict animals marked for slaughter</FML.SendToSlaughterArea>
-  <FML.SendToSlaughterArea.Tip>Restrict animals designated for slaughtering to a specific area</FML.SendToSlaughterArea.Tip>
-  <FML.SendToMilkingArea>Restrict animals ready to be milked</FML.SendToMilkingArea>
-  <FML.SendToMilkingArea.Tip>Restrict animals with milk fullness above 94% to a specific area.</FML.SendToMilkingArea.Tip>
-  <FML.SendToShearingArea>Restrict animals ready to be sheared</FML.SendToShearingArea>
-  <FML.SendToShearingArea.Tip>Restrict animals with shearing fullness above 94% to a specific area</FML.SendToShearingArea.Tip>
-  <FM.Livestock.TargetCountsHeader>Target counts</FM.Livestock.TargetCountsHeader>
-  <FM.Livestock.AreaRestrictionsHeader>Area restrictions</FM.Livestock.AreaRestrictionsHeader>
-  <FM.Livestock.TrainingHeader>Training</FM.Livestock.TrainingHeader>
-  <FM.Livestock.ButcherHeader>Butchering</FM.Livestock.ButcherHeader>
-  <FM.Livestock.TamingHeader>Taming</FM.Livestock.TamingHeader>
-  <FML.Tame>tame</FML.Tame>
-  <FML.Wild>wild</FML.Wild>
-  <FM.Livestock.AnimalsHeader>{0} {1}</FM.Livestock.AnimalsHeader>
-  <FM.Livestock.SelectPawnKind>No job selected</FM.Livestock.SelectPawnKind>
-  <FM.Livestock.DisabledBecauseSlaughterExcessDisabled>Disabled because excess livestock is not being butchered.</FM.Livestock.DisabledBecauseSlaughterExcessDisabled>
-  <FML.SendToTrainingArea>Restrict animals marked for training</FML.SendToTrainingArea>
-  <FML.SendToTrainingArea.Tip>Restrict animals designated for training to a specific area.</FML.SendToTrainingArea.Tip>
-  <FM.Livestock.DisabledBecauseNoTrainingSet>Disabled because no training target is set.</FM.Livestock.DisabledBecauseNoTrainingSet>
-  <FM.Livestock.CannotTrainTooSmall>{0} are too small to train this.</FM.Livestock.CannotTrainTooSmall>
-  <FM.Livestock.DisabledBecauseRoamingAnimal>{0} cannot be restricted</FM.Livestock.DisabledBecauseRoamingAnimal>
-  <FM.Livestock.DisabledBecauseRoamingAnimalTip>{0} cannot be restricted to an area because they are a roaming animal. Try penning them in an enclosure instead.</FM.Livestock.DisabledBecauseRoamingAnimalTip>
+    <!-- Livestock tab -->
+    <FML.Livestock>Livestock</FML.Livestock>
+    <FML.TargetCounts>Target counts</FML.TargetCounts>
+    <FML.Adult>Adult</FML.Adult>
+    <FML.Juvenile>Juvenile</FML.Juvenile>
+    <FML.Training>Training</FML.Training>
+    <FML.RestrictToArea>Restrict animals to area?</FML.RestrictToArea>
+    <FML.RestrictToArea.Tip>Restrict animals to a specific area, optionally separated by gender and lifestage</FML.RestrictToArea.Tip>
+    <FML.ButcherExcess>Butcher excess livestock</FML.ButcherExcess>
+    <FML.ButcherExcess.Tip>Should excess livestock be butchered for meat?</FML.ButcherExcess.Tip>
+    <FML.ButcherTrained>Trained</FML.ButcherTrained>
+    <FML.ButcherTrained.Tip>Are trained animals allowed to be butchered?</FML.ButcherTrained.Tip>
+    <FML.ButcherPregnant>Pregnant</FML.ButcherPregnant>
+    <FML.ButcherPregnant.Tip>Are pregnant animals allowed to be butchered?</FML.ButcherPregnant.Tip>
+    <FML.ButcherBonded>Bonded</FML.ButcherBonded>
+    <FML.ButcherBonded.Tip>Are bonded animals allowed to be butchered?</FML.ButcherBonded.Tip>
+    <FML.TameMore>Auto-designate animals to be tamed</FML.TameMore>
+    <FML.TameMore.Tip>Should the manager designate wild animals to be tamed?</FML.TameMore.Tip>
+    <FML.TameArea>Allow taming in:</FML.TameArea>
+    <FML.ListEntryTooltip>{0}s:\n{1}/{5} adult females\n{2}/{6} adult males\n{3}/{7} juvenile females\n{4}/{8} juvenile males</FML.ListEntryTooltip>
+    <FML.TameWildCount>{0} tamed, {1} in the wild.</FML.TameWildCount>
+    <FML.NoAnimals>no {0} {1}</FML.NoAnimals>
+    <FML.GenderHeader>Gender</FML.GenderHeader>
+    <FML.AgeHeader>Age (Lifestage)</FML.AgeHeader>
+    <FML.MeatHeader>Expected meat amount when butchered</FML.MeatHeader>
+    <FML.MilkHeader>Progress till next milking</FML.MilkHeader>
+    <FML.WoolHeader>Progress till next shearing</FML.WoolHeader>
+    <FML.Yields>Expected yield: {0} x{1}</FML.Yields>
+    <FML.UnassignTraining>Unassign training</FML.UnassignTraining>
+    <FML.UnassignTraining.Tip>Unassign training targets for animals</FML.UnassignTraining.Tip>
+    <FML.TrainYoung>Train young animals</FML.TrainYoung>
+    <FML.SendToSlaughterArea>Restrict animals marked for slaughter</FML.SendToSlaughterArea>
+    <FML.SendToSlaughterArea.Tip>Restrict animals designated for slaughtering to a specific area</FML.SendToSlaughterArea.Tip>
+    <FML.SendToMilkingArea>Restrict animals ready to be milked</FML.SendToMilkingArea>
+    <FML.SendToMilkingArea.Tip>Restrict animals with milk fullness above 94% to a specific area.</FML.SendToMilkingArea.Tip>
+    <FML.SendToShearingArea>Restrict animals ready to be sheared</FML.SendToShearingArea>
+    <FML.SendToShearingArea.Tip>Restrict animals with shearing fullness above 94% to a specific area</FML.SendToShearingArea.Tip>
+    <FM.Livestock.TargetCountsHeader>Target counts</FM.Livestock.TargetCountsHeader>
+    <FM.Livestock.AreaRestrictionsHeader>Area restrictions</FM.Livestock.AreaRestrictionsHeader>
+    <FM.Livestock.TrainingHeader>Training</FM.Livestock.TrainingHeader>
+    <FM.Livestock.ButcherHeader>Butchering</FM.Livestock.ButcherHeader>
+    <FM.Livestock.TamingHeader>Taming</FM.Livestock.TamingHeader>
+    <FML.Tame>tame</FML.Tame>
+    <FML.Wild>wild</FML.Wild>
+    <FM.Livestock.AnimalsHeader>{0} {1}</FM.Livestock.AnimalsHeader>
+    <FM.Livestock.SelectPawnKind>No job selected</FM.Livestock.SelectPawnKind>
+    <FM.Livestock.DisabledBecauseSlaughterExcessDisabled>Disabled because excess livestock is not being butchered.</FM.Livestock.DisabledBecauseSlaughterExcessDisabled>
+    <FML.SendToTrainingArea>Restrict animals marked for training</FML.SendToTrainingArea>
+    <FML.SendToTrainingArea.Tip>Restrict animals designated for training to a specific area.</FML.SendToTrainingArea.Tip>
+    <FM.Livestock.DisabledBecauseNoTrainingSet>Disabled because no training target is set.</FM.Livestock.DisabledBecauseNoTrainingSet>
+    <FM.Livestock.CannotTrainTooSmall>{0} are too small to train this.</FM.Livestock.CannotTrainTooSmall>
+    <FM.Livestock.DisabledBecauseRoamingAnimal>{0} cannot be restricted</FM.Livestock.DisabledBecauseRoamingAnimal>
+    <FM.Livestock.DisabledBecauseRoamingAnimalTip>{0} cannot be restricted to an area because they are a roaming animal. Try penning them in an enclosure instead.</FM.Livestock.DisabledBecauseRoamingAnimalTip>
 
-  <!-- following -->
-  <FM.Livestock.FollowHeader>Following</FM.Livestock.FollowHeader>
-  <FM.Livestock.MasterDefault>Assign master(s)</FM.Livestock.MasterDefault>
-  <FM.Livestock.MasterDefault.Tip>Assign animals to a specific master, or to groups of colonists. May overwrite user settings when enabled.</FM.Livestock.MasterDefault.Tip>
-  <FM.Livestock.RespectBonds>Respect bonds</FM.Livestock.RespectBonds>
-  <FM.Livestock.RespectBonds.Tip>If enabled, always assigns animals that have bonded with a colonist to that colonist. If disabled, bonds are ignored.</FM.Livestock.RespectBonds.Tip>
-  <FM.Livestock.RespectBonds.DisabledBecauseMastersNotSet>Disabled because master is set to a specific pawn, or set manually.</FM.Livestock.RespectBonds.DisabledBecauseMastersNotSet>
-  <FM.Livestock.Follow>Set master following</FM.Livestock.Follow>
-  <FM.Livestock.FollowTip>Set master follow settings, will overwrite user settings when enabled. If disabled, follow settings can be assigned manually.</FM.Livestock.FollowTip>
-  <FM.Livestock.FollowDrafted>Drafted</FM.Livestock.FollowDrafted>
-  <FM.Livestock.FollowDrafted.Tip>Should animals follow their assigned masters when the master is drafted?</FM.Livestock.FollowDrafted.Tip>
-  <FM.Livestock.FollowFieldwork>Fieldwork</FM.Livestock.FollowFieldwork>
-  <FM.Livestock.FollowFieldwork.Tip>Should animals follow their assigned masters when the master is doing field work (e.g., hunting)?</FM.Livestock.FollowFieldwork.Tip>
-  <FM.Livestock.FollowTraining>Follow trainer</FM.Livestock.FollowTraining>
-  <FM.Livestock.FollowTraining.Tip>Make animals marked for training try to follow their trainer.</FM.Livestock.FollowTraining.Tip>
-  <FM.Livestock.MasterTraining>Assign trainer(s)</FM.Livestock.MasterTraining>
-  <FM.Livestock.MasterTraining.Tip>Assign animals marked for training to a specific master (trainer), or to all trainers. May overwrite user settings when enabled.</FM.Livestock.MasterTraining.Tip>
-  <FM.Livestock.Master>{0} ({1})</FM.Livestock.Master>
-  <!-- 0; pawn name, 1; skill level -->
+    <!-- following -->
+    <FM.Livestock.FollowHeader>Following</FM.Livestock.FollowHeader>
+    <FM.Livestock.MasterDefault>Assign master(s)</FM.Livestock.MasterDefault>
+    <FM.Livestock.MasterDefault.Tip>Assign animals to a specific master, or to groups of colonists. May overwrite user settings when enabled.</FM.Livestock.MasterDefault.Tip>
+    <FM.Livestock.RespectBonds>Respect bonds</FM.Livestock.RespectBonds>
+    <FM.Livestock.RespectBonds.Tip>If enabled, always assigns animals that have bonded with a colonist to that colonist. If disabled, bonds are ignored.</FM.Livestock.RespectBonds.Tip>
+    <FM.Livestock.RespectBonds.DisabledBecauseMastersNotSet>Disabled because master is set to a specific pawn, or set manually.</FM.Livestock.RespectBonds.DisabledBecauseMastersNotSet>
+    <FM.Livestock.Follow>Set master following</FM.Livestock.Follow>
+    <FM.Livestock.FollowTip>Set master follow settings, will overwrite user settings when enabled. If disabled, follow settings can be assigned manually.</FM.Livestock.FollowTip>
+    <FM.Livestock.FollowDrafted>Drafted</FM.Livestock.FollowDrafted>
+    <FM.Livestock.FollowDrafted.Tip>Should animals follow their assigned masters when the master is drafted?</FM.Livestock.FollowDrafted.Tip>
+    <FM.Livestock.FollowFieldwork>Fieldwork</FM.Livestock.FollowFieldwork>
+    <FM.Livestock.FollowFieldwork.Tip>Should animals follow their assigned masters when the master is doing field work (e.g., hunting)?</FM.Livestock.FollowFieldwork.Tip>
+    <FM.Livestock.FollowTraining>Follow trainer</FM.Livestock.FollowTraining>
+    <FM.Livestock.FollowTraining.Tip>Make animals marked for training try to follow their trainer.</FM.Livestock.FollowTraining.Tip>
+    <FM.Livestock.MasterTraining>Assign trainer(s)</FM.Livestock.MasterTraining>
+    <FM.Livestock.MasterTraining.Tip>Assign animals marked for training to a specific master (trainer), or to all trainers. May overwrite user settings when enabled.</FM.Livestock.MasterTraining.Tip>
+    <FM.Livestock.Master>{0} ({1})</FM.Livestock.Master>
+    <!-- 0; pawn name, 1; skill level -->
 
-  <!-- MasterMode enum -->
-  <FM.Livestock.MasterMode.Default>Manual</FM.Livestock.MasterMode.Default>
-  <FM.Livestock.MasterMode.Hunters>Hunters</FM.Livestock.MasterMode.Hunters>
-  <FM.Livestock.MasterMode.Trainers>Trainers</FM.Livestock.MasterMode.Trainers>
-  <FM.Livestock.MasterMode.Melee>Melee</FM.Livestock.MasterMode.Melee>
-  <FM.Livestock.MasterMode.Ranged>Ranged</FM.Livestock.MasterMode.Ranged>
-  <FM.Livestock.MasterMode.Violent>Violent</FM.Livestock.MasterMode.Violent>
-  <FM.Livestock.MasterMode.NonViolent>Non-violent</FM.Livestock.MasterMode.NonViolent>
-  <FM.Livestock.MasterMode.All>All</FM.Livestock.MasterMode.All>
+    <!-- MasterMode enum -->
+    <FM.Livestock.MasterMode.Default>Manual</FM.Livestock.MasterMode.Default>
+    <FM.Livestock.MasterMode.Hunters>Hunters</FM.Livestock.MasterMode.Hunters>
+    <FM.Livestock.MasterMode.Trainers>Trainers</FM.Livestock.MasterMode.Trainers>
+    <FM.Livestock.MasterMode.Melee>Melee</FM.Livestock.MasterMode.Melee>
+    <FM.Livestock.MasterMode.Ranged>Ranged</FM.Livestock.MasterMode.Ranged>
+    <FM.Livestock.MasterMode.Violent>Violent</FM.Livestock.MasterMode.Violent>
+    <FM.Livestock.MasterMode.NonViolent>Non-violent</FM.Livestock.MasterMode.NonViolent>
+    <FM.Livestock.MasterMode.All>All</FM.Livestock.MasterMode.All>
 
-  <!-- Right click job fail reasons -->
-  <Fluffy.ColonyManager.CannotManage.NoPower>no power</Fluffy.ColonyManager.CannotManage.NoPower>
-  <Fluffy.ColonyManager.CannotManage.NoJobs>no jobs set</Fluffy.ColonyManager.CannotManage.NoJobs>
-  <Fluffy.ColonyManager.CannotManage.NoActiveJobs>all jobs are done</Fluffy.ColonyManager.CannotManage.NoActiveJobs>
+    <!-- Right click job fail reasons -->
+    <Fluffy.ColonyManager.CannotManage.NoPower>no power</Fluffy.ColonyManager.CannotManage.NoPower>
+    <Fluffy.ColonyManager.CannotManage.NoJobs>no jobs set</Fluffy.ColonyManager.CannotManage.NoJobs>
+    <Fluffy.ColonyManager.CannotManage.NoActiveJobs>all jobs are done</Fluffy.ColonyManager.CannotManage.NoActiveJobs>
 
-  <!-- History chapter labels -->
-  <Fluffy.ColonyManager.HistoryStock>stock</Fluffy.ColonyManager.HistoryStock>
-  <Fluffy.ColonyManager.HistoryDesignated>designated</Fluffy.ColonyManager.HistoryDesignated>
-  <Fluffy.ColonyManager.HistoryCorpses>corpses</Fluffy.ColonyManager.HistoryCorpses>
-  <Fluffy.ColonyManager.HistoryChunks>chunks</Fluffy.ColonyManager.HistoryChunks>
-  <Fluffy.ColonyManager.HistoryProduction>production</Fluffy.ColonyManager.HistoryProduction>
-  <Fluffy.ColonyManager.HistoryConsumption>consumption</Fluffy.ColonyManager.HistoryConsumption>
-  <Fluffy.ColonyManager.HistoryBatteries>batteries</Fluffy.ColonyManager.HistoryBatteries>
+    <!-- History chapter labels -->
+    <Fluffy.ColonyManager.HistoryStock>stock</Fluffy.ColonyManager.HistoryStock>
+    <Fluffy.ColonyManager.HistoryDesignated>designated</Fluffy.ColonyManager.HistoryDesignated>
+    <Fluffy.ColonyManager.HistoryCorpses>corpses</Fluffy.ColonyManager.HistoryCorpses>
+    <Fluffy.ColonyManager.HistoryChunks>chunks</Fluffy.ColonyManager.HistoryChunks>
+    <Fluffy.ColonyManager.HistoryProduction>production</Fluffy.ColonyManager.HistoryProduction>
+    <Fluffy.ColonyManager.HistoryConsumption>consumption</Fluffy.ColonyManager.HistoryConsumption>
+    <Fluffy.ColonyManager.HistoryBatteries>batteries</Fluffy.ColonyManager.HistoryBatteries>
 
-  <!-- manager tab target list extra info labels -->
-  <Fluffy.ColonyManager.Yield>Expected yield:</Fluffy.ColonyManager.Yield>
-  <Fluffy.ColonyManager.Aggressiveness>Aggressiveness: {0}</Fluffy.ColonyManager.Aggressiveness>
-  <Fluffy.ColonyManager.Gender.Male>male</Fluffy.ColonyManager.Gender.Male>
-  <Fluffy.ColonyManager.Gender.Female>female</Fluffy.ColonyManager.Gender.Female>
+    <!-- manager tab target list extra info labels -->
+    <Fluffy.ColonyManager.Yield>Expected yield:</Fluffy.ColonyManager.Yield>
+    <Fluffy.ColonyManager.Aggressiveness>Aggressiveness: {0}</Fluffy.ColonyManager.Aggressiveness>
+    <Fluffy.ColonyManager.Gender.Male>male</Fluffy.ColonyManager.Gender.Male>
+    <Fluffy.ColonyManager.Gender.Female>female</Fluffy.ColonyManager.Gender.Female>
 </LanguageData>
