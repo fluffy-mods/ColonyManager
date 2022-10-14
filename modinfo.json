@@ -5,7 +5,7 @@
     "url": "https://github.com/fluffy-mods/ColonyManager",
     "version": {
         "major": 5,
-        "minor": 3,
+        "minor": 4,
         "build": 677
     },
     "author": {
@@ -19,6 +19,15 @@
         "url": "https://github.com/fluffy-mods/ColonyManager"
     },
     "changelog": [
+        {
+            "date": "2022-10-14T20:26:23.000Z",
+            "message": "initial build for 1.4",
+            "author": {
+                "name": "Fluffy",
+                "email": "fluffy.l2032@gmail.com"
+            },
+            "hash": "65ec04ec613a5dd3c7d3f19b17a67dbc7189cf4e"
+        },
         {
             "date": "2022-09-19T15:15:05.000Z",
             "message": "add indicator and shortcut toggle for aggressive animals",
