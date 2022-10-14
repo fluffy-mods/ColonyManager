@@ -195,11 +195,11 @@ namespace FluffyManager
                 for (var index = 0; index < pawnKind.RaceProps.trainableTags.Count; ++index)
                     if (td.MatchesTag(pawnKind.RaceProps.trainableTags[index]))
                     {
-                        if (pawnKind.RaceProps.baseBodySize < (double)td.minBodySize)
+                        if (pawnKind.RaceProps.baseBodySize < td.minBodySize)
                         {
                             visible = true;
                             return new AcceptanceReport(
-                                "CannotTrainTooSmall".Translate((object)pawnKind.LabelCap));
+                                "CannotTrainTooSmall".Translate(pawnKind.LabelCap));
                         }
 
                         visible = true;
@@ -216,14 +216,14 @@ namespace FluffyManager
             {
                 visible = true;
                 return new AcceptanceReport(
-                    "FM.Livestock.CannotTrainTooSmall".Translate((object)pawnKind.GetLabelPlural()));
+                    "FM.Livestock.CannotTrainTooSmall".Translate(pawnKind.GetLabelPlural()));
             }
 
             if (pawnKind.RaceProps.trainability.intelligenceOrder < td.requiredTrainability.intelligenceOrder)
             {
                 visible = true;
                 return
-                    new AcceptanceReport("CannotTrainNotSmartEnough".Translate((object)td.requiredTrainability));
+                    new AcceptanceReport("CannotTrainNotSmartEnough".Translate(td.requiredTrainability));
             }
 
             visible = true;
@@ -451,7 +451,7 @@ namespace FluffyManager
             // This should handle manual cancellations and natural completions.
             // it deliberately won't add new designations made manually.
             // Note that this also has the unfortunate side-effect of not re-adding designations after loading a game.
-            _designations = _designations.Intersect(manager.map.designationManager.allDesignations).ToList();
+            _designations = _designations.Intersect(manager.map.designationManager.AllDesignations).ToList();
 
             // handle butchery
             DoButcherJobs(ref actionTaken);
